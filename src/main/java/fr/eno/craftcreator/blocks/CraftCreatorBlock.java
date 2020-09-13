@@ -19,7 +19,7 @@ public class CraftCreatorBlock extends Block
 {
 	public CraftCreatorBlock()
 	{
-		super(Block.Properties.create(Material.WOOD).hardnessAndResistance(99999F));
+		super(Block.Properties.create(Material.WOOD));
 	}
 	
 	@Override
