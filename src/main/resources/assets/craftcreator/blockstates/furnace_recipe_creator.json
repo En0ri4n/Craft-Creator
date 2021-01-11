@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "facing=north": { "model": "craftcreator:block/furnace_recipe_creator" },
+        "facing=south": { "model": "craftcreator:block/furnace_recipe_creator", "y": 180 },
+        "facing=east": { "model": "craftcreator:block/furnace_recipe_creator", "y": 90 },
+        "facing=west": { "model": "craftcreator:block/furnace_recipe_creator", "y": 270 }
+    }
+}

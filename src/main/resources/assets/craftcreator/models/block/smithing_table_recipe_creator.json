@@ -1,0 +1,12 @@
+{
+    "parent": "block/cube",
+    "textures": {
+        "particle": "craftcreator:block/smithing_table_recipe_creator_front",
+        "down": "craftcreator:block/smithing_table_recipe_creator_bottom",
+        "up": "craftcreator:block/smithing_table_recipe_creator_top",
+        "north": "craftcreator:block/smithing_table_recipe_creator_front",
+        "east": "craftcreator:block/smithing_table_recipe_creator_side",
+        "south": "craftcreator:block/smithing_table_recipe_creator_front",
+        "west": "craftcreator:block/smithing_table_recipe_creator_side"
+    }
+}

@@ -1,0 +1,5 @@
+{
+    "variants": {
+        "": { "model": "craftcreator:block/crafting_table_recipe_creator" }
+    }
+}

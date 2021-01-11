@@ -1,7 +1,7 @@
 package fr.eno.craftcreator.tileentity;
 
-import fr.eno.craftcreator.CraftCreator;
-import fr.eno.craftcreator.container.CraftCreatorContainer;
+import fr.eno.craftcreator.container.CraftingTableRecipeCreatorContainer;
+import fr.eno.craftcreator.init.InitTileEntities;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -14,13 +14,13 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 
-public class CraftCreatorTile extends LockableTileEntity
+public class CraftingTableRecipeCreatorTile extends LockableTileEntity
 {
 	private final NonNullList<ItemStack> inventory = NonNullList.<ItemStack>withSize(10, ItemStack.EMPTY);
 	
-	public CraftCreatorTile()
+	public CraftingTableRecipeCreatorTile()
 	{
-		super(CraftCreator.ModRegistry.CRAFT_CREATOR_TILE.get());
+		super(InitTileEntities.CRAFTING_TABLE_RECIPE_CREATOR.get());
 	}
 
 	@Override
@@ -82,12 +82,12 @@ public class CraftCreatorTile extends LockableTileEntity
 	@Override
 	protected ITextComponent getDefaultName()
 	{
-		return new StringTextComponent("container.craft_creator.title");
+		return new StringTextComponent("container.crafting_table_recipe_creator.title");
 	}
 
 	@Override
 	protected Container createMenu(int id, PlayerInventory player)
 	{
-		return new CraftCreatorContainer(id, player, new PacketBuffer(Unpooled.buffer()).writeBlockPos(getPos()));
+		return new CraftingTableRecipeCreatorContainer(id, player, new PacketBuffer(Unpooled.buffer()).writeBlockPos(getPos()));
 	}
 }

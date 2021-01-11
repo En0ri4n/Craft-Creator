@@ -1,0 +1,8 @@
+{
+    "parent": "block/orientable",
+    "textures": {
+        "top": "craftcreator:block/furnace_recipe_creator_top",
+        "front": "craftcreator:block/furnace_recipe_creator_front",
+        "side": "craftcreator:block/furnace_recipe_creator_side"
+    }
+}

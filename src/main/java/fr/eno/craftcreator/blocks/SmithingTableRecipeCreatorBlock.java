@@ -1,25 +1,26 @@
 package fr.eno.craftcreator.blocks;
 
-import fr.eno.craftcreator.tileentity.CraftCreatorTile;
+import fr.eno.craftcreator.tileentity.SmithingTableRecipeCreatorTile;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkHooks;
 
-public class CraftCreatorBlock extends Block
+public class SmithingTableRecipeCreatorBlock extends Block
 {
-	public CraftCreatorBlock()
+	public SmithingTableRecipeCreatorBlock()
 	{
-		super(Block.Properties.create(Material.WOOD));
+		super(Block.Properties.create(Material.WOOD).sound(SoundType.WOOD).hardnessAndResistance(99999F));
 	}
 	
 	@Override
@@ -29,21 +30,23 @@ public class CraftCreatorBlock extends Block
 		{
 			TileEntity tileentity = worldIn.getTileEntity(pos);
 			
-			if(tileentity instanceof CraftCreatorTile)
+			if(tileentity instanceof SmithingTableRecipeCreatorTile)
 			{
-				CraftCreatorTile tile = (CraftCreatorTile) tileentity;
+				player.sendMessage(new StringTextComponent(TextFormatting.RED + "Sorry, the smithing table has been implemented in minecraft 1.16 !"));
+				// SmithingTableRecipeCreatorTile tile = (SmithingTableRecipeCreatorTile) tileentity;
+				// NetworkHooks.openGui((ServerPlayerEntity) player, tile, pos);
 				
-				NetworkHooks.openGui((ServerPlayerEntity) player, tile, pos);
+				return ActionResultType.SUCCESS;
 			}
 		}
 		
-		return ActionResultType.FAIL;
+		return ActionResultType.CONSUME;
 	}
 	
 	@Override
 	public TileEntity createTileEntity(BlockState state, IBlockReader world)
 	{
-		return new CraftCreatorTile();
+		return new SmithingTableRecipeCreatorTile();
 	}
 	
 	@Override

@@ -1,0 +1,5 @@
+{
+    "variants": {
+        "": { "model": "craftcerator:block/smithing_table_recipe_creator" }
+    }
+}

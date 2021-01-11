@@ -1,23 +1,21 @@
 package fr.eno.craftcreator.container;
 
-import fr.eno.craftcreator.CraftCreator;
 import fr.eno.craftcreator.container.utils.CommonContainer;
-import fr.eno.craftcreator.tileentity.CraftCreatorTile;
+import fr.eno.craftcreator.init.InitContainers;
+import fr.eno.craftcreator.tileentity.CraftingTableRecipeCreatorTile;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.network.PacketBuffer;
 
-public class CraftCreatorContainer extends CommonContainer
+public class CraftingTableRecipeCreatorContainer extends CommonContainer
 {
-	public CraftCreatorContainer(int windowId, PlayerInventory playerInventory, PacketBuffer packet)
+	public CraftingTableRecipeCreatorContainer(int windowId, PlayerInventory playerInventory, PacketBuffer packet)
 	{
-		super(CraftCreator.ModRegistry.CRAFT_CREATOR_CONTAINER.get(), windowId, 10);
-		CraftCreatorTile tile = (CraftCreatorTile) playerInventory.player.world.getTileEntity(packet.readBlockPos());
+		super(InitContainers.CRAFTING_TABLE_RECIPE_CREATOR.get(), windowId, 10);
+		CraftingTableRecipeCreatorTile tile = (CraftingTableRecipeCreatorTile) playerInventory.player.world.getTileEntity(packet.readBlockPos());
 		int index = 0;
 		
-		this.addSlot(new Slot(tile, index++, 124, 35));
-
 		for (int x = 0; x < 3; ++x)
 		{
 			for (int y = 0; y < 3; ++y)
@@ -25,6 +23,8 @@ public class CraftCreatorContainer extends CommonContainer
 				this.addSlot(new Slot(tile, index++, 30 + y * 18, 17 + x * 18));
 			}
 		}
+		
+		this.addSlot(new Slot(tile, index++, 124, 35));
 		
 		this.bindPlayerInventory(playerInventory);
 	}
