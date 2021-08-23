@@ -1,25 +1,20 @@
 package fr.eno.craftcreator.screen;
 
-import java.awt.Color;
-import java.util.Map;
+import com.google.common.collect.*;
+import com.mojang.blaze3d.systems.*;
+import fr.eno.craftcreator.*;
+import fr.eno.craftcreator.container.*;
+import fr.eno.craftcreator.screen.buttons.*;
+import fr.eno.craftcreator.utils.*;
+import net.minecraft.client.gui.screen.inventory.*;
+import net.minecraft.client.gui.widget.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.item.*;
+import net.minecraft.util.*;
+import net.minecraft.util.text.*;
 
-import com.google.common.collect.ImmutableMap;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.realmsclient.gui.ChatFormatting;
-
-import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.container.FurnaceRecipeCreatorContainer;
-import fr.eno.craftcreator.screen.buttons.MultipleItemChoiceButton;
-import fr.eno.craftcreator.utils.CraftHelper;
-import fr.eno.craftcreator.utils.CraftType;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import java.awt.*;
+import java.util.*;
 
 public class FurnaceRecipeCreatorScreen extends ContainerScreen<FurnaceRecipeCreatorContainer>
 {
@@ -41,7 +36,7 @@ public class FurnaceRecipeCreatorScreen extends ContainerScreen<FurnaceRecipeCre
 		super.init();
 		this.addButton(recipeTypeButton = new MultipleItemChoiceButton<Item, CraftType>(this.guiLeft + xSize - 20, guiTop, 20, 20, RECIPE_TYPE_MAP));
 
-		this.addButton(new Button(guiLeft + 76, guiTop + 33, 30, 20, ChatFormatting.BOLD + "->", button -> CraftHelper.createFurnaceRecipe(this.container.getInventory(), this.getRecipeType(), expField.getText(), cookTimeField.getText())));
+		this.addButton(new ExecuteButton(guiLeft + 76, guiTop + 33, 32, button -> CraftHelper.createFurnaceRecipe(this.container.getInventory(), this.getRecipeType(), expField.getText(), cookTimeField.getText())));
 		
 		expField = new TextFieldWidget(font, guiLeft + 8, guiTop + 30, 40, 10, "");
 		expField.setText("0.1");
@@ -59,11 +54,13 @@ public class FurnaceRecipeCreatorScreen extends ContainerScreen<FurnaceRecipeCre
 		RenderSystem.scaled(scale, scale, scale);
 		String expStr = "Exp. Gained :";
 		String cookTimeStr = "Cook Time :";
-		font.drawString(expStr, (int) ((guiLeft + 8) / scale), (int) ((guiTop + 30 - font.FONT_HEIGHT * scale) / scale), Color.BLACK.getRGB());
-		font.drawString(cookTimeStr, (int) ((guiLeft + 8) / scale), (int) ((guiTop + 60 - font.FONT_HEIGHT * scale) / scale), Color.BLACK.getRGB());
+		font.drawString(expStr, (int) ((guiLeft + 8) / scale), (int) ((guiTop + 30 - font.FONT_HEIGHT * scale) / scale), Color.WHITE.getRGB());
+		font.drawString(cookTimeStr, (int) ((guiLeft + 8) / scale), (int) ((guiTop + 60 - font.FONT_HEIGHT * scale) / scale), Color.WHITE.getRGB());
 		RenderSystem.popMatrix();
 		this.expField.render(mouseX, mouseY, partialTicks);
 		this.cookTimeField.render(mouseX, mouseY, partialTicks);
+		this.minecraft.getTextureManager().bindTexture(GUI_TEXTURES);
+		blit(this.guiLeft + 57, this.guiTop + 37, 176, 0, 14, 14, 256, 256);
 	}
 
 	@Override

@@ -2,6 +2,10 @@ package fr.eno.craftcreator;
 
 import java.util.function.Predicate;
 
+import fr.eno.craftcreator.commands.*;
+import net.minecraftforge.common.*;
+import net.minecraftforge.eventbus.api.*;
+import net.minecraftforge.fml.event.server.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,7 +22,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -32,8 +35,12 @@ public class CraftCreator
 	public CraftCreator()
 	{
 		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+
 		bus.addListener(this::setup);
 		bus.addListener(this::clientSetup);
+		bus.addListener(this::onServerStart);
+
+		MinecraftForge.EVENT_BUS.register(this);
 
 		InitBlocks.BLOCKS.register(bus);
 		InitContainers.CONTAINERS.register(bus);
@@ -54,6 +61,12 @@ public class CraftCreator
 		ScreenManager.registerFactory(InitContainers.FURNACE_RECIPE_CREATOR.get(), FurnaceRecipeCreatorScreen::new);
 		ScreenManager.registerFactory(InitContainers.STONE_CUTTER_RECIPE_CREATOR.get(), StoneCutterRecipeCreatorScreen::new);
 		ScreenManager.registerFactory(InitContainers.SMITHING_TABLE_RECIPE_CREATOR.get(), SmithingTableRecipeCreatorScreen::new);
+	}
+
+	@SubscribeEvent
+	public void onServerStart(FMLServerStartingEvent e)
+	{
+		TestRecipesCommand.register(e.getCommandDispatcher());
 	}
 	
 	public static final ItemGroup CRAFT_CREATOR_TAB = new ItemGroup(References.MOD_ID)

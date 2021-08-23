@@ -1,20 +1,16 @@
 package fr.eno.craftcreator.screen;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.realmsclient.gui.ChatFormatting;
-
-import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.container.StoneCutterRecipeCreatorContainer;
-import fr.eno.craftcreator.utils.CraftHelper;
-import fr.eno.craftcreator.utils.GuiUtils;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import com.mojang.blaze3d.systems.*;
+import fr.eno.craftcreator.*;
+import fr.eno.craftcreator.container.*;
+import fr.eno.craftcreator.screen.buttons.*;
+import fr.eno.craftcreator.utils.*;
+import net.minecraft.client.gui.screen.*;
+import net.minecraft.client.gui.screen.inventory.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.item.*;
+import net.minecraft.util.*;
+import net.minecraft.util.text.*;
 
 public class StoneCutterRecipeCreatorScreen extends ContainerScreen<StoneCutterRecipeCreatorContainer>
 {
@@ -30,7 +26,7 @@ public class StoneCutterRecipeCreatorScreen extends ContainerScreen<StoneCutterR
 	{
 		super.init();
 		
-		this.addButton(new Button(guiLeft + 69, guiTop + 31, 30, 20, ChatFormatting.BOLD + "->", button -> CraftHelper.createStoneCutterRecipe(this.container.getInventory())));
+		this.addButton(new ExecuteButton(guiLeft + 69, guiTop + 31, 30, button -> CraftHelper.createStoneCutterRecipe(this.container.getInventory())));
 	}
 	
 	@Override
