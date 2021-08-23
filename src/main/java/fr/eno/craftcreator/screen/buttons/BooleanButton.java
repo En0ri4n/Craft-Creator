@@ -42,7 +42,7 @@ public class BooleanButton extends Button
 
 			String str = Utils.getS("button.boolean." + name + "." + (isOn ? "on" : "off"));
 
-			Screen.blit(x, y, this.width, this.height, 0, yOffset, 100, 20, 200, 60);
+			Screen.blit(x, y, this.width, this.height, 0, yOffset, 100, 20, 100, 60);
 			drawCenteredString(mc.fontRenderer, str, this.x + this.width / 2, this.y + this.height / 3, Color.WHITE.getRGB());
 		}
 	}

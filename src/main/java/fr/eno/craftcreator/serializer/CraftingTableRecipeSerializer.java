@@ -1,19 +1,14 @@
 package fr.eno.craftcreator.serializer;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.google.gson.*;
+import fr.eno.craftcreator.utils.*;
+import net.minecraft.inventory.container.*;
+import net.minecraft.item.*;
+import net.minecraft.tags.*;
+import net.minecraft.util.*;
+import net.minecraftforge.registries.*;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-
-import fr.eno.craftcreator.utils.CraftType;
-import fr.eno.craftcreator.utils.Utilities;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.util.IItemProvider;
+import java.util.*;
 
 public class CraftingTableRecipeSerializer extends RecipeSerializer
 {
@@ -25,18 +20,17 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 		this.setOutput(output, count);
 	}
 
-	public CraftingTableRecipeSerializer setIngredients(List<Item> list)
+	public void setIngredients(List<Item> list, List<Slot> taggedSlot)
 	{
 		if(type.equals(CraftType.CRAFTING_TABLE_SHAPED))
 		{
-			createShapedIngredients(list);
+			createShapedIngredients(list, taggedSlot);
 		}
 		else
 		{
 			createShapelessIngredients(list);
 		}
 
-		return this;
 	}
 
 	private void createShapelessIngredients(List<Item> items)
@@ -53,44 +47,78 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 		recipe.add("ingredients", ingredients);
 	}
 
-	private void createShapedIngredients(List<Item> items)
+	private void createShapedIngredients(List<Item> items, List<Slot> taggedSlot)
 	{
-		Map<Item, Character> pattern = createPattern(items);
+		Map<ResourceLocation, Character> pattern = createPattern(items, taggedSlot);
 		createKeys(pattern);
 	}
 
-	private void createKeys(Map<Item, Character> map)
+	private void createKeys(Map<ResourceLocation, Character> map)
 	{
 		JsonObject symbolListObj = new JsonObject();
-		List<Item> list = map.keySet().stream().collect(Collectors.toList());
+		List<ResourceLocation> list = new ArrayList<>(map.keySet());
 
-		for (int i = 0; i < list.size(); i++)
+		for(ResourceLocation resourceLocation : list)
 		{
 			JsonObject symbolObj = new JsonObject();
-			symbolObj.addProperty("item", String.valueOf(list.get(i).getRegistryName().toString()));
-			symbolListObj.add(String.valueOf(map.get(list.get(i))), symbolObj);
+
+			if(ItemTags.getCollection().get(resourceLocation) != null)
+			{
+				Tag<Item> tag = ItemTags.getCollection().get(resourceLocation);
+				symbolObj.addProperty("tag", tag.getId().toString());
+				symbolListObj.add(String.valueOf(map.get(tag.getId())), symbolObj);
+			}
+			else if(ForgeRegistries.ITEMS.containsKey(resourceLocation))
+			{
+				Item item = ForgeRegistries.ITEMS.getValue(resourceLocation);
+				symbolObj.addProperty("item", item.getRegistryName().toString());
+				symbolListObj.add(String.valueOf(map.get(item.getRegistryName())), symbolObj);
+			}
 		}
 
 		recipe.add("key", symbolListObj);
 	}
 
-	private Map<Item, Character> createPattern(List<Item> list)
+	private Map<ResourceLocation, Character> createPattern(List<Item> list, List<Slot> taggedSlot)
 	{
-		Map<Item, Character> patterns = new HashMap<Item, Character>();
+		Map<ResourceLocation, Character> patterns = new HashMap<>();
 		JsonArray array = new JsonArray();
 
 		String str = "";
 
 		for (int index = 0; index < 9; index++)
 		{
+			Character key = keyList.get(index);
+
 			if(list.get(index) != null)
 			{
 				if(list.get(index) != Items.AIR)
 				{
-					if(!patterns.containsKey(list.get(index)))
-						patterns.put(list.get(index), keyList.get(index));
+					int finalIndex = index;
+					if(taggedSlot.stream().anyMatch(s -> s.getSlotIndex() == finalIndex))
+					{
+						Slot slot = taggedSlot.stream().filter(s -> s.getSlotIndex() == finalIndex).findFirst().get();
 
-					str = str.concat(String.valueOf(patterns.get(list.get(index))));
+						if(getFirstTag(slot) != null)
+						{
+							Tag<Item> tag = getFirstTag(slot);
+
+							if(!patterns.containsKey(tag.getId()))
+							{
+								patterns.put(tag.getId(), key);
+							}
+
+							str = str.concat(String.valueOf(patterns.get(tag.getId())));
+							continue;
+						}
+					}
+
+					if(!patterns.containsKey(list.get(index).getRegistryName()))
+					{
+						patterns.put(list.get(index).getRegistryName(), keyList.get(index));
+					}
+
+					str = str.concat(String.valueOf(patterns.get(list.get(index).getRegistryName())));
 					continue;
 				}
 			}
@@ -98,20 +126,25 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 			str = str.concat(" ");
 		}
 
-		Utilities.splitToListWithSize(str, 3).forEach(s -> array.add(s));
+		Utilities.splitToListWithSize(str, 3).forEach(array::add);
 		recipe.add("pattern", array);
 
 		return patterns;
 	}
 
-	private CraftingTableRecipeSerializer setOutput(IItemProvider output, int count)
+	private Tag<Item> getFirstTag(Slot slot)
+	{
+		if(!slot.getHasStack() ||slot.getStack().getItem().getTags().size() <= 0) return null;
+		return ItemTags.getCollection().get(new ArrayList<>(slot.getStack().getItem().getTags()).get(0));
+	}
+
+	private void setOutput(IItemProvider output, int count)
 	{
 		JsonObject result = new JsonObject();
 		result.addProperty("item", output.asItem().getRegistryName().toString());
 		result.addProperty("count", count);
 		recipe.add("result", result);
 
-		return this;
 	}
 
 	public static CraftingTableRecipeSerializer create(CraftType type, IItemProvider output, int count)

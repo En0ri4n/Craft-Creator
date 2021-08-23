@@ -5,6 +5,7 @@ import com.mojang.realmsclient.gui.ChatFormatting;
 
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.container.SmithingTableRecipeCreatorContainer;
+import fr.eno.craftcreator.screen.buttons.*;
 import fr.eno.craftcreator.utils.CraftHelper;
 import fr.eno.craftcreator.utils.GuiUtils;
 import net.minecraft.client.gui.screen.Screen;
@@ -30,7 +31,7 @@ public class SmithingTableRecipeCreatorScreen extends ContainerScreen<SmithingTa
 	{
 		super.init();
 
-		this.addButton(new Button(guiLeft + 86, guiTop + 33, 30, 20, ChatFormatting.BOLD + "->", button -> CraftHelper.createSmithingTableRecipe(this.container.getInventory())));
+		this.addButton(new ExecuteButton(guiLeft + 86, guiTop + 33, 30, button -> CraftHelper.createSmithingTableRecipe(this.container.getInventory())));
 	}
 	
 	@Override
