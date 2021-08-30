@@ -10,10 +10,12 @@ import net.minecraftforge.items.*;
 
 public class CraftingTableRecipeCreatorContainer extends CommonContainer
 {
+	private CraftingTableRecipeCreatorTile tile;
+
 	public CraftingTableRecipeCreatorContainer(int windowId, PlayerInventory playerInventory, PacketBuffer packet)
 	{
 		super(InitContainers.CRAFTING_TABLE_RECIPE_CREATOR.get(), windowId, 10);
-		CraftingTableRecipeCreatorTile tile = (CraftingTableRecipeCreatorTile) playerInventory.player.world.getTileEntity(packet.readBlockPos());
+		this.tile = (CraftingTableRecipeCreatorTile) playerInventory.player.world.getTileEntity(packet.readBlockPos());
 		int index = 0;
 		
 		for (int x = 0; x < 3; ++x)
@@ -24,7 +26,7 @@ public class CraftingTableRecipeCreatorContainer extends CommonContainer
 			}
 		}
 		
-		this.addSlot(new SlotItemHandler(tile, index++, 124, 35));
+		this.addSlot(new SlotItemHandler(tile, index, 124, 35));
 		
 		this.bindPlayerInventory(playerInventory);
 	}
@@ -33,5 +35,10 @@ public class CraftingTableRecipeCreatorContainer extends CommonContainer
 	public boolean canInteractWith(PlayerEntity playerIn)
 	{
 		return true;
+	}
+
+	public CraftingTableRecipeCreatorTile getTile()
+	{
+		return tile;
 	}
 }

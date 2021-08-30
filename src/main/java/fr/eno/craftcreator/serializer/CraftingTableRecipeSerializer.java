@@ -2,10 +2,10 @@ package fr.eno.craftcreator.serializer;
 
 import com.google.gson.*;
 import fr.eno.craftcreator.utils.*;
-import net.minecraft.inventory.container.*;
 import net.minecraft.item.*;
 import net.minecraft.tags.*;
 import net.minecraft.util.*;
+import net.minecraftforge.items.*;
 import net.minecraftforge.registries.*;
 
 import java.util.*;
@@ -20,7 +20,7 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 		this.setOutput(output, count);
 	}
 
-	public void setIngredients(List<Item> list, Map<Slot, ResourceLocation> taggedSlot)
+	public void setIngredients(List<Item> list, Map<SlotItemHandler, ResourceLocation> taggedSlot)
 	{
 		if(type.equals(CraftType.CRAFTING_TABLE_SHAPED))
 		{
@@ -47,7 +47,7 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 		recipe.add("ingredients", ingredients);
 	}
 
-	private void createShapedIngredients(List<Item> items, Map<Slot, ResourceLocation> taggedSlot)
+	private void createShapedIngredients(List<Item> items, Map<SlotItemHandler, ResourceLocation> taggedSlot)
 	{
 		Map<ResourceLocation, Character> pattern = createPattern(items, taggedSlot);
 		createKeys(pattern);
@@ -79,7 +79,7 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 		recipe.add("key", symbolListObj);
 	}
 
-	private Map<ResourceLocation, Character> createPattern(List<Item> list, Map<Slot, ResourceLocation> taggedSlot)
+	private Map<ResourceLocation, Character> createPattern(List<Item> list, Map<SlotItemHandler, ResourceLocation> taggedSlot)
 	{
 		Map<ResourceLocation, Character> patterns = new HashMap<>();
 		JsonArray array = new JsonArray();
@@ -96,7 +96,7 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 				{
 					int finalIndex = index;
 
-					Optional<Slot> optionalSlot = taggedSlot.keySet().stream().filter(s -> s.getSlotIndex() == finalIndex).findFirst();
+					Optional<SlotItemHandler> optionalSlot = taggedSlot.keySet().stream().filter(s -> s.getSlotIndex() == finalIndex).findFirst();
 
 					if(optionalSlot.isPresent())
 					{
