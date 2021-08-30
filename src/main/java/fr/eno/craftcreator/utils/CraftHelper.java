@@ -1,8 +1,6 @@
 package fr.eno.craftcreator.utils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import fr.eno.craftcreator.serializer.CraftingTableRecipeSerializer;
 import fr.eno.craftcreator.serializer.FurnaceRecipeSerializer;
@@ -10,7 +8,7 @@ import fr.eno.craftcreator.serializer.SmithingTableRecipeSerializer;
 import fr.eno.craftcreator.serializer.StoneCutterRecipeSerializer;
 import net.minecraft.inventory.container.*;
 import net.minecraft.item.*;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.*;
 
 public class CraftHelper
 {
@@ -45,7 +43,7 @@ public class CraftHelper
 		StoneCutterRecipeSerializer.create(output.getItem(), output.getCount()).setIngredient(input).serializeRecipe();
 	}
 	
-	public static void createCraftingTableRecipe(NonNullList<ItemStack> inventory, List<Slot> taggedSlots, boolean isShaped)
+	public static void createCraftingTableRecipe(NonNullList<ItemStack> inventory, Map<Slot, ResourceLocation> taggedSlots, boolean isShaped)
 	{
 		ItemStack output = inventory.get(9);
 		
