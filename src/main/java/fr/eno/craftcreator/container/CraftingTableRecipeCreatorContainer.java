@@ -5,8 +5,8 @@ import fr.eno.craftcreator.init.InitContainers;
 import fr.eno.craftcreator.tileentity.CraftingTableRecipeCreatorTile;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Slot;
 import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.items.*;
 
 public class CraftingTableRecipeCreatorContainer extends CommonContainer
 {
@@ -20,11 +20,11 @@ public class CraftingTableRecipeCreatorContainer extends CommonContainer
 		{
 			for (int y = 0; y < 3; ++y)
 			{
-				this.addSlot(new Slot(tile, index++, 30 + y * 18, 17 + x * 18));
+				this.addSlot(new SlotItemHandler(tile, index++, 30 + y * 18, 17 + x * 18));
 			}
 		}
 		
-		this.addSlot(new Slot(tile, index++, 124, 35));
+		this.addSlot(new SlotItemHandler(tile, index++, 124, 35));
 		
 		this.bindPlayerInventory(playerInventory);
 	}

@@ -1,12 +1,11 @@
 package fr.eno.craftcreator.container;
 
-import fr.eno.craftcreator.container.utils.CommonContainer;
-import fr.eno.craftcreator.init.InitContainers;
-import fr.eno.craftcreator.tileentity.StoneCutterRecipeCreatorTile;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.network.PacketBuffer;
+import fr.eno.craftcreator.container.utils.*;
+import fr.eno.craftcreator.init.*;
+import fr.eno.craftcreator.tileentity.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.network.*;
+import net.minecraftforge.items.*;
 
 public class StoneCutterRecipeCreatorContainer extends CommonContainer
 {
@@ -16,8 +15,8 @@ public class StoneCutterRecipeCreatorContainer extends CommonContainer
 		StoneCutterRecipeCreatorTile tile = (StoneCutterRecipeCreatorTile) playerInventory.player.world.getTileEntity(packet.readBlockPos());
 		int index = 0;
 
-		this.addSlot(new Slot(tile, index++, 39, 33));
-		this.addSlot(new Slot(tile, index++, 114, 33));
+		this.addSlot(new SlotItemHandler(tile, index++, 39, 33));
+		this.addSlot(new SlotItemHandler(tile, index, 114, 33));
 		
 		this.bindPlayerInventory(playerInventory);
 	}

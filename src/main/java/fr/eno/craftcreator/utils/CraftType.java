@@ -14,7 +14,7 @@ public enum CraftType
 	
 	private final ResourceLocation type;
 
-	private CraftType(ResourceLocation type)
+	CraftType(ResourceLocation type)
 	{
 		this.type = type;
 	}

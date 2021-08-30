@@ -12,7 +12,6 @@ public class ReflectUtils
     /**
      * Get value from the provided field
      *
-     * @param <T>
      * @param field    The field to get value
      * @param instance The instance of the class
      * @param value    The type of the return value of the field
@@ -53,7 +52,6 @@ public class ReflectUtils
     }
 
     /**
-     * @param <T>
      * @param clazz   The class of the method
      * @param obfName The SRG Name of the method
      * @param params  The class of parameters of the method
@@ -104,9 +102,6 @@ public class ReflectUtils
     /**
      * Set current field with a new value
      *
-     * @param field
-     * @param target
-     * @param value
      */
     public static void setField(Field field, Object target, Object value)
     {

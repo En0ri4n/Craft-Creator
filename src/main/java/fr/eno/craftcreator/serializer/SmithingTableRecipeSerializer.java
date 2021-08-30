@@ -29,13 +29,12 @@ public class SmithingTableRecipeSerializer extends RecipeSerializer
 		return this;
 	}
 
-	private SmithingTableRecipeSerializer setOutput(IItemProvider output)
+	private void setOutput(IItemProvider output)
 	{
 		JsonObject result = new JsonObject();
 		result.addProperty("item", output.asItem().getRegistryName().toString());
 		recipe.add("result", result);
-		return this;
-	}
+    }
 
 	public static SmithingTableRecipeSerializer create(IItemProvider output)
 	{

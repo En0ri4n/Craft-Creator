@@ -16,7 +16,7 @@ import net.minecraft.util.ResourceLocation;
 public class MultipleItemChoiceButton<K extends Item, V> extends Button
 {
 	private static final ResourceLocation TEXTURE = References.getLoc("textures/gui/buttons/item_button.png");
-	Minecraft mc = Minecraft.getInstance();
+	final Minecraft mc = Minecraft.getInstance();
 	private final Map<K, V> map;
 	private int currentIndex;
 	private V currentValue;

@@ -33,10 +33,8 @@ public class SmithingTableRecipeCreatorBlock extends Block
 			if(tileentity instanceof SmithingTableRecipeCreatorTile)
 			{
 				player.sendMessage(new StringTextComponent(TextFormatting.RED + "Sorry, the smithing table has been implemented in minecraft 1.16 !"));
-				// SmithingTableRecipeCreatorTile tile = (SmithingTableRecipeCreatorTile) tileentity;
-				// NetworkHooks.openGui((ServerPlayerEntity) player, tile, pos);
-				
-				return ActionResultType.SUCCESS;
+
+                return ActionResultType.SUCCESS;
 			}
 		}
 		

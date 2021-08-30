@@ -27,6 +27,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
+import javax.annotation.*;
+
 @Mod(References.MOD_ID)
 public class CraftCreator
 {
@@ -70,7 +72,8 @@ public class CraftCreator
 	}
 	
 	public static final ItemGroup CRAFT_CREATOR_TAB = new ItemGroup(References.MOD_ID)
-	{	
+	{
+		@Nonnull
 		@Override
 		public ItemStack createIcon()
 		{

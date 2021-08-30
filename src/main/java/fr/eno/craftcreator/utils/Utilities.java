@@ -26,11 +26,6 @@ public class Utilities
 	
 	public static ITextComponent createClickableComponent(ITextComponent component, File toOpen)
 	{
-		ITextComponent itextcomponent = component.applyTextStyle(TextFormatting.UNDERLINE).applyTextStyle((msg) ->
-		{
-			msg.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, toOpen.getAbsolutePath()));
-		});
-		
-		return itextcomponent;
+		return component.applyTextStyle(TextFormatting.UNDERLINE).applyTextStyle((msg) -> msg.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, toOpen.getAbsolutePath())));
 	}
 }

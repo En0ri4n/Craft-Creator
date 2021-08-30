@@ -1,7 +1,6 @@
 package fr.eno.craftcreator.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.realmsclient.gui.ChatFormatting;
 
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.container.SmithingTableRecipeCreatorContainer;
@@ -10,7 +9,6 @@ import fr.eno.craftcreator.utils.CraftHelper;
 import fr.eno.craftcreator.utils.GuiUtils;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;

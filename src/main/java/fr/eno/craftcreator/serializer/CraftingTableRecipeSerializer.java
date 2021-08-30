@@ -95,6 +95,7 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 				if(list.get(index) != Items.AIR)
 				{
 					int finalIndex = index;
+
 					if(taggedSlot.stream().anyMatch(s -> s.getSlotIndex() == finalIndex))
 					{
 						Slot slot = taggedSlot.stream().filter(s -> s.getSlotIndex() == finalIndex).findFirst().get();

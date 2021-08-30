@@ -16,7 +16,7 @@ public class BooleanButton extends Button
 	private static final ResourceLocation TEXTURE = References.getLoc("textures/gui/buttons/basic_button.png");
 
 	private boolean isOn;
-	private String name;
+	private final String name;
 
 	public BooleanButton(String name, int x, int y, int width, int height, boolean value)
 	{

@@ -1,7 +1,6 @@
 package fr.eno.craftcreator.screen;
 
 import com.mojang.blaze3d.systems.*;
-import com.mojang.realmsclient.gui.*;
 import fr.eno.craftcreator.*;
 import fr.eno.craftcreator.container.*;
 import fr.eno.craftcreator.screen.buttons.*;
@@ -9,7 +8,6 @@ import fr.eno.craftcreator.tileentity.*;
 import fr.eno.craftcreator.utils.*;
 import net.minecraft.client.gui.screen.*;
 import net.minecraft.client.gui.screen.inventory.*;
-import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.entity.player.*;
 import net.minecraft.inventory.container.*;
 import net.minecraft.item.*;
