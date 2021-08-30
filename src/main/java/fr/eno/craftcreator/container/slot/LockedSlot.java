@@ -1,13 +1,14 @@
 package fr.eno.craftcreator.container.slot;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.entity.player.*;
+import net.minecraft.item.*;
+import net.minecraftforge.items.*;
 
-public class LockedSlot extends Slot
+import javax.annotation.*;
+
+public class LockedSlot extends SlotItemHandler
 {	
-	public LockedSlot(IInventory inventoryIn, int index, int xPosition, int yPosition, ItemStack stack)
+	public LockedSlot(IItemHandler inventoryIn, int index, int xPosition, int yPosition, ItemStack stack)
 	{
 		super(inventoryIn, index, xPosition, yPosition);
 		putStack(stack);
@@ -20,5 +21,5 @@ public class LockedSlot extends Slot
 	}
 	
 	@Override
-	public void putStack(ItemStack stack) { super.putStack(stack); }
+	public void putStack(@Nonnull ItemStack stack) { super.putStack(stack); }
 }

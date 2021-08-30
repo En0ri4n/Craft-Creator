@@ -16,7 +16,7 @@ import net.minecraft.entity.LivingEntity;
 
 public class GuiUtils
 {
-	public static Minecraft mc = Minecraft.getInstance();
+	public static final Minecraft mc = Minecraft.getInstance();
 	
 	public static void closeAndGrabMouse()
 	{
@@ -26,19 +26,18 @@ public class GuiUtils
 	
 	public static void close()
 	{
-		mc.displayGuiScreen((Screen) null);
+		mc.displayGuiScreen(null);
 	}
 	
 	public static boolean isMouseHover(int x, int y, int mouseX, int mouseY, int width, int height)
 	{
-		boolean flag = mouseX > x && mouseX < (x + width) && mouseY > y && mouseY < (y + height);
-		
-		return flag;
+
+		return mouseX > x && mouseX < (x + width) && mouseY > y && mouseY < (y + height);
 	}
 	
 	public static void drawEntityOnScreen(int posX, int posY, int scale, float mouseX, float mouseY, LivingEntity p_228187_5_) {
-	      float f = (float)Math.atan((double)(mouseX / 40.0F));
-	      float f1 = (float)Math.atan((double)(mouseY / 40.0F));
+	      float f = (float)Math.atan(mouseX / 40.0F);
+	      float f1 = (float)Math.atan(mouseY / 40.0F);
 	      RenderSystem.pushMatrix();
 	      RenderSystem.translatef((float)posX, (float)posY, 1050.0F);
 	      RenderSystem.scalef(1.0F, 1.0F, -1.0F);
@@ -86,8 +85,7 @@ public class GuiUtils
 	
 	public static Color rainbowString()
 	{
-		Color color = new Color((Color.HSBtoRGB(System.currentTimeMillis() % 2000L / 2000.0f, 1.0f, 1.0f)));
-		return color;
+		return new Color((Color.HSBtoRGB(System.currentTimeMillis() % 2000L / 2000.0f, 1.0f, 1.0f)));
 	}
 	
 	public static void drawHighlight(int x, int y)

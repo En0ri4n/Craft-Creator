@@ -1,93 +1,32 @@
 package fr.eno.craftcreator.tileentity;
 
-import fr.eno.craftcreator.container.StoneCutterRecipeCreatorContainer;
-import fr.eno.craftcreator.init.InitTileEntities;
-import io.netty.buffer.Unpooled;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.ItemStackHelper;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.LockableTileEntity;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import fr.eno.craftcreator.container.*;
+import fr.eno.craftcreator.init.*;
+import io.netty.buffer.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.inventory.container.*;
+import net.minecraft.network.*;
+import net.minecraft.util.text.*;
 
-public class StoneCutterRecipeCreatorTile extends LockableTileEntity
+import javax.annotation.*;
+
+public class StoneCutterRecipeCreatorTile extends InventoryContainerTileEntity
 {
-	private final NonNullList<ItemStack> inventory = NonNullList.<ItemStack>withSize(2, ItemStack.EMPTY);
-
 	public StoneCutterRecipeCreatorTile()
 	{
-		super(InitTileEntities.STONE_CUTTER_RECIPE_CREATOR.get());
+		super(InitTileEntities.STONE_CUTTER_RECIPE_CREATOR.get(), 2);
 	}
 
+	@Nonnull
 	@Override
-	public int getSizeInventory()
-	{
-		return inventory.size();
-	}
-
-	@Override
-	public boolean isEmpty()
-	{
-		for(ItemStack stack : inventory)
-		{
-			if(!stack.isEmpty())
-			{
-				return false;
-			}
-		}
-		
-		return true;
-	}
-
-	@Override
-	public ItemStack getStackInSlot(int index)
-	{
-		return this.inventory.get(index);
-	}
-
-	@Override
-	public ItemStack decrStackSize(int index, int count)
-	{
-		return ItemStackHelper.getAndSplit(inventory, index, count);
-	}
-
-	@Override
-	public ItemStack removeStackFromSlot(int index)
-	{
-		return ItemStackHelper.getAndRemove(inventory, index);
-	}
-
-	@Override
-	public void setInventorySlotContents(int index, ItemStack stack)
-	{
-		this.inventory.set(index, stack);
-	}
-
-	@Override
-	public boolean isUsableByPlayer(PlayerEntity player)
-	{
-		return true;
-	}
-
-	@Override
-	public void clear()
-	{
-		this.inventory.clear();
-	}
-
-	@Override
-	protected ITextComponent getDefaultName()
+	public ITextComponent getDisplayName()
 	{
 		return new StringTextComponent("container.stone_cutter_recipe_creator.title");
 	}
 
 	@Override
-	protected Container createMenu(int id, PlayerInventory player)
+	public Container createMenu(int id, @Nonnull PlayerInventory playerInventory, @Nonnull PlayerEntity player)
 	{
-		return new StoneCutterRecipeCreatorContainer(id, player, new PacketBuffer(Unpooled.buffer()).writeBlockPos(pos));
+		return new StoneCutterRecipeCreatorContainer(id, playerInventory, new PacketBuffer(Unpooled.buffer()).writeBlockPos(pos));
 	}
 }

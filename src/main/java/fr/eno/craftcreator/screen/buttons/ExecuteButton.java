@@ -1,14 +1,11 @@
 package fr.eno.craftcreator.screen.buttons;
 
 import fr.eno.craftcreator.*;
-import fr.eno.craftcreator.screen.buttons.pressable.*;
 import fr.eno.craftcreator.utils.*;
 import net.minecraft.client.*;
 import net.minecraft.client.gui.screen.*;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.*;
-
-import java.awt.*;
 
 public class ExecuteButton extends Button
 {

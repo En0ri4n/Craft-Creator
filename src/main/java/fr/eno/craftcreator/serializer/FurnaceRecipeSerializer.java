@@ -19,33 +19,29 @@ public class FurnaceRecipeSerializer extends RecipeSerializer
 		cookingTime = 200;
 	}
 	
-	public FurnaceRecipeSerializer setExperience(double exp)
+	public void setExperience(double exp)
 	{
 		recipe.addProperty("experience", exp);
 		this.experience = exp;
-		return this;
-	}
+    }
 	
-	public FurnaceRecipeSerializer setCookingTime(int cookingTime)
+	public void setCookingTime(int cookingTime)
 	{
 		recipe.addProperty("cookingtime", cookingTime);
 		this.cookingTime = cookingTime;
-		return this;
-	}
+    }
 
-	public FurnaceRecipeSerializer setIngredient(Item item)
+	public void setIngredient(Item item)
 	{
 		JsonObject ingredient = new JsonObject();
 		ingredient.addProperty("item", item.getRegistryName().toString());
 		recipe.add("ingredient", ingredient);
-		return this;
-	}
+    }
 
-	private FurnaceRecipeSerializer setOutput(IItemProvider output)
+	private void setOutput(IItemProvider output)
 	{
 		recipe.addProperty("result", output.asItem().getRegistryName().toString());
-		return this;
-	}
+    }
 	
 	@Override
 	public void serializeRecipe()

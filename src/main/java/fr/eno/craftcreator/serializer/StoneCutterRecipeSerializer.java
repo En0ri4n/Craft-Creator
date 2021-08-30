@@ -21,12 +21,11 @@ public class StoneCutterRecipeSerializer extends RecipeSerializer
 		return this;
 	}
 
-	private StoneCutterRecipeSerializer setOutput(IItemProvider output, int count)
+	private void setOutput(IItemProvider output, int count)
 	{
 		recipe.addProperty("result", output.asItem().getRegistryName().toString());
 		recipe.addProperty("count", count);
-		return this;
-	}
+    }
 
 	public static StoneCutterRecipeSerializer create(IItemProvider output, int count)
 	{

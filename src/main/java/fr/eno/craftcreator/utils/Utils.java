@@ -14,14 +14,12 @@ import net.minecraft.util.text.TranslationTextComponent;
  */
 public class Utils
 {
-	static Minecraft mc = Minecraft.getInstance();
+	static final Minecraft mc = Minecraft.getInstance();
 	
 	/**
 	 * call {@link References#getTranslate(String, Object...)}
 	 * @see References#getTranslate(String, Object...)
 	 * 
-	 * @param path
-	 * @param args
 	 * @return The {@link TranslationTextComponent}
 	 */
 	public static TranslationTextComponent get(String path, Object... args)
@@ -33,8 +31,6 @@ public class Utils
 	 * call {@link References#getTranslate(String, Object...)} directly formatted to string
 	 * @see References#getTranslate(String, Object...)
 	 * 
-	 * @param path
-	 * @param args
 	 * @return The formatted string from {@link TranslationTextComponent}
 	 */
 	public static String getS(String path, Object... args)

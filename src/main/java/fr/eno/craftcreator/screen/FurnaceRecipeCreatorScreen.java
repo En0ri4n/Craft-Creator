@@ -34,7 +34,7 @@ public class FurnaceRecipeCreatorScreen extends ContainerScreen<FurnaceRecipeCre
 	protected void init()
 	{
 		super.init();
-		this.addButton(recipeTypeButton = new MultipleItemChoiceButton<Item, CraftType>(this.guiLeft + xSize - 20, guiTop, 20, 20, RECIPE_TYPE_MAP));
+		this.addButton(recipeTypeButton = new MultipleItemChoiceButton<>(this.guiLeft + xSize - 20, guiTop, 20, 20, RECIPE_TYPE_MAP));
 
 		this.addButton(new ExecuteButton(guiLeft + 76, guiTop + 33, 32, button -> CraftHelper.createFurnaceRecipe(this.container.getInventory(), this.getRecipeType(), expField.getText(), cookTimeField.getText())));
 		
