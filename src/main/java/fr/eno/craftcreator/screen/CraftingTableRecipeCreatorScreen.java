@@ -13,21 +13,23 @@ import net.minecraft.inventory.container.*;
 import net.minecraft.item.*;
 import net.minecraft.util.*;
 import net.minecraft.util.text.*;
+import net.minecraftforge.items.*;
 
 import java.awt.*;
-import java.util.List;
 import java.util.*;
 
 public class CraftingTableRecipeCreatorScreen extends ContainerScreen<CraftingTableRecipeCreatorContainer>
 {
     private BooleanButton craftTypeButton;
-    private final List<Slot> taggedSlots;
+    private final Map<Slot, ResourceLocation> taggedSlots;
+    private Slot selectedSlot;
+    private GuiList<ResourceLocation> guiTagList;
     private static final ResourceLocation CRAFT_CREATOR_TABLE_GUI_TEXTURES = new ResourceLocation(References.MOD_ID, "textures/gui/container/crafting_table_recipe_creator.png");
 
     public CraftingTableRecipeCreatorScreen(CraftingTableRecipeCreatorContainer screenContainer, PlayerInventory inv, ITextComponent titleIn)
     {
         super(screenContainer, inv, titleIn);
-        this.taggedSlots = new ArrayList<>();
+        this.taggedSlots = new HashMap<>();
     }
 
     @Override
@@ -37,6 +39,9 @@ public class CraftingTableRecipeCreatorScreen extends ContainerScreen<CraftingTa
         this.addButton(craftTypeButton = new BooleanButton("craftType", guiLeft + 100, guiTop + 60, 68, 20, true));
 
         this.addButton(new ExecuteButton(guiLeft + 86, guiTop + 33, 30, button -> CraftHelper.createCraftingTableRecipe(this.container.getInventory(), this.getTaggedSlots(), this.isShaped())));
+
+        this.selectedSlot = null;
+        this.guiTagList = new GuiList<>(this, this.guiLeft - 120, this.guiTop, 120, 18);
     }
 
     @Override
@@ -44,20 +49,26 @@ public class CraftingTableRecipeCreatorScreen extends ContainerScreen<CraftingTa
     {
         Slot slot = this.getSelectedSlot(mouseX, mouseY);
 
-        boolean checkInventory = slot != null && slot.inventory instanceof CraftingTableRecipeCreatorTile;
-
-        if(checkInventory && Screen.hasShiftDown())
+        if((slot instanceof SlotItemHandler) && slot != null && !slot.getStack().getItem().getTags().isEmpty())
         {
-            if(this.taggedSlots.stream().noneMatch(s -> s.slotNumber == slot.slotNumber)) this.taggedSlots.add(slot);
-            else this.taggedSlots.remove(slot);
-            return true;
+            this.guiTagList.setKeys(null);
+            this.selectedSlot = null;
+
+            boolean checkInventory = slot != null && ((SlotItemHandler) slot).getItemHandler() instanceof CraftingTableRecipeCreatorTile;
+
+            if(checkInventory && Screen.hasControlDown())
+            {
+                this.selectedSlot = slot;
+                this.guiTagList.setKeys(new ArrayList<>(slot.getStack().getItem().getTags()));
+
+                if(this.taggedSlots.containsKey(slot))
+                    this.guiTagList.setSelectedKey(this.taggedSlots.get(slot));
+
+                return true;
+            }
         }
 
-        if(checkInventory && minecraft.player.inventory.getItemStack().getItem() == Items.AIR && !slot.getHasStack())
-        {
-            if(this.taggedSlots.stream().noneMatch(s -> s.slotNumber == slot.slotNumber)) this.taggedSlots.add(slot);
-            else this.taggedSlots.remove(slot);
-        }
+        this.guiTagList.mouseClicked((int) mouseX, (int) mouseY, resourceLocation -> this.taggedSlots.put(this.selectedSlot, resourceLocation));
 
         return super.mouseClicked(mouseX, mouseY, mouseClick);
     }
@@ -90,6 +101,9 @@ public class CraftingTableRecipeCreatorScreen extends ContainerScreen<CraftingTa
         Screen.blit(this.guiLeft + xSize - 20, guiTop, 20, 20, 0, yTextureOffset, 20, 20, 20, 40);
         minecraft.getItemRenderer().renderItemIntoGUI(new ItemStack(Items.CRAFTING_TABLE), this.guiLeft + xSize - 18, guiTop + 2);
         if(Screen.hasShiftDown()) this.drawString(this.font, References.getTranslate("screen.crafting.info").getFormattedText(), this.guiLeft, this.guiTop - 8, Color.GRAY.getRGB());
+
+        if(this.guiTagList.getKeys() != null)
+            this.guiTagList.render(mouseX, mouseY);
     }
 
     private boolean isShaped()
@@ -108,13 +122,16 @@ public class CraftingTableRecipeCreatorScreen extends ContainerScreen<CraftingTa
         int j = (this.height - this.ySize) / 2;
         this.blit(x, j, 0, 0, this.xSize, this.ySize);
 
-        for(Slot slot : this.taggedSlots)
+        for(Slot slot : this.taggedSlots.keySet())
         {
             fill(x + slot.xPos, y + slot.yPos, x + slot.xPos + 16, y + slot.yPos + 16, new Color(0F, 0.5F, 0F, 0.5F).getRGB());
         }
+
+        if(this.selectedSlot != null)
+            fill(x + selectedSlot.xPos, y + selectedSlot.yPos, x + selectedSlot.xPos + 16, y + selectedSlot.yPos + 16, Color.YELLOW.getRGB());
     }
 
-    public List<Slot> getTaggedSlots()
+    public Map<Slot, ResourceLocation> getTaggedSlots()
     {
         return this.taggedSlots;
     }

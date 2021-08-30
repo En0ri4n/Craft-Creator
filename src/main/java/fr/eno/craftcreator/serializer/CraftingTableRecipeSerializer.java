@@ -20,7 +20,7 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 		this.setOutput(output, count);
 	}
 
-	public void setIngredients(List<Item> list, List<Slot> taggedSlot)
+	public void setIngredients(List<Item> list, Map<Slot, ResourceLocation> taggedSlot)
 	{
 		if(type.equals(CraftType.CRAFTING_TABLE_SHAPED))
 		{
@@ -47,7 +47,7 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 		recipe.add("ingredients", ingredients);
 	}
 
-	private void createShapedIngredients(List<Item> items, List<Slot> taggedSlot)
+	private void createShapedIngredients(List<Item> items, Map<Slot, ResourceLocation> taggedSlot)
 	{
 		Map<ResourceLocation, Character> pattern = createPattern(items, taggedSlot);
 		createKeys(pattern);
@@ -79,7 +79,7 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 		recipe.add("key", symbolListObj);
 	}
 
-	private Map<ResourceLocation, Character> createPattern(List<Item> list, List<Slot> taggedSlot)
+	private Map<ResourceLocation, Character> createPattern(List<Item> list, Map<Slot, ResourceLocation> taggedSlot)
 	{
 		Map<ResourceLocation, Character> patterns = new HashMap<>();
 		JsonArray array = new JsonArray();
@@ -96,22 +96,19 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 				{
 					int finalIndex = index;
 
-					if(taggedSlot.stream().anyMatch(s -> s.getSlotIndex() == finalIndex))
+					Optional<Slot> optionalSlot = taggedSlot.keySet().stream().filter(s -> s.getSlotIndex() == finalIndex).findFirst();
+
+					if(optionalSlot.isPresent())
 					{
-						Slot slot = taggedSlot.stream().filter(s -> s.getSlotIndex() == finalIndex).findFirst().get();
+						ResourceLocation loc = taggedSlot.get(optionalSlot.get());
 
-						if(getFirstTag(slot) != null)
+						if(!patterns.containsKey(loc))
 						{
-							Tag<Item> tag = getFirstTag(slot);
-
-							if(!patterns.containsKey(tag.getId()))
-							{
-								patterns.put(tag.getId(), key);
-							}
-
-							str = str.concat(String.valueOf(patterns.get(tag.getId())));
-							continue;
+							patterns.put(loc, key);
 						}
+
+						str = str.concat(String.valueOf(patterns.get(loc)));
+						continue;
 					}
 
 					if(!patterns.containsKey(list.get(index).getRegistryName()))
@@ -131,12 +128,6 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 		recipe.add("pattern", array);
 
 		return patterns;
-	}
-
-	private Tag<Item> getFirstTag(Slot slot)
-	{
-		if(!slot.getHasStack() ||slot.getStack().getItem().getTags().size() <= 0) return null;
-		return ItemTags.getCollection().get(new ArrayList<>(slot.getStack().getItem().getTags()).get(0));
 	}
 
 	private void setOutput(IItemProvider output, int count)
