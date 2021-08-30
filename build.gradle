@@ -123,7 +123,7 @@ jar {
             "Specification-Vendor": "En0ri4n",
             "Specification-Version": "1", // We are version 1 of ourselves
             "Implementation-Title": project.name,
-            "Implementation-Version": "${archiveVersion}",
+            "Implementation-Version": "${project.version}",
             "Implementation-Vendor" :"En0ri4n",
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])

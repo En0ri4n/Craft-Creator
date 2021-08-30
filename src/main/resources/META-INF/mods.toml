@@ -4,13 +4,13 @@ license="All rights reserved"
 issueTrackerURL="http://my.issue.tracker/" #optional
 [[mods]] #mandatory
 modId="craftcreator" #mandatory
-version="${file.jarVersion}" #mandatory
+version="${file.version}" #mandatory
 displayName="Craft Creator" #mandatory
 updateJSONURL="http://myurl.me/" #optional
 displayURL="http://example.com/" #optional
-logoFile="examplemod.png" #optional
-credits="Thanks for this example mod goes to Java" #optional
-authors="Love, Cheese and small house plants" #optional
+logoFile="logo.png" #optional
+credits="Thanks to MFF" #optional
+authors="En0ri4n" #optional
 description='''
 This is a long form description of the mod. You can write whatever you want here
 
@@ -23,6 +23,6 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis lacinia magn
 [[dependencies.craftcreator]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.4]"
+    versionRange="[1.16.5]"
     ordering="NONE"
     side="BOTH"
