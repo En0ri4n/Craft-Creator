@@ -18,9 +18,6 @@ public class CraftHelper
 	{
 		Item input = inventory.get(0).getItem();
 		Item output = inventory.get(1).getItem();
-
-		if(output.getItem() == Items.AIR) return;
-
 		FurnaceRecipeSerializer recipe = FurnaceRecipeSerializer.create(type, output);
 
 		try { recipe.setExperience(Double.parseDouble(exp)); } catch(Exception ignored) {}
@@ -34,7 +31,6 @@ public class CraftHelper
 	public static void createSmithingTableRecipe(NonNullList<ItemStack> inventory)
 	{
 		ItemStack output = inventory.get(2);
-		if(output.getItem() == Items.AIR) return;
 
 		List<Item> input = Arrays.asList(inventory.get(0).getItem(), inventory.get(1).getItem());
 		
@@ -45,8 +41,6 @@ public class CraftHelper
 	{
 		ItemStack output = inventory.get(0);
 		Item input = inventory.get(1).getItem();
-
-		if(output.getItem() == Items.AIR) return;
 		
 		StoneCutterRecipeSerializer.create(output.getItem(), output.getCount()).setIngredient(input).serializeRecipe();
 	}
@@ -54,7 +48,6 @@ public class CraftHelper
 	public static void createCraftingTableRecipe(NonNullList<ItemStack> inventory, List<Slot> taggedSlots, boolean isShaped)
 	{
 		ItemStack output = inventory.get(9);
-		if(output.getItem() == Items.AIR) return;
 		
 		CraftingTableRecipeSerializer recipe = CraftingTableRecipeSerializer.create(isShaped ? CraftType.CRAFTING_TABLE_SHAPED : CraftType.CRAFTING_TABLE_SHAPELESS, output.getItem(), output.getCount());
 		
