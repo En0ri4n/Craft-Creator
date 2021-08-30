@@ -3,16 +3,13 @@ package fr.eno.craftcreator;
 import java.util.function.Predicate;
 
 import fr.eno.craftcreator.commands.*;
+import fr.eno.craftcreator.init.*;
 import net.minecraftforge.common.*;
 import net.minecraftforge.eventbus.api.*;
 import net.minecraftforge.fml.event.server.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import fr.eno.craftcreator.init.InitBlocks;
-import fr.eno.craftcreator.init.InitContainers;
-import fr.eno.craftcreator.init.InitItems;
-import fr.eno.craftcreator.init.InitTileEntities;
 import fr.eno.craftcreator.screen.CraftingTableRecipeCreatorScreen;
 import fr.eno.craftcreator.screen.FurnaceRecipeCreatorScreen;
 import fr.eno.craftcreator.screen.SmithingTableRecipeCreatorScreen;
@@ -48,6 +45,9 @@ public class CraftCreator
 		InitContainers.CONTAINERS.register(bus);
 		InitItems.ITEMS.register(bus);
 		InitTileEntities.TILE_ENTITY.register(bus);
+
+		InitPackets.initNetwork();
+		InitPackets.registerMessages();
 	}
 
 	private void setup(final FMLCommonSetupEvent event)

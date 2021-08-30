@@ -18,9 +18,9 @@ public class BooleanButton extends Button
 	private boolean isOn;
 	private final String name;
 
-	public BooleanButton(String name, int x, int y, int width, int height, boolean value)
+	public BooleanButton(String name, int x, int y, int width, int height, boolean value, IPressable onPress)
 	{
-		super(x, y, width, height, "", new NullPressable());
+		super(x, y, width, height, "", onPress);
 		this.name = name;
 		this.isOn = value;
 	}
