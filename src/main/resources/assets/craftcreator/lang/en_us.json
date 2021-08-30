@@ -3,7 +3,7 @@
 	"craftcreator.button.boolean.craftType.on": "Shaped",
 	"craftcreator.button.boolean.craftType.off": "Shapeless",
 	"craftcreator.serializer.success": "§rRecipe saved at : §a§n%s",
-	"craftcreator.screen.crafting.info": "§oShift click on slot to use tag instead of item",
+	"craftcreator.screen.crafting.info": "§oCtrl + Click on slot to use tag instead of item",
 	"block.craftcreator.furnace_recipe_creator": "§lFurnace Recipe Creator",
 	"block.craftcreator.crafting_table_recipe_creator": "§lCrafting Table Recipe Creator",
 	"block.craftcreator.stone_cutter_recipe_creator": "§lStone Cutter Recipe Creator",

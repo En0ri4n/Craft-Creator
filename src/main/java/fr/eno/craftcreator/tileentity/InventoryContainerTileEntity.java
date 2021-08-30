@@ -10,9 +10,9 @@ import net.minecraftforge.items.*;
 
 import javax.annotation.*;
 
-public abstract class InventoryContainerTileEntity extends TileEntity implements IItemHandler, INamedContainerProvider
+public abstract class InventoryContainerTileEntity extends TileEntity implements IItemHandlerModifiable, INamedContainerProvider
 {
-    private final NonNullList<ItemStack> inventory;
+    private NonNullList<ItemStack> inventory;
 
     public InventoryContainerTileEntity(TileEntityType<?> type, int inventorySize)
     {
@@ -24,15 +24,17 @@ public abstract class InventoryContainerTileEntity extends TileEntity implements
     public void read(@Nonnull CompoundNBT compound)
     {
         super.read(compound);
-        ItemStackHelper.loadAllItems(compound.getCompound("Inventory"), this.inventory);
+        this.inventory = NonNullList.withSize(inventory.size(), ItemStack.EMPTY);
+        ItemStackHelper.loadAllItems(compound, this.inventory);
     }
 
     @Nonnull
     @Override
     public CompoundNBT write(@Nonnull CompoundNBT compound)
     {
-        ItemStackHelper.saveAllItems(compound.getCompound("Inventory"), this.inventory);
-        return super.write(compound);
+        CompoundNBT nbt = super.write(compound);
+        ItemStackHelper.saveAllItems(nbt, this.inventory, false);
+        return nbt;
     }
 
     @Override
@@ -45,6 +47,7 @@ public abstract class InventoryContainerTileEntity extends TileEntity implements
     @Override
     public ItemStack getStackInSlot(int slot)
     {
+        this.validateSlotIndex(slot);
         return this.inventory.get(slot);
     }
 
@@ -87,6 +90,8 @@ public abstract class InventoryContainerTileEntity extends TileEntity implements
             {
                 existing.grow(reachedLimit ? limit : stack.getCount());
             }
+
+            this.markDirty();
         }
 
         return reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, stack.getCount()- limit) : ItemStack.EMPTY;
@@ -118,6 +123,7 @@ public abstract class InventoryContainerTileEntity extends TileEntity implements
             if (!simulate)
             {
                 this.inventory.set(slot, ItemStack.EMPTY);
+                this.markDirty();
                 return existing;
             }
             else
@@ -130,6 +136,7 @@ public abstract class InventoryContainerTileEntity extends TileEntity implements
             if (!simulate)
             {
                 this.inventory.set(slot, ItemHandlerHelper.copyStackWithSize(existing, existing.getCount() - toExtract));
+                this.markDirty();
             }
 
             return ItemHandlerHelper.copyStackWithSize(existing, toExtract);
@@ -140,6 +147,14 @@ public abstract class InventoryContainerTileEntity extends TileEntity implements
     {
         if (slot < 0 || slot >= inventory.size())
             throw new RuntimeException("Slot " + slot + " not in valid range - [0," + inventory.size() + ")");
+    }
+
+    @Override
+    public void setStackInSlot(int slot, @Nonnull ItemStack stack)
+    {
+        this.validateSlotIndex(slot);
+        this.inventory.set(slot, stack);
+        this.markDirty();
     }
 
     @Override
