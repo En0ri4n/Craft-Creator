@@ -5,6 +5,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.particle.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
@@ -21,6 +22,12 @@ public class SmithingTableRecipeCreatorBlock extends Block
 	public SmithingTableRecipeCreatorBlock()
 	{
 		super(Block.Properties.create(Material.WOOD).sound(SoundType.WOOD).hardnessAndResistance(99999F));
+	}
+
+	@Override
+	public boolean addDestroyEffects(BlockState state, World world, BlockPos pos, ParticleManager manager)
+	{
+		return true;
 	}
 	
 	@Override

@@ -6,6 +6,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.particle.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
@@ -17,18 +18,59 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.shapes.*;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
 
+import java.util.stream.*;
+
 public class FurnaceRecipeCreatorBlock extends Block
 {
 	public static final DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
+	private static final VoxelShape SHAPE = Stream.of(
+			Block.makeCuboidShape(1, 0, 1, 15, 15, 15),
+			Block.makeCuboidShape(13, 0, 0, 16, 14, 1),
+			Block.makeCuboidShape(3, 5, 0, 13, 9, 1),
+			Block.makeCuboidShape(2, 15, 2, 14, 16, 14),
+			Block.makeCuboidShape(2, 15, 1, 14, 16, 2),
+			Block.makeCuboidShape(14, 15, 2, 15, 16, 14),
+			Block.makeCuboidShape(2, 15, 14, 14, 16, 15),
+			Block.makeCuboidShape(1, 15, 2, 2, 16, 14),
+			Block.makeCuboidShape(15, 0, 1, 16, 14, 15),
+			Block.makeCuboidShape(15, 14, 2, 16, 15, 14),
+			Block.makeCuboidShape(0, 14, 2, 1, 15, 14),
+			Block.makeCuboidShape(0, 0, 1, 1, 14, 15),
+			Block.makeCuboidShape(0, 0, 15, 16, 14, 16),
+			Block.makeCuboidShape(0, 0, 0, 3, 14, 1),
+			Block.makeCuboidShape(2, 14, 15, 14, 15, 16),
+			Block.makeCuboidShape(3, 0, 0, 13, 1, 1),
+			Block.makeCuboidShape(11, 4, 0, 13, 5, 1),
+			Block.makeCuboidShape(3, 4, 0, 5, 5, 1),
+			Block.makeCuboidShape(3, 3, 0, 4, 4, 1),
+			Block.makeCuboidShape(12, 3, 0, 13, 4, 1),
+			Block.makeCuboidShape(3, 12, 0, 13, 14, 1),
+			Block.makeCuboidShape(2, 14, 0, 14, 15, 1),
+			Block.makeCuboidShape(12, 11, 0, 13, 12, 1),
+			Block.makeCuboidShape(3, 11, 0, 4, 12, 1)
+	).reduce((v1, v2) -> VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR)).get();
 
 	public FurnaceRecipeCreatorBlock()
 	{
 		super(Block.Properties.create(Material.IRON).sound(SoundType.STONE).hardnessAndResistance(99999F));
 		this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.NORTH));
+	}
+
+	@Override
+	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context)
+	{
+		return SHAPE;
+	}
+
+	@Override
+	public boolean addDestroyEffects(BlockState state, World world, BlockPos pos, ParticleManager manager)
+	{
+		return true;
 	}
 
 	@Override
