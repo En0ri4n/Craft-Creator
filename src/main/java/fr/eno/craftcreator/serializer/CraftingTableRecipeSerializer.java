@@ -49,11 +49,11 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 
 	private void createShapedIngredients(List<Item> items, Map<SlotItemHandler, ResourceLocation> taggedSlot)
 	{
-		Map<ResourceLocation, Character> pattern = createPattern(items, taggedSlot);
+		Map<ResourceLocation, PairValue<Boolean, Character>> pattern = createPattern(items, taggedSlot);
 		createKeys(pattern);
 	}
 
-	private void createKeys(Map<ResourceLocation, Character> map)
+	private void createKeys(Map<ResourceLocation, PairValue<Boolean, Character>> map)
 	{
 		JsonObject symbolListObj = new JsonObject();
 		List<ResourceLocation> list = new ArrayList<>(map.keySet());
@@ -62,26 +62,28 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 		{
 			JsonObject symbolObj = new JsonObject();
 
-			if(ItemTags.getCollection().get(resourceLocation) != null)
+			if(ItemTags.getCollection().get(resourceLocation) != null && map.get(resourceLocation).getFirstValue())
 			{
 				Tag<Item> tag = ItemTags.getCollection().get(resourceLocation);
 				symbolObj.addProperty("tag", tag.getId().toString());
-				symbolListObj.add(String.valueOf(map.get(tag.getId())), symbolObj);
+				char symbol = map.get(tag.getId()).getSecondValue();
+				symbolListObj.add(String.valueOf(symbol), symbolObj);
 			}
 			else if(ForgeRegistries.ITEMS.containsKey(resourceLocation))
 			{
 				Item item = ForgeRegistries.ITEMS.getValue(resourceLocation);
 				symbolObj.addProperty("item", item.getRegistryName().toString());
-				symbolListObj.add(String.valueOf(map.get(item.getRegistryName())), symbolObj);
+				char symbol = map.get(item.getRegistryName()).getSecondValue();
+				symbolListObj.add(String.valueOf(symbol), symbolObj);
 			}
 		}
 
 		recipe.add("key", symbolListObj);
 	}
 
-	private Map<ResourceLocation, Character> createPattern(List<Item> list, Map<SlotItemHandler, ResourceLocation> taggedSlot)
+	private Map<ResourceLocation, PairValue<Boolean, Character>> createPattern(List<Item> list, Map<SlotItemHandler, ResourceLocation> taggedSlot)
 	{
-		Map<ResourceLocation, Character> patterns = new HashMap<>();
+		Map<ResourceLocation, PairValue<Boolean, Character>> patterns = new HashMap<>();
 		JsonArray array = new JsonArray();
 
 		String str = "";
@@ -104,19 +106,19 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 
 						if(!patterns.containsKey(loc))
 						{
-							patterns.put(loc, key);
+							patterns.put(loc, PairValue.create(true, key));
 						}
 
-						str = str.concat(String.valueOf(patterns.get(loc)));
+						str = str.concat(String.valueOf(patterns.get(loc).getSecondValue()));
 						continue;
 					}
 
 					if(!patterns.containsKey(list.get(index).getRegistryName()))
 					{
-						patterns.put(list.get(index).getRegistryName(), keyList.get(index));
+						patterns.put(list.get(index).getRegistryName(), PairValue.create(false, keyList.get(index)));
 					}
 
-					str = str.concat(String.valueOf(patterns.get(list.get(index).getRegistryName())));
+					str = str.concat(String.valueOf(patterns.get(list.get(index).getRegistryName()).getSecondValue()));
 					continue;
 				}
 			}

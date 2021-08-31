@@ -1,15 +1,13 @@
 package fr.eno.craftcreator.screen.buttons;
 
-import java.awt.Color;
-
-import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.screen.buttons.pressable.NullPressable;
-import fr.eno.craftcreator.utils.GuiUtils;
-import fr.eno.craftcreator.utils.Utils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
+import fr.eno.craftcreator.*;
+import fr.eno.craftcreator.utils.*;
+import net.minecraft.client.*;
+import net.minecraft.client.gui.screen.*;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.*;
+
+import java.awt.*;
 
 public class BooleanButton extends Button
 {
@@ -37,7 +35,7 @@ public class BooleanButton extends Button
 			
 			if(active)
 			{
-				yOffset = GuiUtils.isMouseHover(x, y, mouseX, mouseY, width, height) ? 40 : 20;
+				yOffset = ExecuteButton.isMouseHover(x, y, mouseX, mouseY, width, height) ? 40 : 20;
 			}
 
 			String str = Utils.getS("button.boolean." + name + "." + (isOn ? "on" : "off"));
@@ -51,6 +49,7 @@ public class BooleanButton extends Button
 	public void onClick(double p_onClick_1_, double p_onClick_3_)
 	{
 		this.isOn = !this.isOn;
+		super.onClick(p_onClick_1_, p_onClick_3_);
 	}
 
 	public boolean isOn()

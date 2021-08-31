@@ -6,7 +6,6 @@ import fr.eno.craftcreator.serializer.CraftingTableRecipeSerializer;
 import fr.eno.craftcreator.serializer.FurnaceRecipeSerializer;
 import fr.eno.craftcreator.serializer.SmithingTableRecipeSerializer;
 import fr.eno.craftcreator.serializer.StoneCutterRecipeSerializer;
-import net.minecraft.inventory.container.*;
 import net.minecraft.item.*;
 import net.minecraft.util.*;
 import net.minecraftforge.items.*;

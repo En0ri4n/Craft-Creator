@@ -20,7 +20,7 @@ public class CommonContainer extends Container
 	}
 
 	@Override
-	public boolean canInteractWith(PlayerEntity playerIn)
+	public boolean canInteractWith(@Nonnull PlayerEntity playerIn)
 	{
 		return true;
 	}
@@ -43,10 +43,10 @@ public class CommonContainer extends Container
 
 	@Override
 	@Nonnull
-	public ItemStack transferStackInSlot(PlayerEntity playerIn, int index)
+	public ItemStack transferStackInSlot(@Nonnull PlayerEntity playerIn, int index)
 	{
 		ItemStack itemstack = ItemStack.EMPTY;
-		Slot slot = (Slot) this.inventorySlots.get(index);
+		Slot slot = this.inventorySlots.get(index);
 
 		if (slot != null && slot.getHasStack())
 		{
@@ -77,7 +77,7 @@ public class CommonContainer extends Container
 	}
 
 	@Override
-	protected boolean mergeItemStack(ItemStack stack, int startIndex, int endIndex, boolean reverseDirection)
+	protected boolean mergeItemStack(@Nonnull ItemStack stack, int startIndex, int endIndex, boolean reverseDirection)
 	{
 		boolean flag = false;
 		int i = startIndex;
@@ -88,7 +88,7 @@ public class CommonContainer extends Container
 		{
 			while (stack.getCount() > 0 && (!reverseDirection && i < endIndex || reverseDirection && i >= startIndex))
 			{
-				Slot slot = (Slot) this.inventorySlots.get(i);
+				Slot slot = this.inventorySlots.get(i);
 				ItemStack itemstack = slot.getStack();
 				int maxLimit = Math.min(stack.getMaxStackSize(), slot.getSlotStackLimit());
 
@@ -127,7 +127,7 @@ public class CommonContainer extends Container
 
 			while (!reverseDirection && i < endIndex || reverseDirection && i >= startIndex)
 			{
-				Slot slot1 = (Slot) this.inventorySlots.get(i);
+				Slot slot1 = this.inventorySlots.get(i);
 				ItemStack itemstack1 = slot1.getStack();
 
 				if (itemstack1.isEmpty() && slot1.isItemValid(stack))

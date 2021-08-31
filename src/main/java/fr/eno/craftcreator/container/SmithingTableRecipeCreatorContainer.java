@@ -7,6 +7,8 @@ import net.minecraft.entity.player.*;
 import net.minecraft.network.*;
 import net.minecraftforge.items.*;
 
+import javax.annotation.*;
+
 public class SmithingTableRecipeCreatorContainer extends CommonContainer
 {
 	public SmithingTableRecipeCreatorContainer(int windowId, PlayerInventory playerInventory, PacketBuffer packet)
@@ -23,7 +25,7 @@ public class SmithingTableRecipeCreatorContainer extends CommonContainer
 	}
 
 	@Override
-	public boolean canInteractWith(PlayerEntity playerIn)
+	public boolean canInteractWith(@Nonnull PlayerEntity playerIn)
 	{
 		return true;
 	}

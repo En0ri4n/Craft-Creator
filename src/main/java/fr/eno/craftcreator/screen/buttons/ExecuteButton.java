@@ -1,10 +1,9 @@
 package fr.eno.craftcreator.screen.buttons;
 
 import fr.eno.craftcreator.*;
-import fr.eno.craftcreator.utils.*;
 import net.minecraft.client.*;
 import net.minecraft.client.gui.screen.*;
-import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.gui.widget.button.*;
 import net.minecraft.util.*;
 
 public class ExecuteButton extends Button
@@ -28,10 +27,15 @@ public class ExecuteButton extends Button
 			
 			if(active)
 			{
-				yOffset = GuiUtils.isMouseHover(x, y, mouseX, mouseY, width, height) ? 20 : 0;
+				yOffset = isMouseHover(x, y, mouseX, mouseY, width, height) ? 20 : 0;
 			}
 
 			Screen.blit(x, y, this.width, this.height, 0, yOffset, 42, 20, 42, 40);
 		}
+	}
+
+	public static boolean isMouseHover(int x, int y, int mouseX, int mouseY, int width, int height)
+	{
+		return mouseX > x && mouseX < (x + width) && mouseY > y && mouseY < (y + height);
 	}
 }

@@ -10,6 +10,8 @@ import net.minecraft.item.*;
 import net.minecraft.network.*;
 import net.minecraftforge.items.*;
 
+import javax.annotation.*;
+
 public class FurnaceRecipeCreatorContainer extends CommonContainer
 {
 	public FurnaceRecipeCreatorContainer(int windowId, PlayerInventory playerInventory, PacketBuffer packet)
@@ -29,7 +31,7 @@ public class FurnaceRecipeCreatorContainer extends CommonContainer
 	}
 
 	@Override
-	public boolean canInteractWith(PlayerEntity playerIn)
+	public boolean canInteractWith(@Nonnull PlayerEntity playerIn)
 	{
 		return true;
 	}

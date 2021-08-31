@@ -7,6 +7,8 @@ import net.minecraft.entity.player.*;
 import net.minecraft.network.*;
 import net.minecraftforge.items.*;
 
+import javax.annotation.*;
+
 public class StoneCutterRecipeCreatorContainer extends CommonContainer
 {
 	public StoneCutterRecipeCreatorContainer(int windowId, PlayerInventory playerInventory, PacketBuffer packet)
@@ -22,7 +24,7 @@ public class StoneCutterRecipeCreatorContainer extends CommonContainer
 	}
 
 	@Override
-	public boolean canInteractWith(PlayerEntity playerIn)
+	public boolean canInteractWith(@Nonnull PlayerEntity playerIn)
 	{
 		return true;
 	}
