@@ -1,12 +1,10 @@
 package fr.eno.craftcreator.utils;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import net.minecraft.util.text.*;
+import net.minecraft.util.text.event.*;
 
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.event.ClickEvent;
+import java.io.*;
+import java.util.*;
 
 public class Utilities
 {
@@ -24,8 +22,8 @@ public class Utilities
 		return parts;
 	}
 	
-	public static ITextComponent createClickableComponent(ITextComponent component, File toOpen)
+	public static IFormattableTextComponent createClickableComponent(String component, File toOpen)
 	{
-		return component.applyTextStyle(TextFormatting.UNDERLINE).applyTextStyle((msg) -> msg.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, toOpen.getAbsolutePath())));
+		return new StringTextComponent(component).modifyStyle((msg) -> msg.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, toOpen.getAbsolutePath())));
 	}
 }

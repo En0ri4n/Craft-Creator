@@ -1,5 +1,6 @@
 package fr.eno.craftcreator.screen;
 
+import com.mojang.blaze3d.matrix.*;
 import com.mojang.blaze3d.systems.*;
 import fr.eno.craftcreator.*;
 import fr.eno.craftcreator.container.*;
@@ -11,6 +12,8 @@ import net.minecraft.entity.player.*;
 import net.minecraft.item.*;
 import net.minecraft.util.*;
 import net.minecraft.util.text.*;
+
+import javax.annotation.*;
 
 public class StoneCutterRecipeCreatorScreen extends ContainerScreen<StoneCutterRecipeCreatorContainer>
 {
@@ -30,23 +33,23 @@ public class StoneCutterRecipeCreatorScreen extends ContainerScreen<StoneCutterR
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
+	public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
-		super.render(mouseX, mouseY, partialTicks);
+		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		minecraft.getTextureManager().bindTexture(References.getLoc("textures/gui/buttons/item_button.png"));
 		int yTextureOffset = ExecuteButton.isMouseHover(this.guiLeft + xSize - 20, guiTop, mouseX, mouseY, 20, 20) ? 20 : 0;
-		Screen.blit(this.guiLeft + xSize - 20, guiTop, 20, 20, 0, yTextureOffset, 20, 20, 20, 40);
+		Screen.blit(matrixStack, this.guiLeft + xSize - 20, guiTop, 20, 20, 0, yTextureOffset, 20, 20, 20, 40);
 		minecraft.getItemRenderer().renderItemIntoGUI(new ItemStack(Items.STONECUTTER), this.guiLeft + xSize - 18, guiTop + 1);
 	}
 
 	@Override
-	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
+	protected void drawGuiContainerBackgroundLayer(@Nonnull MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY)
 	{
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		this.minecraft.getTextureManager().bindTexture(GUI_TEXTURES);
 		int i = this.guiLeft;
 		int j = (this.height - this.ySize) / 2;
-		this.blit(i, j, 0, 0, this.xSize, this.ySize);
+		this.blit(matrixStack, i, j, 0, 0, this.xSize, this.ySize);
 	}
 	
 	@Override
@@ -66,4 +69,7 @@ public class StoneCutterRecipeCreatorScreen extends ContainerScreen<StoneCutterR
 	{
 		return super.mouseClicked(p_mouseClicked_1_, p_mouseClicked_3_, p_mouseClicked_5_);
 	}
+
+	@Override
+	protected void drawGuiContainerForegroundLayer(@Nonnull MatrixStack matrixStack, int x, int y) {}
 }

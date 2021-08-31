@@ -7,6 +7,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.particle.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
@@ -24,6 +25,8 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
 
+import javax.annotation.*;
+
 public class StoneCutterRecipeCreatorBlock extends Block
 {
 	public static final DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
@@ -34,6 +37,12 @@ public class StoneCutterRecipeCreatorBlock extends Block
 		super(Block.Properties.create(Material.IRON).sound(SoundType.STONE).hardnessAndResistance(99999F));
 		this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.NORTH));
 	}
+
+	@Override
+	public boolean addDestroyEffects(BlockState state, World world, BlockPos pos, ParticleManager manager)
+	{
+		return true;
+	}
 	
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context)
@@ -41,26 +50,29 @@ public class StoneCutterRecipeCreatorBlock extends Block
 		return this.getDefaultState().with(FACING, context.getPlacementHorizontalFacing().getOpposite());
 	}
 	
+	@Nonnull
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context)
+	public VoxelShape getShape(@Nonnull BlockState state, @Nonnull IBlockReader worldIn, @Nonnull BlockPos pos, @Nonnull ISelectionContext context)
 	{
 		return SHAPE;
 	}
 	
+	@Nonnull
 	@Override
-	public BlockRenderType getRenderType(BlockState state)
+	public BlockRenderType getRenderType(@Nonnull BlockState state)
 	{
 		return BlockRenderType.MODEL;
 	}
 	
 	@Override
-	public boolean isTransparent(BlockState state)
+	public boolean isTransparent(@Nonnull BlockState state)
 	{
 		return true;
 	}
 	
+	@Nonnull
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit)
+	public ActionResultType onBlockActivated(@Nonnull BlockState state, World worldIn, @Nonnull BlockPos pos, @Nonnull PlayerEntity player, @Nonnull Hand handIn, @Nonnull BlockRayTraceResult hit)
 	{
 		if(!worldIn.isRemote)
 		{

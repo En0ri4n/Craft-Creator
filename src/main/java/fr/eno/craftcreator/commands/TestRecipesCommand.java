@@ -1,43 +1,23 @@
 package fr.eno.craftcreator.commands;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.Collection;
+import com.google.gson.*;
+import com.mojang.brigadier.*;
+import com.mojang.brigadier.context.*;
+import fr.eno.craftcreator.utils.*;
+import net.minecraft.command.*;
+import net.minecraft.util.text.*;
+import net.minecraft.world.server.*;
+import org.apache.commons.io.*;
 
-import org.apache.commons.io.FileUtils;
-
-import com.google.common.collect.Lists;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.context.CommandContext;
-
-import fr.eno.craftcreator.CraftCreator;
-import fr.eno.craftcreator.utils.ReflectUtils;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.resources.ResourcePackList;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.server.ChunkManager;
-import net.minecraft.world.storage.IServerConfiguration;
+import java.io.*;
+import java.lang.reflect.*;
 
 public class TestRecipesCommand
 {
 	public static void register(CommandDispatcher<CommandSource> dispatcher)
 	{
-		dispatcher.register(Commands.literal("testrecipes").requires((source) ->
-		{
-			return source.hasPermissionLevel(4);
-		}).executes((ctx) ->
-		{
-			return execute(ctx);
-		}));
+		dispatcher.register(Commands.literal("testrecipes").requires((source) -> source.hasPermissionLevel(4))
+				.executes(TestRecipesCommand::execute));
 	}
 
 	public static int execute(CommandContext<CommandSource> ctx)
@@ -61,23 +41,11 @@ public class TestRecipesCommand
 				e.printStackTrace();
 			}
 
-		reloadPacks(ctx);
-
+		ctx.getSource().getServer().getCommandManager().handleCommand(ctx.getSource(), "/reload");
 		ctx.getSource().sendFeedback(new StringTextComponent(TextFormatting.GREEN + "Recipes has been loaded successfully !"), false);
+		register(ctx.getSource().getServer().getFunctionManager().getCommandDispatcher());
 
-		return 1;
-	}
-
-	private static void reloadPacks(CommandContext<CommandSource> ctx)
-	{
-		CommandSource commandsource = ctx.getSource();
-		MinecraftServer minecraftserver = commandsource.getServer();
-		ResourcePackList resourcepacklist = minecraftserver.getResourcePacks();
-		IServerConfiguration iserverconfiguration = minecraftserver.getServerConfiguration();
-		Collection<String> collection = resourcepacklist.func_232621_d_();
-		Collection<String> collection1 = getDatapackList(resourcepacklist, iserverconfiguration, collection);
-		commandsource.sendFeedback(new TranslationTextComponent("commands.reload.success"), true);
-		executeReload(collection1, commandsource);
+		return 0;
 	}
 
 	private static File createDatapack(CommandContext<CommandSource> ctx)
@@ -123,32 +91,5 @@ public class TestRecipesCommand
 		recipeFolder.mkdirs();
 
 		return recipeFolder;
-	}
-
-	private static Collection<String> getDatapackList(ResourcePackList packList, IServerConfiguration serverConfig, Collection<String> p_241058_2_)
-	{
-		packList.reloadPacksFromFinders();
-		Collection<String> collection = Lists.newArrayList(p_241058_2_);
-		Collection<String> collection1 = serverConfig.getDatapackCodec().getDisabled();
-
-		for (String s : packList.func_232616_b_())
-		{
-			if(!collection1.contains(s) && !collection.contains(s))
-			{
-				collection.add(s);
-			}
-		}
-
-		return collection;
-	}
-
-	public static void executeReload(Collection<String> packs, CommandSource source)
-	{
-		source.getServer().func_240780_a_(packs).exceptionally((p_241061_1_) ->
-		{
-			CraftCreator.LOGGER.warn("Failed to execute reload", p_241061_1_);
-			source.sendErrorMessage(new TranslationTextComponent("commands.reload.failure"));
-			return null;
-		});
 	}
 }

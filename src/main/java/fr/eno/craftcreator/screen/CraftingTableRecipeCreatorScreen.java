@@ -1,5 +1,6 @@
 package fr.eno.craftcreator.screen;
 
+import com.mojang.blaze3d.matrix.*;
 import com.mojang.blaze3d.systems.*;
 import fr.eno.craftcreator.*;
 import fr.eno.craftcreator.container.*;
@@ -18,7 +19,8 @@ import net.minecraft.util.text.*;
 import net.minecraftforge.fml.network.*;
 import net.minecraftforge.items.*;
 
-import java.awt.*;
+import javax.annotation.*;
+import java.awt.Color;
 import java.util.*;
 
 public class CraftingTableRecipeCreatorScreen extends ContainerScreen<CraftingTableRecipeCreatorContainer>
@@ -46,7 +48,7 @@ public class CraftingTableRecipeCreatorScreen extends ContainerScreen<CraftingTa
         this.addButton(new ExecuteButton(guiLeft + 86, guiTop + 33, 30, button -> CraftHelper.createCraftingTableRecipe(this.container.getInventory(), this.getTaggedSlots(), this.isShaped())));
 
         this.selectedSlot = null;
-        this.guiTagList = new GuiList<>(this, this.guiLeft, this.guiTop + 1, 18);
+        this.guiTagList = new GuiList<>(this.guiLeft, this.guiTop + 1, 18);
     }
 
     @Override
@@ -129,17 +131,19 @@ public class CraftingTableRecipeCreatorScreen extends ContainerScreen<CraftingTa
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks)
+    public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        super.render(mouseX, mouseY, partialTicks);
-        minecraft.getTextureManager().bindTexture(References.getLoc("textures/gui/buttons/item_button.png"));
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
+
         int yTextureOffset = ExecuteButton.isMouseHover(this.guiLeft + xSize - 20, guiTop, mouseX, mouseY, 20, 20) ? 20 : 0;
-        Screen.blit(this.guiLeft + xSize - 20, guiTop, 20, 20, 0, yTextureOffset, 20, 20, 20, 40);
+        minecraft.getTextureManager().bindTexture(References.getLoc("textures/gui/buttons/item_button.png"));
+        Screen.blit(matrixStack, this.guiLeft + xSize - 20, guiTop, 20, 20, 0, yTextureOffset, 20, 20, 20, 40);
         minecraft.getItemRenderer().renderItemIntoGUI(new ItemStack(Items.CRAFTING_TABLE), this.guiLeft + xSize - 18, guiTop + 2);
-        if(Screen.hasShiftDown() || Screen.hasControlDown()) this.drawString(this.font, References.getTranslate("screen.crafting.info").getFormattedText(), this.guiLeft, this.guiTop - 8, Color.GRAY.getRGB());
+
+        if(Screen.hasShiftDown() || Screen.hasControlDown()) drawString(matrixStack, this.font, References.getTranslate("screen.crafting.info").getString(), this.guiLeft, this.guiTop - 8, Color.GRAY.getRGB());
 
         if(this.guiTagList.getKeys() != null)
-            this.guiTagList.render(mouseX, mouseY);
+            this.guiTagList.render(matrixStack, mouseX, mouseY);
     }
 
     private boolean isShaped()
@@ -162,23 +166,23 @@ public class CraftingTableRecipeCreatorScreen extends ContainerScreen<CraftingTa
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
+    protected void drawGuiContainerBackgroundLayer(@Nonnull MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY)
     {
-        this.renderBackground();
+        this.renderBackground(matrixStack);
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.minecraft.getTextureManager().bindTexture(CRAFT_CREATOR_TABLE_GUI_TEXTURES);
         int x = this.guiLeft;
         int y = this.guiTop;
         int j = (this.height - this.ySize) / 2;
-        this.blit(x, j, 0, 0, this.xSize, this.ySize);
+        this.blit(matrixStack, x, j, 0, 0, this.xSize, this.ySize);
 
         for(Slot slot : this.taggedSlots.keySet())
         {
-            fill(x + slot.xPos, y + slot.yPos, x + slot.xPos + 16, y + slot.yPos + 16, new Color(0F, 0.5F, 0F, 0.5F).getRGB());
+            fill(matrixStack, x + slot.xPos, y + slot.yPos, x + slot.xPos + 16, y + slot.yPos + 16, new Color(0F, 0.5F, 0F, 0.5F).getRGB());
         }
 
         if(this.selectedSlot != null)
-            fill(x + selectedSlot.xPos, y + selectedSlot.yPos, x + selectedSlot.xPos + 16, y + selectedSlot.yPos + 16, Color.YELLOW.getRGB());
+            fill(matrixStack, x + selectedSlot.xPos, y + selectedSlot.yPos, x + selectedSlot.xPos + 16, y + selectedSlot.yPos + 16, Color.YELLOW.getRGB());
     }
 
     public Map<SlotItemHandler, ResourceLocation> getTaggedSlots()
@@ -199,4 +203,7 @@ public class CraftingTableRecipeCreatorScreen extends ContainerScreen<CraftingTa
 
         this.craftTypeButton.setOn(isShaped);
     }
+
+    @Override
+    protected void drawGuiContainerForegroundLayer(@Nonnull MatrixStack matrixStack, int x, int y) {}
 }

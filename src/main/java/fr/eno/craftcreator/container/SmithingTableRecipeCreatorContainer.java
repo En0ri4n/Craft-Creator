@@ -17,9 +17,9 @@ public class SmithingTableRecipeCreatorContainer extends CommonContainer
 		SmithingTableRecipeCreatorTile tile = (SmithingTableRecipeCreatorTile) playerInventory.player.world.getTileEntity(packet.readBlockPos());
 		int index = 0;
 
-		this.addSlot(new SlotItemHandler(tile, index++, 124, 35));
-		this.addSlot(new SlotItemHandler(tile, index++, 150, 35));
-		this.addSlot(new SlotItemHandler(tile, index, 164, 35));
+		this.addSlot(new SlotItemHandler(tile, index++, 27, 47));
+		this.addSlot(new SlotItemHandler(tile, index++, 76, 47));
+		this.addSlot(new SlotItemHandler(tile, index, 134, 47));
 		
 		this.bindPlayerInventory(playerInventory);
 	}

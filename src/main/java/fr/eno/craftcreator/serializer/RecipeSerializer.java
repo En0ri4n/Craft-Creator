@@ -49,7 +49,7 @@ public abstract class RecipeSerializer
 		try(BufferedWriter writer = new BufferedWriter(new FileWriter(this.getOutputFile())))
 		{
 			gson.toJson(recipe, writer);
-			Objects.requireNonNull(mc.player).sendMessage(Utilities.createClickableComponent(Utils.get("serializer.success", this.getOutputFile().getName()), this.getOutputFile()));
+			Objects.requireNonNull(mc.player).sendMessage(Utilities.createClickableComponent(Utils.getS("serializer.success", this.getOutputFile().getName()), this.getOutputFile()), mc.player.getUniqueID());
 		}
 		catch(JsonIOException | IOException e)
 		{

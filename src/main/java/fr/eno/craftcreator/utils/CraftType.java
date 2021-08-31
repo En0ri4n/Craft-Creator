@@ -10,8 +10,9 @@ public enum CraftType
 	FURNACE_BLASTING(new ResourceLocation("blasting")),
 	FURNACE_SMOKING(new ResourceLocation("smoking")),
 	CAMPFIRE_COOKING(new ResourceLocation("campfire_cooking")),
-	STONECUTTING(new ResourceLocation("stonecutting"));
-	
+	STONECUTTING(new ResourceLocation("stonecutting")),
+	SMITHING_TABLE(new ResourceLocation("smithing"));
+
 	private final ResourceLocation type;
 
 	CraftType(ResourceLocation type)
