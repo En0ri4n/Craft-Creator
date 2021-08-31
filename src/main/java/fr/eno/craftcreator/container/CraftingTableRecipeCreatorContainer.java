@@ -8,9 +8,11 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.items.*;
 
+import javax.annotation.*;
+
 public class CraftingTableRecipeCreatorContainer extends CommonContainer
 {
-	private CraftingTableRecipeCreatorTile tile;
+	private final CraftingTableRecipeCreatorTile tile;
 
 	public CraftingTableRecipeCreatorContainer(int windowId, PlayerInventory playerInventory, PacketBuffer packet)
 	{
@@ -32,7 +34,7 @@ public class CraftingTableRecipeCreatorContainer extends CommonContainer
 	}
 
 	@Override
-	public boolean canInteractWith(PlayerEntity playerIn)
+	public boolean canInteractWith(@Nonnull PlayerEntity playerIn)
 	{
 		return true;
 	}

@@ -34,7 +34,7 @@ public class StoneCutterRecipeCreatorScreen extends ContainerScreen<StoneCutterR
 	{
 		super.render(mouseX, mouseY, partialTicks);
 		minecraft.getTextureManager().bindTexture(References.getLoc("textures/gui/buttons/item_button.png"));
-		int yTextureOffset = GuiUtils.isMouseHover(this.guiLeft + xSize - 20, guiTop, mouseX, mouseY, 20, 20) ? 20 : 0;
+		int yTextureOffset = ExecuteButton.isMouseHover(this.guiLeft + xSize - 20, guiTop, mouseX, mouseY, 20, 20) ? 20 : 0;
 		Screen.blit(this.guiLeft + xSize - 20, guiTop, 20, 20, 0, yTextureOffset, 20, 20, 20, 40);
 		minecraft.getItemRenderer().renderItemIntoGUI(new ItemStack(Items.STONECUTTER), this.guiLeft + xSize - 18, guiTop + 1);
 	}

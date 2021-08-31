@@ -41,12 +41,12 @@ public class CraftingTableRecipeCreatorScreen extends ContainerScreen<CraftingTa
         super.init();
         InitPackets.getNetWork().send(PacketDistributor.SERVER.noArg(), new GetCraftingTableRecipeCreatorTileInfosServerPacket(this.container.getTile().getPos(), this.container.windowId));
 
-        this.addButton(craftTypeButton = new BooleanButton("craftType", guiLeft + 100, guiTop + 60, 68, 20, true, button -> updateServerData()));
+        this.addButton(craftTypeButton = new BooleanButton("craftType", guiLeft + 100, guiTop + 60, 68, 20, true, button -> updateServerTileData()));
 
         this.addButton(new ExecuteButton(guiLeft + 86, guiTop + 33, 30, button -> CraftHelper.createCraftingTableRecipe(this.container.getInventory(), this.getTaggedSlots(), this.isShaped())));
 
         this.selectedSlot = null;
-        this.guiTagList = new GuiList<>(this, this.guiLeft, this.guiTop, 18);
+        this.guiTagList = new GuiList<>(this, this.guiLeft, this.guiTop + 1, 18);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class CraftingTableRecipeCreatorScreen extends ContainerScreen<CraftingTa
     {
         Slot slot = this.getSelectedSlot(mouseX, mouseY);
 
-        if((slot instanceof SlotItemHandler) && slot != null)
+        if((slot instanceof SlotItemHandler) && slot != null && slot.getSlotIndex() != 9)
         {
             boolean checkInventory = slot != null && ((SlotItemHandler) slot).getItemHandler() instanceof CraftingTableRecipeCreatorTile;
 
@@ -63,10 +63,12 @@ public class CraftingTableRecipeCreatorScreen extends ContainerScreen<CraftingTa
                 this.guiTagList.setKeys(null);
                 this.selectedSlot = null;
                 this.taggedSlots.remove(slot);
+                updateServerTileData();
                 return super.mouseClicked(mouseX, mouseY, mouseClick);
             }
 
             this.guiTagList.setKeys(null);
+            this.guiTagList.setSelectedKey(null);
             this.selectedSlot = null;
 
             if(checkInventory && Screen.hasControlDown() && !slot.getStack().getItem().getTags().isEmpty())
@@ -74,9 +76,18 @@ public class CraftingTableRecipeCreatorScreen extends ContainerScreen<CraftingTa
                 this.selectedSlot = (SlotItemHandler) slot;
                 this.guiTagList.setKeys(new ArrayList<>(slot.getStack().getItem().getTags()));
 
-                if(this.taggedSlots.containsKey(slot))
-                    this.guiTagList.setSelectedKey(this.taggedSlots.get(slot));
+                if(this.taggedSlots.containsKey(this.selectedSlot))
+                    this.guiTagList.setSelectedKey(this.taggedSlots.get(this.selectedSlot));
 
+                updateServerTileData();
+                return true;
+            }
+            else if(checkInventory && Screen.hasControlDown() && slot.getStack().getItem().getTags().isEmpty())
+            {
+                this.guiTagList.setKeys(null);
+                this.guiTagList.setSelectedKey(null);
+                this.selectedSlot = null;
+                updateServerTileData();
                 return true;
             }
         }
@@ -86,12 +97,12 @@ public class CraftingTableRecipeCreatorScreen extends ContainerScreen<CraftingTa
             if(resourceLocation == null)
             {
                 this.taggedSlots.remove(this.selectedSlot);
-                updateServerData();
+                updateServerTileData();
                 return;
             }
 
             this.taggedSlots.put(this.selectedSlot, resourceLocation);
-            updateServerData();
+            updateServerTileData();
         });
 
         return super.mouseClicked(mouseX, mouseY, mouseClick);
@@ -122,10 +133,10 @@ public class CraftingTableRecipeCreatorScreen extends ContainerScreen<CraftingTa
     {
         super.render(mouseX, mouseY, partialTicks);
         minecraft.getTextureManager().bindTexture(References.getLoc("textures/gui/buttons/item_button.png"));
-        int yTextureOffset = GuiUtils.isMouseHover(this.guiLeft + xSize - 20, guiTop, mouseX, mouseY, 20, 20) ? 20 : 0;
+        int yTextureOffset = ExecuteButton.isMouseHover(this.guiLeft + xSize - 20, guiTop, mouseX, mouseY, 20, 20) ? 20 : 0;
         Screen.blit(this.guiLeft + xSize - 20, guiTop, 20, 20, 0, yTextureOffset, 20, 20, 20, 40);
         minecraft.getItemRenderer().renderItemIntoGUI(new ItemStack(Items.CRAFTING_TABLE), this.guiLeft + xSize - 18, guiTop + 2);
-        if(Screen.hasShiftDown()) this.drawString(this.font, References.getTranslate("screen.crafting.info").getFormattedText(), this.guiLeft, this.guiTop - 8, Color.GRAY.getRGB());
+        if(Screen.hasShiftDown() || Screen.hasControlDown()) this.drawString(this.font, References.getTranslate("screen.crafting.info").getFormattedText(), this.guiLeft, this.guiTop - 8, Color.GRAY.getRGB());
 
         if(this.guiTagList.getKeys() != null)
             this.guiTagList.render(mouseX, mouseY);
@@ -136,7 +147,7 @@ public class CraftingTableRecipeCreatorScreen extends ContainerScreen<CraftingTa
         return craftTypeButton.isOn();
     }
 
-    private void updateServerData()
+    private void updateServerTileData()
     {
         InitPackets.getNetWork().send(PacketDistributor.SERVER.noArg(), new UpdateCraftingTableRecipeCreatorTilePacket(this.container.getTile().getPos(), this.isShaped(), getTagged(this.taggedSlots)));
     }

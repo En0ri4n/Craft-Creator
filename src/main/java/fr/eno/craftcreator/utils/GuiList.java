@@ -1,6 +1,7 @@
 package fr.eno.craftcreator.utils;
 
 import fr.eno.craftcreator.*;
+import fr.eno.craftcreator.screen.buttons.*;
 import net.minecraft.client.*;
 import net.minecraft.client.gui.screen.*;
 
@@ -41,7 +42,7 @@ public class GuiList<T>
             int y = this.y + 3 + i * keyHeight + i;
             int stringY = y + keyHeight / 2 - mc.fontRenderer.FONT_HEIGHT / 2;
 
-            if(GuiUtils.isMouseHover(x, y, mouseX, mouseY, finalWidth, keyHeight))
+            if(ExecuteButton.isMouseHover(x, y, mouseX, mouseY, finalWidth, keyHeight))
                 Screen.blit(x, y, finalWidth - 6, keyHeight, 0, 20, 100, 20, 100, 60);
             else
                 Screen.blit(x, y, finalWidth - 6, keyHeight, 0, 40, 100, 20, 100, 60);
@@ -49,8 +50,12 @@ public class GuiList<T>
             if(i >= this.keys.size())
             {
                 parent.drawCenteredString(mc.fontRenderer, References.getTranslate("screen.guiList.reset").getString(), x + finalWidth / 2 - 3, stringY, Color.WHITE.getRGB());
+                continue;
             }
-            else if(this.getSelectedKey() != null && this.getSelectedKey() == this.keys.get(i))
+
+            boolean isSelected = this.selectedKey != null && this.selectedKey.toString().equals(this.keys.get(i).toString());
+
+            if(isSelected)
                 parent.drawCenteredString(mc.fontRenderer, this.keys.get(i).toString(), x + finalWidth / 2 - 3, stringY, Color.GREEN.getRGB());
             else
                 parent.drawCenteredString(mc.fontRenderer, this.keys.get(i).toString(), x + finalWidth / 2 - 3, stringY, Color.WHITE.getRGB());
@@ -81,10 +86,11 @@ public class GuiList<T>
 
         for(int i = 0; i < this.keys.size() + 1; i++)
         {
-            int x = this.guiListRight - width + 3;
-            int y = this.y + 3 + (i * keyHeight + (i > 0 ? 1 : 0));
+            int finalWidth = (width + 10);
+            int x = this.guiListRight - finalWidth + 3;
+            int y = this.y + 3 + i * keyHeight + i;
 
-            if(GuiUtils.isMouseHover(x, y, mouseX, mouseY, width - 6, keyHeight))
+            if(ExecuteButton.isMouseHover(x, y, mouseX, mouseY, width - 6, keyHeight))
             {
                 if(i >= this.keys.size())
                 {

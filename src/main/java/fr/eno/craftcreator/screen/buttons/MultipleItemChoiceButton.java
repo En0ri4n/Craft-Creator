@@ -1,17 +1,14 @@
 package fr.eno.craftcreator.screen.buttons;
 
-import java.util.Map;
-import java.util.stream.Collectors;
+import fr.eno.craftcreator.*;
+import fr.eno.craftcreator.screen.buttons.pressable.*;
+import net.minecraft.client.*;
+import net.minecraft.client.gui.screen.*;
+import net.minecraft.client.gui.widget.button.*;
+import net.minecraft.item.*;
+import net.minecraft.util.*;
 
-import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.screen.buttons.pressable.NullPressable;
-import fr.eno.craftcreator.utils.GuiUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import java.util.*;
 
 public class MultipleItemChoiceButton<K extends Item, V> extends Button
 {
@@ -26,7 +23,7 @@ public class MultipleItemChoiceButton<K extends Item, V> extends Button
 	{
 		super(x, y, width, height, "", new NullPressable());
 		this.map = map;
-		this.currentKey = map.keySet().stream().collect(Collectors.toList()).get(0);
+		this.currentKey = new ArrayList<>(map.keySet()).get(0);
 		this.currentValue = map.get(currentKey);
 	}
 
@@ -36,7 +33,7 @@ public class MultipleItemChoiceButton<K extends Item, V> extends Button
 		if(this.visible)
 		{
 			mc.getTextureManager().bindTexture(TEXTURE);			
-			int yOffset = GuiUtils.isMouseHover(x, y, mouseX, mouseY, width, height) ? 20 : 0;
+			int yOffset = ExecuteButton.isMouseHover(x, y, mouseX, mouseY, width, height) ? 20 : 0;
 			Screen.blit(x, y, this.width, this.height, 0, yOffset, 20, 20, 20, 40);
 			
 			mc.getItemRenderer().renderItemIntoGUI(new ItemStack(currentKey), this.x + this.width / 2 - 8, this.y + this.height / 2 - 8);
@@ -57,7 +54,7 @@ public class MultipleItemChoiceButton<K extends Item, V> extends Button
 			currentIndex = 0;
 		}
 
-		this.currentKey = map.keySet().stream().collect(Collectors.toList()).get(currentIndex);
+		this.currentKey = new ArrayList<>(map.keySet()).get(currentIndex);
 		this.currentValue = map.get(currentKey);
 	}
 
