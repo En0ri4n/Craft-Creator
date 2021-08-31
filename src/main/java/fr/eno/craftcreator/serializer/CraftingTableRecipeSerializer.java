@@ -62,11 +62,13 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 		{
 			JsonObject symbolObj = new JsonObject();
 
-			if(ItemTags.getCollection().get(resourceLocation) != null && map.get(resourceLocation).getFirstValue())
+			Optional<? extends ITag.INamedTag<Item>> optionalTag = ItemTags.getAllTags().stream().filter(tag -> tag.getName().equals(resourceLocation)).findFirst();
+
+			if(optionalTag.isPresent() && map.get(resourceLocation).getFirstValue())
 			{
-				Tag<Item> tag = ItemTags.getCollection().get(resourceLocation);
-				symbolObj.addProperty("tag", tag.getId().toString());
-				char symbol = map.get(tag.getId()).getSecondValue();
+				ITag.INamedTag<Item> tag = optionalTag.get();
+				symbolObj.addProperty("tag", tag.getName().toString());
+				char symbol = map.get(tag.getName()).getSecondValue();
 				symbolListObj.add(String.valueOf(symbol), symbolObj);
 			}
 			else if(ForgeRegistries.ITEMS.containsKey(resourceLocation))

@@ -12,7 +12,7 @@ public class SmithingTableRecipeSerializer extends RecipeSerializer
 {
 	private SmithingTableRecipeSerializer(IItemProvider output)
 	{
-		super(CraftType.STONECUTTING, output);
+		super(CraftType.SMITHING_TABLE, output);
 		this.setOutput(output);
 	}
 

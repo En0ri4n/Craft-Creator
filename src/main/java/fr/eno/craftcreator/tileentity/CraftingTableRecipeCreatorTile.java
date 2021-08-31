@@ -5,6 +5,7 @@ import com.mojang.brigadier.exceptions.*;
 import fr.eno.craftcreator.container.*;
 import fr.eno.craftcreator.init.*;
 import io.netty.buffer.*;
+import net.minecraft.block.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.inventory.container.*;
 import net.minecraft.nbt.*;
@@ -27,9 +28,9 @@ public class CraftingTableRecipeCreatorTile extends InventoryContainerTileEntity
 	}
 
 	@Override
-	public void read(@Nonnull CompoundNBT compound)
+	public void read(@Nonnull BlockState state, @Nonnull CompoundNBT compound)
 	{
-		super.read(compound);
+		super.read(state, compound);
 
 		if(compound.contains("isShapedRecipe"))
 			this.shapedRecipe = compound.getBoolean("isShapedRecipe");

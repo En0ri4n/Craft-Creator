@@ -1,30 +1,21 @@
 package fr.eno.craftcreator;
 
-import java.util.function.Predicate;
-
 import fr.eno.craftcreator.commands.*;
 import fr.eno.craftcreator.init.*;
+import fr.eno.craftcreator.screen.*;
+import net.minecraft.client.gui.*;
+import net.minecraft.client.renderer.*;
+import net.minecraft.item.*;
 import net.minecraftforge.common.*;
+import net.minecraftforge.event.*;
 import net.minecraftforge.eventbus.api.*;
-import net.minecraftforge.fml.event.server.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import fr.eno.craftcreator.screen.CraftingTableRecipeCreatorScreen;
-import fr.eno.craftcreator.screen.FurnaceRecipeCreatorScreen;
-import fr.eno.craftcreator.screen.SmithingTableRecipeCreatorScreen;
-import fr.eno.craftcreator.screen.StoneCutterRecipeCreatorScreen;
-import net.minecraft.client.gui.ScreenManager;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.RenderTypeLookup;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.common.*;
+import net.minecraftforge.fml.event.lifecycle.*;
+import net.minecraftforge.fml.javafmlmod.*;
+import org.apache.logging.log4j.*;
 
 import javax.annotation.*;
+import java.util.function.*;
 
 @Mod(References.MOD_ID)
 public class CraftCreator
@@ -37,7 +28,6 @@ public class CraftCreator
 
 		bus.addListener(this::setup);
 		bus.addListener(this::clientSetup);
-		bus.addListener(this::onServerStart);
 
 		MinecraftForge.EVENT_BUS.register(this);
 
@@ -55,6 +45,8 @@ public class CraftCreator
 		Predicate<RenderType> render = (r) -> r == RenderType.getCutout();
 		
 		RenderTypeLookup.setRenderLayer(InitBlocks.STONE_CUTTER_RECIPE_CREATOR.get(), render);
+		RenderTypeLookup.setRenderLayer(InitBlocks.CRAFTING_TABLE_RECIPE_CREATOR.get(), render);
+		RenderTypeLookup.setRenderLayer(InitBlocks.FURNACE_RECIPE_CREATOR.get(), render);
 	}
 	
 	public void clientSetup(FMLClientSetupEvent event)
@@ -66,9 +58,9 @@ public class CraftCreator
 	}
 
 	@SubscribeEvent
-	public void onServerStart(FMLServerStartingEvent e)
+	public void onRegisterCommands(RegisterCommandsEvent e)
 	{
-		TestRecipesCommand.register(e.getCommandDispatcher());
+		TestRecipesCommand.register(e.getDispatcher());
 	}
 	
 	public static final ItemGroup CRAFT_CREATOR_TAB = new ItemGroup(References.MOD_ID)

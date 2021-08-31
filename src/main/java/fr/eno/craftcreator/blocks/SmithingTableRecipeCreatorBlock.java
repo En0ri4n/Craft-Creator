@@ -1,20 +1,17 @@
 package fr.eno.craftcreator.blocks;
 
-import fr.eno.craftcreator.tileentity.SmithingTableRecipeCreatorTile;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import fr.eno.craftcreator.tileentity.*;
+import net.minecraft.block.*;
+import net.minecraft.block.material.*;
+import net.minecraft.client.particle.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.tileentity.*;
+import net.minecraft.util.*;
+import net.minecraft.util.math.*;
+import net.minecraft.world.*;
+import net.minecraftforge.fml.network.*;
+
+import javax.annotation.*;
 
 public class SmithingTableRecipeCreatorBlock extends Block
 {
@@ -22,9 +19,17 @@ public class SmithingTableRecipeCreatorBlock extends Block
 	{
 		super(Block.Properties.create(Material.WOOD).sound(SoundType.WOOD).hardnessAndResistance(99999F));
 	}
-	
+
 	@Override
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit)
+	public boolean addDestroyEffects(BlockState state, World world, BlockPos pos, ParticleManager manager)
+	{
+		return true;
+	}
+	
+	@Nonnull
+	@Override
+	@SuppressWarnings("deprecation")
+	public ActionResultType onBlockActivated(@Nonnull BlockState state, World worldIn, @Nonnull BlockPos pos, @Nonnull PlayerEntity player, @Nonnull Hand handIn, @Nonnull BlockRayTraceResult hit)
 	{
 		if(!worldIn.isRemote)
 		{
@@ -32,8 +37,9 @@ public class SmithingTableRecipeCreatorBlock extends Block
 			
 			if(tileentity instanceof SmithingTableRecipeCreatorTile)
 			{
-				player.sendMessage(new StringTextComponent(TextFormatting.RED + "Sorry, the smithing table has been implemented in minecraft 1.16 !"));
+				SmithingTableRecipeCreatorTile tile = (SmithingTableRecipeCreatorTile) tileentity;
 
+				NetworkHooks.openGui((ServerPlayerEntity) player, tile, pos);
                 return ActionResultType.SUCCESS;
 			}
 		}

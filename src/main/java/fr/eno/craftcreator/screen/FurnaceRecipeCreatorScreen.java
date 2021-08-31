@@ -1,6 +1,7 @@
 package fr.eno.craftcreator.screen;
 
 import com.google.common.collect.*;
+import com.mojang.blaze3d.matrix.*;
 import com.mojang.blaze3d.systems.*;
 import fr.eno.craftcreator.*;
 import fr.eno.craftcreator.container.*;
@@ -13,9 +14,11 @@ import net.minecraft.item.*;
 import net.minecraft.util.*;
 import net.minecraft.util.text.*;
 
-import java.awt.*;
+import javax.annotation.*;
+import java.awt.Color;
 import java.util.*;
 
+@SuppressWarnings("deprecation")
 public class FurnaceRecipeCreatorScreen extends ContainerScreen<FurnaceRecipeCreatorContainer>
 {
 	private MultipleItemChoiceButton<Item, CraftType> recipeTypeButton;
@@ -38,39 +41,39 @@ public class FurnaceRecipeCreatorScreen extends ContainerScreen<FurnaceRecipeCre
 
 		this.addButton(new ExecuteButton(guiLeft + 76, guiTop + 33, 32, button -> CraftHelper.createFurnaceRecipe(this.container.getInventory(), this.getRecipeType(), expField.getText(), cookTimeField.getText())));
 		
-		expField = new TextFieldWidget(font, guiLeft + 8, guiTop + 30, 40, 10, "");
+		expField = new TextFieldWidget(font, guiLeft + 8, guiTop + 30, 40, 10, new StringTextComponent(""));
 		expField.setText("0.1");
-		cookTimeField = new TextFieldWidget(font, guiLeft + 8, guiTop + 60, 40, 10, "");
+		cookTimeField = new TextFieldWidget(font, guiLeft + 8, guiTop + 60, 40, 10, new StringTextComponent(""));
 		cookTimeField.setText("200");
 	}
 	
 	@Override
-	public void render(int mouseX, int mouseY, float partialTicks)
-	{		
-		super.render(mouseX, mouseY, partialTicks);
+	public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	{
+		super.render(matrixStack, mouseX, mouseY, partialTicks);
 
 		double scale = 0.7D;
 		RenderSystem.pushMatrix();
 		RenderSystem.scaled(scale, scale, scale);
 		String expStr = "Exp. Gained :";
 		String cookTimeStr = "Cook Time :";
-		font.drawString(expStr, (int) ((guiLeft + 8) / scale), (int) ((guiTop + 30 - font.FONT_HEIGHT * scale) / scale), Color.WHITE.getRGB());
-		font.drawString(cookTimeStr, (int) ((guiLeft + 8) / scale), (int) ((guiTop + 60 - font.FONT_HEIGHT * scale) / scale), Color.WHITE.getRGB());
+		font.drawString(matrixStack, expStr, (int) ((guiLeft + 8) / scale), (int) ((guiTop + 30 - font.FONT_HEIGHT * scale) / scale), Color.WHITE.getRGB());
+		font.drawString(matrixStack, cookTimeStr, (int) ((guiLeft + 8) / scale), (int) ((guiTop + 60 - font.FONT_HEIGHT * scale) / scale), Color.WHITE.getRGB());
 		RenderSystem.popMatrix();
-		this.expField.render(mouseX, mouseY, partialTicks);
-		this.cookTimeField.render(mouseX, mouseY, partialTicks);
+		this.expField.render(matrixStack, mouseX, mouseY, partialTicks);
+		this.cookTimeField.render(matrixStack, mouseX, mouseY, partialTicks);
 		this.minecraft.getTextureManager().bindTexture(GUI_TEXTURES);
-		blit(this.guiLeft + 57, this.guiTop + 37, 176, 0, 14, 14, 256, 256);
+		blit(matrixStack, this.guiLeft + 57, this.guiTop + 37, 176, 0, 14, 14, 256, 256);
 	}
 
 	@Override
-	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
+	protected void drawGuiContainerBackgroundLayer(@Nonnull MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY)
 	{
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 		this.minecraft.getTextureManager().bindTexture(GUI_TEXTURES);
 		int i = this.guiLeft;
 		int j = (this.height - this.ySize) / 2;
-		this.blit(i, j, 0, 0, this.xSize, this.ySize);
+		this.blit(matrixStack, i, j, 0, 0, this.xSize, this.ySize);
 	}
 	
 	@Override
@@ -106,4 +109,7 @@ public class FurnaceRecipeCreatorScreen extends ContainerScreen<FurnaceRecipeCre
 	{
 		return recipeTypeButton.getCurrentValue();
 	}
+
+	@Override
+	protected void drawGuiContainerForegroundLayer(@Nonnull MatrixStack matrixStack, int x, int y) {}
 }

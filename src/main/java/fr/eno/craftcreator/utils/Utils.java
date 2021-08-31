@@ -35,7 +35,7 @@ public class Utils
 	 */
 	public static String getS(String path, Object... args)
 	{
-		return References.getTranslate(path, args).getFormattedText();
+		return References.getTranslate(path, args).getString();
 	}
 	
 	/**

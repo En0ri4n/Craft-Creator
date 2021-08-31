@@ -1,5 +1,6 @@
 package fr.eno.craftcreator.tileentity;
 
+import net.minecraft.block.*;
 import net.minecraft.inventory.*;
 import net.minecraft.inventory.container.*;
 import net.minecraft.item.*;
@@ -21,9 +22,9 @@ public abstract class InventoryContainerTileEntity extends TileEntity implements
     }
 
     @Override
-    public void read(@Nonnull CompoundNBT compound)
+    public void read(@Nonnull BlockState state, @Nonnull CompoundNBT compound)
     {
-        super.read(compound);
+        super.read(state, compound);
         this.inventory = NonNullList.withSize(inventory.size(), ItemStack.EMPTY);
         ItemStackHelper.loadAllItems(compound, this.inventory);
     }

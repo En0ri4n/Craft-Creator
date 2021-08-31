@@ -1,13 +1,16 @@
 package fr.eno.craftcreator.screen.buttons;
 
+import com.mojang.blaze3d.matrix.*;
 import fr.eno.craftcreator.*;
 import fr.eno.craftcreator.utils.*;
 import net.minecraft.client.*;
 import net.minecraft.client.gui.screen.*;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.*;
+import net.minecraft.util.text.*;
 
-import java.awt.*;
+import javax.annotation.*;
+import java.awt.Color;
 
 public class BooleanButton extends Button
 {
@@ -18,13 +21,13 @@ public class BooleanButton extends Button
 
 	public BooleanButton(String name, int x, int y, int width, int height, boolean value, IPressable onPress)
 	{
-		super(x, y, width, height, "", onPress);
+		super(x, y, width, height, new StringTextComponent(""), onPress);
 		this.name = name;
 		this.isOn = value;
 	}
 
 	@Override
-	public void renderButton(int mouseX, int mouseY, float partialTicks)
+	public void renderButton(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		Minecraft mc = Minecraft.getInstance();
 
@@ -40,8 +43,8 @@ public class BooleanButton extends Button
 
 			String str = Utils.getS("button.boolean." + name + "." + (isOn ? "on" : "off"));
 
-			Screen.blit(x, y, this.width, this.height, 0, yOffset, 100, 20, 100, 60);
-			drawCenteredString(mc.fontRenderer, str, this.x + this.width / 2, this.y + this.height / 3, Color.WHITE.getRGB());
+			Screen.blit(matrixStack, x, y, this.width, this.height, 0, yOffset, 100, 20, 100, 60);
+			drawCenteredString(matrixStack, mc.fontRenderer, str, this.x + this.width / 2, this.y + this.height / 3, Color.WHITE.getRGB());
 		}
 	}
 
