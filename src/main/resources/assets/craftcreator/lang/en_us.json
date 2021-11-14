@@ -1,16 +1,52 @@
 {
 	"itemGroup.craftcreator": "§lCraft Creator",
+
 	"craftcreator.button.boolean.craftType.on": "Shaped",
 	"craftcreator.button.boolean.craftType.off": "Shapeless",
+
 	"craftcreator.serializer.success": "Recipe saved at : §a§n%s",
+	"craftcreator.js_serializer.success": "Recipe %s -> %s successfully generated !",
+	"craftcreator.js_serializer.fail.recipe_exists": "§cA recipe with the same output already exists !",
+
 	"craftcreator.screen.crafting.info": "§oCtrl + Click on slot to use tag instead of item",
 	"craftcreator.screen.guiList.reset": "§cReset Tag",
+
 	"block.craftcreator.furnace_recipe_creator": "§lFurnace Recipe Creator",
 	"block.craftcreator.crafting_table_recipe_creator": "§lCrafting Table Recipe Creator",
 	"block.craftcreator.stone_cutter_recipe_creator": "§lStone Cutter Recipe Creator",
 	"block.craftcreator.smithing_table_recipe_creator": "§lSmithing Table Recipe Creator",
+	"block.craftcreator.botania_recipe_creator": "§lBotania Recipe Creator",
+
 	"craftcreator.container.crafting_table_recipe_creator.title": "Crafting Table Recipe Creator",
 	"craftcreator.container.stone_cutter_recipe_creator.title": "Cutter Recipe Creator",
 	"craftcreator.container.furnace_recipe_creator.title": "Furnace Recipe Creator",
-	"craftcreator.container.smithing_table_recipe_creator.title": "Smithing Recipe Creator"
+	"craftcreator.container.smithing_table_recipe_creator.title": "Smithing Recipe Creator",
+
+	"craftcreator.screen.botania_recipe_creator.button.next": ">",
+	"craftcreator.screen.botania_recipe_creator.button.previous": "<",
+
+	"craftcreator.screen.botania_recipe_creator.mana_infusion.title": "Mana Infusion Recipe Creator",
+	"craftcreator.screen.botania_recipe_creator.elven_trade.title": "Elven Trade Recipe Creator",
+	"craftcreator.screen.botania_recipe_creator.pure_daisy.title": "Pure Daisy Recipe Creator",
+	"craftcreator.screen.botania_recipe_creator.brew.title": "Brew Recipe Creator",
+	"craftcreator.screen.botania_recipe_creator.petal_apothecary.title": "Petal Recipe Creator",
+	"craftcreator.screen.botania_recipe_creator.runic_altar.title": "Rune Recipe Creator",
+	"craftcreator.screen.botania_recipe_creator.terra_plate.title": "Terra Plate Recipe Creator",
+
+	"craftcreator.screen.recipe_manager.button.remove_recipe": "Remove Recipe...",
+
+	"craftcreator.screen.recipe_manager.button.back": "Back",
+	"craftcreator.screen.recipe_manager.button.modifier_manager": "Modifier Manager",
+
+	"craftcreator.screen.mod_selection.list.mod": "Mod",
+	"craftcreator.screen.mod_selection.infos.modId": "Choose the Mod...",
+	"craftcreator.screen.mod_selection.infos.recipeType": "...and the Recipe Type",
+	"craftcreator.screen.mod_selection.list.recipe_type": "Recipe Type",
+
+	"craftcreator.screen.recipe_manager.list.added_recipes": "Added Recipes",
+	"craftcreator.screen.recipe_manager.list.modified_recipes": "Modified Recipes",
+	"craftcreator.screen.recipe_manager.list.recipes": "Recipes",
+
+	"craftcreator.screen.widget.simple_list.tooltip.input": "§6Input :",
+	"craftcreator.screen.widget.simple_list.tooltip.output": "§2Output :"
 }

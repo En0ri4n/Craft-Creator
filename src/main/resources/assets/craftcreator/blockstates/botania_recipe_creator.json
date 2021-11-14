@@ -1,0 +1,5 @@
+{
+    "variants": {
+        "": { "model": "craftcreator:block/botania_recipe_creator" }
+    }
+}

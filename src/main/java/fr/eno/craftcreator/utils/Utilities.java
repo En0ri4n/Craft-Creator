@@ -1,5 +1,7 @@
 package fr.eno.craftcreator.utils;
 
+import fr.eno.craftcreator.*;
+import net.minecraft.util.*;
 import net.minecraft.util.text.*;
 import net.minecraft.util.text.event.*;
 
@@ -8,6 +10,21 @@ import java.util.*;
 
 public class Utilities
 {
+	public static List<Integer> createList(int startIndex, int size)
+	{
+		List<Integer> ints = new ArrayList<>();
+
+		for(int i = startIndex; i < size; i++)
+			ints.add(i);
+
+		return ints;
+	}
+
+	public static ResourceLocation getGuiContainerTexture(String modid, String path)
+	{
+		return References.getLoc("textures/gui/container/" + modid + "/" + path);
+	}
+
 	public static List<String> splitToListWithSize(String text, int size)
 	{
 		List<String> parts = new ArrayList<>();

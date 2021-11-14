@@ -2,6 +2,8 @@ package fr.eno.craftcreator;
 
 import fr.eno.craftcreator.commands.*;
 import fr.eno.craftcreator.init.*;
+import fr.eno.craftcreator.kubejs.*;
+import fr.eno.craftcreator.kubejs.utils.*;
 import fr.eno.craftcreator.screen.*;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.renderer.*;
@@ -25,6 +27,8 @@ public class CraftCreator
 	public CraftCreator()
 	{
 		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+
+		KubeJSManager.initialize();
 
 		bus.addListener(this::setup);
 		bus.addListener(this::clientSetup);
@@ -55,6 +59,9 @@ public class CraftCreator
 		ScreenManager.registerFactory(InitContainers.FURNACE_RECIPE_CREATOR.get(), FurnaceRecipeCreatorScreen::new);
 		ScreenManager.registerFactory(InitContainers.STONE_CUTTER_RECIPE_CREATOR.get(), StoneCutterRecipeCreatorScreen::new);
 		ScreenManager.registerFactory(InitContainers.SMITHING_TABLE_RECIPE_CREATOR.get(), SmithingTableRecipeCreatorScreen::new);
+
+		if(SupportedMods.isBotaniaLoaded())
+			ScreenManager.registerFactory(InitContainers.BOTANIA_RECIPE_CREATOR.get(), BotaniaRecipeCreatorScreen::new);
 	}
 
 	@SubscribeEvent

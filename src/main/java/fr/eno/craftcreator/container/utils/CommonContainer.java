@@ -48,7 +48,7 @@ public class CommonContainer extends Container
 		ItemStack itemstack = ItemStack.EMPTY;
 		Slot slot = this.inventorySlots.get(index);
 
-		if (slot != null && slot.getHasStack())
+		if (slot != null && slot.getHasStack() && slot.xPos > 0 && slot.yPos > 0)
 		{
 			ItemStack itemstack1 = slot.getStack();
 			itemstack = itemstack1.copy();

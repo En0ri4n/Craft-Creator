@@ -2,8 +2,6 @@ package fr.eno.craftcreator.blocks;
 
 import fr.eno.craftcreator.tileentity.*;
 import net.minecraft.block.*;
-import net.minecraft.block.material.*;
-import net.minecraft.client.particle.*;
 import net.minecraft.entity.player.*;
 import net.minecraft.tileentity.*;
 import net.minecraft.util.*;
@@ -15,7 +13,7 @@ import net.minecraftforge.fml.network.*;
 import javax.annotation.*;
 import java.util.stream.*;
 
-public class CraftingTableRecipeCreatorBlock extends Block
+public class CraftingTableRecipeCreatorBlock extends RecipeCreatorBlock
 {
 	private static final VoxelShape SHAPE = Stream.of(
 			Block.makeCuboidShape(15, 12, 5, 16, 16, 11),
@@ -86,13 +84,6 @@ public class CraftingTableRecipeCreatorBlock extends Block
 
 	public CraftingTableRecipeCreatorBlock()
 	{
-		super(Block.Properties.create(Material.WOOD).sound(SoundType.WOOD).hardnessAndResistance(99999F));
-	}
-
-	@Override
-	public boolean addDestroyEffects(BlockState state, World world, BlockPos pos, ParticleManager manager)
-	{
-		return true;
 	}
 
 	@Nonnull
@@ -127,11 +118,5 @@ public class CraftingTableRecipeCreatorBlock extends Block
 	public TileEntity createTileEntity(BlockState state, IBlockReader world)
 	{
 		return new CraftingTableRecipeCreatorTile();
-	}
-	
-	@Override
-	public boolean hasTileEntity(BlockState state)
-	{
-		return true;
 	}
 }
