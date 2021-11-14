@@ -1,32 +1,22 @@
 package fr.eno.craftcreator.blocks;
 
-import fr.eno.craftcreator.tileentity.FurnaceRecipeCreatorTile;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.particle.*;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.state.DirectionProperty;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
+import fr.eno.craftcreator.tileentity.*;
+import net.minecraft.block.*;
+import net.minecraft.entity.player.*;
+import net.minecraft.item.*;
+import net.minecraft.state.*;
+import net.minecraft.state.StateContainer.*;
+import net.minecraft.tileentity.*;
+import net.minecraft.util.*;
+import net.minecraft.util.math.*;
 import net.minecraft.util.math.shapes.*;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraft.world.*;
+import net.minecraftforge.fml.network.*;
 
 import javax.annotation.*;
 import java.util.stream.*;
 
-public class FurnaceRecipeCreatorBlock extends Block
+public class FurnaceRecipeCreatorBlock extends RecipeCreatorBlock
 {
 	public static final DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
 	private static final VoxelShape SHAPE = Stream.of(
@@ -58,7 +48,6 @@ public class FurnaceRecipeCreatorBlock extends Block
 
 	public FurnaceRecipeCreatorBlock()
 	{
-		super(Block.Properties.create(Material.IRON).sound(SoundType.STONE).hardnessAndResistance(99999F));
 		this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.NORTH));
 	}
 
@@ -67,12 +56,6 @@ public class FurnaceRecipeCreatorBlock extends Block
 	public VoxelShape getShape(@Nonnull BlockState state, @Nonnull IBlockReader worldIn, @Nonnull BlockPos pos, @Nonnull ISelectionContext context)
 	{
 		return SHAPE;
-	}
-
-	@Override
-	public boolean addDestroyEffects(BlockState state, World world, BlockPos pos, ParticleManager manager)
-	{
-		return true;
 	}
 
 	@Nonnull
@@ -106,12 +89,6 @@ public class FurnaceRecipeCreatorBlock extends Block
 	public TileEntity createTileEntity(BlockState state, IBlockReader world)
 	{
 		return new FurnaceRecipeCreatorTile();
-	}
-
-	@Override
-	public boolean hasTileEntity(BlockState state)
-	{
-		return true;
 	}
 
 	@Override

@@ -1,12 +1,10 @@
 package fr.eno.craftcreator.init;
 
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.blocks.CraftingTableRecipeCreatorBlock;
-import fr.eno.craftcreator.blocks.FurnaceRecipeCreatorBlock;
-import fr.eno.craftcreator.blocks.SmithingTableRecipeCreatorBlock;
-import fr.eno.craftcreator.blocks.StoneCutterRecipeCreatorBlock;
+import fr.eno.craftcreator.blocks.*;
+import fr.eno.craftcreator.kubejs.utils.*;
 import net.minecraft.block.Block;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraftforge.fml.*;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -18,4 +16,11 @@ public class InitBlocks
 	public static final RegistryObject<Block> FURNACE_RECIPE_CREATOR = BLOCKS.register("furnace_recipe_creator", FurnaceRecipeCreatorBlock::new);
 	public static final RegistryObject<Block> STONE_CUTTER_RECIPE_CREATOR = BLOCKS.register("stone_cutter_recipe_creator", StoneCutterRecipeCreatorBlock::new);
 	public static final RegistryObject<Block> SMITHING_TABLE_RECIPE_CREATOR = BLOCKS.register("smithing_table_recipe_creator", SmithingTableRecipeCreatorBlock::new);
+
+	public static final RegistryObject<Block> BOTANIA_RECIPE_CREATOR;
+
+	static
+	{
+		BOTANIA_RECIPE_CREATOR = SupportedMods.isBotaniaLoaded() ? BLOCKS.register("botania_recipe_creator", BotaniaRecipeCreatorBlock::new) : null;
+	}
 }

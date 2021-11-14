@@ -43,7 +43,7 @@ public class GetCraftingTableRecipeCreatorTileInfosServerPacket
             if(tileEntity instanceof CraftingTableRecipeCreatorTile)
             {
                 CraftingTableRecipeCreatorTile tile = (CraftingTableRecipeCreatorTile) tileEntity;
-                InitPackets.getNetWork().send(PacketDistributor.PLAYER.with(() -> ctx.get().getSender()), new GetCraftingTableRecipeCreatorTileInfosClientPacket(msg.windowId, tile.isShapedRecipe(), tile.getTaggedSlots()));
+                InitPackets.getNetWork().send(PacketDistributor.PLAYER.with(() -> ctx.get().getSender()), new GetCraftingTableRecipeCreatorTileInfosClientPacket(msg.windowId, tile.isShapedRecipe()));
             }
 
             ctx.get().setPacketHandled(true);
