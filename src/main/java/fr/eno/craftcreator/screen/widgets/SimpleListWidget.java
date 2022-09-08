@@ -5,6 +5,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
+import fr.eno.craftcreator.utils.Callable;
 import fr.eno.craftcreator.utils.PairValue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
@@ -20,8 +21,10 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +37,10 @@ public class SimpleListWidget extends ExtendedList<SimpleListWidget.Entry>
     private final int titleBoxHeight;
     private final int scrollBarWidth;
     private boolean canHaveSelected;
+    private boolean hasTitleBox;
+    private Callable<Entry> onSelected;
+    private boolean isVisible;
+    private Callable<Entry> onDelete;
 
     public SimpleListWidget(Minecraft mcIn, int leftIn, int topIn, int widthIn, int heightIn, int slotHeightIn, int titleBoxHeight, int scrollBarWidth, ITextComponent titleIn)
     {
@@ -46,6 +53,24 @@ public class SimpleListWidget extends ExtendedList<SimpleListWidget.Entry>
         this.titleBoxHeight = titleBoxHeight;
         this.scrollBarWidth = scrollBarWidth;
         this.canHaveSelected = true;
+        this.hasTitleBox = true;
+        this.isVisible = true;
+    }
+
+    public SimpleListWidget(Minecraft mcIn, int x, int y, int widthIn, int heightIn, int slotHeightIn, int scrollBarWidth)
+    {
+
+        super(mcIn, widthIn - scrollBarWidth, heightIn, 0, 0, slotHeightIn);
+        this.x0 = x;
+        this.x1 = x + widthIn - scrollBarWidth;
+        this.y0 = y;
+        this.y1 = y + heightIn;
+        this.title = new StringTextComponent("");
+        this.titleBoxHeight = 0;
+        this.scrollBarWidth = scrollBarWidth;
+        this.canHaveSelected = true;
+        this.hasTitleBox = false;
+        this.isVisible = true;
     }
 
     public void setCanHaveSelected(boolean bool)
@@ -68,9 +93,16 @@ public class SimpleListWidget extends ExtendedList<SimpleListWidget.Entry>
     @Override
     public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        Screen.fill(matrixStack, this.x0, this.y0 - titleBoxHeight, this.x0 + this.width, this.y0, new Color(108, 22, 255, 150).getRGB());
-        Screen.drawCenteredString(matrixStack, minecraft.fontRenderer, this.title, this.x0 + this.width / 2, this.y0 - this.titleBoxHeight / 2 - minecraft.fontRenderer.FONT_HEIGHT / 2, Color.WHITE.getRGB());
-        //this.renderBackground(matrixStack);
+        if(!this.isVisible)
+            return;
+
+        if(hasTitleBox)
+        {
+            Screen.fill(matrixStack, this.x0, this.y0 - titleBoxHeight, this.x0 + this.width, this.y0, new Color(108, 22, 255, 150).getRGB());
+            Screen.drawCenteredString(matrixStack, minecraft.fontRenderer, this.title, this.x0 + this.width / 2, this.y0 - this.titleBoxHeight / 2 - minecraft.fontRenderer.FONT_HEIGHT / 2, Color.WHITE.getRGB());
+            //this.renderBackground(matrixStack);
+        }
+
         int scrollBarPosX = this.getScrollbarPosition();
         int scrollBarPosXWidth = scrollBarPosX + this.scrollBarWidth;
         Tessellator tessellator = Tessellator.getInstance();
@@ -175,8 +207,25 @@ public class SimpleListWidget extends ExtendedList<SimpleListWidget.Entry>
     }
 
     @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers)
+    {
+        if(keyCode == GLFW.GLFW_KEY_DELETE)
+        {
+            if(this.getSelected() != null)
+            {
+                this.onDelete.run(this.getSelected());
+                this.setSelected(null);
+            }
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button)
     {
+        if(!this.isVisible)
+            return false;
+
         this.updateScrollingState(mouseX, mouseY, button);
 
         if(canHaveSelected)
@@ -198,6 +247,28 @@ public class SimpleListWidget extends ExtendedList<SimpleListWidget.Entry>
         entries.forEach(this::addEntry);
     }
 
+    @Override
+    public void setSelected(@Nullable Entry entry)
+    {
+        if(this.onSelected != null)
+        {
+            this.onSelected.run(entry);
+            this.onSelected = null;
+        }
+        super.setSelected(entry);
+    }
+
+    public void setOnSelectedChange(Callable<Entry> onSelected)
+    {
+        this.onSelected = onSelected;
+    }
+
+    public void setCoordinates(int x, int y)
+    {
+        this.x0 = x;
+        this.y0 = y;
+    }
+
     public void renderTooltip(MatrixStack matrixStack, int mouseX, int mouseY)
     {
         Entry entry = getEntryAtPosition(mouseX, mouseY);
@@ -208,9 +279,26 @@ public class SimpleListWidget extends ExtendedList<SimpleListWidget.Entry>
         }
     }
 
+    public void setOnDelete(Callable<Entry> onDelete)
+    {
+        this.onDelete = onDelete;
+    }
+
+    public boolean isVisible()
+    {
+        return isVisible;
+    }
+
+    public void setVisible(boolean visible)
+    {
+        isVisible = visible;
+    }
+
     public static abstract class Entry extends ExtendedList.AbstractListEntry<SimpleListWidget.Entry>
     {
         protected Minecraft minecraft = Minecraft.getInstance();
+
+        public abstract String toString();
 
         public abstract void renderTooltip(MatrixStack matrixStack, int mouseX, int mouseY);
     }
@@ -231,18 +319,32 @@ public class SimpleListWidget extends ExtendedList<SimpleListWidget.Entry>
             if(displayStr.contains("/")) displayStr = displayStr.substring(displayStr.indexOf('/') + 1);
 
             Color color = Color.WHITE;
-            if(minecraft.fontRenderer.getStringWidth(displayStr) > width - 16)
-                displayStr = displayStr.substring(0, 15) + "...";
+            if(minecraft.fontRenderer.getStringWidth(displayStr) > width - (16 + 5))
+            {
+                int letters = displayStr.toCharArray().length;
+                int string_width = minecraft.fontRenderer.getStringWidth(displayStr);
+                int letter_width = string_width / letters;
+                int def_width = width - (16 + 5);
+                int width_much = string_width - def_width;
+                int letters_to_remove = width_much / letter_width;
+                displayStr = displayStr.substring(0, displayStr.length() - letters_to_remove - 3) + "...";
+            }
 
             if(isMouseOver)
                 color = Color.yellow;
 
-            Screen.drawCenteredString(matrixStack, minecraft.fontRenderer, displayStr, left + width / 2, (top + height / 2 - minecraft.fontRenderer.FONT_HEIGHT / 2), color.getRGB());
+            Screen.drawString(matrixStack, minecraft.fontRenderer, displayStr, left + 16 + 5, (top + height / 2 - minecraft.fontRenderer.FONT_HEIGHT / 2), color.getRGB());
 
             ItemStack item = RecipeFileUtils.getOneOutput(recipe);
 
             int yPos = height / 2 - 16 / 2;
             minecraft.getItemRenderer().renderItemAndEffectIntoGuiWithoutEntity(item, left + yPos, top + yPos);
+        }
+
+        @Override
+        public String toString()
+        {
+            return null;
         }
 
         public void renderTooltip(MatrixStack matrixStack, int mouseX, int mouseY)
@@ -299,15 +401,29 @@ public class SimpleListWidget extends ExtendedList<SimpleListWidget.Entry>
             //Screen.fill(matrixStack, left, top, left + width, top + height, 0xFFFFFF);
 
             String displayStr = resource;
-            if(minecraft.fontRenderer.getStringWidth(displayStr) > width)
-                displayStr = displayStr.substring(0, 15) + "...";
+            if(minecraft.fontRenderer.getStringWidth(displayStr) > width - (16 + 5))
+            {
+                int letters = displayStr.toCharArray().length;
+                int string_width = minecraft.fontRenderer.getStringWidth(displayStr);
+                int letter_width = string_width / letters;
+                int def_width = width - (16 + 5);
+                int width_much = string_width - def_width;
+                int letters_to_remove = width_much / letter_width;
+                displayStr = displayStr.substring(0, displayStr.length() - letters_to_remove - 3) + "...";
+            }
 
             Color strColor = isMouseOver ? Color.YELLOW : Color.WHITE;
             RenderSystem.pushMatrix();
-            double scale = 1.1D;
+            double scale = 1D;
             RenderSystem.scaled(scale, scale, scale);
-            Screen.drawCenteredString(matrixStack, minecraft.fontRenderer, displayStr, (int) ((left + width / 2) / scale), (int) ((top + height / 2 - ((double) minecraft.fontRenderer.FONT_HEIGHT * scale) / 2) / scale), strColor.getRGB());
+            Screen.drawCenteredString(matrixStack, minecraft.fontRenderer, displayStr, (int) ((left + width / 2) / scale), (int) ((top + height / 2 - ((double) minecraft.fontRenderer.FONT_HEIGHT * scale) / 2) / scale) + 2, strColor.getRGB());
             RenderSystem.popMatrix();
+        }
+
+        @Override
+        public String toString()
+        {
+            return this.resource;
         }
 
         @Override
@@ -321,6 +437,60 @@ public class SimpleListWidget extends ExtendedList<SimpleListWidget.Entry>
         {
             this.tooltips = tooltips;
             return this;
+        }
+    }
+    public static class ResourceLocationEntry extends Entry
+    {
+        private List<ITextComponent> tooltips;
+        private final ResourceLocation resourceLocation;
+
+        public ResourceLocationEntry(ResourceLocation resourceLocation)
+        {
+            this.resourceLocation = resourceLocation;
+            this.tooltips = new ArrayList<>();
+        }
+
+        public ResourceLocation getResourceLocation()
+        {
+            return resourceLocation;
+        }
+
+        @Override
+        public void render(@Nonnull MatrixStack matrixStack, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean isMouseOver, float partialTicks)
+        {
+            //Screen.fill(matrixStack, left, top, left + width, top + height, 0xFFFFFF);
+
+            String displayStr = resourceLocation.toString();
+            if(minecraft.fontRenderer.getStringWidth(displayStr) > width - (16 + 5))
+            {
+                int letters = displayStr.toCharArray().length;
+                int string_width = minecraft.fontRenderer.getStringWidth(displayStr);
+                int letter_width = string_width / letters;
+                int def_width = width - (16 + 5);
+                int width_much = string_width - def_width;
+                int letters_to_remove = width_much / letter_width;
+                displayStr = displayStr.substring(0, displayStr.length() - letters_to_remove - 3) + "...";
+            }
+
+            Color strColor = isMouseOver ? Color.YELLOW : Color.WHITE;
+            RenderSystem.pushMatrix();
+            double scale = 1.1D;
+            RenderSystem.scaled(scale, scale, scale);
+            Screen.drawCenteredString(matrixStack, minecraft.fontRenderer, displayStr, (int) ((left + width / 2) / scale), (int) ((top + height / 2 - ((double) minecraft.fontRenderer.FONT_HEIGHT * scale) / 2) / scale), strColor.getRGB());
+            RenderSystem.popMatrix();
+        }
+
+        @Override
+        public String toString()
+        {
+            return this.resourceLocation.toString();
+        }
+
+        @Override
+        public void renderTooltip(MatrixStack matrixStack, int mouseX, int mouseY)
+        {
+            if(!tooltips.isEmpty())
+                net.minecraftforge.fml.client.gui.GuiUtils.drawHoveringText(matrixStack, tooltips, mouseX, mouseY, minecraft.getMainWindow().getScaledWidth(), minecraft.getMainWindow().getScaledHeight(), -1, minecraft.fontRenderer);
         }
     }
 }

@@ -112,9 +112,9 @@ public class RecipeFileUtils
         return recipes;
     }
 
-    public static <T extends IRecipe<?>> Map<PairValue<Integer, ModifiedRecipeType>, List<ITextComponent>> getModifiedRecipesFor(String modId, IRecipeType<T> recipeType)
+    public static <T extends IRecipe<?>> Map<PairValue<Integer, String>, List<ITextComponent>> getModifiedRecipesFor(String modId, IRecipeType<T> recipeType)
     {
-        Map<PairValue<Integer, ModifiedRecipeType>, List<ITextComponent>> modifiedRecipes = new HashMap<>();
+        Map<PairValue<Integer, String>, List<ITextComponent>> modifiedRecipes = new HashMap<>();
 
         try
         {
@@ -133,7 +133,8 @@ public class RecipeFileUtils
                     if(JSON_MATCHER.find())
                     {
                         ModifiedRecipeType modifiedRecipeType = ModifiedRecipeType.byDescriptor(descriptor.get());
-                        modifiedRecipes.put(PairValue.create(index++, modifiedRecipeType), getModifiedRecipe(modifiedRecipeType, JSON_MATCHER.group()));
+                        PairValue<String, List<ITextComponent>> tooltips = getModifiedRecipe(modifiedRecipeType, JSON_MATCHER.group());
+                        modifiedRecipes.put(PairValue.create(index++, tooltips.getFirstValue()), tooltips.getSecondValue());
                     }
                 }
             }
@@ -157,6 +158,29 @@ public class RecipeFileUtils
             List<String> lines = Files.readAllLines(recipeFile.toPath(), StandardCharsets.UTF_8);
             for(int i = 0; i < lines.size(); i++)
                 if(lines.get(i).contains(getStartRecipeTypeGroup(recipeType)))
+                {
+                    if(lines.get(i).contains(line)) break;
+
+                    lines.add(i + 1, "\t" + line);
+                    break;
+                }
+            Files.write(recipeFile.toPath(), lines, StandardCharsets.UTF_8);
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public static void insertAndWriteLinesToRemoveRecipe(String modId, String line)
+    {
+        try
+        {
+            File recipeFile = RecipeFileUtils.getRecipeFile(modId);
+
+            List<String> lines = Files.readAllLines(recipeFile.toPath(), StandardCharsets.UTF_8);
+            for(int i = 0; i < lines.size(); i++)
+                if(lines.get(i).contains(MODIFIED_RECIPE_START))
                 {
                     if(lines.get(i).contains(line)) break;
 
@@ -283,15 +307,16 @@ public class RecipeFileUtils
         return jsonRecipes;
     }
 
-    private static List<ITextComponent> getModifiedRecipe(ModifiedRecipeType type, String line)
+    private static PairValue<String, List<ITextComponent>> getModifiedRecipe(ModifiedRecipeType type, String line)
     {
+        String title = "";
         List<ITextComponent> list = new ArrayList<>();
 
         switch(type)
         {
             case REMOVED:
                 JsonObject json = GSON.fromJson(line, JsonElement.class).getAsJsonObject();
-                list.add(type.getTitle());
+                list.add(new StringTextComponent(TextFormatting.GOLD + json.get(json.entrySet().stream().findFirst().get().getKey().toLowerCase()).getAsString()));
                 list.add(new StringTextComponent(""));
                 comps.forEach(comp ->
                 {
@@ -302,6 +327,11 @@ public class RecipeFileUtils
                         list.add(new StringTextComponent(""));
                     }
                 });
+
+                list.add(new StringTextComponent(TextFormatting.RED + "Status : " + TextFormatting.DARK_RED + type.getTitle().getString()));
+                list.add(new StringTextComponent(""));
+
+                title = json.get(json.entrySet().stream().findFirst().get().getKey().toLowerCase()).getAsString();
                 break;
             case REPLACED_INPUT:
                 break;
@@ -309,7 +339,7 @@ public class RecipeFileUtils
                 break;
         }
 
-        return list;
+        return PairValue.create(title, list);
     }
 
     public static PairValue<String, Integer> getParam(IRecipe<?> recipe)
