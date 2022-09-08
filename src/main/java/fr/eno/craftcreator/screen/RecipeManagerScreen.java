@@ -2,6 +2,7 @@ package fr.eno.craftcreator.screen;
 
 import com.mojang.blaze3d.matrix.*;
 import fr.eno.craftcreator.*;
+import fr.eno.craftcreator.kubejs.jsserializers.ModRecipesJSSerializer;
 import fr.eno.craftcreator.kubejs.utils.*;
 import fr.eno.craftcreator.screen.buttons.*;
 import fr.eno.craftcreator.screen.widgets.*;
@@ -9,6 +10,7 @@ import net.minecraft.util.*;
 import net.minecraft.util.text.*;
 
 import javax.annotation.*;
+import java.util.Collections;
 
 public class RecipeManagerScreen extends ListScreen
 {
@@ -37,8 +39,14 @@ public class RecipeManagerScreen extends ListScreen
         this.setEntries(2, DeserializerHelper.getModifiedRecipesEntryList(this.modId, this.recipeType));
         this.getLists().forEach(slw -> slw.setCanHaveSelected(true));
 
-        this.addButton(new SimpleButton(References.getTranslate("screen.recipe_manager.button.back"), this.width / 2 - 40, this.height - bottomHeight - 7, 80, 20, button -> minecraft.displayGuiScreen(new ModSelectionScreen())));
+        this.getList(0).setOnDelete((entry ->
+        {
+            SimpleListWidget.RecipeEntry recipeEntry = (SimpleListWidget.RecipeEntry)entry;
+            ModRecipesJSSerializer.getInstance(recipeEntry.getRecipe().getId().getNamespace()).removeRecipe(Collections.singletonMap(ModRecipesJSSerializer.RemoveTag.RECIPE_ID, recipeEntry.getRecipe().getId().toString()));
+            this.setEntries(2, DeserializerHelper.getModifiedRecipesEntryList(this.modId, this.recipeType));
+        }));
 
+        this.addButton(new SimpleButton(References.getTranslate("screen.recipe_manager.button.back"), this.width / 2 - 40, this.height - bottomHeight - 7, 80, 20, button -> minecraft.displayGuiScreen(new ModSelectionScreen())));
         this.addButton(new SimpleButton(References.getTranslate("screen.recipe_manager.button.modifier_manager"), this.width - 130, this.height - bottomHeight - 7, 120, 20, button -> minecraft.displayGuiScreen(new RecipeModifierManagerScreen(this, this.modId, this.recipeType))));
     }
 

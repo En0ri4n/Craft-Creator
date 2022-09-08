@@ -48,5 +48,14 @@
 	"craftcreator.screen.recipe_manager.list.recipes": "Recipes",
 
 	"craftcreator.screen.widget.simple_list.tooltip.input": "§6Input :",
-	"craftcreator.screen.widget.simple_list.tooltip.output": "§2Output :"
+	"craftcreator.screen.widget.simple_list.tooltip.output": "§2Output :",
+
+	"craftcreator.screen.remove_manager.title": "Remove Recipe",
+	"craftcreator.screen.remove_manager.button.has_input_item": "Input Item :",
+	"craftcreator.screen.remove_manager.button.has_output_item": "Output Item :",
+	"craftcreator.screen.remove_manager.button.has_mod": "Mod Id :",
+	"craftcreator.screen.remove_manager.button.has_type": "Type :",
+	"craftcreator.screen.remove_manager.button.has_id": "Id :",
+	"craftcreator.screen.remove_manager.button.remove": "Remove Recipe",
+	"craftcreator.screen.remove_manager.button.back": "Back"
 }

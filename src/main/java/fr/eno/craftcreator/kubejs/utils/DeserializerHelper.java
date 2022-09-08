@@ -8,6 +8,7 @@ import net.minecraft.util.*;
 import net.minecraft.util.registry.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 public class DeserializerHelper
@@ -20,6 +21,8 @@ public class DeserializerHelper
 
         return entries;
     }
+
+
 
     public static <T extends SimpleListWidget.Entry> List<T> getAddedRecipesEntryList(String modId, ResourceLocation recipeTypeLoc)
     {
@@ -40,7 +43,7 @@ public class DeserializerHelper
         List<T> entries = new ArrayList<>();
 
         RecipeFileUtils.getModifiedRecipesFor(modId, recipeType).forEach((pairValue, display) ->
-                entries.add((T) new SimpleListWidget.StringEntry(pairValue.getSecondValue().getTitle().getString()).setTooltips(display)));
+                entries.add((T) new SimpleListWidget.StringEntry(pairValue.getSecondValue()).setTooltips(display)));
 
         return entries;
     }
@@ -68,6 +71,6 @@ public class DeserializerHelper
                         entries.add((E) new SimpleListWidget.RecipeEntry(recipe));
                 });
 
-        return entries;
+        return entries.stream().sorted((object1, object2) -> ((SimpleListWidget.RecipeEntry) object1).getRecipe().getId().toString().compareTo(((SimpleListWidget.RecipeEntry) object2).getRecipe().getId().toString())).collect(Collectors.toList());
     }
 }

@@ -5,18 +5,23 @@ import fr.eno.craftcreator.init.*;
 import fr.eno.craftcreator.kubejs.*;
 import fr.eno.craftcreator.kubejs.utils.*;
 import fr.eno.craftcreator.screen.*;
+import fr.eno.craftcreator.utils.EntryHelper;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.renderer.*;
 import net.minecraft.item.*;
+import net.minecraft.world.DimensionType;
 import net.minecraftforge.common.*;
 import net.minecraftforge.event.*;
 import net.minecraftforge.eventbus.api.*;
 import net.minecraftforge.fml.common.*;
 import net.minecraftforge.fml.event.lifecycle.*;
+import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.*;
 import org.apache.logging.log4j.*;
 
 import javax.annotation.*;
+import java.util.ArrayList;
 import java.util.function.*;
 
 @Mod(References.MOD_ID)
@@ -62,6 +67,12 @@ public class CraftCreator
 
 		if(SupportedMods.isBotaniaLoaded())
 			ScreenManager.registerFactory(InitContainers.BOTANIA_RECIPE_CREATOR.get(), BotaniaRecipeCreatorScreen::new);
+	}
+
+	@SubscribeEvent
+	public void onServerStart(FMLServerStartedEvent event)
+	{
+		event.getServer().getWorlds().forEach(EntryHelper::init);
 	}
 
 	@SubscribeEvent
