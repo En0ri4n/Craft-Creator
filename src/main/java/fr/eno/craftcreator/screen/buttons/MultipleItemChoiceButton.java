@@ -1,17 +1,19 @@
 package fr.eno.craftcreator.screen.buttons;
 
-import com.mojang.blaze3d.matrix.*;
-import fr.eno.craftcreator.*;
-import fr.eno.craftcreator.screen.buttons.pressable.*;
-import net.minecraft.client.*;
-import net.minecraft.client.gui.screen.*;
-import net.minecraft.client.gui.widget.button.*;
-import net.minecraft.item.*;
-import net.minecraft.util.*;
-import net.minecraft.util.text.*;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import fr.eno.craftcreator.References;
+import fr.eno.craftcreator.screen.buttons.pressable.NullPressable;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.StringTextComponent;
 
-import javax.annotation.*;
-import java.util.*;
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.Map;
 
 public class MultipleItemChoiceButton<K extends Item, V> extends Button
 {

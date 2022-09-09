@@ -1,10 +1,11 @@
 package fr.eno.craftcreator.container.slot;
 
-import net.minecraft.entity.player.*;
-import net.minecraft.item.*;
-import net.minecraftforge.items.*;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.SlotItemHandler;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
 
 public class LockedSlot extends SlotItemHandler
 {	

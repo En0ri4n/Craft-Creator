@@ -1,24 +1,26 @@
 package fr.eno.craftcreator.screen;
 
-import com.mojang.blaze3d.matrix.*;
-import com.mojang.blaze3d.systems.*;
-import fr.eno.craftcreator.*;
-import fr.eno.craftcreator.container.*;
-import fr.eno.craftcreator.screen.buttons.*;
-import fr.eno.craftcreator.utils.*;
-import net.minecraft.client.gui.screen.*;
-import net.minecraft.client.gui.screen.inventory.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.item.*;
-import net.minecraft.util.*;
-import net.minecraft.util.text.*;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
+import fr.eno.craftcreator.References;
+import fr.eno.craftcreator.container.SmithingTableRecipeCreatorContainer;
+import fr.eno.craftcreator.kubejs.jsserializers.MinecraftRecipeSerializer;
+import fr.eno.craftcreator.screen.buttons.ExecuteButton;
+import fr.eno.craftcreator.screen.buttons.SimpleCheckBox;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 
-import javax.annotation.*;
-import java.awt.Color;
+import javax.annotation.Nonnull;
 
 public class SmithingTableRecipeCreatorScreen extends ContainerScreen<SmithingTableRecipeCreatorContainer>
 {
 	private static final ResourceLocation GUI_TEXTURES = References.getLoc("textures/gui/container/smithing_table_recipe_creator.png");
+	private SimpleCheckBox isKubeJSRecipeButton;
 
 	public SmithingTableRecipeCreatorScreen(SmithingTableRecipeCreatorContainer screenContainer, PlayerInventory inv, ITextComponent titleIn)
 	{
@@ -30,7 +32,9 @@ public class SmithingTableRecipeCreatorScreen extends ContainerScreen<SmithingTa
 	{
 		super.init();
 
-		this.addButton(new ExecuteButton(guiLeft + 98, guiTop + 45, 30, button -> CraftHelper.createSmithingTableRecipe(this.container.getInventory())));
+		this.addButton(isKubeJSRecipeButton = new SimpleCheckBox(5, this.height - 20, 15, 15, References.getTranslate("screen.recipe_creator_screen.kube_js_button"), false));
+
+		this.addButton(new ExecuteButton(guiLeft + 98, guiTop + 45, 30, button -> MinecraftRecipeSerializer.createSmithingTableRecipe(this.container.getInventory(), this.isKubeJSRecipeButton.isChecked())));
 	}
 	
 	@Override

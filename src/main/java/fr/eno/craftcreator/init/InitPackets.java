@@ -1,12 +1,13 @@
 package fr.eno.craftcreator.init;
 
-import fr.eno.craftcreator.*;
-import fr.eno.craftcreator.kubejs.utils.*;
+import fr.eno.craftcreator.References;
+import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import fr.eno.craftcreator.packets.*;
-import net.minecraftforge.fml.network.*;
-import net.minecraftforge.fml.network.simple.*;
+import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.fml.network.NetworkRegistry;
+import net.minecraftforge.fml.network.simple.SimpleChannel;
 
-import java.util.*;
+import java.util.Optional;
 
 public class InitPackets
 {

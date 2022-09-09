@@ -1,16 +1,16 @@
 package fr.eno.craftcreator.screen.buttons;
 
-import com.mojang.blaze3d.matrix.*;
-import fr.eno.craftcreator.*;
-import fr.eno.craftcreator.utils.*;
-import net.minecraft.client.*;
-import net.minecraft.client.gui.screen.*;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import fr.eno.craftcreator.References;
+import fr.eno.craftcreator.utils.Utils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.util.*;
-import net.minecraft.util.text.*;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.StringTextComponent;
 
-import javax.annotation.*;
-import java.awt.Color;
+import javax.annotation.Nonnull;
+import java.awt.*;
 
 public class BooleanButton extends Button
 {

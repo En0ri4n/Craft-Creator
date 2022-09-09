@@ -1,11 +1,12 @@
 package fr.eno.craftcreator.init;
 
-import fr.eno.craftcreator.*;
-import fr.eno.craftcreator.item.*;
-import fr.eno.craftcreator.kubejs.utils.*;
-import net.minecraft.item.*;
-import net.minecraftforge.fml.*;
-import net.minecraftforge.registries.*;
+import fr.eno.craftcreator.References;
+import fr.eno.craftcreator.item.ItemBlockBasic;
+import fr.eno.craftcreator.kubejs.utils.SupportedMods;
+import net.minecraft.item.Item;
+import net.minecraftforge.fml.RegistryObject;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class InitItems
 {

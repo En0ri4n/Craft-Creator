@@ -1,8 +1,10 @@
 package fr.eno.craftcreator.utils;
 
-import net.minecraft.inventory.container.*;
+import net.minecraft.inventory.container.Slot;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class PositionnedSlot
 {

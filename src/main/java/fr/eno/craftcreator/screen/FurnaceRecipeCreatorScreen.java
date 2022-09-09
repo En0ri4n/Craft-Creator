@@ -1,22 +1,27 @@
 package fr.eno.craftcreator.screen;
 
-import com.google.common.collect.*;
-import com.mojang.blaze3d.matrix.*;
-import com.mojang.blaze3d.systems.*;
-import fr.eno.craftcreator.*;
-import fr.eno.craftcreator.container.*;
-import fr.eno.craftcreator.screen.buttons.*;
-import fr.eno.craftcreator.utils.*;
-import net.minecraft.client.gui.screen.inventory.*;
-import net.minecraft.client.gui.widget.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.item.*;
-import net.minecraft.util.*;
-import net.minecraft.util.text.*;
+import com.google.common.collect.ImmutableMap;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
+import fr.eno.craftcreator.References;
+import fr.eno.craftcreator.container.FurnaceRecipeCreatorContainer;
+import fr.eno.craftcreator.kubejs.jsserializers.MinecraftRecipeSerializer;
+import fr.eno.craftcreator.screen.buttons.ExecuteButton;
+import fr.eno.craftcreator.screen.buttons.MultipleItemChoiceButton;
+import fr.eno.craftcreator.screen.buttons.SimpleCheckBox;
+import fr.eno.craftcreator.utils.CraftType;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.Items;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 
-import javax.annotation.*;
-import java.awt.Color;
-import java.util.*;
+import javax.annotation.Nonnull;
+import java.awt.*;
+import java.util.Map;
 
 @SuppressWarnings("deprecation")
 public class FurnaceRecipeCreatorScreen extends ContainerScreen<FurnaceRecipeCreatorContainer>
@@ -24,7 +29,8 @@ public class FurnaceRecipeCreatorScreen extends ContainerScreen<FurnaceRecipeCre
 	private MultipleItemChoiceButton<Item, CraftType> recipeTypeButton;
 	private static final ResourceLocation GUI_TEXTURES = new ResourceLocation(References.MOD_ID, "textures/gui/container/furnace_recipe_creator.png");
 	private final Map<Item, CraftType> RECIPE_TYPE_MAP = ImmutableMap.of(Items.FURNACE, CraftType.FURNACE_SMELTING, Items.BLAST_FURNACE, CraftType.FURNACE_BLASTING, Items.SMOKER, CraftType.FURNACE_SMOKING, Items.CAMPFIRE, CraftType.CAMPFIRE_COOKING);
-	
+
+	private SimpleCheckBox isKubeJSRecipeButton;
 	private TextFieldWidget expField;
 	private TextFieldWidget cookTimeField;
 	
@@ -39,7 +45,9 @@ public class FurnaceRecipeCreatorScreen extends ContainerScreen<FurnaceRecipeCre
 		super.init();
 		this.addButton(recipeTypeButton = new MultipleItemChoiceButton<>(this.guiLeft + xSize - 20, guiTop, 20, 20, RECIPE_TYPE_MAP));
 
-		this.addButton(new ExecuteButton(guiLeft + 76, guiTop + 33, 32, button -> CraftHelper.createFurnaceRecipe(this.container.getInventory(), this.getRecipeType(), expField.getText(), cookTimeField.getText())));
+
+		this.addButton(isKubeJSRecipeButton = new SimpleCheckBox(5, this.height - 20, 15, 15, References.getTranslate("screen.recipe_creator_screen.kube_js_button"), false));
+		this.addButton(new ExecuteButton(guiLeft + 76, guiTop + 33, 32, button -> MinecraftRecipeSerializer.createFurnaceRecipe(this.container.getInventory(), this.getRecipeType(), expField.getText(), cookTimeField.getText(), isKubeJSRecipeButton.isChecked())));
 		
 		expField = new TextFieldWidget(font, guiLeft + 8, guiTop + 30, 40, 10, new StringTextComponent(""));
 		expField.setText("0.1");

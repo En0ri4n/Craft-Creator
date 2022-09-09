@@ -1,25 +1,24 @@
 package fr.eno.craftcreator.screen;
 
-import com.mojang.blaze3d.matrix.*;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;
-import fr.eno.craftcreator.screen.widgets.*;
-import net.minecraft.client.gui.screen.*;
-import net.minecraft.util.text.*;
+import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.util.text.ITextComponent;
 
-import javax.annotation.*;
-import java.util.*;
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ListScreen extends Screen
 {
     protected final List<SimpleListWidget> lists;
-    protected final List<DropDownListWidget> ddlists;
     protected int doubleClickCounter;
 
     protected ListScreen(ITextComponent titleIn)
     {
         super(titleIn);
         this.lists = new ArrayList<>();
-        this.ddlists = new ArrayList<>();
     }
 
     protected List<SimpleListWidget> getLists()
@@ -31,28 +30,15 @@ public class ListScreen extends Screen
     {
         this.lists.add(list);
     }
-    protected void addDDList(DropDownListWidget list)
-    {
-        this.ddlists.add(list);
-    }
 
     protected SimpleListWidget getList(int index)
     {
         return this.lists.get(index);
     }
-    protected DropDownListWidget getDDList(int index)
-    {
-        return this.ddlists.get(index);
-    }
 
     protected void setEntries(int index, List<SimpleListWidget.Entry> entries)
     {
         this.getList(index).setEntries(entries);
-    }
-
-    protected void setDDEntries(int index, List<DropDownListWidget.Entry> entries)
-    {
-        this.getDDList(index).setEntries(entries);
     }
 
     protected void clearLists()
@@ -63,19 +49,16 @@ public class ListScreen extends Screen
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button)
     {
+        boolean flag = super.mouseClicked(mouseX, mouseY, button);
         this.lists.forEach(list -> list.mouseClicked(mouseX, mouseY, button));
-        this.ddlists.forEach(list -> list.mouseClicked(mouseX, mouseY, button));
         this.doubleClickCounter = 20;
-        return super.mouseClicked(mouseX, mouseY, button);
+        return flag;
     }
 
     @Override
     public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         if(this.doubleClickCounter >= 0) this.doubleClickCounter--;
-
-        this.ddlists.forEach(list -> list.render(matrixStack, mouseX, mouseY, partialTicks));
-        this.ddlists.forEach(list -> list.renderTooltip(matrixStack, mouseX, mouseY));
 
         super.render(matrixStack, mouseX, mouseY, partialTicks);
 
@@ -89,7 +72,6 @@ public class ListScreen extends Screen
     public boolean mouseScrolled(double mouseX, double mouseY, double delta)
     {
         this.lists.forEach(list -> list.mouseScrolled(mouseX, mouseY, delta));
-        this.ddlists.forEach(list -> list.mouseScrolled(mouseX, mouseY, delta));
         return super.mouseScrolled(mouseX, mouseY, delta);
     }
 
@@ -97,7 +79,6 @@ public class ListScreen extends Screen
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY)
     {
         this.lists.forEach(list -> list.mouseDragged(mouseX, mouseY, button, dragX, dragY));
-        this.ddlists.forEach(list -> list.mouseDragged(mouseX, mouseY, button, dragX, dragY));
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 
@@ -106,7 +87,6 @@ public class ListScreen extends Screen
     public boolean mouseReleased(double mouseX, double mouseY, int button)
     {
         this.lists.forEach(list -> list.mouseReleased(mouseX, mouseY, button));
-        this.ddlists.forEach(list -> list.mouseReleased(mouseX, mouseY, button));
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
@@ -114,7 +94,6 @@ public class ListScreen extends Screen
     public boolean keyPressed(int keyCode, int scanCode, int modifiers)
     {
         this.lists.forEach(list -> list.keyPressed(keyCode, scanCode, modifiers));
-        this.ddlists.forEach(list -> list.keyPressed(keyCode, scanCode, modifiers));
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 

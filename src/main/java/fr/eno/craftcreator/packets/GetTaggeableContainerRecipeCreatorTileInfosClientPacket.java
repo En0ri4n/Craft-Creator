@@ -1,13 +1,14 @@
 package fr.eno.craftcreator.packets;
 
-import fr.eno.craftcreator.screen.*;
-import net.minecraft.client.*;
-import net.minecraft.network.*;
-import net.minecraft.util.*;
-import net.minecraftforge.fml.network.*;
+import fr.eno.craftcreator.screen.TaggeableSlotsContainerScreen;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.network.NetworkEvent;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
 
 public class GetTaggeableContainerRecipeCreatorTileInfosClientPacket
 {

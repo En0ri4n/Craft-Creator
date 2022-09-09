@@ -1,23 +1,27 @@
 package fr.eno.craftcreator.screen;
 
-import com.mojang.blaze3d.matrix.*;
-import fr.eno.craftcreator.*;
-import fr.eno.craftcreator.init.*;
-import fr.eno.craftcreator.packets.*;
-import fr.eno.craftcreator.tileentity.*;
-import fr.eno.craftcreator.utils.*;
-import net.minecraft.client.gui.screen.*;
-import net.minecraft.client.gui.screen.inventory.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.inventory.container.*;
-import net.minecraft.util.*;
-import net.minecraft.util.math.*;
-import net.minecraft.util.text.*;
-import net.minecraftforge.fml.network.*;
-import net.minecraftforge.items.*;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import fr.eno.craftcreator.References;
+import fr.eno.craftcreator.init.InitPackets;
+import fr.eno.craftcreator.packets.GetTaggeableContainerRecipeCreatorTileInfosServerPacket;
+import fr.eno.craftcreator.packets.UpdateTaggeableContainerRecipeCreatorTilePacket;
+import fr.eno.craftcreator.tileentity.TaggeableInventoryContainerTileEntity;
+import fr.eno.craftcreator.utils.GuiList;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.Slot;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.items.SlotItemHandler;
 
-import javax.annotation.*;
-import java.util.*;
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class TaggeableSlotsContainerScreen<T extends Container> extends ContainerScreen<T>
 {

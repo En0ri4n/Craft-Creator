@@ -1,14 +1,17 @@
 package fr.eno.craftcreator.tileentity;
 
-import com.mojang.brigadier.*;
-import com.mojang.brigadier.exceptions.*;
-import net.minecraft.block.*;
-import net.minecraft.nbt.*;
-import net.minecraft.tileentity.*;
-import net.minecraft.util.*;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.block.BlockState;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.ResourceLocation;
 
-import javax.annotation.*;
-import java.util.*;
+import javax.annotation.Nonnull;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class TaggeableInventoryContainerTileEntity extends InventoryContainerTileEntity
 {

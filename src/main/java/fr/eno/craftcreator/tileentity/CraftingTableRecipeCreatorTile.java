@@ -1,16 +1,19 @@
 package fr.eno.craftcreator.tileentity;
 
-import fr.eno.craftcreator.container.*;
-import fr.eno.craftcreator.init.*;
-import io.netty.buffer.*;
-import net.minecraft.block.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.inventory.container.*;
-import net.minecraft.nbt.*;
-import net.minecraft.network.*;
-import net.minecraft.util.text.*;
+import fr.eno.craftcreator.container.CraftingTableRecipeCreatorContainer;
+import fr.eno.craftcreator.init.InitTileEntities;
+import io.netty.buffer.Unpooled;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class CraftingTableRecipeCreatorTile extends TaggeableInventoryContainerTileEntity
 {

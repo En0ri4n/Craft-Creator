@@ -1,6 +1,6 @@
 package fr.eno.craftcreator.screen;
 
-import net.minecraft.util.text.*;
+import net.minecraft.util.text.StringTextComponent;
 
 public class AddRecipeManagerScreen extends ChildrenScreen
 {

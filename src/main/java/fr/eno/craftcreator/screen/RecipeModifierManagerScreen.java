@@ -30,8 +30,8 @@ public class RecipeModifierManagerScreen extends ChildrenScreen
 
         int bottomHeight = 20;
 
-        this.addList(new SimpleListWidget(minecraft, 5, 5, this.width / 4, this.height - bottomHeight, 15, 15, 5, References.getTranslate("screen.recipe_manager.list.recipes")));
-        this.addList(new SimpleListWidget(minecraft, this.width - 5 - this.width / 4, 5, this.width / 4, this.height - bottomHeight, 15, 15, 5, References.getTranslate("screen.recipe_manager.list.modified_recipes")));
+        this.addList(new SimpleListWidget(minecraft, 5, 5, this.width / 4, this.height - bottomHeight, 15, 15, 5, References.getTranslate("screen.recipe_manager.list.recipes"), null));
+        this.addList(new SimpleListWidget(minecraft, this.width - 5 - this.width / 4, 5, this.width / 4, this.height - bottomHeight, 15, 15, 5, References.getTranslate("screen.recipe_manager.list.modified_recipes"), null));
 
         this.setEntries(0, DeserializerHelper.getRecipes(this.recipeType));
         this.setEntries(1, DeserializerHelper.getModifiedRecipesEntryList(this.modId, this.recipeType));

@@ -1,11 +1,9 @@
 package fr.eno.craftcreator.screen.buttons;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import fr.eno.craftcreator.References;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextProperties;
 import net.minecraft.util.text.TextComponent;
 import net.minecraftforge.fml.client.gui.GuiUtils;

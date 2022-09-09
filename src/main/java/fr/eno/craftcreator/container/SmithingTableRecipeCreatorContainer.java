@@ -1,13 +1,14 @@
 package fr.eno.craftcreator.container;
 
-import fr.eno.craftcreator.container.utils.*;
-import fr.eno.craftcreator.init.*;
-import fr.eno.craftcreator.tileentity.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.network.*;
-import net.minecraftforge.items.*;
+import fr.eno.craftcreator.container.utils.CommonContainer;
+import fr.eno.craftcreator.init.InitContainers;
+import fr.eno.craftcreator.tileentity.SmithingTableRecipeCreatorTile;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.items.SlotItemHandler;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
 
 public class SmithingTableRecipeCreatorContainer extends CommonContainer
 {

@@ -6,9 +6,9 @@ import fr.eno.craftcreator.tileentity.CraftingTableRecipeCreatorTile;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.items.*;
+import net.minecraftforge.items.SlotItemHandler;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
 
 public class CraftingTableRecipeCreatorContainer extends CommonContainer
 {

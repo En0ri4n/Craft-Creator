@@ -1,10 +1,11 @@
 package fr.eno.craftcreator.container.slot;
 
-import net.minecraft.item.*;
-import net.minecraftforge.items.*;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.SlotItemHandler;
 
-import javax.annotation.*;
-import java.util.function.*;
+import javax.annotation.Nonnull;
+import java.util.function.Predicate;
 
 public class DefinedSlot extends SlotItemHandler
 {

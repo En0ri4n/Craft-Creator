@@ -1,23 +1,33 @@
 package fr.eno.craftcreator.utils;
 
-import fr.eno.craftcreator.*;
-import net.minecraft.util.*;
-import net.minecraft.util.text.*;
-import net.minecraft.util.text.event.*;
+import fr.eno.craftcreator.References;
+import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.IFormattableTextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.event.ClickEvent;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Utilities
 {
-	public static List<Integer> createList(int startIndex, int size)
+	public static List<SimpleListWidget.Entry> copyPartialMatches(String token, List<SimpleListWidget.Entry> inputs)
 	{
-		List<Integer> ints = new ArrayList<>();
+		List<SimpleListWidget.Entry> list = new ArrayList<>();
+		if (!token.isEmpty())
+		{
+			for (SimpleListWidget.Entry s : inputs)
+			{
+				if (s.toString().contains(token))
+				{
+					list.add(s);
+				}
+			}
+		}
 
-		for(int i = startIndex; i < size; i++)
-			ints.add(i);
-
-		return ints;
+		return list;
 	}
 
 	public static ResourceLocation getGuiContainerTexture(String modid, String path)

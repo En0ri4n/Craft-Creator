@@ -1,17 +1,25 @@
 package fr.eno.craftcreator.kubejs.managers;
 
-import com.google.common.collect.*;
-import fr.eno.craftcreator.kubejs.jsserializers.*;
-import fr.eno.craftcreator.screen.*;
-import fr.eno.craftcreator.utils.*;
-import net.minecraft.block.*;
-import net.minecraft.inventory.container.*;
-import net.minecraft.item.*;
-import net.minecraft.util.*;
-import vazkii.botania.api.brew.*;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import fr.eno.craftcreator.kubejs.jsserializers.BotaniaRecipesJSSerializer;
+import fr.eno.craftcreator.screen.BotaniaRecipeCreatorScreen;
+import fr.eno.craftcreator.utils.PositionnedSlot;
+import fr.eno.craftcreator.utils.SlotHelper;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
+import net.minecraft.inventory.container.Slot;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import vazkii.botania.api.brew.Brew;
+import vazkii.botania.api.brew.IBrewItem;
 
-import javax.annotation.*;
-import java.util.*;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class BotaniaRecipeManagers
 {

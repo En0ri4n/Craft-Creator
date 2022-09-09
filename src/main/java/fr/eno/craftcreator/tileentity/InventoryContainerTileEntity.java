@@ -1,15 +1,17 @@
 package fr.eno.craftcreator.tileentity;
 
-import net.minecraft.block.*;
-import net.minecraft.inventory.*;
-import net.minecraft.inventory.container.*;
-import net.minecraft.item.*;
-import net.minecraft.nbt.*;
-import net.minecraft.tileentity.*;
-import net.minecraft.util.*;
-import net.minecraftforge.items.*;
+import net.minecraft.block.BlockState;
+import net.minecraft.inventory.ItemStackHelper;
+import net.minecraft.inventory.container.INamedContainerProvider;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.NonNullList;
+import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.items.ItemHandlerHelper;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
 
 public abstract class InventoryContainerTileEntity extends TileEntity implements IItemHandlerModifiable, INamedContainerProvider
 {

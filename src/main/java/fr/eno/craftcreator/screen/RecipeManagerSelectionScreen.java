@@ -1,10 +1,10 @@
 package fr.eno.craftcreator.screen;
 
-import com.mojang.blaze3d.matrix.*;
-import fr.eno.craftcreator.*;
-import fr.eno.craftcreator.screen.buttons.*;
-import net.minecraft.client.gui.screen.*;
-import net.minecraft.util.text.*;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import fr.eno.craftcreator.References;
+import fr.eno.craftcreator.screen.buttons.SimpleButton;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.util.text.ITextComponent;
 
 import javax.annotation.Nonnull;
 

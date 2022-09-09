@@ -2,9 +2,9 @@ package fr.eno.craftcreator.init;
 
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.blocks.*;
-import fr.eno.craftcreator.kubejs.utils.*;
+import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import net.minecraft.block.Block;
-import net.minecraftforge.fml.*;
+import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
