@@ -1,18 +1,20 @@
 package fr.eno.craftcreator.tileentity;
 
-import fr.eno.craftcreator.*;
-import fr.eno.craftcreator.container.*;
-import fr.eno.craftcreator.init.*;
-import fr.eno.craftcreator.utils.*;
-import io.netty.buffer.*;
-import net.minecraft.block.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.inventory.container.*;
-import net.minecraft.nbt.*;
-import net.minecraft.network.*;
-import net.minecraft.util.text.*;
+import fr.eno.craftcreator.References;
+import fr.eno.craftcreator.container.BotaniaRecipeCreatorContainer;
+import fr.eno.craftcreator.init.InitTileEntities;
+import fr.eno.craftcreator.utils.SlotHelper;
+import io.netty.buffer.Unpooled;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.text.ITextComponent;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class BotaniaRecipeCreatorTile extends TaggeableInventoryContainerTileEntity
 {

@@ -1,0 +1,24 @@
+package fr.eno.craftcreator.screen.widgets;
+
+import fr.eno.craftcreator.utils.Callable;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.util.text.StringTextComponent;
+
+public class SimpleTextFieldWidget extends TextFieldWidget
+{
+    private final Callable<SimpleTextFieldWidget> onTextChangeCallable;
+
+    public SimpleTextFieldWidget(StringTextComponent text, FontRenderer font, int x, int y, int width, int height, Callable<SimpleTextFieldWidget> onTextChange)
+    {
+        super(font, x, y, width, height, text);
+        this.onTextChangeCallable = onTextChange;
+    }
+
+    @Override
+    public boolean keyPressed(int p_231046_1_, int p_231046_2_, int p_231046_3_)
+    {
+        this.onTextChangeCallable.run(this);
+        return super.keyPressed(p_231046_1_, p_231046_2_, p_231046_3_);
+    }
+}

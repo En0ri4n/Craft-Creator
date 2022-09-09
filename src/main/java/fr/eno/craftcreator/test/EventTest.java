@@ -1,13 +1,13 @@
 package fr.eno.craftcreator.test;
 
-import fr.eno.craftcreator.*;
-import fr.eno.craftcreator.screen.*;
-import net.minecraft.client.*;
-import net.minecraft.client.util.*;
-import net.minecraftforge.event.*;
-import net.minecraftforge.eventbus.api.*;
-import net.minecraftforge.fml.common.*;
-import org.lwjgl.glfw.*;
+import fr.eno.craftcreator.References;
+import fr.eno.craftcreator.screen.ModSelectionScreen;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.util.InputMappings;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import org.lwjgl.glfw.GLFW;
 
 @Mod.EventBusSubscriber(modid = References.MOD_ID)
 public class EventTest

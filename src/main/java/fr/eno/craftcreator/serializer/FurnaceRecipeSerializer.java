@@ -1,7 +1,6 @@
 package fr.eno.craftcreator.serializer;
 
 import com.google.gson.JsonObject;
-
 import fr.eno.craftcreator.utils.CraftType;
 import net.minecraft.item.Item;
 import net.minecraft.util.IItemProvider;
@@ -44,12 +43,12 @@ public class FurnaceRecipeSerializer extends RecipeSerializer
     }
 	
 	@Override
-	public void serializeRecipe()
+	public void serializeRecipe(boolean isKubeJSRecipe)
 	{
 		this.setExperience(experience);
 		this.setCookingTime(cookingTime);
 		
-		super.serializeRecipe();
+		super.serializeRecipe(isKubeJSRecipe);
 	}
 
 	public static FurnaceRecipeSerializer create(CraftType type, IItemProvider output)

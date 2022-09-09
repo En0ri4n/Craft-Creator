@@ -1,17 +1,20 @@
 package fr.eno.craftcreator.container;
 
-import fr.eno.craftcreator.container.slot.*;
-import fr.eno.craftcreator.container.utils.*;
-import fr.eno.craftcreator.init.*;
-import fr.eno.craftcreator.tileentity.*;
-import fr.eno.craftcreator.utils.*;
-import net.minecraft.block.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.network.*;
-import net.minecraftforge.items.*;
-import vazkii.botania.api.brew.*;
+import fr.eno.craftcreator.container.slot.DefinedSlot;
+import fr.eno.craftcreator.container.utils.CommonContainer;
+import fr.eno.craftcreator.init.InitContainers;
+import fr.eno.craftcreator.tileentity.BotaniaRecipeCreatorTile;
+import fr.eno.craftcreator.utils.PositionnedSlot;
+import fr.eno.craftcreator.utils.SlotHelper;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.items.SlotItemHandler;
+import vazkii.botania.api.brew.IBrewItem;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
 
 public class BotaniaRecipeCreatorContainer extends CommonContainer
 {

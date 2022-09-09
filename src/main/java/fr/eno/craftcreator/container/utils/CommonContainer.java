@@ -1,13 +1,13 @@
 package fr.eno.craftcreator.container.utils;
 
-import javax.annotation.Nonnull;
-
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
+
+import javax.annotation.Nonnull;
 
 public class CommonContainer extends Container
 {

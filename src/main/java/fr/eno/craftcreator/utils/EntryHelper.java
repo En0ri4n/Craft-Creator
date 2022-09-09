@@ -1,8 +1,6 @@
 package fr.eno.craftcreator.utils;
 
-import fr.eno.craftcreator.screen.widgets.DropDownListWidget;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
-import net.minecraft.client.Minecraft;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeType;

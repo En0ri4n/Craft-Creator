@@ -57,5 +57,7 @@
 	"craftcreator.screen.remove_manager.button.has_type": "Type :",
 	"craftcreator.screen.remove_manager.button.has_id": "Id :",
 	"craftcreator.screen.remove_manager.button.remove": "Remove Recipe",
-	"craftcreator.screen.remove_manager.button.back": "Back"
+	"craftcreator.screen.remove_manager.button.back": "Back",
+
+	"craftcreator.screen.recipe_creator_screen.kube_js_button": "Is KubeJS Recipe"
 }

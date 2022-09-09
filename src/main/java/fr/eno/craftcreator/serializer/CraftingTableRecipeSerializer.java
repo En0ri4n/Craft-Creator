@@ -1,12 +1,18 @@
 package fr.eno.craftcreator.serializer;
 
-import com.google.gson.*;
-import fr.eno.craftcreator.utils.*;
-import net.minecraft.item.*;
-import net.minecraft.tags.*;
-import net.minecraft.util.*;
-import net.minecraftforge.items.*;
-import net.minecraftforge.registries.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import fr.eno.craftcreator.utils.CraftType;
+import fr.eno.craftcreator.utils.PairValue;
+import fr.eno.craftcreator.utils.Utilities;
+import net.minecraft.item.Item;
+import net.minecraft.item.Items;
+import net.minecraft.tags.ITag;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.util.IItemProvider;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.items.SlotItemHandler;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.*;
 
@@ -39,6 +45,8 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 
 		for (Item item : items)
 		{
+			if(item.equals(Items.AIR)) continue;
+
 			JsonObject obj = new JsonObject();
 			obj.addProperty("item", item.getRegistryName().getPath());
 			ingredients.add(obj);

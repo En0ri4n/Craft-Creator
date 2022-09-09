@@ -1,9 +1,9 @@
 package fr.eno.craftcreator.kubejs;
 
-import fr.eno.craftcreator.kubejs.utils.*;
-import net.minecraft.client.*;
+import fr.eno.craftcreator.kubejs.utils.SupportedMods;
+import net.minecraft.client.Minecraft;
 
-import java.io.*;
+import java.io.File;
 
 public class KubeJSManager
 {

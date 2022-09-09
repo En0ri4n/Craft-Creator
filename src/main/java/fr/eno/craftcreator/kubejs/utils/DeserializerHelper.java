@@ -1,13 +1,15 @@
 package fr.eno.craftcreator.kubejs.utils;
 
-import fr.eno.craftcreator.screen.widgets.*;
-import net.minecraft.client.*;
-import net.minecraft.inventory.*;
-import net.minecraft.item.crafting.*;
-import net.minecraft.util.*;
-import net.minecraft.util.registry.*;
+import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
+import net.minecraft.client.Minecraft;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.IRecipeType;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
@@ -42,8 +44,8 @@ public class DeserializerHelper
 
         List<T> entries = new ArrayList<>();
 
-        RecipeFileUtils.getModifiedRecipesFor(modId, recipeType).forEach((pairValue, display) ->
-                entries.add((T) new SimpleListWidget.StringEntry(pairValue.getSecondValue()).setTooltips(display)));
+        RecipeFileUtils.getModifiedRecipesFor().forEach(modifiedRecipe ->
+                entries.add((T) new SimpleListWidget.ModifiedRecipeEntry(modifiedRecipe)));
 
         return entries;
     }

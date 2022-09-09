@@ -2,10 +2,10 @@ package fr.eno.craftcreator.init;
 
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.container.*;
-import fr.eno.craftcreator.kubejs.utils.*;
+import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraftforge.common.extensions.IForgeContainerType;
-import net.minecraftforge.fml.*;
+import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 

@@ -1,15 +1,19 @@
 package fr.eno.craftcreator.blocks;
 
 import net.minecraft.block.*;
-import net.minecraft.block.material.*;
-import net.minecraft.client.particle.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.tileentity.*;
-import net.minecraft.util.*;
-import net.minecraft.util.math.*;
-import net.minecraft.world.*;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.particle.ParticleManager;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.World;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public abstract class RecipeCreatorBlock extends Block
 {

@@ -1,11 +1,11 @@
 package fr.eno.craftcreator.utils;
 
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class ReflectUtils
 {

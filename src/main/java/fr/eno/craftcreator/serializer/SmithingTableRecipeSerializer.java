@@ -1,12 +1,11 @@
 package fr.eno.craftcreator.serializer;
 
-import java.util.List;
-
 import com.google.gson.JsonObject;
-
 import fr.eno.craftcreator.utils.CraftType;
 import net.minecraft.item.Item;
 import net.minecraft.util.IItemProvider;
+
+import java.util.List;
 
 public class SmithingTableRecipeSerializer extends RecipeSerializer
 {

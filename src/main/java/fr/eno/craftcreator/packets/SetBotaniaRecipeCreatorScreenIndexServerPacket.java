@@ -1,13 +1,13 @@
 package fr.eno.craftcreator.packets;
 
-import fr.eno.craftcreator.tileentity.*;
-import net.minecraft.network.*;
-import net.minecraft.tileentity.*;
-import net.minecraft.util.math.*;
-import net.minecraft.world.server.*;
-import net.minecraftforge.fml.network.*;
+import fr.eno.craftcreator.tileentity.BotaniaRecipeCreatorTile;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.fml.network.NetworkEvent;
 
-import java.util.function.*;
+import java.util.function.Supplier;
 
 public class SetBotaniaRecipeCreatorScreenIndexServerPacket
 {

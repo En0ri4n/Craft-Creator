@@ -1,7 +1,6 @@
 package fr.eno.craftcreator.serializer;
 
 import com.google.gson.JsonObject;
-
 import fr.eno.craftcreator.utils.CraftType;
 import net.minecraft.util.IItemProvider;
 

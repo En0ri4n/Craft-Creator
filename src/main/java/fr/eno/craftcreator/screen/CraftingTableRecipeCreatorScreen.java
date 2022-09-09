@@ -1,26 +1,31 @@
 package fr.eno.craftcreator.screen;
 
-import com.mojang.blaze3d.matrix.*;
-import com.mojang.blaze3d.systems.*;
-import fr.eno.craftcreator.*;
-import fr.eno.craftcreator.container.*;
-import fr.eno.craftcreator.init.*;
-import fr.eno.craftcreator.packets.*;
-import fr.eno.craftcreator.screen.buttons.*;
-import fr.eno.craftcreator.utils.*;
-import net.minecraft.client.gui.screen.*;
-import net.minecraft.entity.player.*;
-import net.minecraft.item.*;
-import net.minecraft.util.*;
-import net.minecraft.util.text.*;
-import net.minecraftforge.fml.network.*;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
+import fr.eno.craftcreator.References;
+import fr.eno.craftcreator.container.CraftingTableRecipeCreatorContainer;
+import fr.eno.craftcreator.init.InitPackets;
+import fr.eno.craftcreator.kubejs.jsserializers.MinecraftRecipeSerializer;
+import fr.eno.craftcreator.packets.GetCraftingTableRecipeCreatorTileInfosServerPacket;
+import fr.eno.craftcreator.packets.UpdateCraftingTableRecipeCreatorTilePacket;
+import fr.eno.craftcreator.screen.buttons.BooleanButton;
+import fr.eno.craftcreator.screen.buttons.ExecuteButton;
+import fr.eno.craftcreator.screen.buttons.SimpleCheckBox;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.fml.network.PacketDistributor;
 
-import javax.annotation.*;
+import javax.annotation.Nonnull;
 
 public class CraftingTableRecipeCreatorScreen extends TaggeableSlotsContainerScreen<CraftingTableRecipeCreatorContainer>
 {
     private BooleanButton craftTypeButton;
     private static final ResourceLocation CRAFT_CREATOR_TABLE_GUI_TEXTURES = References.getLoc("textures/gui/container/crafting_table_recipe_creator.png");
+    private SimpleCheckBox isKubeJSRecipeButton;
 
     public CraftingTableRecipeCreatorScreen(CraftingTableRecipeCreatorContainer screenContainer, PlayerInventory inv, ITextComponent titleIn)
     {
@@ -33,9 +38,10 @@ public class CraftingTableRecipeCreatorScreen extends TaggeableSlotsContainerScr
         super.init();
         InitPackets.getNetWork().send(PacketDistributor.SERVER.noArg(), new GetCraftingTableRecipeCreatorTileInfosServerPacket(this.container.getTile().getPos(), this.container.windowId));
 
-        this.addButton(craftTypeButton = new BooleanButton("craftType", guiLeft + 100, guiTop + 60, 68, 20, true, button -> InitPackets.getNetWork().send(PacketDistributor.SERVER.noArg(), new UpdateCraftingTableRecipeCreatorTilePacket(this.container.getTile().getPos(), this.isShaped()))));
 
-        this.addButton(new ExecuteButton(guiLeft + 86, guiTop + 33, 30, button -> CraftHelper.createCraftingTableRecipe(this.container.getInventory(), this.getTaggedSlots(), this.isShaped())));
+        this.addButton(isKubeJSRecipeButton = new SimpleCheckBox(5, this.height - 20, 15, 15, References.getTranslate("screen.recipe_creator_screen.kube_js_button"), false));
+        this.addButton(craftTypeButton = new BooleanButton("craftType", guiLeft + 100, guiTop + 60, 68, 20, true, button -> InitPackets.getNetWork().send(PacketDistributor.SERVER.noArg(), new UpdateCraftingTableRecipeCreatorTilePacket(this.container.getTile().getPos(), this.isShaped()))));
+        this.addButton(new ExecuteButton(guiLeft + 86, guiTop + 33, 30, button -> MinecraftRecipeSerializer.createCraftingTableRecipe(this.container.getInventory(), this.getTaggedSlots(), this.isShaped(), isKubeJSRecipeButton.isChecked())));
     }
 
     @Override

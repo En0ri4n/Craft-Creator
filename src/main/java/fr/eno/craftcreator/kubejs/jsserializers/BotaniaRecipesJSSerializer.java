@@ -1,16 +1,25 @@
 package fr.eno.craftcreator.kubejs.jsserializers;
 
-import com.google.common.collect.*;
-import com.google.gson.*;
-import fr.eno.craftcreator.kubejs.utils.*;
-import net.minecraft.block.*;
-import net.minecraft.item.*;
-import net.minecraft.item.crafting.*;
-import net.minecraft.util.*;
-import vazkii.botania.api.brew.*;
-import vazkii.botania.common.crafting.*;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Multimap;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
+import fr.eno.craftcreator.kubejs.utils.SupportedMods;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipeType;
+import net.minecraft.util.ResourceLocation;
+import vazkii.botania.api.brew.Brew;
+import vazkii.botania.common.crafting.ModRecipeTypes;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class BotaniaRecipesJSSerializer extends ModRecipesJSSerializer
 {
@@ -122,11 +131,6 @@ public class BotaniaRecipesJSSerializer extends ModRecipesJSSerializer
         addRecipeToFile(gson.toJson(obj), ModRecipeTypes.TERRA_PLATE_TYPE);
 
         sendSuccessMessage(ModRecipeTypes.TERRA_PLATE_TYPE, result.getItem().getRegistryName());
-    }
-
-    private void addRecipeToFile(String recipeJson, IRecipeType<?> recipeType)
-    {
-        RecipeFileUtils.insertAndWriteLines(this.modId, recipeType, "event.custom(" + recipeJson + ")");
     }
 
     private JsonArray getArray(Multimap<ResourceLocation, Boolean> ingredients)

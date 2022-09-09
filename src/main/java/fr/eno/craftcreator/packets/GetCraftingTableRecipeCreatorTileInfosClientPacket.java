@@ -1,11 +1,11 @@
 package fr.eno.craftcreator.packets;
 
-import fr.eno.craftcreator.screen.*;
-import net.minecraft.client.*;
-import net.minecraft.network.*;
-import net.minecraftforge.fml.network.*;
+import fr.eno.craftcreator.screen.CraftingTableRecipeCreatorScreen;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.NetworkEvent;
 
-import java.util.function.*;
+import java.util.function.Supplier;
 
 public class GetCraftingTableRecipeCreatorTileInfosClientPacket
 {

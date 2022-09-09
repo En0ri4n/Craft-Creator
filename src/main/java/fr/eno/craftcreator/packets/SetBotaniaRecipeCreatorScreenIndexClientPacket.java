@@ -1,12 +1,12 @@
 package fr.eno.craftcreator.packets;
 
-import fr.eno.craftcreator.screen.*;
-import net.minecraft.client.*;
-import net.minecraft.client.gui.screen.*;
-import net.minecraft.network.*;
-import net.minecraftforge.fml.network.*;
+import fr.eno.craftcreator.screen.BotaniaRecipeCreatorScreen;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.NetworkEvent;
 
-import java.util.function.*;
+import java.util.function.Supplier;
 
 public class SetBotaniaRecipeCreatorScreenIndexClientPacket
 {

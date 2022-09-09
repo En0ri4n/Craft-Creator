@@ -1,16 +1,22 @@
 package fr.eno.craftcreator.commands;
 
-import com.google.gson.*;
-import com.mojang.brigadier.*;
-import com.mojang.brigadier.context.*;
-import fr.eno.craftcreator.utils.*;
-import net.minecraft.command.*;
-import net.minecraft.util.text.*;
-import net.minecraft.world.server.*;
-import org.apache.commons.io.*;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.context.CommandContext;
+import fr.eno.craftcreator.utils.ReflectUtils;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.server.ChunkManager;
+import org.apache.commons.io.FileUtils;
 
-import java.io.*;
-import java.lang.reflect.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.reflect.Field;
 
 public class TestRecipesCommand
 {
