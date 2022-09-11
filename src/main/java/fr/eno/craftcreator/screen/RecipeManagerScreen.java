@@ -4,6 +4,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.kubejs.jsserializers.ModRecipesJSSerializer;
 import fr.eno.craftcreator.kubejs.utils.DeserializerHelper;
+import fr.eno.craftcreator.kubejs.utils.ModDispatcher;
 import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
@@ -35,7 +36,7 @@ public class RecipeManagerScreen extends ListScreen
 
         this.addList(new SimpleListWidget(minecraft, 10, 10, this.width / 3 - 15, this.height - 10 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.recipes"), (entry) ->
         {
-            ModRecipesJSSerializer.getInstance(((SimpleListWidget.RecipeEntry) entry).getRecipe().getId().getNamespace()).removeRecipe(new ModifiedRecipe(RecipeFileUtils.ModifiedRecipeType.REMOVED, Collections.singletonMap(ModRecipesJSSerializer.RecipeDescriptors.RECIPE_ID, ((SimpleListWidget.RecipeEntry) entry).getRecipe().getId().toString())));
+            ModDispatcher.getSeralizer(((SimpleListWidget.RecipeEntry) entry).getRecipe().getId().getNamespace()).removeRecipe(new ModifiedRecipe(RecipeFileUtils.ModifiedRecipeType.REMOVED, Collections.singletonMap(ModRecipesJSSerializer.RecipeDescriptors.RECIPE_ID, ((SimpleListWidget.RecipeEntry) entry).getRecipe().getId().toString())));
             updateLists();
         }));
         this.addList(new SimpleListWidget(minecraft, this.width / 3 + 10, 10, this.width / 3 - 15, this.height - 10 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.added_recipes"), (entry) ->

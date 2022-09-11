@@ -30,19 +30,22 @@ public class SimpleCheckBox extends CheckboxButton
     @Override
     public void renderWidget(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        Minecraft minecraft = Minecraft.getInstance();
-        minecraft.getTextureManager().bindTexture(TEXTURE);
-        RenderSystem.enableDepthTest();
-        FontRenderer fontrenderer = minecraft.fontRenderer;
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.alpha);
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        Screen.blit(matrixStack, this.x, this.y, this.width, this.height, !isFocused() ? 0 : 20, !isChecked() ? 0 : 20, 20, 20, 64, 64);
-        this.renderBg(matrixStack, minecraft, mouseX, mouseY);
-        if(true)
+        if(visible)
         {
-            drawString(matrixStack, fontrenderer, this.getMessage(), this.x + this.width + 4, this.y + (this.height - 8) / 2, 14737632 | MathHelper.ceil(this.alpha * 255.0F) << 24);
+            Minecraft minecraft = Minecraft.getInstance();
+            minecraft.getTextureManager().bindTexture(TEXTURE);
+            RenderSystem.enableDepthTest();
+            FontRenderer fontrenderer = minecraft.fontRenderer;
+            RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.alpha);
+            RenderSystem.enableBlend();
+            RenderSystem.defaultBlendFunc();
+            RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+            Screen.blit(matrixStack, this.x, this.y, this.width, this.height, !isFocused() ? 0 : 20, !isChecked() ? 0 : 20, 20, 20, 64, 64);
+            this.renderBg(matrixStack, minecraft, mouseX, mouseY);
+            if(true)
+            {
+                drawString(matrixStack, fontrenderer, this.getMessage(), this.x + this.width + 4, this.y + (this.height - 8) / 2, 14737632 | MathHelper.ceil(this.alpha * 255.0F) << 24);
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ package fr.eno.craftcreator.screen;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.kubejs.jsserializers.ModRecipesJSSerializer;
+import fr.eno.craftcreator.kubejs.utils.ModDispatcher;
 import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;
 import fr.eno.craftcreator.screen.buttons.SimpleCheckBox;
@@ -109,7 +110,7 @@ public class RemoveRecipeManagerScreen extends ChildrenScreen
             this.removeMap.remove(ModRecipesJSSerializer.RecipeDescriptors.RECIPE_ID);
 
         if(!this.removeMap.isEmpty())
-            ModRecipesJSSerializer.getInstance(getModId()).removeRecipe(new ModifiedRecipe(RecipeFileUtils.ModifiedRecipeType.REMOVED, removeMap));
+            ModDispatcher.getSeralizer(getModId()).removeRecipe(new ModifiedRecipe(RecipeFileUtils.ModifiedRecipeType.REMOVED, removeMap));
     }
 
     private String getModId()

@@ -4,22 +4,24 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
+import fr.eno.craftcreator.utils.PairValue;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeType;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
+import vazkii.botania.api.BotaniaAPI;
 import vazkii.botania.api.brew.Brew;
+import vazkii.botania.api.recipe.*;
 import vazkii.botania.common.crafting.ModRecipeTypes;
+import vazkii.botania.common.item.ModItems;
+import vazkii.botania.common.item.brew.ItemVial;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BotaniaRecipesJSSerializer extends ModRecipesJSSerializer
 {
@@ -33,8 +35,6 @@ public class BotaniaRecipesJSSerializer extends ModRecipesJSSerializer
 
     public void createInfusionRecipe(Item ingredient, Block catalyst, ItemStack result, int mana)
     {
-        if(isRecipeExists(ModRecipeTypes.MANA_INFUSION_TYPE, result.getItem().getRegistryName())) return;
-
         JsonObject obj = new JsonObject();
         RecipeFileUtils.setRecipeType(obj, ModRecipeTypes.MANA_INFUSION_TYPE);
         obj.addProperty("mana", mana);
@@ -61,13 +61,11 @@ public class BotaniaRecipesJSSerializer extends ModRecipesJSSerializer
 
     public void createPureDaisyRecipe(Block input, Block output, int time)
     {
-        if(isRecipeExists(ModRecipeTypes.PURE_DAISY_TYPE, output.getRegistryName())) return;
-
         JsonObject obj = new JsonObject();
         RecipeFileUtils.setRecipeType(obj, ModRecipeTypes.PURE_DAISY_TYPE);
         obj.addProperty("time", time);
-        obj.add("input", RecipeFileUtils.mapToJsonObject(ImmutableMap.of("type", "block", "block", input.getRegistryName().toString())));
-        obj.add("output", RecipeFileUtils.singletonJsonObject("name", output.getRegistryName().toString()));
+        obj.add("input", RecipeFileUtils.mapToJsonObject(ImmutableMap.of("type", "block", "block", Objects.requireNonNull(input.getRegistryName()).toString())));
+        obj.add("output", RecipeFileUtils.singletonJsonObject("name", Objects.requireNonNull(output.getRegistryName()).toString()));
 
         addRecipeToFile(gson.toJson(obj), ModRecipeTypes.PURE_DAISY_TYPE);
 
@@ -76,11 +74,9 @@ public class BotaniaRecipesJSSerializer extends ModRecipesJSSerializer
 
     public void createBrewRecipe(List<Item> ingredients, Brew brew)
     {
-        if(isRecipeExists(ModRecipeTypes.BREW_TYPE, brew.getRegistryName())) return;
-
         JsonObject obj = new JsonObject();
         RecipeFileUtils.setRecipeType(obj, ModRecipeTypes.BREW_TYPE);
-        obj.addProperty("brew", brew.getRegistryName().toString());
+        obj.addProperty("brew", Objects.requireNonNull(brew.getRegistryName()).toString());
         obj.add("ingredients", RecipeFileUtils.listWithSingletonItems(ingredients, "item"));
 
         addRecipeToFile(gson.toJson(obj), ModRecipeTypes.BREW_TYPE);
@@ -90,8 +86,6 @@ public class BotaniaRecipesJSSerializer extends ModRecipesJSSerializer
 
     public void createPetalRecipe(Multimap<ResourceLocation, Boolean> ingredients, ItemStack result)
     {
-        if(isRecipeExists(ModRecipeTypes.PETAL_TYPE, result.getItem().getRegistryName())) return;
-
         JsonObject obj = new JsonObject();
         RecipeFileUtils.setRecipeType(obj, ModRecipeTypes.PETAL_TYPE);
         obj.add("output", getResult(result));
@@ -104,8 +98,6 @@ public class BotaniaRecipesJSSerializer extends ModRecipesJSSerializer
 
     public void createRuneRecipe(Multimap<ResourceLocation, Boolean> ingredients, ItemStack result, int mana)
     {
-        if(isRecipeExists(ModRecipeTypes.RUNE_TYPE, result.getItem().getRegistryName())) return;
-
         JsonObject obj = new JsonObject();
         RecipeFileUtils.setRecipeType(obj, ModRecipeTypes.RUNE_TYPE);
         obj.add("output", getResult(result));
@@ -119,9 +111,6 @@ public class BotaniaRecipesJSSerializer extends ModRecipesJSSerializer
 
     public void createTerraPlateRecipe(Multimap<ResourceLocation, Boolean> ingredients, ItemStack result, int mana)
     {
-        if(isRecipeExists(ModRecipeTypes.TERRA_PLATE_TYPE, result.getItem().getRegistryName()))
-            return;
-
         JsonObject obj = new JsonObject();
         RecipeFileUtils.setRecipeType(obj, ModRecipeTypes.TERRA_PLATE_TYPE);
         obj.addProperty("mana", mana);
@@ -133,27 +122,57 @@ public class BotaniaRecipesJSSerializer extends ModRecipesJSSerializer
         sendSuccessMessage(ModRecipeTypes.TERRA_PLATE_TYPE, result.getItem().getRegistryName());
     }
 
-    private JsonArray getArray(Multimap<ResourceLocation, Boolean> ingredients)
+    @Override
+    public PairValue<String, Integer> getParam(IRecipe<?> recipe)
     {
-        JsonArray array = new JsonArray();
-        ingredients.forEach((loc, isTag) -> array.add(RecipeFileUtils.singletonJsonObject(isTag ? "tag" : "item", loc.toString())));
-        return array;
+        if(recipe instanceof IManaInfusionRecipe)
+            return PairValue.create("Mana", ((IManaInfusionRecipe) recipe).getManaToConsume());
+        else if(recipe instanceof IRuneAltarRecipe)
+            return PairValue.create("Mana", ((IRuneAltarRecipe) recipe).getManaUsage());
+        else if(recipe instanceof ITerraPlateRecipe)
+            return PairValue.create("Mana", ((ITerraPlateRecipe) recipe).getMana());
+        else if(recipe instanceof IPureDaisyRecipe)
+            return PairValue.create("Time", ((IPureDaisyRecipe) recipe).getTime());
+
+        return null;
     }
 
-    private JsonObject getResult(ItemStack result)
+    @Override
+    public Map<String, ResourceLocation> getOutput(IRecipe<?> recipe)
     {
-        Map<String, Object> map = new HashMap<>();
+        Map<String, ResourceLocation> locations = new HashMap<>();
 
-        map.put("item", result.getItem().getRegistryName().toString());
-        if(result.getCount() > 1)
-            map.put("count", result.getCount());
+        if(recipe instanceof IPureDaisyRecipe)
+        {
+            IPureDaisyRecipe recipePureDaisy = (IPureDaisyRecipe) recipe;
+            locations.put("Block", recipePureDaisy.getOutputState().getBlock().getRegistryName());
+        }
 
-        return RecipeFileUtils.mapToJsonObject(map);
+        if(recipe instanceof IElvenTradeRecipe)
+        {
+            IElvenTradeRecipe recipeElvenTrade = (IElvenTradeRecipe) recipe;
+            recipeElvenTrade.getOutputs().forEach(is -> locations.put("Item", is.getItem().getRegistryName()));
+        }
+
+        if(recipe instanceof IBrewRecipe)
+        {
+            IBrewRecipe recipeBrew = (IBrewRecipe) recipe;
+            locations.put("Brew", recipeBrew.getBrew().getRegistryName());
+        }
+
+        return !locations.isEmpty() ? locations : Collections.singletonMap("Item", recipe.getRecipeOutput().getItem().getRegistryName());
     }
 
-    private boolean isRecipeExists(IRecipeType<?> recipeType, ResourceLocation resultOutput)
+    @Override
+    public ItemStack getOneOutput(Map.Entry<String, ResourceLocation> entry)
     {
-        return recipeType == null && resultOutput == null;
+        switch(Objects.requireNonNull(entry).getKey())
+        {
+            case "Brew":
+                return ((ItemVial) ModItems.flask).getItemForBrew(BotaniaAPI.instance().getBrewRegistry().getOrDefault(entry.getValue()), new ItemStack(ModItems.flask));
+        }
+
+        return ItemStack.EMPTY;
     }
 
     public static BotaniaRecipesJSSerializer get()

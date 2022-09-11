@@ -6,6 +6,7 @@ import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.container.CraftingTableRecipeCreatorContainer;
 import fr.eno.craftcreator.init.InitPackets;
 import fr.eno.craftcreator.kubejs.jsserializers.MinecraftRecipeSerializer;
+import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import fr.eno.craftcreator.packets.GetCraftingTableRecipeCreatorTileInfosServerPacket;
 import fr.eno.craftcreator.packets.UpdateCraftingTableRecipeCreatorTilePacket;
 import fr.eno.craftcreator.screen.buttons.BooleanButton;
@@ -42,6 +43,9 @@ public class CraftingTableRecipeCreatorScreen extends TaggeableSlotsContainerScr
         this.addButton(isKubeJSRecipeButton = new SimpleCheckBox(5, this.height - 20, 15, 15, References.getTranslate("screen.recipe_creator_screen.kube_js_button"), false));
         this.addButton(craftTypeButton = new BooleanButton("craftType", guiLeft + 100, guiTop + 60, 68, 20, true, button -> InitPackets.getNetWork().send(PacketDistributor.SERVER.noArg(), new UpdateCraftingTableRecipeCreatorTilePacket(this.container.getTile().getPos(), this.isShaped()))));
         this.addButton(new ExecuteButton(guiLeft + 86, guiTop + 33, 30, button -> MinecraftRecipeSerializer.createCraftingTableRecipe(this.container.getInventory(), this.getTaggedSlots(), this.isShaped(), isKubeJSRecipeButton.isChecked())));
+
+        if(!SupportedMods.isKubeJSLoaded())
+            this.isKubeJSRecipeButton.visible = false;
     }
 
     @Override

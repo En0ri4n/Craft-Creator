@@ -5,24 +5,26 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.kubejs.jsserializers.ModRecipesJSSerializer;
+import fr.eno.craftcreator.kubejs.utils.ModDispatcher;
 import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
 import fr.eno.craftcreator.utils.Callable;
 import fr.eno.craftcreator.utils.GuiUtils;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
 import fr.eno.craftcreator.utils.PairValue;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.list.ExtendedList;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -40,6 +42,7 @@ import java.util.Objects;
 @SuppressWarnings({"unchecked", "deprecation"})
 public class SimpleListWidget extends ExtendedList<SimpleListWidget.Entry>
 {
+    private static final ResourceLocation BACKGROUND_TILE = References.getLoc("textures/gui/background_tile.png");
     private final ITextComponent title;
     private final int titleBoxHeight;
     private final int scrollBarWidth;
@@ -116,7 +119,7 @@ public class SimpleListWidget extends ExtendedList<SimpleListWidget.Entry>
         BufferBuilder bufferbuilder = tessellator.getBuffer();
 
         // Background
-        this.minecraft.getTextureManager().bindTexture(AbstractGui.BACKGROUND_LOCATION);
+        this.minecraft.getTextureManager().bindTexture(BACKGROUND_TILE);
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 0.5F);
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
         bufferbuilder.pos(this.x0, this.y1, 0.0D).tex((float) this.x0 / 32.0F, (float) (this.y1 + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, 100).endVertex();
@@ -253,6 +256,7 @@ public class SimpleListWidget extends ExtendedList<SimpleListWidget.Entry>
     {
         this.clearEntries();
         entries.forEach(this::addEntry);
+        this.setScrollAmount(0D);
     }
 
     @Override
@@ -350,7 +354,7 @@ public class SimpleListWidget extends ExtendedList<SimpleListWidget.Entry>
 
             Screen.drawString(matrixStack, minecraft.fontRenderer, displayStr, left + 16 + 5, (top + height / 2 - minecraft.fontRenderer.FONT_HEIGHT / 2), color.getRGB());
 
-            ItemStack item = RecipeFileUtils.getOneOutput(recipe);
+            ItemStack item = ModDispatcher.getOneOutput(recipe);
 
             int yPos = height / 2 - 16 / 2;
             minecraft.getItemRenderer().renderItemAndEffectIntoGuiWithoutEntity(item, left + yPos, top + yPos);
@@ -366,7 +370,7 @@ public class SimpleListWidget extends ExtendedList<SimpleListWidget.Entry>
         {
             List<ITextComponent> tooltips = new ArrayList<>();
             Multimap<String, ResourceLocation> input = RecipeFileUtils.getInput(recipe);
-            Map<String, ResourceLocation> output = RecipeFileUtils.getOutput(recipe);
+            Map<String, ResourceLocation> output = ModDispatcher.getOutput(recipe);
 
             tooltips.add(new StringTextComponent(this.recipe.getId().toString()).mergeStyle(TextFormatting.GREEN, TextFormatting.UNDERLINE));
             tooltips.add(new StringTextComponent(""));
