@@ -5,6 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.container.SmithingTableRecipeCreatorContainer;
 import fr.eno.craftcreator.kubejs.jsserializers.MinecraftRecipeSerializer;
+import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import fr.eno.craftcreator.screen.buttons.ExecuteButton;
 import fr.eno.craftcreator.screen.buttons.SimpleCheckBox;
 import net.minecraft.client.gui.screen.Screen;
@@ -35,6 +36,9 @@ public class SmithingTableRecipeCreatorScreen extends ContainerScreen<SmithingTa
 		this.addButton(isKubeJSRecipeButton = new SimpleCheckBox(5, this.height - 20, 15, 15, References.getTranslate("screen.recipe_creator_screen.kube_js_button"), false));
 
 		this.addButton(new ExecuteButton(guiLeft + 98, guiTop + 45, 30, button -> MinecraftRecipeSerializer.createSmithingTableRecipe(this.container.getInventory(), this.isKubeJSRecipeButton.isChecked())));
+
+		if(!SupportedMods.isKubeJSLoaded())
+			this.isKubeJSRecipeButton.visible = false;
 	}
 	
 	@Override

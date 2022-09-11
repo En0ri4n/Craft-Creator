@@ -14,6 +14,11 @@ public class SupportedMods
 
     public static final List<String> MODS_IDS = Arrays.asList(MINECRAFT, BOTANIA);
 
+    public static boolean isModLoaded(String modId)
+    {
+        return MODS_IDS.contains(modId) && ModList.get().isLoaded(modId);
+    }
+
     public static boolean isBotaniaLoaded()
     {
         return isKubeJSLoaded() && ModList.get().isLoaded(BOTANIA);

@@ -6,6 +6,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.container.FurnaceRecipeCreatorContainer;
 import fr.eno.craftcreator.kubejs.jsserializers.MinecraftRecipeSerializer;
+import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import fr.eno.craftcreator.screen.buttons.ExecuteButton;
 import fr.eno.craftcreator.screen.buttons.MultipleItemChoiceButton;
 import fr.eno.craftcreator.screen.buttons.SimpleCheckBox;
@@ -53,6 +54,9 @@ public class FurnaceRecipeCreatorScreen extends ContainerScreen<FurnaceRecipeCre
 		expField.setText("0.1");
 		cookTimeField = new TextFieldWidget(font, guiLeft + 8, guiTop + 60, 40, 10, new StringTextComponent(""));
 		cookTimeField.setText("200");
+
+		if(!SupportedMods.isKubeJSLoaded())
+			this.isKubeJSRecipeButton.visible = false;
 	}
 	
 	@Override

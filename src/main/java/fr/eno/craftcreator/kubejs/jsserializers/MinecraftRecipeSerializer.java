@@ -6,17 +6,17 @@ import fr.eno.craftcreator.serializer.FurnaceRecipeSerializer;
 import fr.eno.craftcreator.serializer.SmithingTableRecipeSerializer;
 import fr.eno.craftcreator.serializer.StoneCutterRecipeSerializer;
 import fr.eno.craftcreator.utils.CraftType;
+import fr.eno.craftcreator.utils.PairValue;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.items.SlotItemHandler;
+import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
 {
@@ -80,9 +80,35 @@ public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
     }
 
     @Override
+    public PairValue<String, Integer> getParam(IRecipe<?> recipe)
+    {
+        return null;
+    }
+
+    @Override
     public void sendSuccessMessage(IRecipeType<?> type, ResourceLocation result)
     {
         super.sendSuccessMessage(type, result);
+    }
+
+    @Override
+    public Map<String, ResourceLocation> getOutput(IRecipe<?> recipe)
+    {
+        return Collections.singletonMap("Item", recipe.getRecipeOutput().getItem().getRegistryName());
+    }
+
+    @Override
+    public ItemStack getOneOutput(Map.Entry<String, ResourceLocation> entry)
+    {
+        switch(Objects.requireNonNull(entry).getKey())
+        {
+            case "Block":
+                return new ItemStack(ForgeRegistries.BLOCKS.getValue(entry.getValue()));
+            case "Item":
+                return new ItemStack(ForgeRegistries.ITEMS.getValue(entry.getValue()));
+        }
+
+        return ItemStack.EMPTY;
     }
 
     public static MinecraftRecipeSerializer get()

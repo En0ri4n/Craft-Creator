@@ -7,6 +7,7 @@ import fr.eno.craftcreator.packets.GetTaggeableContainerRecipeCreatorTileInfosSe
 import fr.eno.craftcreator.packets.UpdateTaggeableContainerRecipeCreatorTilePacket;
 import fr.eno.craftcreator.tileentity.TaggeableInventoryContainerTileEntity;
 import fr.eno.craftcreator.utils.GuiList;
+import fr.eno.craftcreator.utils.ReflectUtils;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.entity.player.PlayerInventory;
@@ -19,12 +20,16 @@ import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nonnull;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public abstract class TaggeableSlotsContainerScreen<T extends Container> extends ContainerScreen<T>
 {
+    protected final Field slotXPosField = ReflectUtils.getFieldAndSetAccessible(Slot.class, "field_75223_e");
+    protected final Field slotYPosField = ReflectUtils.getFieldAndSetAccessible(Slot.class, "field_75221_f");
+
     private Map<SlotItemHandler, ResourceLocation> taggedSlots;
     private GuiList<ResourceLocation> guiTagList;
     private SlotItemHandler selectedSlot;

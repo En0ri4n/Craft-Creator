@@ -42,9 +42,6 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 public class BotaniaRecipeCreatorScreen extends TaggeableSlotsContainerScreen<BotaniaRecipeCreatorContainer>
 {
-    private final Field slotXPosField = ReflectUtils.getFieldAndSetAccessible(Slot.class, "field_75223_e");
-    private final Field slotYPosField = ReflectUtils.getFieldAndSetAccessible(Slot.class, "field_75221_f");
-
     private TextFieldWidget textField;
 
     private ExecuteButton executeButton;
