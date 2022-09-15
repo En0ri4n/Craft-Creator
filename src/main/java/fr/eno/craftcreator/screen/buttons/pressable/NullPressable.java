@@ -1,9 +1,8 @@
 package fr.eno.craftcreator.screen.buttons.pressable;
 
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.gui.widget.button.Button.IPressable;
+import net.minecraft.client.gui.components.Button;
 
-public class NullPressable implements IPressable
+public class NullPressable implements Button.OnPress
 {
 	@Override
 	public void onPress(Button button) {}

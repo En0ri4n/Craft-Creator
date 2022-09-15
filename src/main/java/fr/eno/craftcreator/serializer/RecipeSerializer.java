@@ -11,10 +11,10 @@ import fr.eno.craftcreator.utils.CraftType;
 import fr.eno.craftcreator.utils.Utilities;
 import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.ItemLike;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -30,9 +30,9 @@ public abstract class RecipeSerializer
 	protected final CraftType type;
 	protected final JsonObject recipe;
 	
-	private final IItemProvider output;
+	private final ItemLike output;
 	
-	public RecipeSerializer(CraftType type, IItemProvider output)
+	public RecipeSerializer(CraftType type, ItemLike output)
 	{
 		this.recipe = new JsonObject();
 		this.type = type;
@@ -54,11 +54,11 @@ public abstract class RecipeSerializer
 			if(!isKubeJSRecipe)
 			{
 				gson.toJson(recipe, writer);
-				Objects.requireNonNull(mc.player).sendMessage(Utilities.createClickableComponent(Utils.getS("serializer.success", this.getOutputFile().getName()), this.getOutputFile()), mc.player.getUniqueID());
+				Objects.requireNonNull(mc.player).sendMessage(Utilities.createClickableComponent(Utils.getS("serializer.success", this.getOutputFile().getName()), this.getOutputFile()), mc.player.getUUID());
 			}
 			else
 			{
-				IRecipeType<?> recipeType = RecipeFileUtils.byName(type.getType());
+				RecipeType<?> recipeType = RecipeFileUtils.byName(type.getType());
 
 				if(type.equals(CraftType.CRAFTING_TABLE_SHAPED) || type.equals(CraftType.CRAFTING_TABLE_SHAPELESS))
 					recipeType = RecipeFileUtils.byName(new ResourceLocation("minecraft", "crafting"));
@@ -75,7 +75,7 @@ public abstract class RecipeSerializer
 	
 	private File getOutputFile()
 	{
-		File directory = new File(Minecraft.getInstance().gameDir, "Craft-Generator");
+		File directory = new File(Minecraft.getInstance().gameDirectory, "Craft-Generator");
 		if(!directory.exists())
 			directory.mkdirs();
 

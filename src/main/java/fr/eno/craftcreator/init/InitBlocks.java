@@ -3,10 +3,10 @@ package fr.eno.craftcreator.init;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.blocks.*;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
-import net.minecraft.block.Block;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 public class InitBlocks
 {

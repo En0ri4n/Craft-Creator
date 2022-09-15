@@ -1,11 +1,11 @@
 package fr.eno.craftcreator.packets;
 
 import fr.eno.craftcreator.tileentity.CraftingTableRecipeCreatorTile;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
@@ -20,13 +20,13 @@ public class UpdateCraftingTableRecipeCreatorTilePacket
         this.shapedRecipe = shapedRecipe;
     }
 
-    public static void encode(UpdateCraftingTableRecipeCreatorTilePacket msg, PacketBuffer packetBuffer)
+    public static void encode(UpdateCraftingTableRecipeCreatorTilePacket msg, FriendlyByteBuf packetBuffer)
     {
         packetBuffer.writeBlockPos(msg.pos);
         packetBuffer.writeBoolean(msg.shapedRecipe);
     }
 
-    public static UpdateCraftingTableRecipeCreatorTilePacket decode(PacketBuffer packetBuffer)
+    public static UpdateCraftingTableRecipeCreatorTilePacket decode(FriendlyByteBuf packetBuffer)
     {
         BlockPos pos = packetBuffer.readBlockPos();
         boolean shapedRecipe = packetBuffer.readBoolean();
@@ -38,13 +38,12 @@ public class UpdateCraftingTableRecipeCreatorTilePacket
     {
         public static void handle(UpdateCraftingTableRecipeCreatorTilePacket msg, Supplier<NetworkEvent.Context> ctx)
         {
-            ServerWorld world = ctx.get().getSender().getServerWorld();
+            ServerLevel world = ctx.get().getSender().getLevel();
 
-            TileEntity tileEntity = world.getTileEntity(msg.pos);
+            BlockEntity tileEntity = world.getBlockEntity(msg.pos);
 
-            if(tileEntity instanceof CraftingTableRecipeCreatorTile)
+            if(tileEntity instanceof CraftingTableRecipeCreatorTile tile)
             {
-                CraftingTableRecipeCreatorTile tile = (CraftingTableRecipeCreatorTile) tileEntity;
                 tile.setShapedRecipe(msg.shapedRecipe);
             }
 

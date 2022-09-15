@@ -1,15 +1,15 @@
 package fr.eno.craftcreator.screen.widgets;
 
 import fr.eno.craftcreator.utils.Callable;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.network.chat.TextComponent;
 
-public class SimpleTextFieldWidget extends TextFieldWidget
+public class SimpleTextFieldWidget extends EditBox
 {
     private final Callable<SimpleTextFieldWidget> onTextChangeCallable;
 
-    public SimpleTextFieldWidget(StringTextComponent text, FontRenderer font, int x, int y, int width, int height, Callable<SimpleTextFieldWidget> onTextChange)
+    public SimpleTextFieldWidget(TextComponent text, Font font, int x, int y, int width, int height, Callable<SimpleTextFieldWidget> onTextChange)
     {
         super(font, x, y, width, height, text);
         this.onTextChangeCallable = onTextChange;

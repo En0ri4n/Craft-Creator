@@ -1,7 +1,7 @@
 package fr.eno.craftcreator.screen;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.container.BotaniaRecipeCreatorContainer;
 import fr.eno.craftcreator.init.InitPackets;
@@ -16,24 +16,23 @@ import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.ReflectUtils;
 import fr.eno.craftcreator.utils.SlotHelper;
 import fr.eno.craftcreator.utils.Utilities;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.items.SlotItemHandler;
+import net.minecraftforge.network.PacketDistributor;
 import vazkii.botania.common.block.ModBlocks;
 import vazkii.botania.common.block.ModSubtiles;
 import vazkii.botania.common.crafting.ModRecipeTypes;
 import vazkii.botania.common.item.ModItems;
 
 import javax.annotation.Nonnull;
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,15 +41,15 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 public class BotaniaRecipeCreatorScreen extends TaggeableSlotsContainerScreen<BotaniaRecipeCreatorContainer>
 {
-    private TextFieldWidget textField;
+    private EditBox textField;
 
     private ExecuteButton executeButton;
 
     private int currentScreenIndex;
 
-    public BotaniaRecipeCreatorScreen(BotaniaRecipeCreatorContainer screenContainer, PlayerInventory inv, ITextComponent titleIn)
+    public BotaniaRecipeCreatorScreen(BotaniaRecipeCreatorContainer screenContainer, Inventory inv, Component titleIn)
     {
-        super(screenContainer, inv, titleIn, screenContainer.tile.getPos());
+        super(screenContainer, inv, titleIn, screenContainer.tile.getBlockPos());
         this.currentScreenIndex = 0;
     }
 
@@ -59,15 +58,15 @@ public class BotaniaRecipeCreatorScreen extends TaggeableSlotsContainerScreen<Bo
     {
         super.init();
 
-        InitPackets.getNetWork().send(PacketDistributor.SERVER.noArg(), new GetBotaniaRecipeCreatorScreenIndexPacket(this.container.tile.getPos()));
+        InitPackets.getNetWork().send(PacketDistributor.SERVER.noArg(), new GetBotaniaRecipeCreatorScreenIndexPacket(this.getMenu().tile.getBlockPos()));
 
-        this.addButton(executeButton = new ExecuteButton(this.guiLeft + this.xSize / 2 - 20, this.guiTop + 35,40, (button) -> BotaniaRecipeManagers.createRecipe(getCurrentRecipe(), this.container.inventorySlots.stream().filter(slot -> slot instanceof SlotItemHandler).collect(Collectors.toList()), getTagged(), getParameterValue())));
+        this.addRenderableWidget(executeButton = new ExecuteButton(this.leftPos + this.imageWidth / 2 - 20, this.topPos + 35,40, (button) -> BotaniaRecipeManagers.createRecipe(getCurrentRecipe(), this.getMenu().slots.stream().filter(slot -> slot instanceof SlotItemHandler).collect(Collectors.toList()), getTagged(), getParameterValue())));
 
-        this.addButton(new SimpleButton(References.getTranslate("screen.botania_recipe_creator.button.next"), this.guiLeft + this.xSize + 3, this.guiTop + this.ySize - 66, 10, 20, (button) -> nextPage()));
-        this.addButton(new SimpleButton(References.getTranslate("screen.botania_recipe_creator.button.previous"),  this.guiLeft - 3 - 10, this.guiTop + this.ySize - 66,10, 20, (button) -> previousPage()));
+        this.addRenderableWidget(new SimpleButton(References.getTranslate("screen.botania_recipe_creator.button.next"), this.leftPos + this.imageWidth + 3, this.topPos + this.imageHeight - 66, 10, 20, (button) -> nextPage()));
+        this.addRenderableWidget(new SimpleButton(References.getTranslate("screen.botania_recipe_creator.button.previous"),  this.leftPos - 3 - 10, this.topPos + this.imageHeight - 66,10, 20, (button) -> previousPage()));
 
-        textField = new TextFieldWidget(minecraft.fontRenderer, guiLeft + xSize - 44, guiTop + ySize / 2 - 16, 35, 10, new StringTextComponent(""));
-        textField.setText(String.valueOf(100));
+        textField = new EditBox(minecraft.font, leftPos + imageWidth - 44, topPos + imageHeight / 2 - 16, 35, 10, new TextComponent(""));
+        textField.setValue(String.valueOf(100));
 
         updateScreen();
     }
@@ -76,7 +75,7 @@ public class BotaniaRecipeCreatorScreen extends TaggeableSlotsContainerScreen<Bo
     {
         try
         {
-            return Integer.parseInt(this.textField.getText());
+            return Integer.parseInt(this.textField.getValue());
         }
         catch(NumberFormatException ignored) {}
 
@@ -99,25 +98,25 @@ public class BotaniaRecipeCreatorScreen extends TaggeableSlotsContainerScreen<Bo
         switch(getCurrentRecipe())
         {
             case MANA_INFUSION:
-                setTextFieldPos(guiLeft + xSize - 44, textField.y);
-                setExecuteButtonPos(this.guiLeft + this.xSize / 2 - 20, this.guiTop + 35);
+                setTextFieldPos(leftPos + imageWidth - 44, textField.y);
+                setExecuteButtonPos(this.leftPos + this.imageWidth / 2 - 20, this.topPos + 35);
                 break;
             case ELVEN_TRADE:
             case PURE_DAISY:
-                setTextFieldPos(guiLeft + xSize / 2 - 35 / 2, textField.y);
-                setExecuteButtonPos(this.guiLeft + this.xSize / 2 - 20, this.guiTop + 35);
+                setTextFieldPos(leftPos + imageWidth / 2 - 35 / 2, textField.y);
+                setExecuteButtonPos(this.leftPos + this.imageWidth / 2 - 20, this.topPos + 35);
                 break;
             case BREWERY:
             case TERRA_PLATE:
-                setTextFieldPos(guiLeft + xSize / 2, textField.y);
-                setExecuteButtonPos(this.guiLeft + this.xSize / 2 - 5, this.guiTop + 31);
+                setTextFieldPos(leftPos + imageWidth / 2, textField.y);
+                setExecuteButtonPos(this.leftPos + this.imageWidth / 2 - 5, this.topPos + 31);
                 break;
             case PETAL_APOTHECARY:
-                setExecuteButtonPos(this.guiLeft + this.xSize / 2 - 1, this.guiTop + 31);
+                setExecuteButtonPos(this.leftPos + this.imageWidth / 2 - 1, this.topPos + 31);
                 break;
             case RUNIC_ALTAR:
-                setTextFieldPos(guiLeft + xSize / 2, textField.y);
-                setExecuteButtonPos(this.guiLeft + this.xSize / 2 - 2, this.guiTop + 31);
+                setTextFieldPos(leftPos + imageWidth / 2, textField.y);
+                setExecuteButtonPos(this.leftPos + this.imageWidth / 2 - 2, this.topPos + 31);
                 break;
         }
     }
@@ -142,7 +141,7 @@ public class BotaniaRecipeCreatorScreen extends TaggeableSlotsContainerScreen<Bo
 
     private void setSlot(int index, int x, int y)
     {
-        setPos(this.container.inventorySlots.stream().filter(s -> s.getSlotIndex() == index).findFirst().orElse(null), x, y);
+        setPos(this.getMenu().slots.stream().filter(s -> s.getSlotIndex() == index).findFirst().orElse(null), x, y);
     }
 
     private BotaniaRecipes getCurrentRecipe()
@@ -151,7 +150,7 @@ public class BotaniaRecipeCreatorScreen extends TaggeableSlotsContainerScreen<Bo
     }
 
     @Override
-    public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         this.renderBackground(matrixStack);
 
@@ -160,12 +159,12 @@ public class BotaniaRecipeCreatorScreen extends TaggeableSlotsContainerScreen<Bo
         switch(getCurrentRecipe())
         {
             case MANA_INFUSION:
-                minecraft.getItemRenderer().renderItemAndEffectIntoGUI(new ItemStack(ModBlocks.creativePool), this.guiLeft + xSize / 2 - 8, this.guiTop + 14);
+                minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(ModBlocks.creativePool), this.leftPos + imageWidth / 2 - 8, this.topPos + 14);
                 this.textField.render(matrixStack, mouseX, mouseY, partialTicks);
                 renderTextfieldTitle("Mana :", matrixStack);
                 break;
             case ELVEN_TRADE:
-                minecraft.getItemRenderer().renderItemAndEffectIntoGUI(new ItemStack(ModBlocks.livingwoodGlimmering), this.guiLeft + xSize / 2 - 8, this.guiTop + 14);
+                minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(ModBlocks.livingwoodGlimmering), this.leftPos + imageWidth / 2 - 8, this.topPos + 14);
                 break;
             case PURE_DAISY:
                 int i = 0;
@@ -174,13 +173,13 @@ public class BotaniaRecipeCreatorScreen extends TaggeableSlotsContainerScreen<Bo
                     {
                         if(i == 4)
                         {
-                            minecraft.getItemRenderer().renderItemAndEffectIntoGUI(new ItemStack(ModSubtiles.pureDaisy), this.guiLeft + 8 + 18 * x, this.guiTop + 18 + y * 18);
-                            minecraft.getItemRenderer().renderItemAndEffectIntoGUI(new ItemStack(ModSubtiles.pureDaisy), this.guiLeft + 116 + 18 * x, this.guiTop + 18 + y * 18);
+                            minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(ModSubtiles.pureDaisy), this.leftPos + 8 + 18 * x, this.topPos + 18 + y * 18);
+                            minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(ModSubtiles.pureDaisy), this.leftPos + 116 + 18 * x, this.topPos + 18 + y * 18);
                         }
                         else if(i != 5)
                         {
-                            minecraft.getItemRenderer().renderItemAndEffectIntoGUI(this.container.inventorySlots.get(SlotHelper.PURE_DAISY_SLOTS.get(0).getIndex()).getHasStack() ? this.container.inventorySlots.get(SlotHelper.PURE_DAISY_SLOTS.get(0).getIndex()).getStack() : ItemStack.EMPTY, this.guiLeft + 8 + 18 * x, this.guiTop + 18 + y * 18);
-                            minecraft.getItemRenderer().renderItemAndEffectIntoGUI(this.container.inventorySlots.get(SlotHelper.PURE_DAISY_SLOTS.get(1).getIndex()).getHasStack() ? this.container.inventorySlots.get(SlotHelper.PURE_DAISY_SLOTS.get(1).getIndex()).getStack() : ItemStack.EMPTY, this.guiLeft + 116 + 18 * x, this.guiTop + 18 + y * 18);
+                            minecraft.getItemRenderer().renderAndDecorateFakeItem(this.getMenu().slots.get(SlotHelper.PURE_DAISY_SLOTS.get(0).getIndex()).hasItem() ? this.getMenu().slots.get(SlotHelper.PURE_DAISY_SLOTS.get(0).getIndex()).getItem() : ItemStack.EMPTY, this.leftPos + 8 + 18 * x, this.topPos + 18 + y * 18);
+                            minecraft.getItemRenderer().renderAndDecorateFakeItem(this.getMenu().slots.get(SlotHelper.PURE_DAISY_SLOTS.get(1).getIndex()).hasItem() ? this.getMenu().slots.get(SlotHelper.PURE_DAISY_SLOTS.get(1).getIndex()).getItem() : ItemStack.EMPTY, this.leftPos + 116 + 18 * x, this.topPos + 18 + y * 18);
                         }
 
                         i++;
@@ -189,33 +188,33 @@ public class BotaniaRecipeCreatorScreen extends TaggeableSlotsContainerScreen<Bo
                 renderTextfieldTitle("Time :", matrixStack);
                 break;
             case BREWERY:
-                minecraft.getItemRenderer().renderItemAndEffectIntoGUI(new ItemStack(ModBlocks.brewery), this.guiLeft + 34, this.guiTop + 33);
+                minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(ModBlocks.brewery), this.leftPos + 34, this.topPos + 33);
                 break;
             case PETAL_APOTHECARY:
-                minecraft.getItemRenderer().renderItemAndEffectIntoGUI(new ItemStack(ModBlocks.defaultAltar), this.guiLeft + Math.floorDiv(xSize, 2) + 21, this.guiTop + 4);
+                minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(ModBlocks.defaultAltar), this.leftPos + Math.floorDiv(imageWidth, 2) + 21, this.topPos + 4);
                 break;
             case RUNIC_ALTAR:
-                minecraft.getItemRenderer().renderItemAndEffectIntoGUI(new ItemStack(ModBlocks.runeAltar), this.guiLeft + Math.floorDiv(xSize, 2) + 16, this.guiTop + 4);
+                minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(ModBlocks.runeAltar), this.leftPos + Math.floorDiv(imageWidth, 2) + 16, this.topPos + 4);
                 this.textField.render(matrixStack, mouseX, mouseY, partialTicks);
                 renderTextfieldTitle("Mana :", matrixStack);
                 break;
             case TERRA_PLATE:
-                minecraft.getItemRenderer().renderItemAndEffectIntoGUI(new ItemStack(ModItems.spark), this.guiLeft + 34, this.guiTop + 34);
+                minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(ModItems.spark), this.leftPos + 34, this.topPos + 34);
                 this.textField.render(matrixStack, mouseX, mouseY, partialTicks);
                 renderTextfieldTitle("Mana :", matrixStack);
                 break;
         }
 
-        this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
+        this.renderTooltip(matrixStack, mouseX, mouseY);
     }
 
-    private void renderTextfieldTitle(String text, MatrixStack matrixStack)
+    private void renderTextfieldTitle(String text, PoseStack matrixStack)
     {
-        RenderSystem.pushMatrix();
-        double scale = 0.85D;
-        RenderSystem.scaled(scale, scale, scale);
-        Screen.drawString(matrixStack, font, new StringTextComponent(text), (int) (textField.x / scale), (int) ((textField.y - font.FONT_HEIGHT * scale) / scale), 0xFFFFFF);
-        RenderSystem.popMatrix();
+        matrixStack.pushPose();
+        float scale = 0.85F;
+        matrixStack.scale(scale, scale, scale);
+        Screen.drawString(matrixStack, font, new TextComponent(text), (int) (textField.x / scale), (int) ((textField.y - font.lineHeight * scale) / scale), 0xFFFFFF);
+        matrixStack.popPose();
     }
 
     @Override
@@ -241,23 +240,23 @@ public class BotaniaRecipeCreatorScreen extends TaggeableSlotsContainerScreen<Bo
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(@Nonnull MatrixStack matrixStack, float partialTicks, int x, int y)
+    protected void renderBg(PoseStack matrixStack, float pPartialTick, int pMouseX, int pMouseY)
     {
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        int i = this.guiLeft;
-        int j = (this.height - this.ySize) / 2;
-        this.minecraft.getTextureManager().bindTexture(getCurrentRecipe().getGuiTexture());
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        int i = this.leftPos;
+        int j = (this.height - this.imageHeight) / 2;
+        this.minecraft.getTextureManager().bindForSetup(getCurrentRecipe().getGuiTexture());
 
-        this.blit(matrixStack, i, j, 0, 0, this.xSize, this.ySize);
+        this.blit(matrixStack, i, j, 0, 0, this.imageWidth, this.imageHeight);
 
-        super.drawGuiContainerBackgroundLayer(matrixStack, partialTicks, x, y);
+        super.renderBg(matrixStack, pPartialTick, pMouseX, pMouseY);
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(@Nonnull MatrixStack matrixStack, int x, int y)
+    protected void renderLabels(PoseStack matrixStack, int pMouseX, int pMouseY)
     {
-        drawCenteredString(matrixStack, minecraft.fontRenderer, References.getTranslate("screen.botania_recipe_creator." + RecipeFileUtils.getName(getCurrentRecipe().getRecipeType()).getPath() + ".title"), this.xSize / 2, -15, 0xFFFFFF);
-        super.drawGuiContainerForegroundLayer(matrixStack, x, y);
+        drawCenteredString(matrixStack, minecraft.font, References.getTranslate("screen.botania_recipe_creator." + RecipeFileUtils.getName(getCurrentRecipe().getRecipeType()).getPath() + ".title"), this.imageWidth / 2, -15, 0xFFFFFF);
+        super.renderLabels(matrixStack, pMouseX, pMouseY);
     }
 
     private void setPos(Slot slot, int x, int y)
@@ -285,12 +284,12 @@ public class BotaniaRecipeCreatorScreen extends TaggeableSlotsContainerScreen<Bo
 
     private void updateServerIndex()
     {
-        InitPackets.getNetWork().send(PacketDistributor.SERVER.noArg(), new SetBotaniaRecipeCreatorScreenIndexServerPacket(this.currentScreenIndex, this.container.tile.getPos()));
+        InitPackets.getNetWork().send(PacketDistributor.SERVER.noArg(), new SetBotaniaRecipeCreatorScreenIndexServerPacket(this.currentScreenIndex, this.getMenu().tile.getBlockPos()));
     }
 
     private void updateSlots()
     {
-        this.container.inventorySlots.forEach(slot -> { if(slot instanceof SlotItemHandler) setPos(slot, -1000, -1000); });
+        this.getMenu().slots.forEach(slot -> { if(slot instanceof SlotItemHandler) setPos(slot, -1000, -1000); });
         getCurrentRecipe().slots.forEach(ds ->setSlot(ds.getIndex(), ds.getxPos(), ds.getyPos()));
     }
 
@@ -304,18 +303,18 @@ public class BotaniaRecipeCreatorScreen extends TaggeableSlotsContainerScreen<Bo
         RUNIC_ALTAR(ModRecipeTypes.RUNE_TYPE, Utilities.getGuiContainerTexture(SupportedMods.BOTANIA, "runic_altar_recipe_creator.png"), SlotHelper.RUNIC_ALTAR_SLOTS),
         TERRA_PLATE(ModRecipeTypes.TERRA_PLATE_TYPE, Utilities.getGuiContainerTexture(SupportedMods.BOTANIA, "terra_plate_recipe_creator.png"), SlotHelper.TERRA_PLATE_SLOTS);
 
-        private final IRecipeType<?> recipeType;
+        private final RecipeType<?> recipeType;
         private final ResourceLocation guiTexture;
         private final List<PositionnedSlot> slots;
 
-        BotaniaRecipes(IRecipeType<?> recipeType, ResourceLocation guiTexture, List<PositionnedSlot> slots)
+        BotaniaRecipes(RecipeType<?> recipeType, ResourceLocation guiTexture, List<PositionnedSlot> slots)
         {
             this.recipeType = recipeType;
             this.guiTexture = guiTexture;
             this.slots = slots;
         }
 
-        public IRecipeType<?> getRecipeType()
+        public RecipeType<?> getRecipeType()
         {
             return recipeType;
         }

@@ -2,9 +2,9 @@ package fr.eno.craftcreator.packets;
 
 import fr.eno.craftcreator.screen.BotaniaRecipeCreatorScreen;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
@@ -17,12 +17,12 @@ public class SetBotaniaRecipeCreatorScreenIndexClientPacket
         this.index = index;
     }
 
-    public static void encode(SetBotaniaRecipeCreatorScreenIndexClientPacket msg, PacketBuffer packetBuffer)
+    public static void encode(SetBotaniaRecipeCreatorScreenIndexClientPacket msg, FriendlyByteBuf packetBuffer)
     {
         packetBuffer.writeInt(msg.index);
     }
 
-    public static SetBotaniaRecipeCreatorScreenIndexClientPacket decode(PacketBuffer packetBuffer)
+    public static SetBotaniaRecipeCreatorScreenIndexClientPacket decode(FriendlyByteBuf packetBuffer)
     {
         int index = packetBuffer.readInt();
 
@@ -31,7 +31,7 @@ public class SetBotaniaRecipeCreatorScreenIndexClientPacket
 
     public static void clientHandle(SetBotaniaRecipeCreatorScreenIndexClientPacket msg, Supplier<NetworkEvent.Context> ctx)
     {
-        Screen screen = Minecraft.getInstance().currentScreen;
+        Screen screen = Minecraft.getInstance().screen;
 
         if(screen instanceof BotaniaRecipeCreatorScreen)
         {

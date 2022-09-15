@@ -2,14 +2,14 @@ package fr.eno.craftcreator.serializer;
 
 import com.google.gson.JsonObject;
 import fr.eno.craftcreator.utils.CraftType;
-import net.minecraft.item.Item;
-import net.minecraft.util.IItemProvider;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
 
 import java.util.List;
 
 public class SmithingTableRecipeSerializer extends RecipeSerializer
 {
-	private SmithingTableRecipeSerializer(IItemProvider output)
+	private SmithingTableRecipeSerializer(ItemLike output)
 	{
 		super(CraftType.SMITHING_TABLE, output);
 		this.setOutput(output);
@@ -28,14 +28,14 @@ public class SmithingTableRecipeSerializer extends RecipeSerializer
 		return this;
 	}
 
-	private void setOutput(IItemProvider output)
+	private void setOutput(ItemLike output)
 	{
 		JsonObject result = new JsonObject();
 		result.addProperty("item", output.asItem().getRegistryName().toString());
 		recipe.add("result", result);
     }
 
-	public static SmithingTableRecipeSerializer create(IItemProvider output)
+	public static SmithingTableRecipeSerializer create(ItemLike output)
 	{
 		return new SmithingTableRecipeSerializer(output);
 	}

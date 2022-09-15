@@ -2,12 +2,12 @@ package fr.eno.craftcreator.packets;
 
 import fr.eno.craftcreator.init.InitPackets;
 import fr.eno.craftcreator.tileentity.TaggeableInventoryContainerTileEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.fml.network.NetworkEvent;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.PacketDistributor;
 
 import java.util.function.Supplier;
 
@@ -22,13 +22,13 @@ public class GetTaggeableContainerRecipeCreatorTileInfosServerPacket
         this.windowId = windowId;
     }
 
-    public static void encode(GetTaggeableContainerRecipeCreatorTileInfosServerPacket msg, PacketBuffer packetBuffer)
+    public static void encode(GetTaggeableContainerRecipeCreatorTileInfosServerPacket msg, FriendlyByteBuf packetBuffer)
     {
         packetBuffer.writeBlockPos(msg.pos);
         packetBuffer.writeInt(msg.windowId);
     }
 
-    public static GetTaggeableContainerRecipeCreatorTileInfosServerPacket decode(PacketBuffer packetBuffer)
+    public static GetTaggeableContainerRecipeCreatorTileInfosServerPacket decode(FriendlyByteBuf packetBuffer)
     {
         return new GetTaggeableContainerRecipeCreatorTileInfosServerPacket(packetBuffer.readBlockPos(), packetBuffer.readInt());
     }
@@ -37,13 +37,12 @@ public class GetTaggeableContainerRecipeCreatorTileInfosServerPacket
     {
         public static void handle(GetTaggeableContainerRecipeCreatorTileInfosServerPacket msg, Supplier<NetworkEvent.Context> ctx)
         {
-            ServerWorld world = ctx.get().getSender().getServerWorld();
+            ServerLevel world = ctx.get().getSender().getLevel();
 
-            TileEntity tileEntity = world.getTileEntity(msg.pos);
+            BlockEntity tileEntity = world.getBlockEntity(msg.pos);
 
-            if(tileEntity instanceof TaggeableInventoryContainerTileEntity)
+            if(tileEntity instanceof TaggeableInventoryContainerTileEntity tile)
             {
-                TaggeableInventoryContainerTileEntity tile = (TaggeableInventoryContainerTileEntity) tileEntity;
                 InitPackets.getNetWork().send(PacketDistributor.PLAYER.with(() -> ctx.get().getSender()), new GetTaggeableContainerRecipeCreatorTileInfosClientPacket(msg.windowId, tile.getTaggedSlots()));
             }
 

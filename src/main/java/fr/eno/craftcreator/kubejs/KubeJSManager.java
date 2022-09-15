@@ -37,7 +37,7 @@ public class KubeJSManager
     private File createKubeJSFolder()
     {
         check();
-        File folder = new File(Minecraft.getInstance().gameDir, "kubejs");
+        File folder = new File(Minecraft.getInstance().gameDirectory, "kubejs");
 
         if(!folder.exists()) folder.mkdirs();
 

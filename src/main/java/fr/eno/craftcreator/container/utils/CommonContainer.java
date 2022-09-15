@@ -1,31 +1,26 @@
 package fr.eno.craftcreator.container.utils;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-
-public class CommonContainer extends Container
+public class CommonContainer extends AbstractContainerMenu
 {
-	protected final int invenSize;
-
-	public CommonContainer(ContainerType<?> type, int id, int size)
+	public CommonContainer(@Nullable MenuType<?> pMenuType, int pContainerId)
 	{
-		super(type, id);
-		invenSize = size;
+		super(pMenuType, pContainerId);
 	}
 
 	@Override
-	public boolean canInteractWith(@Nonnull PlayerEntity playerIn)
+	public boolean stillValid(Player pPlayer)
 	{
 		return true;
 	}
 
-	protected void bindPlayerInventory(PlayerInventory playerInventory)
+	protected void bindPlayerInventory(Inventory playerInventory)
 	{
 		for (int i = 0; i < 3; ++i)
 		{
@@ -39,128 +34,5 @@ public class CommonContainer extends Container
 		{
 			this.addSlot(new Slot(playerInventory, k, 8 + k * 18, 142));
 		}
-	}
-
-	@Override
-	@Nonnull
-	public ItemStack transferStackInSlot(@Nonnull PlayerEntity playerIn, int index)
-	{
-		ItemStack itemstack = ItemStack.EMPTY;
-		Slot slot = this.inventorySlots.get(index);
-
-		if (slot != null && slot.getHasStack() && slot.xPos > 0 && slot.yPos > 0)
-		{
-			ItemStack itemstack1 = slot.getStack();
-			itemstack = itemstack1.copy();
-
-			if (index < invenSize)
-			{
-				if (!this.mergeItemStack(itemstack1, invenSize, this.inventorySlots.size(), true))
-				{
-					return ItemStack.EMPTY;
-				}
-			} else if (!this.mergeItemStack(itemstack1, 0, invenSize, false))
-			{
-				return ItemStack.EMPTY;
-			}
-
-			if (itemstack1.getCount() == 0)
-			{
-				slot.putStack(ItemStack.EMPTY);
-			} else
-			{
-				slot.onSlotChanged();
-			}
-		}
-
-		return itemstack;
-	}
-
-	@Override
-	protected boolean mergeItemStack(@Nonnull ItemStack stack, int startIndex, int endIndex, boolean reverseDirection)
-	{
-		boolean flag = false;
-		int i = startIndex;
-		if (reverseDirection)
-			i = endIndex - 1;
-
-		if (stack.isStackable())
-		{
-			while (stack.getCount() > 0 && (!reverseDirection && i < endIndex || reverseDirection && i >= startIndex))
-			{
-				Slot slot = this.inventorySlots.get(i);
-				ItemStack itemstack = slot.getStack();
-				int maxLimit = Math.min(stack.getMaxStackSize(), slot.getSlotStackLimit());
-
-				if (!itemstack.isEmpty() && areItemStacksEqual(stack, itemstack))
-				{
-					int j = itemstack.getCount() + stack.getCount();
-					if (j <= maxLimit)
-					{
-						stack.setCount(0);
-						itemstack.setCount(j);
-						slot.onSlotChanged();
-						flag = true;
-
-					} else if (itemstack.getCount() < maxLimit)
-					{
-						stack.shrink(maxLimit - itemstack.getCount());
-						itemstack.setCount(maxLimit);
-						slot.onSlotChanged();
-						flag = true;
-					}
-				}
-				if (reverseDirection)
-				{
-					--i;
-				} else
-					++i;
-			}
-		}
-		if (stack.getCount() > 0)
-		{
-			if (reverseDirection)
-			{
-				i = endIndex - 1;
-			} else
-				i = startIndex;
-
-			while (!reverseDirection && i < endIndex || reverseDirection && i >= startIndex)
-			{
-				Slot slot1 = this.inventorySlots.get(i);
-				ItemStack itemstack1 = slot1.getStack();
-
-				if (itemstack1.isEmpty() && slot1.isItemValid(stack))
-				{ // Forge: Make sure to respect isItemValid in the slot.
-					if (stack.getCount() <= slot1.getSlotStackLimit())
-					{
-						slot1.putStack(stack.copy());
-						slot1.onSlotChanged();
-						stack.setCount(0);
-						flag = true;
-						break;
-					} else
-					{
-						itemstack1 = stack.copy();
-						stack.shrink(slot1.getSlotStackLimit());
-						itemstack1.setCount(slot1.getSlotStackLimit());
-						slot1.putStack(itemstack1);
-						slot1.onSlotChanged();
-						flag = true;
-					}
-				}
-				if (reverseDirection)
-				{
-					--i;
-				} else
-					++i;
-			}
-		}
-		return flag;
-	}
-
-	private static boolean areItemStacksEqual(ItemStack stackA, ItemStack stackB)
-	{
-		return stackB.getItem() == stackA.getItem() && stackA.areShareTagsEqual(stackB) && ItemStack.areItemStackTagsEqual(stackA, stackB);
 	}
 }

@@ -1,6 +1,6 @@
 package fr.eno.craftcreator.utils;
 
-import net.minecraft.inventory.container.Slot;
+import net.minecraft.world.inventory.Slot;
 
 import java.util.ArrayList;
 import java.util.List;

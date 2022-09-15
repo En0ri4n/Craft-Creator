@@ -2,10 +2,10 @@ package fr.eno.craftcreator.utils;
 
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.event.ClickEvent;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -49,8 +49,8 @@ public class Utilities
 		return parts;
 	}
 	
-	public static IFormattableTextComponent createClickableComponent(String component, File toOpen)
+	public static MutableComponent createClickableComponent(String component, File toOpen)
 	{
-		return new StringTextComponent(component).modifyStyle((msg) -> msg.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, toOpen.getAbsolutePath())));
+		return new TextComponent(component).withStyle((msg) -> msg.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, toOpen.getAbsolutePath())));
 	}
 }

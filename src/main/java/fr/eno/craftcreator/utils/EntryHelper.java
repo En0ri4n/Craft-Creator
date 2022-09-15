@@ -1,12 +1,12 @@
 package fr.eno.craftcreator.utils;
 
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -40,7 +40,7 @@ public class EntryHelper
         return entries;
     }
 
-    public static <T extends IRecipe<C>, C extends IInventory> void init(World world)
+    public static <T extends Recipe<C>, C extends Container> void init(Level world)
     {
         if(items.isEmpty())
             ForgeRegistries.ITEMS.getValues().forEach(item -> items.add(item.getRegistryName()));
@@ -54,8 +54,8 @@ public class EntryHelper
         if(recipeIds.isEmpty())
             Registry.RECIPE_TYPE.stream().collect(Collectors.toList()).forEach(recipeType ->
         {
-            IRecipeType<T> recipeType1 = (IRecipeType<T>) recipeType;
-            world.getRecipeManager().getRecipesForType(recipeType1).forEach(recipe ->
+            RecipeType<T> recipeType1 = (RecipeType<T>) recipeType;
+            world.getRecipeManager().getAllRecipesFor(recipeType1).forEach(recipe ->
             {
                 if(!recipe.getId().toString().contains("kjs")) recipeIds.add(recipe.getId());
             });

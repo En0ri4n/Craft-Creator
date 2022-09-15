@@ -6,24 +6,23 @@ import fr.eno.craftcreator.kubejs.KubeJSManager;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import fr.eno.craftcreator.screen.*;
 import fr.eno.craftcreator.utils.EntryHelper;
-import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.RenderTypeLookup;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nonnull;
 import java.util.function.Predicate;
 
 @Mod(References.MOD_ID)
@@ -53,28 +52,30 @@ public class CraftCreator
 
     private void setup(final FMLCommonSetupEvent event)
     {
-        Predicate<RenderType> render = (r) -> r == RenderType.getCutout();
+        Predicate<RenderType> render = (r) -> r == RenderType.cutout();
 
-        RenderTypeLookup.setRenderLayer(InitBlocks.STONE_CUTTER_RECIPE_CREATOR.get(), render);
-        RenderTypeLookup.setRenderLayer(InitBlocks.CRAFTING_TABLE_RECIPE_CREATOR.get(), render);
-        RenderTypeLookup.setRenderLayer(InitBlocks.FURNACE_RECIPE_CREATOR.get(), render);
+        ItemBlockRenderTypes.setRenderLayer(InitBlocks.STONE_CUTTER_RECIPE_CREATOR.get(), render);
+        ItemBlockRenderTypes.setRenderLayer(InitBlocks.CRAFTING_TABLE_RECIPE_CREATOR.get(), render);
+        ItemBlockRenderTypes.setRenderLayer(InitBlocks.FURNACE_RECIPE_CREATOR.get(), render);
     }
 
     public void clientSetup(FMLClientSetupEvent event)
     {
-        ScreenManager.registerFactory(InitContainers.CRAFTING_TABLE_RECIPE_CREATOR.get(), CraftingTableRecipeCreatorScreen::new);
-        ScreenManager.registerFactory(InitContainers.FURNACE_RECIPE_CREATOR.get(), FurnaceRecipeCreatorScreen::new);
-        ScreenManager.registerFactory(InitContainers.STONE_CUTTER_RECIPE_CREATOR.get(), StoneCutterRecipeCreatorScreen::new);
-        ScreenManager.registerFactory(InitContainers.SMITHING_TABLE_RECIPE_CREATOR.get(), SmithingTableRecipeCreatorScreen::new);
+        event.enqueueWork(() ->
+        {
+            MenuScreens.register(InitContainers.CRAFTING_TABLE_RECIPE_CREATOR.get(), CraftingTableRecipeCreatorScreen::new);
+            MenuScreens.register(InitContainers.FURNACE_RECIPE_CREATOR.get(), FurnaceRecipeCreatorScreen::new);
+            MenuScreens.register(InitContainers.STONE_CUTTER_RECIPE_CREATOR.get(), StoneCutterRecipeCreatorScreen::new);
+            MenuScreens.register(InitContainers.SMITHING_TABLE_RECIPE_CREATOR.get(), SmithingTableRecipeCreatorScreen::new);
 
-        if(SupportedMods.isBotaniaLoaded())
-            ScreenManager.registerFactory(InitContainers.BOTANIA_RECIPE_CREATOR.get(), BotaniaRecipeCreatorScreen::new);
+            if(SupportedMods.isBotaniaLoaded()) MenuScreens.register(InitContainers.BOTANIA_RECIPE_CREATOR.get(), BotaniaRecipeCreatorScreen::new);
+        });
     }
 
     @SubscribeEvent
-    public void onServerStart(FMLServerStartedEvent event)
+    public void onServerStart(ServerStartedEvent event)
     {
-        event.getServer().getWorlds().forEach(EntryHelper::init);
+        event.getServer().getAllLevels().forEach(EntryHelper::init);
     }
 
     @SubscribeEvent
@@ -83,11 +84,10 @@ public class CraftCreator
         TestRecipesCommand.register(e.getDispatcher());
     }
 
-    public static final ItemGroup CRAFT_CREATOR_TAB = new ItemGroup(References.MOD_ID)
+    public static final CreativeModeTab CRAFT_CREATOR_TAB = new CreativeModeTab(References.MOD_ID)
     {
-        @Nonnull
         @Override
-        public ItemStack createIcon()
+        public ItemStack makeIcon()
         {
             return new ItemStack(InitItems.CRAFTING_TABLE_RECIPE_CREATOR.get());
         }

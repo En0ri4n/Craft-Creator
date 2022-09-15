@@ -4,23 +4,17 @@ import fr.eno.craftcreator.kubejs.jsserializers.BotaniaRecipesJSSerializer;
 import fr.eno.craftcreator.kubejs.jsserializers.MinecraftRecipeSerializer;
 import fr.eno.craftcreator.kubejs.jsserializers.ModRecipesJSSerializer;
 import fr.eno.craftcreator.utils.PairValue;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.registries.ForgeRegistries;
-import vazkii.botania.api.BotaniaAPI;
-import vazkii.botania.common.item.ModItems;
-import vazkii.botania.common.item.brew.ItemVial;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
 
 import javax.annotation.Nullable;
 import java.util.Map;
-import java.util.Objects;
 
 public class ModDispatcher
 {
     @Nullable
-    public static PairValue<String, Integer> getParameters(IRecipe<?> recipe)
+    public static PairValue<String, Integer> getParameters(Recipe<?> recipe)
     {
         String modId = recipe.getId().getNamespace();
 
@@ -44,7 +38,7 @@ public class ModDispatcher
         }
     }
 
-    public static Map<String, ResourceLocation> getOutput(IRecipe<?> recipe)
+    public static Map<String, ResourceLocation> getOutput(Recipe<?> recipe)
     {
         String modId = recipe.getId().getNamespace();
 
@@ -56,7 +50,7 @@ public class ModDispatcher
         return null;
     }
 
-    public static ItemStack getOneOutput(IRecipe<?> recipe)
+    public static ItemStack getOneOutput(Recipe<?> recipe)
     {
         ItemStack stack = ItemStack.EMPTY;
         Map<String, ResourceLocation> locations = ModDispatcher.getOutput(recipe);

@@ -2,8 +2,7 @@ package fr.eno.craftcreator.utils;
 
 import fr.eno.craftcreator.References;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.Component;
 
 /**
  * 
@@ -20,9 +19,9 @@ public class Utils
 	 * call {@link References#getTranslate(String, Object...)}
 	 * @see References#getTranslate(String, Object...)
 	 * 
-	 * @return The {@link TranslationTextComponent}
+	 * @return The {@link net.minecraft.network.chat.TranslatableComponent}
 	 */
-	public static TranslationTextComponent get(String path, Object... args)
+	public static Component get(String path, Object... args)
 	{
 		return References.getTranslate(path, args);
 	}
@@ -31,7 +30,7 @@ public class Utils
 	 * call {@link References#getTranslate(String, Object...)} directly formatted to string
 	 * @see References#getTranslate(String, Object...)
 	 * 
-	 * @return The formatted string from {@link TranslationTextComponent}
+	 * @return The formatted string from {@link net.minecraft.network.chat.TranslatableComponent}
 	 */
 	public static String getS(String path, Object... args)
 	{
@@ -39,14 +38,14 @@ public class Utils
 	}
 	
 	/**
-	 * call {@link FontRenderer#getStringWidth(String)}
-	 * @see FontRenderer#getStringWidth(String)
+	 * call {@link net.minecraft.client.gui.Font#width(String)}
+	 * @see net.minecraft.client.gui.Font#width(String)
 	 * 
 	 * @param str The string
 	 * @return width of the given string
 	 */
 	public static int width(String str)
 	{
-		return mc.fontRenderer.getStringWidth(str);
+		return mc.font.width(str);
 	}
 }

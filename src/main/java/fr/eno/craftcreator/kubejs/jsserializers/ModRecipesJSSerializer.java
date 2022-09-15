@@ -7,17 +7,16 @@ import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
 import fr.eno.craftcreator.utils.PairValue;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.RecipeManager;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.ItemLike;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -48,7 +47,7 @@ public abstract class ModRecipesJSSerializer
             RecipeFileUtils.insertAndWriteLinesToRemoveRecipe(this.modId, finishedLine);
     }
 
-    public static <C extends IInventory, T extends IRecipe<C>> void removeAddedRecipe(IRecipe<C> recipe)
+    public static <C extends Container, T extends Recipe<C>> void removeAddedRecipe(Recipe<C> recipe)
     {
         RecipeFileUtils.removeAddedRecipe(recipe, recipe.getId().getNamespace());
     }
@@ -58,30 +57,30 @@ public abstract class ModRecipesJSSerializer
         RecipeFileUtils.removeModifiedRecipe(recipe);
     }
 
-    private <C extends IInventory, T extends IRecipe<C>> IRecipe<C> getRecipe(IRecipeType<T> type, IItemProvider result)
+    private <C extends Container, T extends Recipe<C>> Recipe<C> getRecipe(RecipeType<T> type, ItemLike result)
     {
-        RecipeManager manager = Objects.requireNonNull(Minecraft.getInstance().world).getRecipeManager();
-        return manager.getRecipesForType(type).stream().filter(irecipe -> irecipe.getRecipeOutput().getItem() == result.asItem()).findFirst().orElse(null);
+        RecipeManager manager = Objects.requireNonNull(Minecraft.getInstance().level).getRecipeManager();
+        return manager.getAllRecipesFor(type).stream().filter(Recipe -> Recipe.getResultItem().getItem() == result.asItem()).findFirst().orElse(null);
     }
-    protected void addRecipeToFile(String recipeJson, IRecipeType<?> recipeType)
+    protected void addRecipeToFile(String recipeJson, RecipeType<?> recipeType)
     {
         RecipeFileUtils.insertAndWriteLines(this.modId, recipeType, "event.custom(" + recipeJson + ")");
     }
 
-    public abstract PairValue<String, Integer> getParam(IRecipe<?> recipe);
+    public abstract PairValue<String, Integer> getParam(Recipe<?> recipe);
 
-    protected void sendSuccessMessage(IRecipeType<?> type, @Nullable ResourceLocation result)
+    protected void sendSuccessMessage(RecipeType<?> type, @Nullable ResourceLocation result)
     {
-        TextComponent baseComponent = new StringTextComponent("Recipe ");
-        TextComponent recipeNameComp = new StringTextComponent(Objects.requireNonNull(result).getPath() + "_from_" + RecipeFileUtils.getName(type).getPath());
-        recipeNameComp.modifyStyle(style ->
+        TextComponent baseComponent = new TextComponent("Recipe ");
+        TextComponent recipeNameComp = new TextComponent(Objects.requireNonNull(result).getPath() + "_from_" + RecipeFileUtils.getName(type).getPath());
+        recipeNameComp.withStyle(style ->
         {
-            style.applyFormatting(TextFormatting.GREEN);
+            style.applyFormat(ChatFormatting.GREEN);
             style.setUnderlined(true);
             return style;
         });
-        TextComponent endComp = new StringTextComponent(" Successfully generated !");
-        Objects.requireNonNull(Minecraft.getInstance().player).sendMessage(baseComponent.appendSibling(recipeNameComp).appendSibling(endComp), Minecraft.getInstance().player.getUniqueID());
+        TextComponent endComp = new TextComponent(" Successfully generated !");
+        Objects.requireNonNull(Minecraft.getInstance().player).sendMessage(baseComponent.append(recipeNameComp).append(endComp), Minecraft.getInstance().player.getUUID());
     }
 
     JsonArray getArray(Multimap<ResourceLocation, Boolean> ingredients)
@@ -102,17 +101,17 @@ public abstract class ModRecipesJSSerializer
         return RecipeFileUtils.mapToJsonObject(map);
     }
 
-    boolean isRecipeExists(IRecipeType<?> recipeType, ResourceLocation resultOutput)
+    boolean isRecipeExists(RecipeType<?> recipeType, ResourceLocation resultOutput)
     {
         return recipeType != null && resultOutput != null;
     }
 
     protected void sendFailMessage()
     {
-        Objects.requireNonNull(Minecraft.getInstance().player).sendMessage(References.getTranslate("js_serializer.fail.recipe_exists"), Minecraft.getInstance().player.getUniqueID());
+        Objects.requireNonNull(Minecraft.getInstance().player).sendMessage(References.getTranslate("js_serializer.fail.recipe_exists"), Minecraft.getInstance().player.getUUID());
     }
 
-    public abstract Map<String, ResourceLocation> getOutput(IRecipe<?> recipe);
+    public abstract Map<String, ResourceLocation> getOutput(Recipe<?> recipe);
 
     public abstract ItemStack getOneOutput(Map.Entry<String, ResourceLocation> entry);
 

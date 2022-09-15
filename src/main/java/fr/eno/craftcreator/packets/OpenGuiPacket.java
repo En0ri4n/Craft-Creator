@@ -1,13 +1,14 @@
 package fr.eno.craftcreator.packets;
 
 import fr.eno.craftcreator.tileentity.BotaniaRecipeCreatorTile;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.fml.network.NetworkEvent;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.NetworkHooks;
 
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -22,15 +23,15 @@ public class OpenGuiPacket
         this.pos = pos;
     }
 
-    public static void encode(OpenGuiPacket msg, PacketBuffer packetBuffer)
+    public static void encode(OpenGuiPacket msg, FriendlyByteBuf packetBuffer)
     {
-        packetBuffer.writeUniqueId(msg.uuid);
+        packetBuffer.writeUUID(msg.uuid);
         packetBuffer.writeBlockPos(msg.pos);
     }
 
-    public static OpenGuiPacket decode(PacketBuffer packetBuffer)
+    public static OpenGuiPacket decode(FriendlyByteBuf packetBuffer)
     {
-        UUID uuid = packetBuffer.readUniqueId();
+        UUID uuid = packetBuffer.readUUID();
         BlockPos pos = packetBuffer.readBlockPos();
 
         return new OpenGuiPacket(uuid, pos);
@@ -40,14 +41,13 @@ public class OpenGuiPacket
     {
         public static void handle(OpenGuiPacket msg, Supplier<NetworkEvent.Context> ctx)
         {
-            ServerWorld world = ctx.get().getSender().getServerWorld();
+            ServerLevel world = ctx.get().getSender().getLevel();
 
-            TileEntity tileEntity = world.getTileEntity(msg.pos);
+            BlockEntity tileEntity = world.getBlockEntity(msg.pos);
 
-            if(tileEntity instanceof BotaniaRecipeCreatorTile)
+            if(tileEntity instanceof BotaniaRecipeCreatorTile tile)
             {
-                BotaniaRecipeCreatorTile tile = (BotaniaRecipeCreatorTile) tileEntity;
-                NetworkHooks.openGui(ctx.get().getSender(), tile, msg.pos);
+                NetworkHooks.openGui(Objects.requireNonNull(ctx.get().getSender()), tile, msg.pos);
             }
 
             ctx.get().setPacketHandled(true);

@@ -1,16 +1,15 @@
 package fr.eno.craftcreator.screen.buttons;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
 
-import javax.annotation.Nonnull;
-import java.awt.*;
+
 
 public class BooleanButton extends Button
 {
@@ -19,22 +18,22 @@ public class BooleanButton extends Button
 	private boolean isOn;
 	private final String name;
 
-	public BooleanButton(String name, int x, int y, int width, int height, boolean value, IPressable onPress)
+	public BooleanButton(String name, int x, int y, int width, int height, boolean value, OnPress onPress)
 	{
-		super(x, y, width, height, new StringTextComponent(""), onPress);
+		super(x, y, width, height, new TextComponent(""), onPress);
 		this.name = name;
 		this.isOn = value;
 	}
 
 	@Override
-	public void renderWidget(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	public void renderButton(PoseStack pPoseStack, int mouseX, int mouseY, float pPartialTick)
 	{
 		Minecraft mc = Minecraft.getInstance();
 
 		if(this.visible)
 		{
 			int yOffset = 0;
-			mc.getTextureManager().bindTexture(TEXTURE);
+			mc.getTextureManager().bindForSetup(TEXTURE);
 			
 			if(active)
 			{
@@ -43,8 +42,8 @@ public class BooleanButton extends Button
 
 			String str = Utils.getS("button.boolean." + name + "." + (isOn ? "on" : "off"));
 
-			Screen.blit(matrixStack, x, y, this.width, this.height, 0, yOffset, 100, 20, 100, 60);
-			drawCenteredString(matrixStack, mc.fontRenderer, str, this.x + this.width / 2, this.y + this.height / 3, Color.WHITE.getRGB());
+			Screen.blit(pPoseStack, x, y, this.width, this.height, 0, yOffset, 100, 20, 100, 60);
+			drawCenteredString(pPoseStack, mc.font, str, this.x + this.width / 2, this.y + this.height / 3, 0xFFFFFF);
 		}
 	}
 
