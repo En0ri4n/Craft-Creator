@@ -1,6 +1,6 @@
 package fr.eno.craftcreator.screen;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.kubejs.jsserializers.ModRecipesJSSerializer;
 import fr.eno.craftcreator.kubejs.utils.DeserializerHelper;
@@ -9,8 +9,8 @@ import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -22,7 +22,7 @@ public class RecipeManagerScreen extends ListScreen
 
     public RecipeManagerScreen(String modId, ResourceLocation recipeType)
     {
-        super(new StringTextComponent(""));
+        super(new TextComponent(""));
         this.modId = modId;
         this.recipeType = recipeType;
     }
@@ -52,8 +52,8 @@ public class RecipeManagerScreen extends ListScreen
         updateLists();
         this.getLists().forEach(slw -> slw.setCanHaveSelected(true));
 
-        this.addButton(new SimpleButton(References.getTranslate("screen.recipe_manager.button.back"), this.width / 2 - 40, this.height - bottomHeight - 7, 80, 20, button -> minecraft.displayGuiScreen(new ModSelectionScreen())));
-        this.addButton(new SimpleButton(References.getTranslate("screen.recipe_manager.button.modifier_manager"), this.width - 130, this.height - bottomHeight - 7, 120, 20, button -> minecraft.displayGuiScreen(new RecipeModifierManagerScreen(this, this.modId, this.recipeType))));
+        this.addRenderableWidget(new SimpleButton(References.getTranslate("screen.recipe_manager.button.back"), this.width / 2 - 40, this.height - bottomHeight - 7, 80, 20, button -> minecraft.setScreen(new ModSelectionScreen())));
+        this.addRenderableWidget(new SimpleButton(References.getTranslate("screen.recipe_manager.button.modifier_manager"), this.width - 130, this.height - bottomHeight - 7, 120, 20, button -> minecraft.setScreen(new RecipeModifierManagerScreen(this, this.modId, this.recipeType))));
     }
 
     private void updateLists()
@@ -64,7 +64,7 @@ public class RecipeManagerScreen extends ListScreen
     }
 
     @Override
-    public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         this.renderBackground(matrixStack);
         super.render(matrixStack, mouseX, mouseY, partialTicks);

@@ -1,43 +1,43 @@
 package fr.eno.craftcreator.tileentity;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.inventory.ItemStackHelper;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.NonNullList;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 
-public abstract class InventoryContainerTileEntity extends TileEntity implements IItemHandlerModifiable, INamedContainerProvider
+public abstract class InventoryContainerTileEntity extends BlockEntity implements IItemHandlerModifiable, MenuProvider
 {
     private NonNullList<ItemStack> inventory;
 
-    public InventoryContainerTileEntity(TileEntityType<?> type, int inventorySize)
+    public InventoryContainerTileEntity(BlockEntityType<?> pType, BlockPos pWorldPosition, BlockState pBlockState, int inventorySize)
     {
-        super(type);
+        super(pType, pWorldPosition, pBlockState);
         this.inventory = NonNullList.withSize(inventorySize, ItemStack.EMPTY);
     }
 
     @Override
-    public void read(@Nonnull BlockState state, @Nonnull CompoundNBT compound)
+    public void load(@NotNull CompoundTag compound)
     {
-        super.read(state, compound);
+        super.load(compound);
         this.inventory = NonNullList.withSize(inventory.size(), ItemStack.EMPTY);
-        ItemStackHelper.loadAllItems(compound, this.inventory);
+        ContainerHelper.loadAllItems(compound, this.inventory);
     }
 
-    @Nonnull
     @Override
-    public CompoundNBT write(@Nonnull CompoundNBT compound)
+    protected void saveAdditional(@NotNull CompoundTag compoundTag)
     {
-        CompoundNBT nbt = super.write(compound);
-        ItemStackHelper.saveAllItems(nbt, this.inventory, false);
-        return nbt;
+        super.saveAdditional(compoundTag);
+        ContainerHelper.saveAllItems(compoundTag, this.inventory, false);
     }
 
     @Override
@@ -94,7 +94,7 @@ public abstract class InventoryContainerTileEntity extends TileEntity implements
                 existing.grow(reachedLimit ? limit : stack.getCount());
             }
 
-            this.markDirty();
+            this.setChanged();
         }
 
         return reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, stack.getCount()- limit) : ItemStack.EMPTY;
@@ -126,7 +126,7 @@ public abstract class InventoryContainerTileEntity extends TileEntity implements
             if (!simulate)
             {
                 this.inventory.set(slot, ItemStack.EMPTY);
-                this.markDirty();
+                this.setChanged();
                 return existing;
             }
             else
@@ -139,7 +139,7 @@ public abstract class InventoryContainerTileEntity extends TileEntity implements
             if (!simulate)
             {
                 this.inventory.set(slot, ItemHandlerHelper.copyStackWithSize(existing, existing.getCount() - toExtract));
-                this.markDirty();
+                this.setChanged();
             }
 
             return ItemHandlerHelper.copyStackWithSize(existing, toExtract);
@@ -157,7 +157,7 @@ public abstract class InventoryContainerTileEntity extends TileEntity implements
     {
         this.validateSlotIndex(slot);
         this.inventory.set(slot, stack);
-        this.markDirty();
+        this.setChanged();
     }
 
     @Override

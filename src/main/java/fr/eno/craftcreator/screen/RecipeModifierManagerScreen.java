@@ -1,13 +1,13 @@
 package fr.eno.craftcreator.screen;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.kubejs.utils.DeserializerHelper;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nonnull;
 
@@ -18,7 +18,7 @@ public class RecipeModifierManagerScreen extends ChildrenScreen
 
     public RecipeModifierManagerScreen(Screen parentIn, String modId, ResourceLocation recipeType)
     {
-        super(new StringTextComponent(""), parentIn);
+        super(new TextComponent(""), parentIn);
         this.modId = modId;
         this.recipeType = recipeType;
     }
@@ -36,11 +36,11 @@ public class RecipeModifierManagerScreen extends ChildrenScreen
         this.setEntries(0, DeserializerHelper.getRecipes(this.recipeType));
         this.setEntries(1, DeserializerHelper.getModifiedRecipesEntryList(this.modId, this.recipeType));
 
-        this.addButton(new SimpleButton(References.getTranslate("screen.recipe_manager.button.back"), this.width / 2 - 40, this.height - bottomHeight - 7, 80, 20, button -> minecraft.displayGuiScreen(new ModSelectionScreen())));
+        this.addRenderableWidget(new SimpleButton(References.getTranslate("screen.recipe_manager.button.back"), this.width / 2 - 40, this.height - bottomHeight - 7, 80, 20, button -> minecraft.setScreen(new ModSelectionScreen())));
     }
 
     @Override
-    public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         this.renderBackground(matrixStack);
         super.render(matrixStack, mouseX, mouseY, partialTicks);

@@ -6,13 +6,13 @@ import fr.eno.craftcreator.kubejs.jsserializers.BotaniaRecipesJSSerializer;
 import fr.eno.craftcreator.screen.BotaniaRecipeCreatorScreen;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import vazkii.botania.api.brew.Brew;
 import vazkii.botania.api.brew.IBrewItem;
 
@@ -56,8 +56,8 @@ public class BotaniaRecipeManagers
         if(getValidOutput(slots) == null)
             return;
 
-        Item input = slots.get(0).getStack().getItem();
-        Item catalystItem = slots.get(1).getStack().getItem();
+        Item input = slots.get(0).getItem().getItem();
+        Item catalystItem = slots.get(1).getItem().getItem();
         ItemStack output = getValidOutput(slots);
 
         if(catalystItem instanceof BlockItem)
@@ -82,7 +82,7 @@ public class BotaniaRecipeManagers
         if(getValidOutput(slots) == null)
             return;
 
-        Item input = slots.get(0).getStack().getItem();
+        Item input = slots.get(0).getItem().getItem();
         Item output = getValidOutput(slots).getItem();
 
         if(input instanceof BlockItem && output instanceof BlockItem)
@@ -146,11 +146,11 @@ public class BotaniaRecipeManagers
     @Nullable
     private static ItemStack getValidOutput(List<Slot> slots)
     {
-        if(slots.get(slots.size() - 1).getHasStack())
+        if(slots.get(slots.size() - 1).hasItem())
         {
             for(Slot slot : slots)
             {
-                if(slot.getHasStack()) return slots.get(slots.size() - 1).getStack();
+                if(slot.hasItem()) return slots.get(slots.size() - 1).getItem();
             }
         }
 
@@ -165,8 +165,8 @@ public class BotaniaRecipeManagers
         {
             if(i > slots.size() - 1) break;
 
-            if(slots.get(i).getHasStack())
-                list.add(slots.get(i).getStack().getItem());
+            if(slots.get(i).hasItem())
+                list.add(slots.get(i).getItem().getItem());
         }
 
         return list;
@@ -178,8 +178,8 @@ public class BotaniaRecipeManagers
 
         for(int i = 0; i < slots.size() - 1; i++)
         {
-            if(slots.get(i).getHasStack())
-                list.add(slots.get(i).getStack().getItem());
+            if(slots.get(i).hasItem())
+                list.add(slots.get(i).getItem().getItem());
         }
 
         return list;
@@ -202,8 +202,8 @@ public class BotaniaRecipeManagers
                 continue;
             }
 
-            if(isValid(slots.get(i).getStack()))
-                map.put(slots.get(i).getStack().getItem().getRegistryName(), false);
+            if(isValid(slots.get(i).getItem()))
+                map.put(slots.get(i).getItem().getItem().getRegistryName(), false);
         }
 
         return map;

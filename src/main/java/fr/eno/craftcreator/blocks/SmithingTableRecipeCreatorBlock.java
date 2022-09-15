@@ -1,50 +1,47 @@
 package fr.eno.craftcreator.blocks;
 
 import fr.eno.craftcreator.tileentity.SmithingTableRecipeCreatorTile;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkHooks;
-
-import javax.annotation.Nonnull;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.network.NetworkHooks;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class SmithingTableRecipeCreatorBlock extends RecipeCreatorBlock
 {
 	public SmithingTableRecipeCreatorBlock()
 	{
 	}
-	
-	@Nonnull
-	@Override
-	@SuppressWarnings("deprecation")
-	public ActionResultType onBlockActivated(@Nonnull BlockState state, World worldIn, @Nonnull BlockPos pos, @Nonnull PlayerEntity player, @Nonnull Hand handIn, @Nonnull BlockRayTraceResult hit)
-	{
-		if(!worldIn.isRemote)
-		{
-			TileEntity tileentity = worldIn.getTileEntity(pos);
-			
-			if(tileentity instanceof SmithingTableRecipeCreatorTile)
-			{
-				SmithingTableRecipeCreatorTile tile = (SmithingTableRecipeCreatorTile) tileentity;
 
-				NetworkHooks.openGui((ServerPlayerEntity) player, tile, pos);
-                return ActionResultType.SUCCESS;
+	@NotNull
+	@Override
+	public InteractionResult use(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit)
+	{
+		if(!pLevel.isClientSide)
+		{
+			BlockEntity tileentity = pLevel.getBlockEntity(pPos);
+			
+			if(tileentity instanceof SmithingTableRecipeCreatorTile tile)
+			{
+
+				NetworkHooks.openGui((ServerPlayer) pPlayer, tile, pPos);
+                return InteractionResult.SUCCESS;
 			}
 		}
 		
-		return ActionResultType.CONSUME;
+		return InteractionResult.CONSUME;
 	}
-	
+
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world)
+	public @Nullable BlockEntity newBlockEntity(@NotNull BlockPos pPos, @NotNull BlockState pState)
 	{
-		return new SmithingTableRecipeCreatorTile();
+		return new SmithingTableRecipeCreatorTile(pPos, pState);
 	}
 }

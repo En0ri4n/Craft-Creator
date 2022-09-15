@@ -1,57 +1,41 @@
 package fr.eno.craftcreator.blocks;
 
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.particle.ParticleManager;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
-public abstract class RecipeCreatorBlock extends Block
+@SuppressWarnings("deprecation")
+public abstract class RecipeCreatorBlock extends BaseEntityBlock
 {
     public RecipeCreatorBlock()
     {
-        super(AbstractBlock.Properties.create(Material.IRON).sound(SoundType.STONE).hardnessAndResistance(999999F));
-    }
-
-    @Override
-    public boolean addDestroyEffects(BlockState state, World world, BlockPos pos, ParticleManager manager)
-    {
-        return true;
+        super(BlockBehaviour.Properties.of(Material.METAL).sound(SoundType.STONE).strength(999999F));
     }
 
     @Nonnull
     @Override
-    public abstract ActionResultType onBlockActivated(@Nonnull BlockState state, World worldIn, @Nonnull BlockPos pos, @Nonnull PlayerEntity player, @Nonnull Hand handIn, @Nonnull BlockRayTraceResult hit);
+    public abstract InteractionResult use(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit);
 
     @Nonnull
     @Override
-    public BlockRenderType getRenderType(@Nonnull BlockState state)
+    public RenderShape getRenderShape(@NotNull BlockState pState)
     {
-        return BlockRenderType.MODEL;
+        return RenderShape.MODEL;
     }
-
+    @org.jetbrains.annotations.Nullable
     @Override
-    public boolean isTransparent(@Nonnull BlockState state)
-    {
-        return true;
-    }
-
-    @Nullable
-    @Override
-    public abstract TileEntity createTileEntity(BlockState state, IBlockReader world);
-
-    @Override
-    public boolean hasTileEntity(BlockState state)
-    {
-        return true;
-    }
+    public abstract BlockEntity newBlockEntity(@NotNull BlockPos pPos, @NotNull BlockState pState);
 }

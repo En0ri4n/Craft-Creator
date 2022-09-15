@@ -1,12 +1,12 @@
 package fr.eno.craftcreator.packets;
 
 import fr.eno.craftcreator.tileentity.TaggeableInventoryContainerTileEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.network.NetworkEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +23,7 @@ public class UpdateTaggeableContainerRecipeCreatorTilePacket
         this.taggedSlots = taggedSlots;
     }
 
-    public static void encode(UpdateTaggeableContainerRecipeCreatorTilePacket msg, PacketBuffer packetBuffer)
+    public static void encode(UpdateTaggeableContainerRecipeCreatorTilePacket msg, FriendlyByteBuf packetBuffer)
     {
         packetBuffer.writeBlockPos(msg.pos);
         packetBuffer.writeInt(msg.taggedSlots.size());
@@ -35,7 +35,7 @@ public class UpdateTaggeableContainerRecipeCreatorTilePacket
         }
     }
 
-    public static UpdateTaggeableContainerRecipeCreatorTilePacket decode(PacketBuffer packetBuffer)
+    public static UpdateTaggeableContainerRecipeCreatorTilePacket decode(FriendlyByteBuf packetBuffer)
     {
         BlockPos pos = packetBuffer.readBlockPos();
         Map<Integer, ResourceLocation> taggedSlots = new HashMap<>();
@@ -53,13 +53,12 @@ public class UpdateTaggeableContainerRecipeCreatorTilePacket
     {
         public static void handle(UpdateTaggeableContainerRecipeCreatorTilePacket msg, Supplier<NetworkEvent.Context> ctx)
         {
-            ServerWorld world = ctx.get().getSender().getServerWorld();
+            ServerLevel world = ctx.get().getSender().getLevel();
 
-            TileEntity tileEntity = world.getTileEntity(msg.pos);
+            BlockEntity tileEntity = world.getBlockEntity(msg.pos);
 
-            if(tileEntity instanceof TaggeableInventoryContainerTileEntity)
+            if(tileEntity instanceof TaggeableInventoryContainerTileEntity tile)
             {
-                TaggeableInventoryContainerTileEntity tile = (TaggeableInventoryContainerTileEntity) tileEntity;
                 tile.setTaggedSlots(msg.taggedSlots);
             }
 

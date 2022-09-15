@@ -5,11 +5,11 @@ import com.google.gson.JsonObject;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import fr.eno.craftcreator.utils.ReflectUtils;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.server.ChunkManager;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ChunkMap;
 import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedWriter;
@@ -17,19 +17,20 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.Objects;
 
 public class TestRecipesCommand
 {
-	public static void register(CommandDispatcher<CommandSource> dispatcher)
+	public static void register(CommandDispatcher<CommandSourceStack> dispatcher)
 	{
-		dispatcher.register(Commands.literal("testrecipes").requires((source) -> source.hasPermissionLevel(4))
+		dispatcher.register(Commands.literal("testrecipes").requires((source) -> source.hasPermission(4))
 				.executes(TestRecipesCommand::execute));
 	}
 
-	public static int execute(CommandContext<CommandSource> ctx)
+	public static int execute(CommandContext<CommandSourceStack> ctx)
 	{
 		File recipeFolder = createDatapack(ctx);
-		File generatorFolder = new File(ctx.getSource().getServer().getDataDirectory(), "Craft-Generator");
+		File generatorFolder = new File(ctx.getSource().getServer().getServerDirectory(), "Craft-Generator");
 
 		File[] datapackRecipeFolder = recipeFolder.listFiles();
 
@@ -37,7 +38,7 @@ public class TestRecipesCommand
 			for (File f : datapackRecipeFolder)
 				f.delete();
 
-		for (File file : generatorFolder.listFiles())
+		for (File file : Objects.requireNonNull(generatorFolder.listFiles()))
 			try
 			{
 				FileUtils.copyFileToDirectory(file, recipeFolder);
@@ -47,17 +48,17 @@ public class TestRecipesCommand
 				e.printStackTrace();
 			}
 
-		ctx.getSource().getServer().getCommandManager().handleCommand(ctx.getSource(), "/reload");
-		ctx.getSource().sendFeedback(new StringTextComponent(TextFormatting.GREEN + "Recipes has been loaded successfully !"), false);
-		register(ctx.getSource().getServer().getFunctionManager().getCommandDispatcher());
+		ctx.getSource().getServer().getCommands().performCommand(ctx.getSource(), "/reload");
+		ctx.getSource().sendSuccess(new TextComponent(ChatFormatting.GREEN + "Recipes has been loaded successfully !"), false);
+		register(ctx.getSource().getServer().getFunctions().getDispatcher());
 
 		return 0;
 	}
 
-	private static File createDatapack(CommandContext<CommandSource> ctx)
+	private static File createDatapack(CommandContext<CommandSourceStack> ctx)
 	{
-		Field worldDirField = ReflectUtils.getFieldAndSetAccessible(ChunkManager.class, "field_219270_x");
-		File worldDir = ReflectUtils.getFieldValue(worldDirField, ctx.getSource().getWorld().getChunkProvider().chunkManager, File.class);
+		Field worldDirField = ReflectUtils.getFieldAndSetAccessible(ChunkMap.class, "f_182284_");
+		File worldDir = new File(Objects.requireNonNull(ReflectUtils.getFieldValue(worldDirField, ctx.getSource().getLevel().getChunkSource().chunkMap, String.class)));
 
 		File datapackFolder = new File(worldDir, "datapacks");
 		File packFolder = new File(datapackFolder, "Craft-Creator");

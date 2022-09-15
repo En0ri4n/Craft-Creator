@@ -1,17 +1,6 @@
 package fr.eno.craftcreator.utils;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.math.vector.Quaternion;
-import net.minecraft.util.math.vector.Vector3f;
-
-import java.awt.*;
 
 @SuppressWarnings("deprecation")
 public class GuiUtils
@@ -21,12 +10,12 @@ public class GuiUtils
 	public static void closeAndGrabMouse()
 	{
 		close();
-		mc.mouseHelper.grabMouse();
+		mc.mouseHandler.grabMouse();
 	}
 	
 	public static void close()
 	{
-		mc.displayGuiScreen((Screen) null);
+		mc.setScreen(null);
 	}
 	
 	public static boolean isMouseHover(int x, int y, int mouseX, int mouseY, int width, int height)
@@ -35,6 +24,7 @@ public class GuiUtils
 		
 		return flag;
 	}
+	/*
 	
 	public static void drawEntityOnScreen(int posX, int posY, int scale, float mouseX, float mouseY, LivingEntity p_228187_5_) {
 	      float f = (float)Math.atan((double)(mouseX / 40.0F));
@@ -101,5 +91,5 @@ public class GuiUtils
 		GlStateManager.colorMask(true, true, true, true);
 		RenderSystem.enableDepthTest();
 		RenderSystem.popMatrix();
-	}
+	}*/
 }

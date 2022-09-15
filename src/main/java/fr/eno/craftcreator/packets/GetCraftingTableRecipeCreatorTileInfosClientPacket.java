@@ -2,8 +2,8 @@ package fr.eno.craftcreator.packets;
 
 import fr.eno.craftcreator.screen.CraftingTableRecipeCreatorScreen;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
@@ -18,13 +18,13 @@ public class GetCraftingTableRecipeCreatorTileInfosClientPacket
         this.shapedRecipe = shapedRecipe;
     }
 
-    public static void encode(GetCraftingTableRecipeCreatorTileInfosClientPacket msg, PacketBuffer packetBuffer)
+    public static void encode(GetCraftingTableRecipeCreatorTileInfosClientPacket msg, FriendlyByteBuf packetBuffer)
     {
         packetBuffer.writeInt(msg.windowId);
         packetBuffer.writeBoolean(msg.shapedRecipe);
     }
 
-    public static GetCraftingTableRecipeCreatorTileInfosClientPacket decode(PacketBuffer packetBuffer)
+    public static GetCraftingTableRecipeCreatorTileInfosClientPacket decode(FriendlyByteBuf packetBuffer)
     {
         int windowId = packetBuffer.readInt();
         boolean shapedRecipe = packetBuffer.readBoolean();
@@ -38,11 +38,11 @@ public class GetCraftingTableRecipeCreatorTileInfosClientPacket
         {
             Minecraft mc = Minecraft.getInstance();
 
-            if(mc.currentScreen instanceof CraftingTableRecipeCreatorScreen)
+            if(mc.screen instanceof CraftingTableRecipeCreatorScreen)
             {
-                CraftingTableRecipeCreatorScreen screen = (CraftingTableRecipeCreatorScreen) mc.currentScreen;
+                CraftingTableRecipeCreatorScreen screen = (CraftingTableRecipeCreatorScreen) mc.screen;
 
-                if(screen.getContainer().windowId == msg.windowId)
+                if(screen.getMenu().containerId == msg.windowId)
                 {
                     screen.setShaped(msg.shapedRecipe);
                 }

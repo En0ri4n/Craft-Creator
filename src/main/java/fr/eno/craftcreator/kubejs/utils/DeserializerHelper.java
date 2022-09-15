@@ -2,11 +2,11 @@ package fr.eno.craftcreator.kubejs.utils;
 
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import net.minecraft.client.Minecraft;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ public class DeserializerHelper
 
     public static <T extends SimpleListWidget.Entry> List<T> getAddedRecipesEntryList(String modId, ResourceLocation recipeTypeLoc)
     {
-        IRecipeType<? extends IRecipe<?>> recipeType = RecipeFileUtils.byName(recipeTypeLoc);
+        RecipeType<? extends Recipe<?>> recipeType = RecipeFileUtils.byName(recipeTypeLoc);
 
         List<T> entries = new ArrayList<>();
 
@@ -40,7 +40,7 @@ public class DeserializerHelper
 
     public static <T extends SimpleListWidget.Entry> List<T> getModifiedRecipesEntryList(String modId, ResourceLocation recipeTypeLoc)
     {
-        IRecipeType<? extends IRecipe<?>> recipeType = RecipeFileUtils.byName(recipeTypeLoc);
+        RecipeType<? extends Recipe<?>> recipeType = RecipeFileUtils.byName(recipeTypeLoc);
 
         List<T> entries = new ArrayList<>();
 
@@ -60,13 +60,13 @@ public class DeserializerHelper
         return entries;
     }
 
-    public static <C extends IInventory, T extends IRecipe<C>, E extends SimpleListWidget.Entry> List<E> getRecipes(ResourceLocation recipeTypeLoc)
+    public static <C extends Container, T extends Recipe<C>, E extends SimpleListWidget.Entry> List<E> getRecipes(ResourceLocation recipeTypeLoc)
     {
-        IRecipeType<T> recipeType = RecipeFileUtils.byName(recipeTypeLoc);
+        RecipeType<T> recipeType = RecipeFileUtils.byName(recipeTypeLoc);
 
         List<E> entries = new ArrayList<>();
 
-        Minecraft.getInstance().world.getRecipeManager().getRecipesForType(recipeType)
+        Minecraft.getInstance().level.getRecipeManager().getAllRecipesFor(recipeType)
                 .forEach(recipe ->
                 {
                     if(!recipe.getId().toString().contains("kjs"))

@@ -3,10 +3,10 @@ package fr.eno.craftcreator.init;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.item.ItemBlockBasic;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
-import net.minecraft.item.Item;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 public class InitItems
 {

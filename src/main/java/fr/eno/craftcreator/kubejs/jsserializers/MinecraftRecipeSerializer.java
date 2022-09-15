@@ -7,12 +7,12 @@ import fr.eno.craftcreator.serializer.SmithingTableRecipeSerializer;
 import fr.eno.craftcreator.serializer.StoneCutterRecipeSerializer;
 import fr.eno.craftcreator.utils.CraftType;
 import fr.eno.craftcreator.utils.PairValue;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -74,27 +74,27 @@ public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
         recipe.serializeRecipe(isKubeJSRecipe);
     }
 
-    public void addMinecraftRecipe(String recipeJson, IRecipeType<?> recipeType)
+    public void addMinecraftRecipe(String recipeJson, RecipeType<?> recipeType)
     {
         addRecipeToFile(recipeJson, recipeType);
     }
 
     @Override
-    public PairValue<String, Integer> getParam(IRecipe<?> recipe)
+    public PairValue<String, Integer> getParam(Recipe<?> recipe)
     {
         return null;
     }
 
     @Override
-    public void sendSuccessMessage(IRecipeType<?> type, ResourceLocation result)
+    public void sendSuccessMessage(RecipeType<?> type, ResourceLocation result)
     {
         super.sendSuccessMessage(type, result);
     }
 
     @Override
-    public Map<String, ResourceLocation> getOutput(IRecipe<?> recipe)
+    public Map<String, ResourceLocation> getOutput(Recipe<?> recipe)
     {
-        return Collections.singletonMap("Item", recipe.getRecipeOutput().getItem().getRegistryName());
+        return Collections.singletonMap("Item", recipe.getResultItem().getItem().getRegistryName());
     }
 
     @Override

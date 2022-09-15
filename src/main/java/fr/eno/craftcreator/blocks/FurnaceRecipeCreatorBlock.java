@@ -1,109 +1,111 @@
 package fr.eno.craftcreator.blocks;
 
 import fr.eno.craftcreator.tileentity.FurnaceRecipeCreatorTile;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.state.DirectionProperty;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.IBooleanFunction;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.network.NetworkHooks;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
 import java.util.stream.Stream;
 
+@SuppressWarnings("deprecation")
 public class FurnaceRecipeCreatorBlock extends RecipeCreatorBlock
 {
-	public static final DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
+	public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 	private static final VoxelShape SHAPE = Stream.of(
-			Block.makeCuboidShape(1, 0, 1, 15, 15, 15),
-			Block.makeCuboidShape(13, 0, 0, 16, 14, 1),
-			Block.makeCuboidShape(3, 5, 0, 13, 9, 1),
-			Block.makeCuboidShape(2, 15, 2, 14, 16, 14),
-			Block.makeCuboidShape(2, 15, 1, 14, 16, 2),
-			Block.makeCuboidShape(14, 15, 2, 15, 16, 14),
-			Block.makeCuboidShape(2, 15, 14, 14, 16, 15),
-			Block.makeCuboidShape(1, 15, 2, 2, 16, 14),
-			Block.makeCuboidShape(15, 0, 1, 16, 14, 15),
-			Block.makeCuboidShape(15, 14, 2, 16, 15, 14),
-			Block.makeCuboidShape(0, 14, 2, 1, 15, 14),
-			Block.makeCuboidShape(0, 0, 1, 1, 14, 15),
-			Block.makeCuboidShape(0, 0, 15, 16, 14, 16),
-			Block.makeCuboidShape(0, 0, 0, 3, 14, 1),
-			Block.makeCuboidShape(2, 14, 15, 14, 15, 16),
-			Block.makeCuboidShape(3, 0, 0, 13, 1, 1),
-			Block.makeCuboidShape(11, 4, 0, 13, 5, 1),
-			Block.makeCuboidShape(3, 4, 0, 5, 5, 1),
-			Block.makeCuboidShape(3, 3, 0, 4, 4, 1),
-			Block.makeCuboidShape(12, 3, 0, 13, 4, 1),
-			Block.makeCuboidShape(3, 12, 0, 13, 14, 1),
-			Block.makeCuboidShape(2, 14, 0, 14, 15, 1),
-			Block.makeCuboidShape(12, 11, 0, 13, 12, 1),
-			Block.makeCuboidShape(3, 11, 0, 4, 12, 1)
-	).reduce((v1, v2) -> VoxelShapes.combineAndSimplify(v1, v2, IBooleanFunction.OR)).get();
+			Block.box(1, 0, 1, 15, 15, 15),
+			Block.box(13, 0, 0, 16, 14, 1),
+			Block.box(3, 5, 0, 13, 9, 1),
+			Block.box(2, 15, 2, 14, 16, 14),
+			Block.box(2, 15, 1, 14, 16, 2),
+			Block.box(14, 15, 2, 15, 16, 14),
+			Block.box(2, 15, 14, 14, 16, 15),
+			Block.box(1, 15, 2, 2, 16, 14),
+			Block.box(15, 0, 1, 16, 14, 15),
+			Block.box(15, 14, 2, 16, 15, 14),
+			Block.box(0, 14, 2, 1, 15, 14),
+			Block.box(0, 0, 1, 1, 14, 15),
+			Block.box(0, 0, 15, 16, 14, 16),
+			Block.box(0, 0, 0, 3, 14, 1),
+			Block.box(2, 14, 15, 14, 15, 16),
+			Block.box(3, 0, 0, 13, 1, 1),
+			Block.box(11, 4, 0, 13, 5, 1),
+			Block.box(3, 4, 0, 5, 5, 1),
+			Block.box(3, 3, 0, 4, 4, 1),
+			Block.box(12, 3, 0, 13, 4, 1),
+			Block.box(3, 12, 0, 13, 14, 1),
+			Block.box(2, 14, 0, 14, 15, 1),
+			Block.box(12, 11, 0, 13, 12, 1),
+			Block.box(3, 11, 0, 4, 12, 1)
+	).reduce((v1, v2) -> Shapes.join(v1, v2, BooleanOp.OR)).get();
 
 	public FurnaceRecipeCreatorBlock()
 	{
-		this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.NORTH));
+		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
 	}
 
-	@Nonnull
 	@Override
-	public VoxelShape getShape(@Nonnull BlockState state, @Nonnull IBlockReader worldIn, @Nonnull BlockPos pos, @Nonnull ISelectionContext context)
+	public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext)
 	{
 		return SHAPE;
 	}
 
-	@Nonnull
+	@NotNull
 	@Override
-	public ActionResultType onBlockActivated(@Nonnull BlockState state, World worldIn, @Nonnull BlockPos pos, @Nonnull PlayerEntity player, @Nonnull Hand handIn, @Nonnull BlockRayTraceResult hit)
+	public InteractionResult use(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit)
 	{
-		if(!worldIn.isRemote)
+		if(!pLevel.isClientSide)
 		{
-			TileEntity tileentity = worldIn.getTileEntity(pos);
+			BlockEntity tileentity = pLevel.getBlockEntity(pPos);
 
-			if(tileentity instanceof FurnaceRecipeCreatorTile)
+			if(tileentity instanceof FurnaceRecipeCreatorTile tile)
 			{
-				FurnaceRecipeCreatorTile tile = (FurnaceRecipeCreatorTile) tileentity;
 
-				NetworkHooks.openGui((ServerPlayerEntity) player, tile, pos);
+				NetworkHooks.openGui((ServerPlayer) pPlayer, tile, pPos);
 
-				return ActionResultType.SUCCESS;
+				return InteractionResult.SUCCESS;
 			}
 		}
 
-		return ActionResultType.CONSUME;
+		return InteractionResult.CONSUME;
+	}
+
+	@Nullable
+	@Override
+	public BlockState getStateForPlacement(BlockPlaceContext pContext)
+	{
+		return this.defaultBlockState().setValue(FACING, pContext.getHorizontalDirection().getOpposite());
 	}
 
 	@Override
-	public BlockState getStateForPlacement(BlockItemUseContext context)
+	public @Nullable BlockEntity newBlockEntity(@NotNull BlockPos pPos, @NotNull BlockState pState)
 	{
-		return this.getDefaultState().with(FACING, context.getPlacementHorizontalFacing().getOpposite());
+		return new FurnaceRecipeCreatorTile(pPos, pState);
 	}
 
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world)
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder)
 	{
-		return new FurnaceRecipeCreatorTile();
-	}
-
-	@Override
-	protected void fillStateContainer(Builder<Block, BlockState> builder)
-	{
-		builder.add(FACING);
+		pBuilder.add(FACING);
+		super.createBlockStateDefinition(pBuilder);
 	}
 }

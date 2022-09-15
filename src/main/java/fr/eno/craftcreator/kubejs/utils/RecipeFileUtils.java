@@ -8,27 +8,22 @@ import fr.eno.craftcreator.kubejs.jsserializers.ModRecipesJSSerializer;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
 import fr.eno.craftcreator.utils.PairValue;
 import io.netty.buffer.Unpooled;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.Registry;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.registries.ForgeRegistries;
-import vazkii.botania.api.BotaniaAPI;
 import vazkii.botania.api.recipe.IPureDaisyRecipe;
 import vazkii.botania.common.crafting.StateIngredientTag;
-import vazkii.botania.common.item.ModItems;
-import vazkii.botania.common.item.brew.ItemVial;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -82,11 +77,11 @@ public class RecipeFileUtils
         return recipe;
     }
 
-    public static <T extends IRecipe<?>> List<T> getAddedRecipesFor(String modId, IRecipeType<T> recipeType)
+    public static <T extends Recipe<?>> List<T> getAddedRecipesFor(String modId, RecipeType<T> recipeType)
     {
         List<T> recipes = new ArrayList<>();
 
-        IRecipeSerializer<T> serializer = (IRecipeSerializer<T>) ForgeRegistries.RECIPE_SERIALIZERS.getValue(getName(recipeType));
+        RecipeSerializer<T> serializer = (RecipeSerializer<T>) ForgeRegistries.RECIPE_SERIALIZERS.getValue(getName(recipeType));
 
         try
         {
@@ -108,16 +103,16 @@ public class RecipeFileUtils
                         if(isCraftingTableCraft)
                         {
                             JsonObject jsonObject = GSON.fromJson(new StringReader(JSON_MATCHER.group()), JsonObject.class);
-                            IRecipeSerializer<T> craftingTableSerializer = (IRecipeSerializer<T>) ForgeRegistries.RECIPE_SERIALIZERS.getValue(new ResourceLocation(jsonObject.get("type").getAsString()));
-                            T tempRecipe = craftingTableSerializer.read(new ResourceLocation(modId, "recipe"), jsonObject);
-                            T recipe = craftingTableSerializer.read(new ResourceLocation(modId, ModDispatcher.getOutput(tempRecipe).values().stream().findAny().orElse(null).getPath()), jsonObject);
+                            RecipeSerializer<T> craftingTableSerializer = (RecipeSerializer<T>) ForgeRegistries.RECIPE_SERIALIZERS.getValue(new ResourceLocation(jsonObject.get("type").getAsString()));
+                            T tempRecipe = craftingTableSerializer.fromJson(new ResourceLocation(modId, "recipe"), jsonObject);
+                            T recipe = craftingTableSerializer.fromJson(new ResourceLocation(modId, ModDispatcher.getOutput(tempRecipe).values().stream().findAny().orElse(null).getPath()), jsonObject);
                             recipes.add(recipe);
                             continue;
                         }
 
                         JsonObject jsonObject = GSON.fromJson(new StringReader(JSON_MATCHER.group()), JsonObject.class);
-                        T tempRecipe = serializer.read(new ResourceLocation(modId, "recipe"), jsonObject);
-                        T recipe = serializer.read(new ResourceLocation(modId, ModDispatcher.getOutput(tempRecipe).values().stream().findAny().orElse(null).getPath()), jsonObject);
+                        T tempRecipe = serializer.fromJson(new ResourceLocation(modId, "recipe"), jsonObject);
+                        T recipe = serializer.fromJson(new ResourceLocation(modId, ModDispatcher.getOutput(tempRecipe).values().stream().findAny().orElse(null).getPath()), jsonObject);
                         recipes.add(recipe);
                     }
                 }
@@ -130,10 +125,10 @@ public class RecipeFileUtils
         return recipes;
     }
 
-    public static <C extends IInventory, T extends IRecipe<C>> void removeAddedRecipe(T addedRecipe, String modId)
+    public static <C extends Container, T extends Recipe<C>> void removeAddedRecipe(T addedRecipe, String modId)
     {
-        IRecipeType<T> recipeType = (IRecipeType<T>) addedRecipe.getType();
-        IRecipeSerializer<T> serializer = (IRecipeSerializer<T>) ForgeRegistries.RECIPE_SERIALIZERS.getValue(getName(recipeType));
+        RecipeType<T> recipeType = (RecipeType<T>) addedRecipe.getType();
+        RecipeSerializer<T> serializer = (RecipeSerializer<T>) ForgeRegistries.RECIPE_SERIALIZERS.getValue(getName(recipeType));
 
         try
         {
@@ -158,14 +153,14 @@ public class RecipeFileUtils
                         T recipe;
                         if(isCraftingTableCraft)
                         {
-                            IRecipeSerializer<T> craftingTableSerializer = (IRecipeSerializer<T>) ForgeRegistries.RECIPE_SERIALIZERS.getValue(new ResourceLocation(jsonObject.get("type").getAsString()));
-                            tempRecipe = craftingTableSerializer.read(new ResourceLocation(modId, "recipe"), jsonObject);
-                            recipe = craftingTableSerializer.read(new ResourceLocation(modId, ModDispatcher.getOutput(tempRecipe).values().stream().findAny().orElse(null).getPath()), jsonObject);
+                            RecipeSerializer<T> craftingTableSerializer = (RecipeSerializer<T>) ForgeRegistries.RECIPE_SERIALIZERS.getValue(new ResourceLocation(jsonObject.get("type").getAsString()));
+                            tempRecipe = craftingTableSerializer.fromJson(new ResourceLocation(modId, "recipe"), jsonObject);
+                            recipe = craftingTableSerializer.fromJson(new ResourceLocation(modId, ModDispatcher.getOutput(tempRecipe).values().stream().findAny().orElse(null).getPath()), jsonObject);
 
-                            PacketBuffer existingRecipeBuffer = new PacketBuffer(Unpooled.buffer());
-                            PacketBuffer jsonRecipeBuffer = new PacketBuffer(Unpooled.buffer());
-                            craftingTableSerializer.write(existingRecipeBuffer, addedRecipe);
-                            craftingTableSerializer.write(jsonRecipeBuffer, recipe);
+                            FriendlyByteBuf existingRecipeBuffer = new FriendlyByteBuf(Unpooled.buffer());
+                            FriendlyByteBuf jsonRecipeBuffer = new FriendlyByteBuf(Unpooled.buffer());
+                            craftingTableSerializer.toNetwork(existingRecipeBuffer, addedRecipe);
+                            craftingTableSerializer.toNetwork(jsonRecipeBuffer, recipe);
 
                             if(existingRecipeBuffer.compareTo(jsonRecipeBuffer) == 0)
                             {
@@ -178,13 +173,13 @@ public class RecipeFileUtils
                             continue;
                         }
 
-                        tempRecipe = serializer.read(new ResourceLocation(modId, "recipe"), jsonObject);
-                        recipe = serializer.read(new ResourceLocation(modId, ModDispatcher.getOutput(tempRecipe).values().stream().findAny().orElse(null).getPath()), jsonObject);
+                        tempRecipe = serializer.fromJson(new ResourceLocation(modId, "recipe"), jsonObject);
+                        recipe = serializer.fromJson(new ResourceLocation(modId, ModDispatcher.getOutput(tempRecipe).values().stream().findAny().orElse(null).getPath()), jsonObject);
 
-                        PacketBuffer existingRecipeBuffer = new PacketBuffer(Unpooled.buffer());
-                        PacketBuffer jsonRecipeBuffer = new PacketBuffer(Unpooled.buffer());
-                        serializer.write(existingRecipeBuffer, addedRecipe);
-                        serializer.write(jsonRecipeBuffer, recipe);
+                        FriendlyByteBuf existingRecipeBuffer = new FriendlyByteBuf(Unpooled.buffer());
+                        FriendlyByteBuf jsonRecipeBuffer = new FriendlyByteBuf(Unpooled.buffer());
+                        serializer.toNetwork(existingRecipeBuffer, addedRecipe);
+                        serializer.toNetwork(jsonRecipeBuffer, recipe);
 
                         if(existingRecipeBuffer.compareTo(jsonRecipeBuffer) == 0)
                         {
@@ -203,7 +198,7 @@ public class RecipeFileUtils
         }
     }
 
-    public static <T extends IRecipe<?>> List<ModifiedRecipe> getModifiedRecipesFor()
+    public static <T extends Recipe<?>> List<ModifiedRecipe> getModifiedRecipesFor()
     {
         List<ModifiedRecipe> modifiedRecipes = new ArrayList<>();
 
@@ -241,7 +236,7 @@ public class RecipeFileUtils
         return modifiedRecipes;
     }
 
-    public static void insertAndWriteLines(String modId, IRecipeType<?> recipeType, String line)
+    public static void insertAndWriteLines(String modId, RecipeType<?> recipeType, String line)
     {
         try
         {
@@ -294,7 +289,7 @@ public class RecipeFileUtils
         }
     }
 
-    private static void checkTypeGroup(File recipeFile, IRecipeType<?> recipeType)
+    private static void checkTypeGroup(File recipeFile, RecipeType<?> recipeType)
     {
         try
         {
@@ -326,7 +321,7 @@ public class RecipeFileUtils
         }
     }
 
-    private static String getStartRecipeTypeGroup(IRecipeType<?> type)
+    private static String getStartRecipeTypeGroup(RecipeType<?> type)
     {
         return getName(type).getPath() + "-recipes";
     }
@@ -358,22 +353,22 @@ public class RecipeFileUtils
         return array;
     }
 
-    public static void setRecipeType(JsonObject obj, IRecipeType<?> type)
+    public static void setRecipeType(JsonObject obj, RecipeType<?> type)
     {
         obj.addProperty("type", getName(type).toString());
     }
 
-    public static ResourceLocation getName(IRecipeType<?> recipeType)
+    public static ResourceLocation getName(RecipeType<?> recipeType)
     {
         return Registry.RECIPE_TYPE.getKey(recipeType);
     }
 
-    public static <T extends IRecipe<C>, C extends IInventory> IRecipeType<T> byName(ResourceLocation location)
+    public static <T extends Recipe<C>, C extends Container> RecipeType<T> byName(ResourceLocation location)
     {
-        return (IRecipeType<T>) Registry.RECIPE_TYPE.getOptional(location).orElse(null);
+        return (RecipeType<T>) Registry.RECIPE_TYPE.getOptional(location).orElse(null);
     }
 
-    public static List<JsonObject> getJsonRecipes(IRecipeType<?> recipeType, String modId)
+    public static List<JsonObject> getJsonRecipes(RecipeType<?> recipeType, String modId)
     {
         List<JsonObject> jsonRecipes = new ArrayList<>();
 
@@ -418,12 +413,12 @@ public class RecipeFileUtils
     }
 
     @Nullable
-    public static PairValue<String, Integer> getParam(IRecipe<?> recipe)
+    public static PairValue<String, Integer> getParam(Recipe<?> recipe)
     {
         return ModDispatcher.getParameters(recipe);
     }
 
-    public static Multimap<String, ResourceLocation> getInput(IRecipe<?> recipe)
+    public static Multimap<String, ResourceLocation> getInput(Recipe<?> recipe)
     {
         Multimap<String, ResourceLocation> locations = ArrayListMultimap.create();
 
@@ -439,7 +434,7 @@ public class RecipeFileUtils
 
         locations.putAll(getIngredients(recipe.getIngredients()));
 
-        if(locations.isEmpty()) locations.put("Item", recipe.getRecipeOutput().getItem().getRegistryName());
+        if(locations.isEmpty()) locations.put("Item", recipe.getResultItem().getItem().getRegistryName());
 
         return locations;
     }
@@ -450,7 +445,7 @@ public class RecipeFileUtils
 
         ingredients.forEach(ingredient ->
         {
-            JsonElement json = ingredient.serialize();
+            JsonElement json = ingredient.toJson();
             if(json instanceof JsonArray) json.getAsJsonArray().forEach(je -> getAndSave(je, locations));
             else getAndSave(json, locations);
         });
@@ -461,8 +456,8 @@ public class RecipeFileUtils
     private static void getAndSave(JsonElement element, Multimap<String, ResourceLocation> map)
     {
         if(element.getAsJsonObject().has("item"))
-            map.put("Item", ResourceLocation.tryCreate(element.getAsJsonObject().get("item").getAsString()));
-        else map.put("Tag", ResourceLocation.tryCreate(element.getAsJsonObject().get("tag").getAsString()));
+            map.put("Item", ResourceLocation.tryParse(element.getAsJsonObject().get("item").getAsString()));
+        else map.put("Tag", ResourceLocation.tryParse(element.getAsJsonObject().get("tag").getAsString()));
     }
 
     public static void removeModifiedRecipe(ModifiedRecipe recipe)
@@ -549,12 +544,14 @@ public class RecipeFileUtils
 
     public enum ModifiedRecipeType
     {
-        REMOVED("event.remove", new StringTextComponent("Removed").mergeStyle(TextFormatting.RED)), REPLACED_INPUT("event.replaceInput", new StringTextComponent("Input Replaced").mergeStyle(TextFormatting.GOLD)), REPLACED_OUTPUT("event.replaceOutput", new StringTextComponent("Output Replaced").mergeStyle(TextFormatting.YELLOW));
+        REMOVED("event.remove", new TextComponent("Removed").withStyle(ChatFormatting.RED)),
+        REPLACED_INPUT("event.replaceInput", new TextComponent("Input Replaced").withStyle(ChatFormatting.GOLD)),
+        REPLACED_OUTPUT("event.replaceOutput", new TextComponent("Output Replaced").withStyle(ChatFormatting.YELLOW));
 
         private final String descriptor;
-        private final ITextComponent title;
+        private final MutableComponent title;
 
-        ModifiedRecipeType(String descriptor, ITextComponent title)
+        ModifiedRecipeType(String descriptor, MutableComponent title)
         {
             this.descriptor = descriptor;
             this.title = title;
@@ -575,7 +572,7 @@ public class RecipeFileUtils
             return null;
         }
 
-        public ITextComponent getTitle()
+        public MutableComponent getTitle()
         {
             return title;
         }

@@ -2,14 +2,15 @@ package fr.eno.craftcreator.tileentity;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,56 +18,58 @@ public abstract class TaggeableInventoryContainerTileEntity extends InventoryCon
 {
     private Map<Integer, ResourceLocation> taggedSlots;
 
-    public TaggeableInventoryContainerTileEntity(TileEntityType<?> type, int inventorySize)
+    public TaggeableInventoryContainerTileEntity(BlockEntityType<?> pType, BlockPos pWorldPosition, BlockState pBlockState, int inventorySize)
     {
-        super(type, inventorySize);
+        super(pType, pWorldPosition, pBlockState, inventorySize);
         this.taggedSlots = new HashMap<>();
     }
 
     @Override
-    public void read(@Nonnull BlockState state, @Nonnull CompoundNBT compound)
+    public void load(@NotNull CompoundTag compound)
     {
-        super.read(state, compound);
+        super.load(compound);
 
         this.taggedSlots.clear();
 
         if(compound.contains("TaggedSlots"))
         {
-            ListNBT list = (ListNBT) compound.get("TaggedSlots");
+            ListTag list = (ListTag) compound.get("TaggedSlots");
 
-            for(INBT nbt : list)
+            if(list != null)
             {
-                CompoundNBT compoundNBT = (CompoundNBT) nbt;
+                for(Tag nbt : list)
+                {
+                    CompoundTag compoundNBT = (CompoundTag) nbt;
 
-                try
-                {
-                    this.taggedSlots.put(compoundNBT.getInt("Slot"), ResourceLocation.read(new StringReader(compoundNBT.getString("Tag"))));
-                }
-                catch(CommandSyntaxException e)
-                {
-                    e.printStackTrace();
+                    try
+                    {
+                        this.taggedSlots.put(compoundNBT.getInt("Slot"), ResourceLocation.read(new StringReader(compoundNBT.getString("Tag"))));
+                    }
+                    catch(CommandSyntaxException e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
     }
 
-    @Nonnull
     @Override
-    public CompoundNBT write(@Nonnull CompoundNBT compound)
+    protected void saveAdditional(@NotNull CompoundTag compoundTag)
     {
-        ListNBT list = new ListNBT();
+        super.saveAdditional(compoundTag);
+
+        ListTag list = new ListTag();
 
         for(Integer integer : this.taggedSlots.keySet())
         {
-            CompoundNBT compoundNBT = new CompoundNBT();
+            CompoundTag compoundNBT = new CompoundTag();
             compoundNBT.putInt("Slot", integer);
             compoundNBT.putString("Tag", this.taggedSlots.get(integer).toString());
             list.add(compoundNBT);
         }
 
-        compound.put("TaggedSlots", list);
-
-        return super.write(compound);
+        compoundTag.put("TaggedSlots", list);
     }
 
     public Map<Integer, ResourceLocation> getTaggedSlots()
@@ -77,6 +80,6 @@ public abstract class TaggeableInventoryContainerTileEntity extends InventoryCon
     public void setTaggedSlots(Map<Integer, ResourceLocation> taggedSlots)
     {
         this.taggedSlots = taggedSlots;
-        this.markDirty();
+        this.setChanged();
     }
 }

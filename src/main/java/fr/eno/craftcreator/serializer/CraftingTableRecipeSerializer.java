@@ -5,12 +5,12 @@ import com.google.gson.JsonObject;
 import fr.eno.craftcreator.utils.CraftType;
 import fr.eno.craftcreator.utils.PairValue;
 import fr.eno.craftcreator.utils.Utilities;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.tags.ITag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -20,7 +20,7 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 {
 	private static final List<Character> keyList = Arrays.asList('G', 'E', 'X', 'M', 'B', 'D', 'W', 'O', 'A');
 
-	private CraftingTableRecipeSerializer(CraftType type, IItemProvider output, int count)
+	private CraftingTableRecipeSerializer(CraftType type, ItemLike output, int count)
 	{
 		super(type, output);
 		this.setOutput(output, count);
@@ -70,13 +70,13 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 		{
 			JsonObject symbolObj = new JsonObject();
 
-			Optional<? extends ITag.INamedTag<Item>> optionalTag = ItemTags.getAllTags().stream().filter(tag -> tag.getName().equals(resourceLocation)).findFirst();
+			Optional<TagKey<Item>> optionalTag = ForgeRegistries.ITEMS.tags().getTagNames().filter(tag -> tag == ItemTags.create(resourceLocation)).findFirst();
 
 			if(optionalTag.isPresent() && map.get(resourceLocation).getFirstValue())
 			{
-				ITag.INamedTag<Item> tag = optionalTag.get();
-				symbolObj.addProperty("tag", tag.getName().toString());
-				char symbol = map.get(tag.getName()).getSecondValue();
+				TagKey<Item> tag = optionalTag.get();
+				symbolObj.addProperty("tag", tag.location().toString());
+				char symbol = map.get(tag.location()).getSecondValue();
 				symbolListObj.add(String.valueOf(symbol), symbolObj);
 			}
 			else if(ForgeRegistries.ITEMS.containsKey(resourceLocation))
@@ -142,7 +142,7 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 		return patterns;
 	}
 
-	private void setOutput(IItemProvider output, int count)
+	private void setOutput(ItemLike output, int count)
 	{
 		JsonObject result = new JsonObject();
 		result.addProperty("item", output.asItem().getRegistryName().toString());
@@ -151,7 +151,7 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 
 	}
 
-	public static CraftingTableRecipeSerializer create(CraftType type, IItemProvider output, int count)
+	public static CraftingTableRecipeSerializer create(CraftType type, ItemLike output, int count)
 	{
 		return new CraftingTableRecipeSerializer(type, output, count);
 	}

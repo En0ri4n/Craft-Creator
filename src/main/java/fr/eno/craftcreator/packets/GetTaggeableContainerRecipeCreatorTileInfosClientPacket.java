@@ -2,9 +2,9 @@ package fr.eno.craftcreator.packets;
 
 import fr.eno.craftcreator.screen.TaggeableSlotsContainerScreen;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.network.NetworkEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +21,7 @@ public class GetTaggeableContainerRecipeCreatorTileInfosClientPacket
         this.taggedSlots = taggedSlots;
     }
 
-    public static void encode(GetTaggeableContainerRecipeCreatorTileInfosClientPacket msg, PacketBuffer packetBuffer)
+    public static void encode(GetTaggeableContainerRecipeCreatorTileInfosClientPacket msg, FriendlyByteBuf packetBuffer)
     {
         packetBuffer.writeInt(msg.windowId);
         packetBuffer.writeInt(msg.taggedSlots.size());
@@ -33,7 +33,7 @@ public class GetTaggeableContainerRecipeCreatorTileInfosClientPacket
         }
     }
 
-    public static GetTaggeableContainerRecipeCreatorTileInfosClientPacket decode(PacketBuffer packetBuffer)
+    public static GetTaggeableContainerRecipeCreatorTileInfosClientPacket decode(FriendlyByteBuf packetBuffer)
     {
         int windowId = packetBuffer.readInt();
         Map<Integer, ResourceLocation> taggedSlots = new HashMap<>();
@@ -54,11 +54,11 @@ public class GetTaggeableContainerRecipeCreatorTileInfosClientPacket
         {
             Minecraft mc = Minecraft.getInstance();
 
-            if(mc.currentScreen instanceof TaggeableSlotsContainerScreen)
+            if(mc.screen instanceof TaggeableSlotsContainerScreen)
             {
-                TaggeableSlotsContainerScreen screen = (TaggeableSlotsContainerScreen) mc.currentScreen;
+                TaggeableSlotsContainerScreen screen = (TaggeableSlotsContainerScreen) mc.screen;
 
-                if(screen.getContainer().windowId == msg.windowId)
+                if(screen.getMenu().containerId == msg.windowId)
                 {
                     screen.setTaggedSlots(msg.taggedSlots);
                 }

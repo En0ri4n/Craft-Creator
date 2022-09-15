@@ -2,13 +2,14 @@ package fr.eno.craftcreator.packets;
 
 import fr.eno.craftcreator.init.InitPackets;
 import fr.eno.craftcreator.tileentity.CraftingTableRecipeCreatorTile;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.fml.network.NetworkEvent;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.PacketDistributor;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 public class GetCraftingTableRecipeCreatorTileInfosServerPacket
@@ -22,13 +23,13 @@ public class GetCraftingTableRecipeCreatorTileInfosServerPacket
         this.windowId = windowId;
     }
 
-    public static void encode(GetCraftingTableRecipeCreatorTileInfosServerPacket msg, PacketBuffer packetBuffer)
+    public static void encode(GetCraftingTableRecipeCreatorTileInfosServerPacket msg, FriendlyByteBuf packetBuffer)
     {
         packetBuffer.writeBlockPos(msg.pos);
         packetBuffer.writeInt(msg.windowId);
     }
 
-    public static GetCraftingTableRecipeCreatorTileInfosServerPacket decode(PacketBuffer packetBuffer)
+    public static GetCraftingTableRecipeCreatorTileInfosServerPacket decode(FriendlyByteBuf packetBuffer)
     {
         return new GetCraftingTableRecipeCreatorTileInfosServerPacket(packetBuffer.readBlockPos(), packetBuffer.readInt());
     }
@@ -37,13 +38,12 @@ public class GetCraftingTableRecipeCreatorTileInfosServerPacket
     {
         public static void handle(GetCraftingTableRecipeCreatorTileInfosServerPacket msg, Supplier<NetworkEvent.Context> ctx)
         {
-            ServerWorld world = ctx.get().getSender().getServerWorld();
+            ServerLevel world = Objects.requireNonNull(ctx.get().getSender()).getLevel();
 
-            TileEntity tileEntity = world.getTileEntity(msg.pos);
+            BlockEntity tileEntity = world.getBlockEntity(msg.pos);
 
-            if(tileEntity instanceof CraftingTableRecipeCreatorTile)
+            if(tileEntity instanceof CraftingTableRecipeCreatorTile tile)
             {
-                CraftingTableRecipeCreatorTile tile = (CraftingTableRecipeCreatorTile) tileEntity;
                 InitPackets.getNetWork().send(PacketDistributor.PLAYER.with(() -> ctx.get().getSender()), new GetCraftingTableRecipeCreatorTileInfosClientPacket(msg.windowId, tile.isShapedRecipe()));
             }
 

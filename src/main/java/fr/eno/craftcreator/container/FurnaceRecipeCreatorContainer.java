@@ -4,37 +4,28 @@ import fr.eno.craftcreator.container.slot.LockedSlot;
 import fr.eno.craftcreator.container.utils.CommonContainer;
 import fr.eno.craftcreator.init.InitContainers;
 import fr.eno.craftcreator.tileentity.FurnaceRecipeCreatorTile;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraftforge.items.SlotItemHandler;
-
-import javax.annotation.Nonnull;
 
 public class FurnaceRecipeCreatorContainer extends CommonContainer
 {
-	public FurnaceRecipeCreatorContainer(int windowId, PlayerInventory playerInventory, PacketBuffer packet)
+	public FurnaceRecipeCreatorContainer(int containerId, Inventory inventory, FriendlyByteBuf packet)
 	{
-		super(InitContainers.FURNACE_RECIPE_CREATOR.get(), windowId, 10);
-		FurnaceRecipeCreatorTile tile = (FurnaceRecipeCreatorTile) playerInventory.player.world.getTileEntity(packet.readBlockPos());
+		super(InitContainers.FURNACE_RECIPE_CREATOR.get(), containerId);
+		FurnaceRecipeCreatorTile tile = (FurnaceRecipeCreatorTile) inventory.player.level.getBlockEntity(packet.readBlockPos());
 		int index = 0;
 
 		this.addSlot(new SlotItemHandler(tile, index++, 56, 17));
 		this.addSlot(new SlotItemHandler(tile, index++, 116, 35));
 		
 		ItemStack fuel = new ItemStack(Items.COAL_BLOCK);
-		fuel.addEnchantment(Enchantments.PROTECTION, 10);
+		fuel.enchant(Enchantments.ALL_DAMAGE_PROTECTION, 10);
 		this.addSlot(new LockedSlot(tile, index, 56, 53, fuel));
 		
-		this.bindPlayerInventory(playerInventory);
-	}
-
-	@Override
-	public boolean canInteractWith(@Nonnull PlayerEntity playerIn)
-	{
-		return true;
+		this.bindPlayerInventory(inventory);
 	}
 }

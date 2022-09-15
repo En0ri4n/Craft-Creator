@@ -3,19 +3,16 @@ package fr.eno.craftcreator.container;
 import fr.eno.craftcreator.container.utils.CommonContainer;
 import fr.eno.craftcreator.init.InitContainers;
 import fr.eno.craftcreator.tileentity.SmithingTableRecipeCreatorTile;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraftforge.items.SlotItemHandler;
-
-import javax.annotation.Nonnull;
 
 public class SmithingTableRecipeCreatorContainer extends CommonContainer
 {
-	public SmithingTableRecipeCreatorContainer(int windowId, PlayerInventory playerInventory, PacketBuffer packet)
+	public SmithingTableRecipeCreatorContainer(int windowId, Inventory playerInventory, FriendlyByteBuf packet)
 	{
-		super(InitContainers.SMITHING_TABLE_RECIPE_CREATOR.get(), windowId, 10);
-		SmithingTableRecipeCreatorTile tile = (SmithingTableRecipeCreatorTile) playerInventory.player.world.getTileEntity(packet.readBlockPos());
+		super(InitContainers.SMITHING_TABLE_RECIPE_CREATOR.get(), windowId);
+		SmithingTableRecipeCreatorTile tile = (SmithingTableRecipeCreatorTile) playerInventory.player.level.getBlockEntity(packet.readBlockPos());
 		int index = 0;
 
 		this.addSlot(new SlotItemHandler(tile, index++, 27, 47));
@@ -23,11 +20,5 @@ public class SmithingTableRecipeCreatorContainer extends CommonContainer
 		this.addSlot(new SlotItemHandler(tile, index, 134, 47));
 		
 		this.bindPlayerInventory(playerInventory);
-	}
-
-	@Override
-	public boolean canInteractWith(@Nonnull PlayerEntity playerIn)
-	{
-		return true;
 	}
 }

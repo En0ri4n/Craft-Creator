@@ -8,12 +8,12 @@ import com.google.gson.JsonObject;
 import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import fr.eno.craftcreator.utils.PairValue;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import vazkii.botania.api.BotaniaAPI;
 import vazkii.botania.api.brew.Brew;
 import vazkii.botania.api.recipe.*;
@@ -76,12 +76,12 @@ public class BotaniaRecipesJSSerializer extends ModRecipesJSSerializer
     {
         JsonObject obj = new JsonObject();
         RecipeFileUtils.setRecipeType(obj, ModRecipeTypes.BREW_TYPE);
-        obj.addProperty("brew", Objects.requireNonNull(brew.getRegistryName()).toString());
+        obj.addProperty("brew", Objects.requireNonNull(BotaniaAPI.instance().getBrewRegistry().getKey(brew)).toString());
         obj.add("ingredients", RecipeFileUtils.listWithSingletonItems(ingredients, "item"));
 
         addRecipeToFile(gson.toJson(obj), ModRecipeTypes.BREW_TYPE);
 
-        sendSuccessMessage(ModRecipeTypes.BREW_TYPE, brew.getRegistryName());
+        sendSuccessMessage(ModRecipeTypes.BREW_TYPE, BotaniaAPI.instance().getBrewRegistry().getKey(brew));
     }
 
     public void createPetalRecipe(Multimap<ResourceLocation, Boolean> ingredients, ItemStack result)
@@ -123,7 +123,7 @@ public class BotaniaRecipesJSSerializer extends ModRecipesJSSerializer
     }
 
     @Override
-    public PairValue<String, Integer> getParam(IRecipe<?> recipe)
+    public PairValue<String, Integer> getParam(Recipe<?> recipe)
     {
         if(recipe instanceof IManaInfusionRecipe)
             return PairValue.create("Mana", ((IManaInfusionRecipe) recipe).getManaToConsume());
@@ -138,7 +138,7 @@ public class BotaniaRecipesJSSerializer extends ModRecipesJSSerializer
     }
 
     @Override
-    public Map<String, ResourceLocation> getOutput(IRecipe<?> recipe)
+    public Map<String, ResourceLocation> getOutput(Recipe<?> recipe)
     {
         Map<String, ResourceLocation> locations = new HashMap<>();
 
@@ -157,10 +157,10 @@ public class BotaniaRecipesJSSerializer extends ModRecipesJSSerializer
         if(recipe instanceof IBrewRecipe)
         {
             IBrewRecipe recipeBrew = (IBrewRecipe) recipe;
-            locations.put("Brew", recipeBrew.getBrew().getRegistryName());
+            locations.put("Brew", BotaniaAPI.instance().getBrewRegistry().getKey(recipeBrew.getBrew()));
         }
 
-        return !locations.isEmpty() ? locations : Collections.singletonMap("Item", recipe.getRecipeOutput().getItem().getRegistryName());
+        return !locations.isEmpty() ? locations : Collections.singletonMap("Item", recipe.getResultItem().getItem().getRegistryName());
     }
 
     @Override
@@ -169,7 +169,7 @@ public class BotaniaRecipesJSSerializer extends ModRecipesJSSerializer
         switch(Objects.requireNonNull(entry).getKey())
         {
             case "Brew":
-                return ((ItemVial) ModItems.flask).getItemForBrew(BotaniaAPI.instance().getBrewRegistry().getOrDefault(entry.getValue()), new ItemStack(ModItems.flask));
+                return ((ItemVial) ModItems.flask).getItemForBrew(BotaniaAPI.instance().getBrewRegistry().get(entry.getValue()), new ItemStack(ModItems.flask));
         }
 
         return ItemStack.EMPTY;
