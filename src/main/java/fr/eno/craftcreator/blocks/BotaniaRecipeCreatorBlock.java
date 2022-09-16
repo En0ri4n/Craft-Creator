@@ -34,10 +34,8 @@ public class BotaniaRecipeCreatorBlock extends RecipeCreatorBlock
         {
             BlockEntity tileentity = pLevel.getBlockEntity(pPos);
 
-            if(tileentity instanceof BotaniaRecipeCreatorTile)
+            if(tileentity instanceof BotaniaRecipeCreatorTile tile)
             {
-                BotaniaRecipeCreatorTile tile = (BotaniaRecipeCreatorTile) tileentity;
-
                 NetworkHooks.openGui((ServerPlayer) pPlayer, tile, pPos);
                 return InteractionResult.SUCCESS;
             }

@@ -29,8 +29,6 @@ import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import java.util.List;
 import java.util.*;
 
 @SuppressWarnings({"unchecked", "deprecation"})
@@ -113,7 +111,7 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
         BufferBuilder bufferbuilder = tessellator.getBuilder();
 
         // Background
-        this.minecraft.getTextureManager().bindForSetup(BACKGROUND_TILE);
+        RenderSystem.setShaderTexture(0, BACKGROUND_TILE);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 0.5F);
         bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
         bufferbuilder.vertex(this.x0, this.y1, 0.0D).uv((float) this.x0 / 32.0F, (float) (this.y1 + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, 100).endVertex();

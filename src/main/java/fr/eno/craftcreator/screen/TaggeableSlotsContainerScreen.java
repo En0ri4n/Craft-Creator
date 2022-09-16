@@ -21,7 +21,6 @@ import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.network.PacketDistributor;
 
 import javax.annotation.Nonnull;
-
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,8 +28,8 @@ import java.util.stream.Collectors;
 
 public abstract class TaggeableSlotsContainerScreen<T extends AbstractContainerMenu> extends AbstractContainerScreen<T>
 {
-    protected final Field slotXPosField = ReflectUtils.getFieldAndSetAccessible(Slot.class, "field_75223_e");
-    protected final Field slotYPosField = ReflectUtils.getFieldAndSetAccessible(Slot.class, "field_75221_f");
+    protected final Field slotXPosField = ReflectUtils.getFieldAndSetAccessible(Slot.class, "f_40220_");
+    protected final Field slotYPosField = ReflectUtils.getFieldAndSetAccessible(Slot.class, "f_40221_");
 
     private Map<SlotItemHandler, ResourceLocation> taggedSlots;
     private GuiList<ResourceLocation> guiTagList;

@@ -1,5 +1,6 @@
 package fr.eno.craftcreator.screen.buttons;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.utils.Utils;
@@ -33,7 +34,7 @@ public class BooleanButton extends Button
 		if(this.visible)
 		{
 			int yOffset = 0;
-			mc.getTextureManager().bindForSetup(TEXTURE);
+			RenderSystem.setShaderTexture(0, TEXTURE);
 			
 			if(active)
 			{

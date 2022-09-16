@@ -33,7 +33,7 @@ public class SimpleCheckBox extends Checkbox
         if(visible)
         {
             Minecraft minecraft = Minecraft.getInstance();
-            minecraft.getTextureManager().bindForSetup(TEXTURE);
+            RenderSystem.setShaderTexture(0, TEXTURE);
             RenderSystem.enableDepthTest();
             Font fontrenderer = minecraft.font;
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
