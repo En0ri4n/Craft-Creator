@@ -1,5 +1,6 @@
 package fr.eno.craftcreator.screen.buttons;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.screen.buttons.pressable.NullPressable;
@@ -37,7 +38,7 @@ public class MultipleItemChoiceButton<K extends Item, V> extends Button
 	{
 		if(this.visible)
 		{
-			mc.getTextureManager().bindForSetup(TEXTURE);
+			RenderSystem.setShaderTexture(0, TEXTURE);
 			int yOffset = ExecuteButton.isMouseHover(x, y, mouseX, mouseY, width, height) ? 20 : 0;
 			Screen.blit(matrixStack, x, y, this.width, this.height, 0, yOffset, 20, 20, 20, 40);
 			

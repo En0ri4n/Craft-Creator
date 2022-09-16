@@ -1,5 +1,6 @@
 package fr.eno.craftcreator.screen;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.kubejs.jsserializers.ModRecipesJSSerializer;
@@ -19,7 +20,6 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nonnull;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -150,7 +150,7 @@ public class RemoveRecipeManagerScreen extends ChildrenScreen
     public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         renderBackground(matrixStack);
-        minecraft.getTextureManager().bindForSetup(GUI_TEXTURE);
+        RenderSystem.setShaderTexture(0, GUI_TEXTURE);
 
         Screen.blit(matrixStack, 10, 10, this.width - 20, this.height - 20, 0, 0, 256, 256, 256, 256);
 

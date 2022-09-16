@@ -245,7 +245,7 @@ public class BotaniaRecipeCreatorScreen extends TaggeableSlotsContainerScreen<Bo
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         int i = this.leftPos;
         int j = (this.height - this.imageHeight) / 2;
-        this.minecraft.getTextureManager().bindForSetup(getCurrentRecipe().getGuiTexture());
+        RenderSystem.setShaderTexture(0, getCurrentRecipe().getGuiTexture());
 
         this.blit(matrixStack, i, j, 0, 0, this.imageWidth, this.imageHeight);
 

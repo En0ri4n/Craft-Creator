@@ -1,5 +1,6 @@
 package fr.eno.craftcreator.screen.buttons;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
 import net.minecraft.client.Minecraft;
@@ -7,7 +8,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-
 
 import java.util.Collections;
 import java.util.List;
@@ -38,7 +38,7 @@ public class SimpleButton extends Button
 		if(this.visible && this.active)
 		{
 			int yOffset = 0;
-			mc.getTextureManager().bindForSetup(TEXTURE);
+			RenderSystem.setShaderTexture(0, TEXTURE);
 			
 			if(active)
 			{

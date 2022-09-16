@@ -21,7 +21,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 
 import javax.annotation.Nonnull;
-
 import java.util.Map;
 
 @SuppressWarnings("deprecation")
@@ -74,7 +73,7 @@ public class FurnaceRecipeCreatorScreen extends AbstractContainerScreen<FurnaceR
 		matrixStack.popPose();
 		this.expField.render(matrixStack, mouseX, mouseY, partialTicks);
 		this.cookTimeField.render(matrixStack, mouseX, mouseY, partialTicks);
-		this.minecraft.getTextureManager().bindForSetup(GUI_TEXTURES);
+		RenderSystem.setShaderTexture(0, GUI_TEXTURES);
 		blit(matrixStack, this.leftPos + 57, this.topPos + 37, 176, 0, 14, 14, 256, 256);
 	}
 
@@ -82,7 +81,7 @@ public class FurnaceRecipeCreatorScreen extends AbstractContainerScreen<FurnaceR
 	protected void renderBg(@Nonnull PoseStack matrixStack, float partialTicks, int mouseX, int mouseY)
 	{
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-		this.minecraft.getTextureManager().bindForSetup(GUI_TEXTURES);
+		RenderSystem.setShaderTexture(0, GUI_TEXTURES);
 		int i = this.leftPos;
 		int j = (this.height - this.imageHeight) / 2;
 		this.blit(matrixStack, i, j, 0, 0, this.imageWidth, this.imageHeight);

@@ -1,12 +1,12 @@
 package fr.eno.craftcreator.utils;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.screen.buttons.ExecuteButton;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
-
 
 import java.util.List;
 
@@ -30,12 +30,12 @@ public class GuiList<T>
     public void render(PoseStack matrixStack, int mouseX, int mouseY)
     {
         int width = getMaxWidth();
-        mc.getTextureManager().bindForSetup(References.getLoc("textures/gui/container/gui_background.png"));
+        RenderSystem.setShaderTexture(0, References.getLoc("textures/gui/container/gui_background.png"));
         Screen.blit(matrixStack, this.guiListRight - (width + 10), y, width + 10, (this.keys.size() + 1) * keyHeight + (this.keys.size() + 1) + 6, 0, 0, 256, 256, 256, 256);
 
         for(int i = 0; i < this.keys.size() + 1; i++)
         {
-            mc.getTextureManager().bindForSetup(References.getLoc("textures/gui/buttons/basic_button.png"));
+            RenderSystem.setShaderTexture(0, References.getLoc("textures/gui/buttons/basic_button.png"));
 
             int finalWidth = (width + 10);
             int x = this.guiListRight - finalWidth + 3;

@@ -54,7 +54,7 @@ public class CraftingTableRecipeCreatorScreen extends TaggeableSlotsContainerScr
         super.render(matrixStack, mouseX, mouseY, partialTicks);
 
         int yTextureOffset = ExecuteButton.isMouseHover(this.leftPos + imageWidth - 20, topPos, mouseX, mouseY, 20, 20) ? 20 : 0;
-        minecraft.getTextureManager().bindForSetup(References.getLoc("textures/gui/buttons/item_button.png"));
+        RenderSystem.setShaderTexture(0, References.getLoc("textures/gui/buttons/item_button.png"));
         Screen.blit(matrixStack, this.leftPos + imageWidth - 20, topPos, 20, 20, 0, yTextureOffset, 20, 20, 20, 40);
         minecraft.getItemRenderer().renderGuiItem(new ItemStack(Items.CRAFTING_TABLE), this.leftPos + imageWidth - 18, topPos + 2);
     }
@@ -69,7 +69,7 @@ public class CraftingTableRecipeCreatorScreen extends TaggeableSlotsContainerScr
     {
         this.renderBackground(matrixStack);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        this.minecraft.getTextureManager().bindForSetup(CRAFT_CREATOR_TABLE_GUI_TEXTURES);
+        RenderSystem.setShaderTexture(0, CRAFT_CREATOR_TABLE_GUI_TEXTURES);
         int x = this.leftPos;
         int j = (this.height - this.imageHeight) / 2;
         this.blit(matrixStack, x, j, 0, 0, this.imageWidth, this.imageHeight);
