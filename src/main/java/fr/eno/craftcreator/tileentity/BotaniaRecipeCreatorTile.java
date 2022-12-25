@@ -56,7 +56,7 @@ public class BotaniaRecipeCreatorTile extends TaggeableInventoryContainerTileEnt
     @Override
     public TextComponent getDisplayName()
     {
-        return (TextComponent) References.getTranslate("tile.botania_recipe_creator.name");
+        return new TextComponent(References.getTranslate("tile.botania_recipe_creator.name").getString());
     }
 
 

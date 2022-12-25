@@ -112,7 +112,7 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
 
         // Background
         RenderSystem.setShaderTexture(0, BACKGROUND_TILE);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 0.5F);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1F);
         bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
         bufferbuilder.vertex(this.x0, this.y1, 0.0D).uv((float) this.x0 / 32.0F, (float) (this.y1 + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, 100).endVertex();
         bufferbuilder.vertex(this.x1, this.y1, 0.0D).uv((float) this.x1 / 32.0F, (float) (this.y1 + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, 100).endVertex();
@@ -356,6 +356,7 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
 
         public void renderTooltip(PoseStack matrixStack, int mouseX, int mouseY)
         {
+            tooltips.clear();
             Multimap<String, ResourceLocation> input = RecipeFileUtils.getInput(recipe);
             Map<String, ResourceLocation> output = ModDispatcher.getOutput(recipe);
 
@@ -444,6 +445,7 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
 
         public void renderTooltip(PoseStack matrixStack, int mouseX, int mouseY)
         {
+            tooltips.clear();
             Map<ModRecipesJSSerializer.RecipeDescriptors, String> recipeDescriptors = recipe.getRecipeMap();
 
             tooltips.add(new TextComponent(recipeDescriptors.values().stream().findFirst().get()).withStyle(ChatFormatting.GREEN, ChatFormatting.UNDERLINE));
@@ -522,7 +524,10 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
         public void renderTooltip(PoseStack matrixStack, int mouseX, int mouseY)
         {
             if(!tooltips.isEmpty() && minecraft.screen != null)
+            {
+                tooltips.clear();
                 minecraft.screen.renderTooltip(matrixStack, tooltips, Optional.empty(), mouseX, mouseY);
+            }
         }
 
         public StringEntry setTooltips(List<Component> tooltips)
@@ -593,7 +598,11 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
         public void renderTooltip(PoseStack matrixStack, int mouseX, int mouseY)
         {
             if(!tooltips.isEmpty() && minecraft.screen != null)
-                minecraft.screen.renderTooltip(matrixStack, tooltips, Optional.empty(), mouseX, mouseY);}
+            {
+                tooltips.clear();
+                minecraft.screen.renderTooltip(matrixStack, tooltips, Optional.empty(), mouseX, mouseY);
+            }
+        }
 
         @Override
         public Component getNarration()

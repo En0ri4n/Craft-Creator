@@ -113,7 +113,6 @@ public class CraftingTableRecipeCreatorBlock extends RecipeCreatorBlock
 			if(tileentity instanceof CraftingTableRecipeCreatorTile tile)
 			{
 				NetworkHooks.openGui((ServerPlayer) pPlayer, tile, pPos);
-				
 				return InteractionResult.SUCCESS;
 			}
 		}

@@ -2,13 +2,31 @@ package fr.eno.craftcreator.utils;
 
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+@SuppressWarnings("unused")
 public class ReflectUtils
 {
+    private static final VarHandle MODIFIERS;
+
+    static
+    {
+        try
+        {
+            var lookup = MethodHandles.privateLookupIn(Field.class, MethodHandles.publicLookup());
+            MODIFIERS = lookup.findVarHandle(Field.class, "modifiers", int.class);
+        }
+        catch (NoSuchFieldException | IllegalAccessException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * Get value from the provided field
      *
@@ -85,12 +103,8 @@ public class ReflectUtils
     {
         try
         {
+            MODIFIERS.set(field, field.getModifiers() & ~Modifier.FINAL);
             field.setAccessible(true);
-
-            Field modifiersField = Field.class.getDeclaredField("modifiers");
-            modifiersField.setAccessible(true);
-            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-
             field.set(null, newValue);
         }
         catch(Exception e)
@@ -101,16 +115,13 @@ public class ReflectUtils
 
     /**
      * Set current field with a new value
-     *
      */
     public static void setField(Field field, Object target, Object value)
     {
         try
         {
+            MODIFIERS.set(field, field.getModifiers() & ~Modifier.FINAL);
             field.setAccessible(true);
-            Field modifiersField = Field.class.getDeclaredField("modifiers");
-            modifiersField.setAccessible(true);
-            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
             field.set(target, value);
         }
         catch(Exception e)
@@ -131,12 +142,10 @@ public class ReflectUtils
         Field field = ObfuscationReflectionHelper.findField(clazz, obfName);
         try
         {
+            MODIFIERS.set(field, field.getModifiers() & ~Modifier.FINAL);
             field.setAccessible(true);
-            Field modifiersField = Field.class.getDeclaredField("modifiers");
-            modifiersField.setAccessible(true);
-            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
         }
-        catch(IllegalAccessException | NoSuchFieldException e)
+        catch(Exception e)
         {
             e.printStackTrace();
         }

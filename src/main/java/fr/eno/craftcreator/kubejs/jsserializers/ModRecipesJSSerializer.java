@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
@@ -20,6 +21,7 @@ import net.minecraft.world.level.ItemLike;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -76,21 +78,21 @@ public abstract class ModRecipesJSSerializer
         recipeNameComp.withStyle(style ->
         {
             style.applyFormat(ChatFormatting.GREEN);
-            style.setUnderlined(true);
+            style.withUnderlined(true);
             return style;
         });
         TextComponent endComp = new TextComponent(" Successfully generated !");
         Objects.requireNonNull(Minecraft.getInstance().player).sendMessage(baseComponent.append(recipeNameComp).append(endComp), Minecraft.getInstance().player.getUUID());
     }
 
-    JsonArray getArray(Multimap<ResourceLocation, Boolean> ingredients)
+    protected JsonArray getArray(Multimap<ResourceLocation, Boolean> ingredients)
     {
         JsonArray array = new JsonArray();
-        ingredients.forEach((loc, isTag) -> array.add(RecipeFileUtils.singletonJsonObject(isTag ? "tag" : "item", loc.toString())));
+        ingredients.forEach((loc, isTag) -> array.add(singletonJsonObject(isTag ? "tag" : "item", loc.toString())));
         return array;
     }
 
-    JsonObject getResult(ItemStack result)
+    protected JsonObject getResult(ItemStack result)
     {
         Map<String, Object> map = new HashMap<>();
 
@@ -98,7 +100,36 @@ public abstract class ModRecipesJSSerializer
         if(result.getCount() > 1)
             map.put("count", result.getCount());
 
-        return RecipeFileUtils.mapToJsonObject(map);
+        return mapToJsonObject(map);
+    }
+
+    protected JsonArray listWithSingletonItems(List<Item> items, String key)
+    {
+        JsonArray array = new JsonArray();
+        items.forEach(item -> array.add(singletonJsonObject(key, Objects.requireNonNull(item.getRegistryName()).toString())));
+        return array;
+    }
+
+    protected JsonObject singletonJsonObject(String key, String value)
+    {
+        JsonObject obj = new JsonObject();
+        obj.addProperty(key, value);
+        return obj;
+    }
+
+    protected JsonObject mapToJsonObject(Map<String, Object> map)
+    {
+        JsonObject obj = new JsonObject();
+        map.forEach((s, o) ->
+        {
+            if(o instanceof Number number) obj.addProperty(s, number);
+            else if(o instanceof String string) obj.addProperty(s, string);
+            else if(o instanceof Boolean bool) obj.addProperty(s, bool);
+            else if(o instanceof Character character) obj.addProperty(s, character);
+            else if(o instanceof JsonArray array) obj.add(s, array);
+            else if(o instanceof JsonObject object) obj.add(s, object);
+        });
+        return obj;
     }
 
     boolean isRecipeExists(RecipeType<?> recipeType, ResourceLocation resultOutput)
