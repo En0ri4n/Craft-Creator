@@ -1,5 +1,6 @@
 package fr.eno.craftcreator.container;
 
+import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
 import fr.eno.craftcreator.container.utils.CommonContainer;
 import fr.eno.craftcreator.init.InitContainers;
 import fr.eno.craftcreator.tileentity.StoneCutterRecipeCreatorTile;
@@ -15,8 +16,8 @@ public class StoneCutterRecipeCreatorContainer extends CommonContainer
 		StoneCutterRecipeCreatorTile tile = (StoneCutterRecipeCreatorTile) playerInventory.player.level.getBlockEntity(packet.readBlockPos());
 		int index = 0;
 
-		this.addSlot(new SlotItemHandler(tile, index++, 39, 33));
-		this.addSlot(new SlotItemHandler(tile, index, 114, 33));
+		this.addSlot(new SimpleSlotItemHandler(tile, index++, 39, 33));
+		this.addSlot(new SimpleSlotItemHandler(tile, index, 114, 33));
 		
 		this.bindPlayerInventory(playerInventory);
 	}

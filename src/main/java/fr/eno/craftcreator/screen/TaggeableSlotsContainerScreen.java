@@ -2,12 +2,12 @@ package fr.eno.craftcreator.screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
+import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
 import fr.eno.craftcreator.init.InitPackets;
 import fr.eno.craftcreator.packets.GetTaggeableContainerRecipeCreatorTileInfosServerPacket;
 import fr.eno.craftcreator.packets.UpdateTaggeableContainerRecipeCreatorTilePacket;
 import fr.eno.craftcreator.tileentity.TaggeableInventoryContainerTileEntity;
 import fr.eno.craftcreator.utils.GuiList;
-import fr.eno.craftcreator.utils.ReflectUtils;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.core.BlockPos;
@@ -21,16 +21,13 @@ import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.network.PacketDistributor;
 
 import javax.annotation.Nonnull;
-import java.lang.reflect.Field;
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public abstract class TaggeableSlotsContainerScreen<T extends AbstractContainerMenu> extends AbstractContainerScreen<T>
 {
-    protected final Field slotXPosField = ReflectUtils.getFieldAndSetAccessible(Slot.class, "f_40220_");
-    protected final Field slotYPosField = ReflectUtils.getFieldAndSetAccessible(Slot.class, "f_40221_");
-
     private Map<SlotItemHandler, ResourceLocation> taggedSlots;
     private GuiList<ResourceLocation> guiTagList;
     private SlotItemHandler selectedSlot;
@@ -198,14 +195,15 @@ public abstract class TaggeableSlotsContainerScreen<T extends AbstractContainerM
     {
         int x = this.leftPos;
         int y = this.topPos;
-        
+
         for(Slot slot : this.taggedSlots.keySet())
         {
-            fill(matrixStack, x + slot.x, y  + slot.y, x + slot.x + 16, y  + slot.y + 16, 0x007f0080);
+            if(slot instanceof SimpleSlotItemHandler simpleSlotItemHandler && simpleSlotItemHandler.isActive())
+                fill(matrixStack, x + slot.x, y + slot.y, x + slot.x + 16, y + slot.y + 16, 0x8006e806);
         }
 
         if(this.selectedSlot != null)
-            fill(matrixStack, x + selectedSlot.x, y  + selectedSlot.y, x + selectedSlot.x + 16, y  + selectedSlot.y + 16, 0xE7f50d);
+            fill(matrixStack, x + selectedSlot.x, y + selectedSlot.y, x + selectedSlot.x + 16, y + selectedSlot.y + 16, 0xFFE7f50d);
     }
 
     @Override

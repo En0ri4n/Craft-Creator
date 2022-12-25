@@ -1,5 +1,6 @@
 package fr.eno.craftcreator.container;
 
+import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
 import fr.eno.craftcreator.container.utils.CommonContainer;
 import fr.eno.craftcreator.init.InitContainers;
 import fr.eno.craftcreator.tileentity.CraftingTableRecipeCreatorTile;
@@ -21,11 +22,11 @@ public class CraftingTableRecipeCreatorContainer extends CommonContainer
 		{
 			for (int y = 0; y < 3; ++y)
 			{
-				this.addSlot(new SlotItemHandler(tile, index++, 30 + y * 18, 17 + x * 18));
+				this.addSlot(new SimpleSlotItemHandler(tile, index++, 30 + y * 18, 17 + x * 18));
 			}
 		}
 		
-		this.addSlot(new SlotItemHandler(tile, index, 124, 35));
+		this.addSlot(new SimpleSlotItemHandler(tile, index, 124, 35));
 		
 		this.bindPlayerInventory(inventory);
 	}

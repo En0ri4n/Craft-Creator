@@ -16,6 +16,7 @@ import java.util.Map;
 
 public abstract class TaggeableInventoryContainerTileEntity extends InventoryContainerTileEntity
 {
+    private static final String TAGGED_SLOTS_TAG = "TaggedSlots";
     private Map<Integer, ResourceLocation> taggedSlots;
 
     public TaggeableInventoryContainerTileEntity(BlockEntityType<?> pType, BlockPos pWorldPosition, BlockState pBlockState, int inventorySize)
@@ -31,9 +32,9 @@ public abstract class TaggeableInventoryContainerTileEntity extends InventoryCon
 
         this.taggedSlots.clear();
 
-        if(compound.contains("TaggedSlots"))
+        if(compound.contains(TAGGED_SLOTS_TAG))
         {
-            ListTag list = (ListTag) compound.get("TaggedSlots");
+            ListTag list = (ListTag) compound.get(TAGGED_SLOTS_TAG);
 
             if(list != null)
             {
@@ -69,7 +70,7 @@ public abstract class TaggeableInventoryContainerTileEntity extends InventoryCon
             list.add(compoundNBT);
         }
 
-        compoundTag.put("TaggedSlots", list);
+        compoundTag.put(TAGGED_SLOTS_TAG, list);
     }
 
     public Map<Integer, ResourceLocation> getTaggedSlots()

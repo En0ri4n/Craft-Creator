@@ -2,6 +2,7 @@ package fr.eno.craftcreator.tileentity;
 
 import fr.eno.craftcreator.container.StoneCutterRecipeCreatorContainer;
 import fr.eno.craftcreator.init.InitTileEntities;
+import fr.eno.craftcreator.utils.SlotHelper;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -18,7 +19,7 @@ public class StoneCutterRecipeCreatorTile extends InventoryContainerTileEntity
 {
 	public StoneCutterRecipeCreatorTile(BlockPos pWorldPosition, BlockState pBlockState)
 	{
-		super(InitTileEntities.STONE_CUTTER_RECIPE_CREATOR.get(), pWorldPosition, pBlockState, 2);
+		super(InitTileEntities.STONE_CUTTER_RECIPE_CREATOR.get(), pWorldPosition, pBlockState, SlotHelper.STONECUTTER_SLOTS_SIZE);
 	}
 
 	@Nonnull

@@ -50,6 +50,7 @@ public class BotaniaRecipeCreatorBlock extends RecipeCreatorBlock
         return new BotaniaRecipeCreatorTile(pPos, pState);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext)
     {

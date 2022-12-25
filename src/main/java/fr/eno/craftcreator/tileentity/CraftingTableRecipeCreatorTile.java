@@ -2,6 +2,7 @@ package fr.eno.craftcreator.tileentity;
 
 import fr.eno.craftcreator.container.CraftingTableRecipeCreatorContainer;
 import fr.eno.craftcreator.init.InitTileEntities;
+import fr.eno.craftcreator.utils.SlotHelper;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -23,7 +24,7 @@ public class CraftingTableRecipeCreatorTile extends TaggeableInventoryContainerT
 
 	public CraftingTableRecipeCreatorTile(BlockPos pWorldPosition, BlockState pBlockState)
 	{
-		super(InitTileEntities.CRAFTING_TABLE_RECIPE_CREATOR.get(), pWorldPosition, pBlockState, 10);
+		super(InitTileEntities.CRAFTING_TABLE_RECIPE_CREATOR.get(), pWorldPosition, pBlockState, SlotHelper.CRAFTING_TABLE_SLOTS_SIZE);
 	}
 
 	@Override

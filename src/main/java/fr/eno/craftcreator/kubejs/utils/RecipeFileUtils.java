@@ -16,7 +16,6 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -104,16 +103,12 @@ public class RecipeFileUtils
                         {
                             JsonObject jsonObject = GSON.fromJson(new StringReader(JSON_MATCHER.group()), JsonObject.class);
                             RecipeSerializer<T> craftingTableSerializer = (RecipeSerializer<T>) ForgeRegistries.RECIPE_SERIALIZERS.getValue(new ResourceLocation(jsonObject.get("type").getAsString()));
-                            T tempRecipe = craftingTableSerializer.fromJson(new ResourceLocation(modId, "recipe"), jsonObject);
-                            T recipe = craftingTableSerializer.fromJson(new ResourceLocation(modId, ModDispatcher.getOutput(tempRecipe).values().stream().findAny().orElse(null).getPath()), jsonObject);
-                            recipes.add(recipe);
+                            addRecipesTo(modId, recipes, jsonObject, craftingTableSerializer);
                             continue;
                         }
 
                         JsonObject jsonObject = GSON.fromJson(new StringReader(JSON_MATCHER.group()), JsonObject.class);
-                        T tempRecipe = serializer.fromJson(new ResourceLocation(modId, "recipe"), jsonObject);
-                        T recipe = serializer.fromJson(new ResourceLocation(modId, ModDispatcher.getOutput(tempRecipe).values().stream().findAny().orElse(null).getPath()), jsonObject);
-                        recipes.add(recipe);
+                        addRecipesTo(modId, recipes, jsonObject, serializer);
                     }
                 }
         }
@@ -123,6 +118,14 @@ public class RecipeFileUtils
         }
 
         return recipes;
+    }
+
+    private static <T extends Recipe<?>> void addRecipesTo(String modId, List<T> recipes, JsonObject jsonObject, RecipeSerializer<T> craftingTableSerializer)
+    {
+        assert craftingTableSerializer != null;
+        T tempRecipe = craftingTableSerializer.fromJson(new ResourceLocation(modId, "recipe"), jsonObject);
+        T recipe = craftingTableSerializer.fromJson(new ResourceLocation(modId, Objects.requireNonNull(ModDispatcher.getOutput(tempRecipe)).values().stream().findAny().orElse(null).getPath()), jsonObject);
+        recipes.add(recipe);
     }
 
     public static <C extends Container, T extends Recipe<C>> void removeAddedRecipe(T addedRecipe, String modId)
@@ -154,39 +157,15 @@ public class RecipeFileUtils
                         if(isCraftingTableCraft)
                         {
                             RecipeSerializer<T> craftingTableSerializer = (RecipeSerializer<T>) ForgeRegistries.RECIPE_SERIALIZERS.getValue(new ResourceLocation(jsonObject.get("type").getAsString()));
-                            tempRecipe = craftingTableSerializer.fromJson(new ResourceLocation(modId, "recipe"), jsonObject);
-                            recipe = craftingTableSerializer.fromJson(new ResourceLocation(modId, ModDispatcher.getOutput(tempRecipe).values().stream().findAny().orElse(null).getPath()), jsonObject);
-
-                            FriendlyByteBuf existingRecipeBuffer = new FriendlyByteBuf(Unpooled.buffer());
-                            FriendlyByteBuf jsonRecipeBuffer = new FriendlyByteBuf(Unpooled.buffer());
-                            craftingTableSerializer.toNetwork(existingRecipeBuffer, addedRecipe);
-                            craftingTableSerializer.toNetwork(jsonRecipeBuffer, recipe);
-
-                            if(existingRecipeBuffer.compareTo(jsonRecipeBuffer) == 0)
-                            {
-                                lines.remove(index);
-                                Files.write(recipeFile.toPath(), lines, StandardCharsets.UTF_8);
+                            if(compareAndRemoveIfEquals(addedRecipe, modId, craftingTableSerializer, recipeFile, lines, index, jsonObject))
                                 return;
-                            }
 
                             index++;
                             continue;
                         }
 
-                        tempRecipe = serializer.fromJson(new ResourceLocation(modId, "recipe"), jsonObject);
-                        recipe = serializer.fromJson(new ResourceLocation(modId, ModDispatcher.getOutput(tempRecipe).values().stream().findAny().orElse(null).getPath()), jsonObject);
-
-                        FriendlyByteBuf existingRecipeBuffer = new FriendlyByteBuf(Unpooled.buffer());
-                        FriendlyByteBuf jsonRecipeBuffer = new FriendlyByteBuf(Unpooled.buffer());
-                        serializer.toNetwork(existingRecipeBuffer, addedRecipe);
-                        serializer.toNetwork(jsonRecipeBuffer, recipe);
-
-                        if(existingRecipeBuffer.compareTo(jsonRecipeBuffer) == 0)
-                        {
-                            lines.remove(index);
-                            Files.write(recipeFile.toPath(), lines, StandardCharsets.UTF_8);
+                        if(compareAndRemoveIfEquals(addedRecipe, modId, serializer, recipeFile, lines, index, jsonObject))
                             return;
-                        }
                     }
                 }
                 index++;
@@ -196,6 +175,27 @@ public class RecipeFileUtils
         {
             e.printStackTrace();
         }
+    }
+
+    private static <C extends Container, T extends Recipe<C>> boolean compareAndRemoveIfEquals(T addedRecipe, String modId, RecipeSerializer<T> serializer, File recipeFile, List<String> lines, int index, JsonObject jsonObject) throws IOException
+    {
+        T tempRecipe;
+        T recipe;
+        tempRecipe = serializer.fromJson(new ResourceLocation(modId, "recipe"), jsonObject);
+        recipe = serializer.fromJson(new ResourceLocation(modId, Objects.requireNonNull(ModDispatcher.getOutput(tempRecipe)).values().stream().findAny().orElse(null).getPath()), jsonObject);
+
+        FriendlyByteBuf existingRecipeBuffer = new FriendlyByteBuf(Unpooled.buffer());
+        FriendlyByteBuf jsonRecipeBuffer = new FriendlyByteBuf(Unpooled.buffer());
+        serializer.toNetwork(existingRecipeBuffer, addedRecipe);
+        serializer.toNetwork(jsonRecipeBuffer, recipe);
+
+        if(existingRecipeBuffer.compareTo(jsonRecipeBuffer) == 0)
+        {
+            lines.remove(index);
+            Files.write(recipeFile.toPath(), lines, StandardCharsets.UTF_8);
+            return true;
+        }
+        return false;
     }
 
     public static <T extends Recipe<?>> List<ModifiedRecipe> getModifiedRecipesFor()
@@ -326,33 +326,6 @@ public class RecipeFileUtils
         return getName(type).getPath() + "-recipes";
     }
 
-    public static JsonObject singletonJsonObject(String key, String value)
-    {
-        JsonObject obj = new JsonObject();
-        obj.addProperty(key, value);
-        return obj;
-    }
-
-    public static JsonObject mapToJsonObject(Map<String, Object> map)
-    {
-        JsonObject obj = new JsonObject();
-        map.forEach((s, o) ->
-        {
-            if(o instanceof Number) obj.addProperty(s, (Number) o);
-            else if(o instanceof String) obj.addProperty(s, (String) o);
-            else if(o instanceof Boolean) obj.addProperty(s, (Boolean) o);
-            else if(o instanceof Character) obj.addProperty(s, (Character) o);
-        });
-        return obj;
-    }
-
-    public static JsonArray listWithSingletonItems(List<Item> items, String key)
-    {
-        JsonArray array = new JsonArray();
-        items.forEach(item -> array.add(singletonJsonObject(key, Objects.requireNonNull(item.getRegistryName()).toString())));
-        return array;
-    }
-
     public static void setRecipeType(JsonObject obj, RecipeType<?> type)
     {
         obj.addProperty("type", getName(type).toString());
@@ -422,10 +395,8 @@ public class RecipeFileUtils
     {
         Multimap<String, ResourceLocation> locations = ArrayListMultimap.create();
 
-        if(recipe instanceof IPureDaisyRecipe)
+        if(recipe instanceof IPureDaisyRecipe recipePureDaisy)
         {
-            IPureDaisyRecipe recipePureDaisy = (IPureDaisyRecipe) recipe;
-
             if(recipePureDaisy.getInput() instanceof StateIngredientTag)
                 locations.put("Tag", ((StateIngredientTag) recipePureDaisy.getInput()).getTagId());
             else locations.put("Block", recipePureDaisy.getInput().pick(new Random()).getBlock().getRegistryName());
