@@ -1,6 +1,6 @@
 package fr.eno.craftcreator.blocks;
 
-import fr.eno.craftcreator.tileentity.FurnaceRecipeCreatorTile;
+import fr.eno.craftcreator.tileentity.vanilla.FurnaceRecipeCreatorTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;

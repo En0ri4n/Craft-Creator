@@ -1,7 +1,7 @@
 package fr.eno.craftcreator.packets;
 
 import fr.eno.craftcreator.init.InitPackets;
-import fr.eno.craftcreator.tileentity.CraftingTableRecipeCreatorTile;
+import fr.eno.craftcreator.tileentity.vanilla.CraftingTableRecipeCreatorTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;

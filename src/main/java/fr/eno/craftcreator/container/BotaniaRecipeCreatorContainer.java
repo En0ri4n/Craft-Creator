@@ -4,7 +4,7 @@ import fr.eno.craftcreator.container.slot.DefinedSlot;
 import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
 import fr.eno.craftcreator.container.utils.CommonContainer;
 import fr.eno.craftcreator.init.InitContainers;
-import fr.eno.craftcreator.tileentity.BotaniaRecipeCreatorTile;
+import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.network.FriendlyByteBuf;
@@ -15,12 +15,9 @@ import vazkii.botania.api.brew.IBrewItem;
 
 public class BotaniaRecipeCreatorContainer extends CommonContainer
 {
-    public BotaniaRecipeCreatorTile tile;
-
     public BotaniaRecipeCreatorContainer(int containerId, Inventory inventory, FriendlyByteBuf packet)
     {
-        super(InitContainers.BOTANIA_RECIPE_CREATOR.get(), containerId);
-        this.tile = (BotaniaRecipeCreatorTile) inventory.player.level.getBlockEntity(packet.readBlockPos());
+        super(InitContainers.BOTANIA_RECIPE_CREATOR.get(), containerId, inventory, packet);
 
         for(int i = 0; i < SlotHelper.BOTANIA_SLOTS_SIZE; i++)
         {
@@ -39,5 +36,11 @@ public class BotaniaRecipeCreatorContainer extends CommonContainer
         }
 
         this.bindPlayerInventory(inventory);
+    }
+
+    @Override
+    public SupportedMods getMod()
+    {
+        return SupportedMods.BOTANIA;
     }
 }

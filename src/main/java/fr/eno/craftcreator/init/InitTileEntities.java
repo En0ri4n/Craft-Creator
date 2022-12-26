@@ -2,7 +2,11 @@ package fr.eno.craftcreator.init;
 
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
-import fr.eno.craftcreator.tileentity.*;
+import fr.eno.craftcreator.tileentity.BotaniaRecipeCreatorTile;
+import fr.eno.craftcreator.tileentity.vanilla.CraftingTableRecipeCreatorTile;
+import fr.eno.craftcreator.tileentity.vanilla.FurnaceRecipeCreatorTile;
+import fr.eno.craftcreator.tileentity.vanilla.SmithingTableRecipeCreatorTile;
+import fr.eno.craftcreator.tileentity.vanilla.StoneCutterRecipeCreatorTile;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -21,6 +25,6 @@ public class InitTileEntities
 
 	static
 	{
-		BOTANIA_RECIPE_CREATOR = SupportedMods.isBotaniaLoaded() ? TILE_ENTITY.register("botania_recipe_creator", () -> BlockEntityType.Builder.of(BotaniaRecipeCreatorTile::new, InitBlocks.BOTANIA_RECIPE_CREATOR.get()).build(null)) : null;
+		BOTANIA_RECIPE_CREATOR = SupportedMods.BOTANIA.isLoaded() ? TILE_ENTITY.register("botania_recipe_creator", () -> BlockEntityType.Builder.of(BotaniaRecipeCreatorTile::new, InitBlocks.BOTANIA_RECIPE_CREATOR.get()).build(null)) : null;
 	}
 }

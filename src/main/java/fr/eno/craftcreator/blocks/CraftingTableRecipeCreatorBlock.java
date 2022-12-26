@@ -1,6 +1,6 @@
 package fr.eno.craftcreator.blocks;
 
-import fr.eno.craftcreator.tileentity.CraftingTableRecipeCreatorTile;
+import fr.eno.craftcreator.tileentity.vanilla.CraftingTableRecipeCreatorTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;

@@ -21,6 +21,6 @@ public class InitItems
 
 	static
 	{
-		BOTANIA_RECIPE_CREATOR = SupportedMods.isBotaniaLoaded() ? ITEMS.register("botania_recipe_creator", () -> new ItemBlockBasic(InitBlocks.BOTANIA_RECIPE_CREATOR.get())) : null;
+		BOTANIA_RECIPE_CREATOR = SupportedMods.BOTANIA.isLoaded() ? ITEMS.register("botania_recipe_creator", () -> new ItemBlockBasic(InitBlocks.BOTANIA_RECIPE_CREATOR.get())) : null;
 	}
 }

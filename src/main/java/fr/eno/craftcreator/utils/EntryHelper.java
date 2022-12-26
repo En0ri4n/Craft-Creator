@@ -12,7 +12,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 public class EntryHelper
@@ -52,7 +51,7 @@ public class EntryHelper
             ModList.get().getMods().forEach(mod -> mods.add(mod.getModId()));
 
         if(recipeIds.isEmpty())
-            Registry.RECIPE_TYPE.stream().collect(Collectors.toList()).forEach(recipeType ->
+            Registry.RECIPE_TYPE.stream().toList().forEach(recipeType ->
         {
             RecipeType<T> recipeType1 = (RecipeType<T>) recipeType;
             world.getRecipeManager().getAllRecipesFor(recipeType1).forEach(recipe ->

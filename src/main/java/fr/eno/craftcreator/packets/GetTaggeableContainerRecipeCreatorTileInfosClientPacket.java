@@ -1,6 +1,6 @@
 package fr.eno.craftcreator.packets;
 
-import fr.eno.craftcreator.screen.TaggeableSlotsContainerScreen;
+import fr.eno.craftcreator.screen.container.TaggeableSlotsContainerScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;

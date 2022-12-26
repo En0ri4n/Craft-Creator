@@ -55,13 +55,10 @@ public class InitPackets
 
         network.registerMessage(id, UpdateTaggeableContainerRecipeCreatorTilePacket.class, UpdateTaggeableContainerRecipeCreatorTilePacket::encode, UpdateTaggeableContainerRecipeCreatorTilePacket::decode, UpdateTaggeableContainerRecipeCreatorTilePacket.ServerHandler::handle, distServer());
 
-
-        if(SupportedMods.isBotaniaLoaded())
-        {
-            network.registerMessage(id++, SetBotaniaRecipeCreatorScreenIndexServerPacket.class, SetBotaniaRecipeCreatorScreenIndexServerPacket::encode, SetBotaniaRecipeCreatorScreenIndexServerPacket::decode, SetBotaniaRecipeCreatorScreenIndexServerPacket::serverHandle, distServer());
-            network.registerMessage(id++, SetBotaniaRecipeCreatorScreenIndexClientPacket.class, SetBotaniaRecipeCreatorScreenIndexClientPacket::encode, SetBotaniaRecipeCreatorScreenIndexClientPacket::decode, SetBotaniaRecipeCreatorScreenIndexClientPacket::clientHandle, distClient());
-            network.registerMessage(id, GetBotaniaRecipeCreatorScreenIndexPacket.class, GetBotaniaRecipeCreatorScreenIndexPacket::encode, GetBotaniaRecipeCreatorScreenIndexPacket::decode, GetBotaniaRecipeCreatorScreenIndexPacket.ServerHandler::handle, distServer());
-        }
+        // Index packets for screens
+        network.registerMessage(id++, SetModRecipeCreatorScreenIndexServerPacket.class, SetModRecipeCreatorScreenIndexServerPacket::encode, SetModRecipeCreatorScreenIndexServerPacket::decode, SetModRecipeCreatorScreenIndexServerPacket::serverHandle, distServer());
+        network.registerMessage(id++, SetModRecipeCreatorScreenIndexClientPacket.class, SetModRecipeCreatorScreenIndexClientPacket::encode, SetModRecipeCreatorScreenIndexClientPacket::decode, SetModRecipeCreatorScreenIndexClientPacket::clientHandle, distClient());
+        network.registerMessage(id, GetModRecipeCreatorScreenIndexPacket.class, GetModRecipeCreatorScreenIndexPacket::encode, GetModRecipeCreatorScreenIndexPacket::decode, GetModRecipeCreatorScreenIndexPacket.ServerHandler::handle, distServer());
     }
 
     private static Optional<NetworkDirection> distClient() { return Optional.of(NetworkDirection.PLAY_TO_CLIENT); }

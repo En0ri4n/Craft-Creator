@@ -21,6 +21,6 @@ public class InitBlocks
 
 	static
 	{
-		BOTANIA_RECIPE_CREATOR = SupportedMods.isBotaniaLoaded() ? BLOCKS.register("botania_recipe_creator", BotaniaRecipeCreatorBlock::new) : null;
+		BOTANIA_RECIPE_CREATOR = SupportedMods.BOTANIA.isLoaded() ? BLOCKS.register("botania_recipe_creator", BotaniaRecipeCreatorBlock::new) : null;
 	}
 }

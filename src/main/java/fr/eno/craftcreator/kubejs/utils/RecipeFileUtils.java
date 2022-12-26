@@ -76,6 +76,11 @@ public class RecipeFileUtils
         return recipe;
     }
 
+    /*
+     * This method is used to get the recipe file of a mod
+     * It will create the file if it doesn't exist
+     * It will also add the start of the file if it doesn't exist
+     */
     public static <T extends Recipe<?>> List<T> getAddedRecipesFor(String modId, RecipeType<T> recipeType)
     {
         List<T> recipes = new ArrayList<>();
@@ -84,7 +89,7 @@ public class RecipeFileUtils
 
         try
         {
-            File recipeFile = RecipeFileUtils.getRecipeFile(modId);
+            File recipeFile = RecipeFileUtils.getRecipeFile(modId); // Get the recipe file
 
             checkTypeGroup(recipeFile, recipeType);
 
@@ -120,6 +125,9 @@ public class RecipeFileUtils
         return recipes;
     }
 
+    /*
+     * This method is used to get the modified recipes of a mod
+     */
     private static <T extends Recipe<?>> void addRecipesTo(String modId, List<T> recipes, JsonObject jsonObject, RecipeSerializer<T> craftingTableSerializer)
     {
         assert craftingTableSerializer != null;
@@ -202,11 +210,11 @@ public class RecipeFileUtils
     {
         List<ModifiedRecipe> modifiedRecipes = new ArrayList<>();
 
-        for(String modId : SupportedMods.MODS_IDS)
+        for(SupportedMods mod : SupportedMods.values())
         {
             try
             {
-                File recipeFile = RecipeFileUtils.getRecipeFile(modId);
+                File recipeFile = RecipeFileUtils.getRecipeFile(mod.getModId());
                 List<String> lines = Files.readAllLines(recipeFile.toPath(), StandardCharsets.UTF_8);
 
                 for(String line : lines)
@@ -433,11 +441,11 @@ public class RecipeFileUtils
 
     public static void removeModifiedRecipe(ModifiedRecipe recipe)
     {
-        for(String modId : SupportedMods.MODS_IDS)
+        for(SupportedMods mod : SupportedMods.values())
         {
             try
             {
-                File recipeFile = RecipeFileUtils.getRecipeFile(modId);
+                File recipeFile = RecipeFileUtils.getRecipeFile(mod.getModId());
                 List<String> lines = Files.readAllLines(recipeFile.toPath(), StandardCharsets.UTF_8);
 
                 int index = 0;
@@ -474,11 +482,11 @@ public class RecipeFileUtils
 
     public static boolean isModifiedRecipePresent(ModifiedRecipe recipe)
     {
-        for(String modId : SupportedMods.MODS_IDS)
+        for(SupportedMods mod : SupportedMods.values())
         {
             try
             {
-                File recipeFile = RecipeFileUtils.getRecipeFile(modId);
+                File recipeFile = RecipeFileUtils.getRecipeFile(mod.getModId());
                 List<String> lines = Files.readAllLines(recipeFile.toPath(), StandardCharsets.UTF_8);
 
                 int index = 0;

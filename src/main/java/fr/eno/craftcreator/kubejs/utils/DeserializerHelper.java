@@ -15,16 +15,14 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unchecked")
 public class DeserializerHelper
 {
-    public static <T extends SimpleListWidget.Entry> List<T> getStringEntryList(List<String> list)
+    public static <T extends SimpleListWidget.Entry> List<T> getStringEntryList(SupportedMods[] mods)
     {
         List<T> entries = new ArrayList<>();
 
-        list.forEach(s -> entries.add((T) new SimpleListWidget.StringEntry(s)));
+        List.of(mods).forEach(mod -> entries.add((T) new SimpleListWidget.StringEntry(mod.getModId())));
 
         return entries;
     }
-
-
 
     public static <T extends SimpleListWidget.Entry> List<T> getAddedRecipesEntryList(String modId, ResourceLocation recipeTypeLoc)
     {

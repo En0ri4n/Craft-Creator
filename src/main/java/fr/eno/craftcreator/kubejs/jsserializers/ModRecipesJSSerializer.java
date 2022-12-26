@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
+import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
 import fr.eno.craftcreator.utils.PairValue;
 import net.minecraft.ChatFormatting;
@@ -28,11 +29,11 @@ import java.util.Objects;
 @SuppressWarnings("unused")
 public abstract class ModRecipesJSSerializer
 {
-    protected String modId;
+    protected SupportedMods mod;
 
-    public ModRecipesJSSerializer(String modId)
+    public ModRecipesJSSerializer(SupportedMods mod)
     {
-        this.modId = modId;
+        this.mod = mod;
     }
 
     public void removeRecipe(ModifiedRecipe modifiedRecipe)
@@ -46,7 +47,7 @@ public abstract class ModRecipesJSSerializer
         String finishedLine = line.replace(line.length() - 1, line.length(), "})").toString();
 
         if(!RecipeFileUtils.isModifiedRecipePresent(modifiedRecipe))
-            RecipeFileUtils.insertAndWriteLinesToRemoveRecipe(this.modId, finishedLine);
+            RecipeFileUtils.insertAndWriteLinesToRemoveRecipe(this.mod.getModId(), finishedLine);
     }
 
     public static <C extends Container, T extends Recipe<C>> void removeAddedRecipe(Recipe<C> recipe)
@@ -66,7 +67,7 @@ public abstract class ModRecipesJSSerializer
     }
     protected void addRecipeToFile(String recipeJson, RecipeType<?> recipeType)
     {
-        RecipeFileUtils.insertAndWriteLines(this.modId, recipeType, "event.custom(" + recipeJson + ")");
+        RecipeFileUtils.insertAndWriteLines(this.mod.getModId(), recipeType, "event.custom(" + recipeJson + ")");
     }
 
     public abstract PairValue<String, Integer> getParam(Recipe<?> recipe);

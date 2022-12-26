@@ -25,7 +25,7 @@ public class ModSelectionScreen extends ListScreen
         this.clearLists();
 
         this.addList(new SimpleListWidget(minecraft, 10, 10, this.width / 4, this.height - 20, 20, 14, 5, References.getTranslate("screen.mod_selection.list.mod"), null));
-        this.getList(0).setEntries(DeserializerHelper.getStringEntryList(SupportedMods.MODS_IDS));
+        this.getList(0).setEntries(DeserializerHelper.getStringEntryList(SupportedMods.values()));
 
         this.addList(new SimpleListWidget(minecraft, this.width / 4 + 20, this.height / 2, this.width - (this.width / 4 + 20) - 10, this.height / 2 - 10, 20, 14, 5, References.getTranslate("screen.mod_selection.list.recipe_type"), null));
 
