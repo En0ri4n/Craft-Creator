@@ -22,6 +22,6 @@ public class InitContainers
 
 	static
 	{
-		BOTANIA_RECIPE_CREATOR = SupportedMods.isBotaniaLoaded() ? CONTAINERS.register("botania_recipe_creator", () -> IForgeMenuType.create(BotaniaRecipeCreatorContainer::new)) : null;
+		BOTANIA_RECIPE_CREATOR = SupportedMods.BOTANIA.isLoaded() ? CONTAINERS.register("botania_recipe_creator", () -> IForgeMenuType.create(BotaniaRecipeCreatorContainer::new)) : null;
 	}
 }

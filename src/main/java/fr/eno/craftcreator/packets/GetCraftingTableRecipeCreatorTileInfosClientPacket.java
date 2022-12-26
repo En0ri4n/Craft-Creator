@@ -1,6 +1,6 @@
 package fr.eno.craftcreator.packets;
 
-import fr.eno.craftcreator.screen.CraftingTableRecipeCreatorScreen;
+import fr.eno.craftcreator.screen.container.CraftingTableRecipeCreatorScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;

@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.tileentity;
+package fr.eno.craftcreator.tileentity.vanilla;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;

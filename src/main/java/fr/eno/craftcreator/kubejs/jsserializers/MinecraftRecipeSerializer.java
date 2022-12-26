@@ -100,15 +100,13 @@ public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
     @Override
     public ItemStack getOneOutput(Map.Entry<String, ResourceLocation> entry)
     {
-        switch(Objects.requireNonNull(entry).getKey())
-        {
-            case "Block":
-                return new ItemStack(ForgeRegistries.BLOCKS.getValue(entry.getValue()));
-            case "Item":
-                return new ItemStack(ForgeRegistries.ITEMS.getValue(entry.getValue()));
-        }
+        return switch(Objects.requireNonNull(entry).getKey())
+                {
+                    case "Block" -> new ItemStack(ForgeRegistries.BLOCKS.getValue(entry.getValue()));
+                    case "Item" -> new ItemStack(ForgeRegistries.ITEMS.getValue(entry.getValue()));
+                    default -> ItemStack.EMPTY;
+                };
 
-        return ItemStack.EMPTY;
     }
 
     public static MinecraftRecipeSerializer get()

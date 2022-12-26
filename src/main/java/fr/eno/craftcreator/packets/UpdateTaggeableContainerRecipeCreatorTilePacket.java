@@ -1,6 +1,6 @@
 package fr.eno.craftcreator.packets;
 
-import fr.eno.craftcreator.tileentity.TaggeableInventoryContainerTileEntity;
+import fr.eno.craftcreator.tileentity.vanilla.TaggeableInventoryContainerTileEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;

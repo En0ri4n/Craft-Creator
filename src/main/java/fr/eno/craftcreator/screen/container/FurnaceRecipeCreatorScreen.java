@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.screen;
+package fr.eno.craftcreator.screen.container;
 
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.systems.RenderSystem;

@@ -6,7 +6,7 @@ import net.minecraft.network.chat.Component;
 
 /**
  * 
- * @author Eno_gamer10
+ * @author En0ri4n
  * 
  * @apiNote Class for call method with the smallest size possible
  *

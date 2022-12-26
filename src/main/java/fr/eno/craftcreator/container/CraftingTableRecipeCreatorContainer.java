@@ -3,10 +3,10 @@ package fr.eno.craftcreator.container;
 import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
 import fr.eno.craftcreator.container.utils.CommonContainer;
 import fr.eno.craftcreator.init.InitContainers;
-import fr.eno.craftcreator.tileentity.CraftingTableRecipeCreatorTile;
+import fr.eno.craftcreator.kubejs.utils.SupportedMods;
+import fr.eno.craftcreator.tileentity.vanilla.CraftingTableRecipeCreatorTile;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraftforge.items.SlotItemHandler;
 
 public class CraftingTableRecipeCreatorContainer extends CommonContainer
 {
@@ -14,7 +14,7 @@ public class CraftingTableRecipeCreatorContainer extends CommonContainer
 
 	public CraftingTableRecipeCreatorContainer(int containerId, Inventory inventory, FriendlyByteBuf packet)
 	{
-		super(InitContainers.CRAFTING_TABLE_RECIPE_CREATOR.get(), containerId);
+		super(InitContainers.CRAFTING_TABLE_RECIPE_CREATOR.get(), containerId, inventory, packet);
 		this.tile = (CraftingTableRecipeCreatorTile) inventory.player.level.getBlockEntity(packet.readBlockPos());
 		int index = 0;
 		
@@ -31,8 +31,9 @@ public class CraftingTableRecipeCreatorContainer extends CommonContainer
 		this.bindPlayerInventory(inventory);
 	}
 
-	public CraftingTableRecipeCreatorTile getTile()
+	@Override
+	public SupportedMods getMod()
 	{
-		return tile;
+		return SupportedMods.MINECRAFT;
 	}
 }

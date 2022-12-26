@@ -28,11 +28,11 @@ public class ModDispatcher
 
     public static ModRecipesJSSerializer getSeralizer(String modId)
     {
-        switch(modId)
+        switch(SupportedMods.getMod(modId))
         {
-            case SupportedMods.BOTANIA:
+            case BOTANIA:
                 return BotaniaRecipesJSSerializer.get();
-            case SupportedMods.MINECRAFT:
+            case MINECRAFT:
             default:
                 return MinecraftRecipeSerializer.get();
         }

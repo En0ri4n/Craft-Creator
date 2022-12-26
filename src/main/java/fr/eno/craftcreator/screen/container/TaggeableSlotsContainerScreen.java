@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.screen;
+package fr.eno.craftcreator.screen.container;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
@@ -6,7 +6,7 @@ import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
 import fr.eno.craftcreator.init.InitPackets;
 import fr.eno.craftcreator.packets.GetTaggeableContainerRecipeCreatorTileInfosServerPacket;
 import fr.eno.craftcreator.packets.UpdateTaggeableContainerRecipeCreatorTilePacket;
-import fr.eno.craftcreator.tileentity.TaggeableInventoryContainerTileEntity;
+import fr.eno.craftcreator.tileentity.vanilla.TaggeableInventoryContainerTileEntity;
 import fr.eno.craftcreator.utils.GuiList;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -21,7 +21,6 @@ import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.network.PacketDistributor;
 
 import javax.annotation.Nonnull;
-import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;

@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.tileentity;
+package fr.eno.craftcreator.tileentity.vanilla;
 
 import fr.eno.craftcreator.container.StoneCutterRecipeCreatorContainer;
 import fr.eno.craftcreator.init.InitTileEntities;

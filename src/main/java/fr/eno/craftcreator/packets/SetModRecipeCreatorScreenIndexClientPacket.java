@@ -1,6 +1,6 @@
 package fr.eno.craftcreator.packets;
 
-import fr.eno.craftcreator.screen.BotaniaRecipeCreatorScreen;
+import fr.eno.craftcreator.screen.container.BotaniaRecipeCreatorScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.FriendlyByteBuf;
@@ -8,28 +8,28 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class SetBotaniaRecipeCreatorScreenIndexClientPacket
+public class SetModRecipeCreatorScreenIndexClientPacket
 {
     private final int index;
 
-    public SetBotaniaRecipeCreatorScreenIndexClientPacket(int index)
+    public SetModRecipeCreatorScreenIndexClientPacket(int index)
     {
         this.index = index;
     }
 
-    public static void encode(SetBotaniaRecipeCreatorScreenIndexClientPacket msg, FriendlyByteBuf packetBuffer)
+    public static void encode(SetModRecipeCreatorScreenIndexClientPacket msg, FriendlyByteBuf packetBuffer)
     {
         packetBuffer.writeInt(msg.index);
     }
 
-    public static SetBotaniaRecipeCreatorScreenIndexClientPacket decode(FriendlyByteBuf packetBuffer)
+    public static SetModRecipeCreatorScreenIndexClientPacket decode(FriendlyByteBuf packetBuffer)
     {
         int index = packetBuffer.readInt();
 
-        return new SetBotaniaRecipeCreatorScreenIndexClientPacket(index);
+        return new SetModRecipeCreatorScreenIndexClientPacket(index);
     }
 
-    public static void clientHandle(SetBotaniaRecipeCreatorScreenIndexClientPacket msg, Supplier<NetworkEvent.Context> ctx)
+    public static void clientHandle(SetModRecipeCreatorScreenIndexClientPacket msg, Supplier<NetworkEvent.Context> ctx)
     {
         Screen screen = Minecraft.getInstance().screen;
 

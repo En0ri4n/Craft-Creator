@@ -3,7 +3,7 @@ package fr.eno.craftcreator.kubejs.managers;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import fr.eno.craftcreator.kubejs.jsserializers.BotaniaRecipesJSSerializer;
-import fr.eno.craftcreator.screen.BotaniaRecipeCreatorScreen;
+import fr.eno.craftcreator.screen.ModRecipes;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.resources.ResourceLocation;
@@ -23,35 +23,29 @@ import java.util.Map;
 
 public class BotaniaRecipeManagers
 {
-    public static void createRecipe(BotaniaRecipeCreatorScreen.BotaniaRecipes recipe, List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, Object param)
+    private static final int MANA_INDEX = 0;
+    
+    public static void createRecipe(ModRecipes recipe, List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, List<Integer> param)
     {
         switch(recipe)
         {
-            case MANA_INFUSION:
-                createManaInfusionRecipe(PositionnedSlot.getValidSlots(SlotHelper.MANA_INFUSION_SLOTS, slots), param);
-                break;
-            case ELVEN_TRADE:
-                createElvenTradeRecipe(PositionnedSlot.getValidSlots(SlotHelper.ELVEN_TRADE_SLOTS, slots), param);
-                break;
-            case PURE_DAISY:
-                createPureDaisyRecipe(PositionnedSlot.getValidSlots(SlotHelper.PURE_DAISY_SLOTS, slots), param);
-                break;
-            case BREWERY:
-                createBreweryRecipe(PositionnedSlot.getValidSlots(SlotHelper.BREWERY_SLOTS, slots));
-                break;
-            case PETAL_APOTHECARY:
-                createPetalRecipe(PositionnedSlot.getValidSlots(SlotHelper.PETAL_APOTHECARY_SLOTS, slots), taggedSlots);
-                break;
-            case RUNIC_ALTAR:
-                createRuneRecipe(PositionnedSlot.getValidSlots(SlotHelper.RUNIC_ALTAR_SLOTS, slots), taggedSlots, param);
-                break;
-            case TERRA_PLATE:
-                createTerraPlateRecipe(PositionnedSlot.getValidSlots(SlotHelper.TERRA_PLATE_SLOTS, slots), taggedSlots, param);
-                break;
+            case MANA_INFUSION ->
+                    createManaInfusionRecipe(PositionnedSlot.getValidSlots(SlotHelper.MANA_INFUSION_SLOTS, slots), param);
+            case ELVEN_TRADE ->
+                    createElvenTradeRecipe(PositionnedSlot.getValidSlots(SlotHelper.ELVEN_TRADE_SLOTS, slots), param);
+            case PURE_DAISY ->
+                    createPureDaisyRecipe(PositionnedSlot.getValidSlots(SlotHelper.PURE_DAISY_SLOTS, slots), param);
+            case BREWERY -> createBreweryRecipe(PositionnedSlot.getValidSlots(SlotHelper.BREWERY_SLOTS, slots));
+            case PETAL_APOTHECARY ->
+                    createPetalRecipe(PositionnedSlot.getValidSlots(SlotHelper.PETAL_APOTHECARY_SLOTS, slots), taggedSlots);
+            case RUNIC_ALTAR ->
+                    createRuneRecipe(PositionnedSlot.getValidSlots(SlotHelper.RUNIC_ALTAR_SLOTS, slots), taggedSlots, param);
+            case TERRA_PLATE ->
+                    createTerraPlateRecipe(PositionnedSlot.getValidSlots(SlotHelper.TERRA_PLATE_SLOTS, slots), taggedSlots, param);
         }
     }
 
-    private static void createManaInfusionRecipe(List<Slot> slots, Object param)
+    private static void createManaInfusionRecipe(List<Slot> slots, List<Integer> param)
     {
         if(getValidOutput(slots) == null)
             return;
@@ -61,12 +55,12 @@ public class BotaniaRecipeManagers
         ItemStack output = getValidOutput(slots);
 
         if(catalystItem instanceof BlockItem)
-            BotaniaRecipesJSSerializer.get().createInfusionRecipe(input, ((BlockItem) catalystItem).getBlock(), output, (int) param);
+            BotaniaRecipesJSSerializer.get().createInfusionRecipe(input, ((BlockItem) catalystItem).getBlock(), output, param.get(MANA_INDEX));
         else
-            BotaniaRecipesJSSerializer.get().createInfusionRecipe(input, Blocks.AIR, output, (int) param);
+            BotaniaRecipesJSSerializer.get().createInfusionRecipe(input, Blocks.AIR, output, param.get(MANA_INDEX));
     }
 
-    private static void createElvenTradeRecipe(List<Slot> slots, Object param)
+    private static void createElvenTradeRecipe(List<Slot> slots, List<Integer> param)
     {
         List<Item> input = getValidList(slots, 0, 5);
         List<Item> output = getValidList(slots, 5, 10);
@@ -77,7 +71,7 @@ public class BotaniaRecipeManagers
         }
     }
 
-    private static void createPureDaisyRecipe(List<Slot> slots, Object param)
+    private static void createPureDaisyRecipe(List<Slot> slots, List<Integer> param)
     {
         if(getValidOutput(slots) == null)
             return;
@@ -90,7 +84,7 @@ public class BotaniaRecipeManagers
             Block inputBlock = ((BlockItem) input).getBlock();
             Block outputBlock = ((BlockItem) output).getBlock();
 
-            BotaniaRecipesJSSerializer.get().createPureDaisyRecipe(inputBlock, outputBlock, (int) param);
+            BotaniaRecipesJSSerializer.get().createPureDaisyRecipe(inputBlock, outputBlock, param.get(MANA_INDEX));
         }
     }
 
@@ -121,7 +115,7 @@ public class BotaniaRecipeManagers
         BotaniaRecipesJSSerializer.get().createPetalRecipe(input, output);
     }
 
-    private static void createRuneRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, Object param)
+    private static void createRuneRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, List<Integer> param)
     {
         if(getValidOutput(slots) == null)
             return;
@@ -129,10 +123,10 @@ public class BotaniaRecipeManagers
         ItemStack output = getValidOutput(slots);
         Multimap<ResourceLocation, Boolean> input = getValidIngredients(slots, taggedSlots);
 
-        BotaniaRecipesJSSerializer.get().createRuneRecipe(input, output, getMana(param));
+        BotaniaRecipesJSSerializer.get().createRuneRecipe(input, output, param.get(MANA_INDEX));
     }
 
-    private static void createTerraPlateRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, Object param)
+    private static void createTerraPlateRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, List<Integer> param)
     {
         if(getValidOutput(slots) == null)
             return;
@@ -140,7 +134,7 @@ public class BotaniaRecipeManagers
         ItemStack output = getValidOutput(slots);
         Multimap<ResourceLocation, Boolean> input = getValidIngredients(slots, taggedSlots);
 
-        BotaniaRecipesJSSerializer.get().createTerraPlateRecipe(input, output, getMana(param));
+        BotaniaRecipesJSSerializer.get().createTerraPlateRecipe(input, output, param.get(MANA_INDEX));
     }
 
     @Nullable
@@ -207,13 +201,5 @@ public class BotaniaRecipeManagers
         }
 
         return map;
-    }
-
-    private static int getMana(Object param)
-    {
-        if(param instanceof Integer)
-            return (int) param;
-
-        return 100;
     }
 }

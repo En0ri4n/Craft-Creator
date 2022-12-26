@@ -1,6 +1,6 @@
 package fr.eno.craftcreator.blocks;
 
-import fr.eno.craftcreator.tileentity.StoneCutterRecipeCreatorTile;
+import fr.eno.craftcreator.tileentity.vanilla.StoneCutterRecipeCreatorTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
