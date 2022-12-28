@@ -2,6 +2,7 @@ package fr.eno.craftcreator.init;
 
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.blocks.*;
+import fr.eno.craftcreator.kubejs.jsserializers.BotaniaRecipesJSSerializer;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.DeferredRegister;
@@ -18,9 +19,11 @@ public class InitBlocks
 	public static final RegistryObject<Block> SMITHING_TABLE_RECIPE_CREATOR = BLOCKS.register("smithing_table_recipe_creator", SmithingTableRecipeCreatorBlock::new);
 
 	public static final RegistryObject<Block> BOTANIA_RECIPE_CREATOR;
+    public static final RegistryObject<Block> THERMAL_RECIPE_CREATOR;
 
-	static
+    static
 	{
 		BOTANIA_RECIPE_CREATOR = SupportedMods.BOTANIA.isLoaded() ? BLOCKS.register("botania_recipe_creator", BotaniaRecipeCreatorBlock::new) : null;
+		THERMAL_RECIPE_CREATOR = SupportedMods.THERMAL.isLoaded() ? BLOCKS.register("thermal_recipe_creator", ThermalRecipeCreatorBlock::new) : null;
 	}
 }

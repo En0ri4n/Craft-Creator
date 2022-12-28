@@ -22,9 +22,11 @@ public class InitTileEntities
 	public static final RegistryObject<BlockEntityType<?>> SMITHING_TABLE_RECIPE_CREATOR = TILE_ENTITY.register("smithing_table_recipe_creator", () -> BlockEntityType.Builder.of(SmithingTableRecipeCreatorTile::new, InitBlocks.SMITHING_TABLE_RECIPE_CREATOR.get()).build(null));
 
 	public static final RegistryObject<BlockEntityType<?>> BOTANIA_RECIPE_CREATOR;
+	public static final RegistryObject<BlockEntityType<?>> THERMAL_RECIPE_CREATOR;
 
 	static
 	{
 		BOTANIA_RECIPE_CREATOR = SupportedMods.BOTANIA.isLoaded() ? TILE_ENTITY.register("botania_recipe_creator", () -> BlockEntityType.Builder.of(BotaniaRecipeCreatorTile::new, InitBlocks.BOTANIA_RECIPE_CREATOR.get()).build(null)) : null;
+		THERMAL_RECIPE_CREATOR = SupportedMods.THERMAL.isLoaded() ? TILE_ENTITY.register("thermal_recipe_creator", () -> BlockEntityType.Builder.of(BotaniaRecipeCreatorTile::new, InitBlocks.THERMAL_RECIPE_CREATOR.get()).build(null)) : null;
 	}
 }

@@ -1,6 +1,8 @@
 package fr.eno.craftcreator.kubejs.jsserializers;
 
 import com.google.common.collect.Multimap;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import fr.eno.craftcreator.References;
@@ -29,6 +31,7 @@ import java.util.Objects;
 @SuppressWarnings("unused")
 public abstract class ModRecipesJSSerializer
 {
+    protected static final Gson gson = new GsonBuilder().create();
     protected SupportedMods mod;
 
     public ModRecipesJSSerializer(SupportedMods mod)

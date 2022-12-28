@@ -3,6 +3,7 @@ package fr.eno.craftcreator.container;
 import fr.eno.craftcreator.container.slot.LockedSlot;
 import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
 import fr.eno.craftcreator.container.utils.CommonContainer;
+import fr.eno.craftcreator.container.utils.VanillaCommonContainer;
 import fr.eno.craftcreator.init.InitContainers;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import fr.eno.craftcreator.tileentity.vanilla.FurnaceRecipeCreatorTile;
@@ -12,11 +13,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 
-public class FurnaceRecipeCreatorContainer extends CommonContainer
+public class FurnaceRecipeCreatorContainer extends VanillaCommonContainer
 {
 	public FurnaceRecipeCreatorContainer(int containerId, Inventory inventory, FriendlyByteBuf packet)
 	{
-		super(InitContainers.FURNACE_RECIPE_CREATOR.get(), containerId, inventory, packet);
+		super(InitContainers.FURNACE_RECIPE_CREATOR.get(), containerId);
 		FurnaceRecipeCreatorTile tile = (FurnaceRecipeCreatorTile) inventory.player.level.getBlockEntity(packet.readBlockPos());
 		int index = 0;
 
@@ -28,11 +29,5 @@ public class FurnaceRecipeCreatorContainer extends CommonContainer
 		this.addSlot(new LockedSlot(tile, index, 56, 53, fuel));
 		
 		this.bindPlayerInventory(inventory);
-	}
-
-	@Override
-	public SupportedMods getMod()
-	{
-		return SupportedMods.MINECRAFT;
 	}
 }

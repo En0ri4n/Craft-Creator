@@ -30,18 +30,18 @@ public class CraftingTableRecipeCreatorScreen extends TaggeableSlotsContainerScr
 
     public CraftingTableRecipeCreatorScreen(CraftingTableRecipeCreatorContainer screenContainer, Inventory inv, Component titleIn)
     {
-        super(screenContainer, inv, titleIn, screenContainer.getTile().getBlockPos());
+        super(screenContainer, inv, titleIn, screenContainer.tile.getBlockPos());
     }
 
     @Override
     protected void init()
     {
         super.init();
-        InitPackets.getNetWork().send(PacketDistributor.SERVER.noArg(), new GetCraftingTableRecipeCreatorTileInfosServerPacket(this.getMenu().getTile().getBlockPos(), this.getMenu().containerId));
+        InitPackets.getNetWork().send(PacketDistributor.SERVER.noArg(), new GetCraftingTableRecipeCreatorTileInfosServerPacket(this.getMenu().tile.getBlockPos(), this.getMenu().containerId));
 
 
         this.addRenderableWidget(isKubeJSRecipeButton = new SimpleCheckBox(5, this.height - 20, 15, 15, References.getTranslate("screen.recipe_creator_screen.kube_js_button"), false));
-        this.addRenderableWidget(craftTypeButton = new BooleanButton("craftType", leftPos + 100, topPos + 60, 68, 20, true, button -> InitPackets.getNetWork().send(PacketDistributor.SERVER.noArg(), new UpdateCraftingTableRecipeCreatorTilePacket(this.getMenu().getTile().getBlockPos(), this.isShaped()))));
+        this.addRenderableWidget(craftTypeButton = new BooleanButton("craftType", leftPos + 100, topPos + 60, 68, 20, true, button -> InitPackets.getNetWork().send(PacketDistributor.SERVER.noArg(), new UpdateCraftingTableRecipeCreatorTilePacket(this.getMenu().tile.getBlockPos(), this.isShaped()))));
         this.addRenderableWidget(new ExecuteButton(leftPos + 86, topPos + 33, 30, button -> MinecraftRecipeSerializer.createCraftingTableRecipe(this.getMenu().getItems(), this.getTaggedSlots(), this.isShaped(), isKubeJSRecipeButton.selected())));
 
         if(!SupportedMods.isKubeJSLoaded())

@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.screen;
+package fr.eno.craftcreator.screen.utils;
 
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;

@@ -8,6 +8,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
+@SuppressWarnings("unused")
 public class InitItems
 {
 	public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, References.MOD_ID);
@@ -18,9 +19,11 @@ public class InitItems
 	public static final RegistryObject<Item> SMITHING_TABLE_RECIPE_CREATOR = ITEMS.register("smithing_table_recipe_creator", () -> new ItemBlockBasic(InitBlocks.SMITHING_TABLE_RECIPE_CREATOR.get()));
 
 	public static final RegistryObject<Item> BOTANIA_RECIPE_CREATOR;
+	public static final RegistryObject<Item> THERMAL_RECIPE_CREATOR;
 
 	static
 	{
 		BOTANIA_RECIPE_CREATOR = SupportedMods.BOTANIA.isLoaded() ? ITEMS.register("botania_recipe_creator", () -> new ItemBlockBasic(InitBlocks.BOTANIA_RECIPE_CREATOR.get())) : null;
+		THERMAL_RECIPE_CREATOR = SupportedMods.THERMAL.isLoaded() ? ITEMS.register("thermal_recipe_creator", () -> new ItemBlockBasic(InitBlocks.THERMAL_RECIPE_CREATOR.get())) : null;
 	}
 }

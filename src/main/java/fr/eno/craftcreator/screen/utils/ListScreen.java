@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.screen;
+package fr.eno.craftcreator.screen.utils;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;

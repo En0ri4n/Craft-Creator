@@ -25,6 +25,12 @@ public class SlotHelper
     public static final List<PositionnedSlot> RUNIC_ALTAR_SLOTS;
     public static final List<PositionnedSlot> TERRA_PLATE_SLOTS;
 
+    public static final int THERMAL_SLOTS_SIZE;
+    public static final List<PositionnedSlot> THERMAL_SLOTS;
+    public static final List<PositionnedSlot> TREE_EXTRACTOR_SLOTS;
+
+
+
     static
     {
         int botaniaSlots = 0;
@@ -37,5 +43,11 @@ public class SlotHelper
         TERRA_PLATE_SLOTS = Arrays.asList(new PositionnedSlot(botaniaSlots++, 34, 11), new PositionnedSlot(botaniaSlots++, 12, 33), new PositionnedSlot(botaniaSlots++, 56, 33), new PositionnedSlot(botaniaSlots++, 22, 57), new PositionnedSlot(botaniaSlots++, 47, 57), new PositionnedSlot(botaniaSlots++, 134, 33));
         BOTANIA_SLOTS = Stream.of(MANA_INFUSION_SLOTS, ELVEN_TRADE_SLOTS, PURE_DAISY_SLOTS, BREWERY_SLOTS, PETAL_APOTHECARY_SLOTS, RUNIC_ALTAR_SLOTS, TERRA_PLATE_SLOTS).flatMap(Collection::stream).collect(Collectors.toList());
         BOTANIA_SLOTS_SIZE = botaniaSlots;
+        
+        int thermalSlots = 0;
+        TREE_EXTRACTOR_SLOTS = Arrays.asList(new PositionnedSlot(thermalSlots++, 26, 53), new PositionnedSlot(thermalSlots++, 26, 24), new PositionnedSlot(thermalSlots++, 134, 24));
+
+        THERMAL_SLOTS = Stream.of(TREE_EXTRACTOR_SLOTS).flatMap(Collection::stream).collect(Collectors.toList());
+        THERMAL_SLOTS_SIZE = thermalSlots;
     }
 }

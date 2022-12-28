@@ -1,0 +1,9 @@
+{
+	"parent": "minecraft:block/orientable_with_bottom",
+	"textures": {
+		"top": "craftcreator:block/top",
+		"front": "craftcreator:block/thermal_recipe_creator_front",
+		"side": "craftcreator:block/thermal_recipe_creator_side",
+		"bottom": "craftcreator:block/thermal_recipe_creator_bottom"
+	}
+}

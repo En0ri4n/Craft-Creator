@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.kubejs.utils.DeserializerHelper;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;
+import fr.eno.craftcreator.screen.utils.ChildrenScreen;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.TextComponent;

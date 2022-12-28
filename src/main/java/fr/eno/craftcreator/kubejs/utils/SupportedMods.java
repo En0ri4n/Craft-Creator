@@ -8,7 +8,8 @@ public enum SupportedMods
 {
     KUBE_JS("kubejs"),
     MINECRAFT("minecraft"),
-    BOTANIA("botania");
+    BOTANIA("botania"),
+    THERMAL("thermal");
 
     private final String modId;
 
@@ -49,5 +50,4 @@ public enum SupportedMods
     {
         return ModList.get().isLoaded(KUBE_JS.getModId());
     }
-
 }

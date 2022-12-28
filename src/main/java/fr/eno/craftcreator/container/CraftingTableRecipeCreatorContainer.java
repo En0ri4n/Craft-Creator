@@ -1,20 +1,19 @@
 package fr.eno.craftcreator.container;
 
 import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
-import fr.eno.craftcreator.container.utils.CommonContainer;
+import fr.eno.craftcreator.container.utils.VanillaCommonContainer;
 import fr.eno.craftcreator.init.InitContainers;
-import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import fr.eno.craftcreator.tileentity.vanilla.CraftingTableRecipeCreatorTile;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 
-public class CraftingTableRecipeCreatorContainer extends CommonContainer
+public class CraftingTableRecipeCreatorContainer extends VanillaCommonContainer
 {
-	private final CraftingTableRecipeCreatorTile tile;
+	public final CraftingTableRecipeCreatorTile tile;
 
 	public CraftingTableRecipeCreatorContainer(int containerId, Inventory inventory, FriendlyByteBuf packet)
 	{
-		super(InitContainers.CRAFTING_TABLE_RECIPE_CREATOR.get(), containerId, inventory, packet);
+		super(InitContainers.CRAFTING_TABLE_RECIPE_CREATOR.get(), containerId);
 		this.tile = (CraftingTableRecipeCreatorTile) inventory.player.level.getBlockEntity(packet.readBlockPos());
 		int index = 0;
 		
@@ -29,11 +28,5 @@ public class CraftingTableRecipeCreatorContainer extends CommonContainer
 		this.addSlot(new SimpleSlotItemHandler(tile, index, 124, 35));
 		
 		this.bindPlayerInventory(inventory);
-	}
-
-	@Override
-	public SupportedMods getMod()
-	{
-		return SupportedMods.MINECRAFT;
 	}
 }

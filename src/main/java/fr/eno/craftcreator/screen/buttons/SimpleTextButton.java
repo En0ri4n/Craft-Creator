@@ -1,6 +1,7 @@
 package fr.eno.craftcreator.screen.buttons;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import fr.eno.craftcreator.utils.GuiUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -34,9 +35,11 @@ public class SimpleTextButton extends Button
 
 		if(this.visible && this.active)
 		{
-			Screen.fill(matrixStack, x, y, x + width, y + height, 0x777879);
-			Screen.fill(matrixStack, x + 1, y + 1, x + width - 1, y + height - 1, 0x000000);
-			drawCenteredString(matrixStack, mc.font, this.getMessage().getString(), this.x + this.width / 2, this.y + height / 2 - mc.font.lineHeight / 2 + 1, 0xFFFFFF);
+			boolean isHovered = GuiUtils.isMouseHover(this.x, this.y, mouseX, mouseY, this.width, this.height);
+			int color = isHovered ? 0x00FF0050 : 0xFFFFFFFF;
+			Screen.fill(matrixStack, x, y, x + width, y + height, 0x777879FF);
+			Screen.fill(matrixStack, x + 1, y + 1, x + width - 1, y + height - 1, 0x00000000);
+			drawCenteredString(matrixStack, mc.font, this.getMessage().getString(), this.x + this.width / 2, this.y + height / 2 - mc.font.lineHeight / 2 + 1, color);
 		}
 	}
 
