@@ -10,7 +10,7 @@ import fr.eno.craftcreator.kubejs.managers.RecipeManagerDispatcher;
 import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
 import fr.eno.craftcreator.packets.GetModRecipeCreatorScreenIndexPacket;
 import fr.eno.craftcreator.packets.SetModRecipeCreatorScreenIndexServerPacket;
-import fr.eno.craftcreator.screen.ModRecipes;
+import fr.eno.craftcreator.screen.utils.ModRecipeCreatorScreens;
 import fr.eno.craftcreator.screen.buttons.ExecuteButton;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;
 import fr.eno.craftcreator.utils.FieldAccessor;
@@ -39,6 +39,9 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     private static final Field SLOT_POS_Y_FIELD = ObfuscationReflectionHelper.findField(Slot.class, "f_40221_");
 
     protected ExecuteButton executeButton;
+    protected SimpleButton nextButton;
+    protected SimpleButton previousButton;
+
     protected final List<EditBox> textFields;
     
     private int currentScreenIndex;
@@ -60,13 +63,11 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
 
         this.addRenderableWidget(executeButton = new ExecuteButton(this.leftPos + this.imageWidth / 2 - 20, this.topPos + 35,40, (button) -> RecipeManagerDispatcher.createRecipe(this.getMenu().getMod(), getCurrentRecipe(), this.getMenu().slots.stream().filter(slot -> slot instanceof SimpleSlotItemHandler).collect(Collectors.toList()), getTagged(), getParametersValue())));
 
-        this.addRenderableWidget(new SimpleButton(References.getTranslate("screen.botania_recipe_creator.button.next"), this.leftPos + this.imageWidth + 3, this.topPos + this.imageHeight - 66, 10, 20, (button) -> nextPage()));
-        this.addRenderableWidget(new SimpleButton(References.getTranslate("screen.botania_recipe_creator.button.previous"),  this.leftPos - 3 - 10, this.topPos + this.imageHeight - 66,10, 20, (button) -> previousPage()));
+        this.addRenderableWidget(nextButton = new SimpleButton(References.getTranslate("screen.recipe_creator.button.next"), this.leftPos + this.imageWidth + 3, this.topPos + this.imageHeight - 66, 10, 20, (button) -> nextPage()));
+        this.addRenderableWidget(previousButton = new SimpleButton(References.getTranslate("screen.recipe_creator.button.previous"),  this.leftPos - 3 - 10, this.topPos + this.imageHeight - 66,10, 20, (button) -> previousPage()));
 
-        textFields.add(new EditBox(minecraft.font, leftPos + imageWidth - 44, topPos + imageHeight / 2 - 16, 35, 10, new TextComponent("")));
-        textFields.get(0).setValue(String.valueOf(100));
-
-        updateScreen();
+        nextButton.visible = hasNext();
+        previousButton.visible = hasPrevious();
     }
 
     private List<Integer> getParametersValue()
@@ -114,9 +115,9 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         this.getMenu().slots.stream().filter(s -> s.getSlotIndex() == index && s instanceof SimpleSlotItemHandler).findFirst().ifPresent(slot -> setPos((SimpleSlotItemHandler) slot, x, y));
     }
 
-    protected ModRecipes getCurrentRecipe()
+    protected ModRecipeCreatorScreens getCurrentRecipe()
     {
-        return ModRecipes.getRecipes(this.getMenu().getMod()).get(currentScreenIndex);
+        return ModRecipeCreatorScreens.getRecipeCreatorScreens(this.getMenu().getMod()).get(currentScreenIndex);
     }
 
     @Override
@@ -169,7 +170,10 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     public boolean mouseClicked(double mouseX, double mouseY, int button)
     {
         this.textFields.forEach(field -> field.mouseClicked(mouseX, mouseY, button));
-        return super.mouseClicked(mouseX, mouseY, button);
+        boolean flag = super.mouseClicked(mouseX, mouseY, button);
+        nextButton.visible = hasNext();
+        previousButton.visible = hasPrevious();
+        return flag;
     }
 
     @Override
@@ -189,7 +193,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     protected void renderLabels(PoseStack matrixStack, int pMouseX, int pMouseY)
     {
         assert minecraft != null;
-        drawCenteredString(matrixStack, minecraft.font, References.getTranslate("screen.botania_recipe_creator." + RecipeFileUtils.getName(getCurrentRecipe().getRecipeType()).getPath() + ".title"), this.imageWidth / 2, -15, 0xFFFFFF);
+        drawCenteredString(matrixStack, minecraft.font, References.getTranslate("screen."+ this.getMenu().getMod().getModId() + "_recipe_creator." + RecipeFileUtils.getName(getCurrentRecipe().getRecipeType()).getPath() + ".title"), this.imageWidth / 2, -15, 0xFFFFFF);
         super.renderLabels(matrixStack, pMouseX, pMouseY);
     }
 
@@ -205,16 +209,32 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         // ReflectUtils.setField(SLOT_POS_Y_FIELD, slot, y);
     }
 
+    private boolean hasNext()
+    {
+        return currentScreenIndex < ModRecipeCreatorScreens.getRecipeCreatorScreens(this.getMenu().getMod()).size() - 1;
+    }
+
     private void nextPage()
     {
-        this.currentScreenIndex = currentScreenIndex >= ModRecipes.values().length - 1 ? 0 : currentScreenIndex + 1;
+        if(!hasNext())
+            return;
+
+        this.currentScreenIndex++;
         updateServerIndex();
         updateScreen();
     }
 
+    private boolean hasPrevious()
+    {
+        return currentScreenIndex > 0;
+    }
+
     private void previousPage()
     {
-        this.currentScreenIndex = currentScreenIndex <= 0 ? ModRecipes.values().length - 1 : this.currentScreenIndex - 1;
+        if(!hasPrevious())
+            return;
+
+        this.currentScreenIndex--;
         updateServerIndex();
         updateScreen();
     }
@@ -224,7 +244,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         InitPackets.getNetWork().send(PacketDistributor.SERVER.noArg(), new SetModRecipeCreatorScreenIndexServerPacket(this.currentScreenIndex, this.getMenu().getTile().getBlockPos()));
     }
 
-    void updateSlots()
+    protected void updateSlots()
     {
         this.getMenu().slots.forEach(slot -> { if(slot instanceof SimpleSlotItemHandler) ((SimpleSlotItemHandler) slot).setActive(false); });
         getCurrentRecipe().getSlots().forEach(ds -> setSlot(ds.getIndex(), ds.getxPos(), ds.getyPos()));

@@ -4,6 +4,7 @@ import fr.eno.craftcreator.commands.TestRecipesCommand;
 import fr.eno.craftcreator.init.*;
 import fr.eno.craftcreator.kubejs.KubeJSManager;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
+import fr.eno.craftcreator.screen.container.ThermalRecipeCreatorScreen;
 import fr.eno.craftcreator.screen.container.*;
 import fr.eno.craftcreator.utils.EntryHelper;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -69,6 +70,7 @@ public class CraftCreator
             MenuScreens.register(InitContainers.SMITHING_TABLE_RECIPE_CREATOR.get(), SmithingTableRecipeCreatorScreen::new);
 
             if(SupportedMods.BOTANIA.isLoaded()) MenuScreens.register(InitContainers.BOTANIA_RECIPE_CREATOR.get(), BotaniaRecipeCreatorScreen::new);
+            if(SupportedMods.THERMAL.isLoaded()) MenuScreens.register(InitContainers.THERMAL_RECIPE_CREATOR.get(), ThermalRecipeCreatorScreen::new);
         });
     }
 

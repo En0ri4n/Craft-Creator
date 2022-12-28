@@ -29,8 +29,10 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     {
         super.init();
 
-        textFields.set(MANA_FIELD, new EditBox(minecraft.font, leftPos + imageWidth - 44, topPos + imageHeight / 2 - 16, 35, 10, new TextComponent("")));
+        textFields.add(new EditBox(minecraft.font, leftPos + imageWidth - 44, topPos + imageHeight / 2 - 16, 35, 10, new TextComponent("")));
         textFields.get(MANA_FIELD).setValue(String.valueOf(100));
+
+        updateScreen();
     }
 
     @Override
@@ -67,9 +69,6 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     @Override
     public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        assert minecraft != null;
-        this.renderBackground(matrixStack);
-
         super.render(matrixStack, mouseX, mouseY, partialTicks);
 
         switch(getCurrentRecipe())

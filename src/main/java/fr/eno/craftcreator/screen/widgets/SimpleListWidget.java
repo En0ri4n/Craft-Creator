@@ -1,6 +1,7 @@
 package fr.eno.craftcreator.screen.widgets;
 
 import com.google.common.collect.Multimap;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import fr.eno.craftcreator.References;
@@ -8,13 +9,14 @@ import fr.eno.craftcreator.kubejs.jsserializers.ModRecipesJSSerializer;
 import fr.eno.craftcreator.kubejs.utils.ModDispatcher;
 import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
 import fr.eno.craftcreator.utils.Callable;
-import fr.eno.craftcreator.utils.GuiUtils;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
 import fr.eno.craftcreator.utils.PairValue;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -31,7 +33,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
-@SuppressWarnings({"unchecked", "deprecation"})
+@SuppressWarnings({"deprecation"})
 public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry>
 {
     private static final ResourceLocation BACKGROUND_TILE = References.getLoc("textures/gui/background_tile.png");
@@ -43,6 +45,7 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
     private Callable<Entry> onSelected;
     private boolean isVisible;
     private Callable<Entry> onDelete;
+    private Entry hoveredEntry;
 
     public SimpleListWidget(Minecraft mcIn, int leftIn, int topIn, int widthIn, int heightIn, int slotHeightIn, int titleBoxHeight, int scrollBarWidth, Component titleIn, @Nullable Callable<Entry> onDelete)
     {
@@ -94,72 +97,110 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
     }
 
     @Override
-    public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void render(@Nonnull PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick)
     {
         if(!this.isVisible) return;
 
         if(hasTitleBox)
         {
-            Screen.fill(matrixStack, this.x0, this.y0 - titleBoxHeight, this.x0 + this.width, this.y0, 0xf1f115);
-            Screen.drawCenteredString(matrixStack, minecraft.font, this.title, this.x0 + this.width / 2, this.y0 - this.titleBoxHeight / 2 - minecraft.font.lineHeight / 2, 0xFFFFFF);
-            //this.renderBackground(matrixStack);
+            Screen.fill(pPoseStack, this.x0, this.y0 - titleBoxHeight, this.x0 + this.width, this.y0, 0xf2c3a942);
+            Screen.drawCenteredString(pPoseStack, minecraft.font, this.title, this.x0 + this.width / 2, this.y0 - this.titleBoxHeight / 2 - minecraft.font.lineHeight / 2, 0xFFFFFF);
+            //this.renderBackground(pPoseStack);
         }
 
-        int scrollBarPosX = this.getScrollbarPosition();
-        int scrollBarPosXWidth = scrollBarPosX + this.scrollBarWidth;
-        Tesselator tessellator = Tesselator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuilder();
+        this.hoveredEntry = this.isMouseOver(pMouseX, pMouseY) ? this.getEntryAtPosition(pMouseX, pMouseY) : null;
+        Tesselator tesselator = Tesselator.getInstance();
+        BufferBuilder bufferbuilder = tesselator.getBuilder();
 
-        // Background
-        RenderSystem.setShaderTexture(0, BACKGROUND_TILE);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1F);
-        bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-        bufferbuilder.vertex(this.x0, this.y1, 0.0D).uv((float) this.x0 / 32.0F, (float) (this.y1 + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, 100).endVertex();
-        bufferbuilder.vertex(this.x1, this.y1, 0.0D).uv((float) this.x1 / 32.0F, (float) (this.y1 + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, 100).endVertex();
-        bufferbuilder.vertex(this.x1, this.y0, 0.0D).uv((float) this.x1 / 32.0F, (float) (this.y0 + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, 100).endVertex();
-        bufferbuilder.vertex(this.x0, this.y0, 0.0D).uv((float) this.x0 / 32.0F, (float) (this.y0 + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, 100).endVertex();
-        tessellator.end();
+        // Render background
+        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+        Entry hovered = this.isMouseOver(pMouseX, pMouseY) ? this.getEntryAtPosition(pMouseX, pMouseY) : null;
+        if(true)
+        { // Background
+            RenderSystem.setShaderTexture(0, BACKGROUND_TILE);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            int alpha = 100;
+            bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+            bufferbuilder.vertex(this.x0, this.y1, 0.0D).uv((float) this.x0 / 32.0F, (float) (this.y1 + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, alpha).endVertex();
+            bufferbuilder.vertex(this.x1, this.y1, 0.0D).uv((float) this.x1 / 32.0F, (float) (this.y1 + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, alpha).endVertex();
+            bufferbuilder.vertex(this.x1, this.y0, 0.0D).uv((float) this.x1 / 32.0F, (float) (this.y0 + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, alpha).endVertex();
+            bufferbuilder.vertex(this.x0, this.y0, 0.0D).uv((float) this.x0 / 32.0F, (float) (this.y0 + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, alpha).endVertex();
+            tesselator.end();
+        }
 
-        int j1 = this.getRowLeft();
+        int rowLeft = this.getRowLeft();
         int k = this.y0 + 4 - (int) this.getScrollAmount();
 
-        this.renderList(matrixStack, j1, k, mouseX, mouseY, partialTicks);
+        this.renderList(pPoseStack, rowLeft, k, pMouseX, pMouseY, pPartialTick);
 
-        // Scrollbar
-        int k1 = this.getMaxScroll();
-        if(k1 > 0)
+        if(false)
+        { // Bottom and top
+            RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+            RenderSystem.setShaderTexture(0, GuiComponent.BACKGROUND_LOCATION);
+            RenderSystem.enableDepthTest();
+            RenderSystem.depthFunc(519);
+            bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+            bufferbuilder.vertex(this.x0, this.y0, -100.0D).uv(0.0F, (float) this.y0 / 32.0F).color(64, 64, 64, 255).endVertex();
+            bufferbuilder.vertex((this.x0 + this.width), this.y0, -100.0D).uv((float) this.width / 32.0F, (float) this.y0 / 32.0F).color(64, 64, 64, 255).endVertex();
+            bufferbuilder.vertex((this.x0 + this.width), 0.0D, -100.0D).uv((float) this.width / 32.0F, 0.0F).color(64, 64, 64, 255).endVertex();
+            bufferbuilder.vertex(this.x0, 0.0D, -100.0D).uv(0.0F, 0.0F).color(64, 64, 64, 255).endVertex();
+            bufferbuilder.vertex(this.x0, this.height, -100.0D).uv(0.0F, (float) this.height / 32.0F).color(64, 64, 64, 255).endVertex();
+            bufferbuilder.vertex((this.x0 + this.width), this.height, -100.0D).uv((float) this.width / 32.0F, (float) this.height / 32.0F).color(64, 64, 64, 255).endVertex();
+            bufferbuilder.vertex((this.x0 + this.width), this.y1, -100.0D).uv((float) this.width / 32.0F, (float) this.y1 / 32.0F).color(64, 64, 64, 255).endVertex();
+            bufferbuilder.vertex(this.x0, this.y1, -100.0D).uv(0.0F, (float) this.y1 / 32.0F).color(64, 64, 64, 255).endVertex();
+            tesselator.end();
+            RenderSystem.depthFunc(515);
+            RenderSystem.disableDepthTest();
+            RenderSystem.enableBlend();
+            RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ZERO, GlStateManager.DestFactor.ONE);
+            RenderSystem.disableTexture();
+            RenderSystem.setShader(GameRenderer::getPositionColorShader);
+
+            bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+            bufferbuilder.vertex(this.x0, (this.y0 + 4), 0.0D).color(0, 0, 0, 0).endVertex();
+            bufferbuilder.vertex(this.x1, (this.y0 + 4), 0.0D).color(0, 0, 0, 0).endVertex();
+            bufferbuilder.vertex(this.x1, this.y0, 0.0D).color(0, 0, 0, 255).endVertex();
+            bufferbuilder.vertex(this.x0, this.y0, 0.0D).color(0, 0, 0, 255).endVertex();
+            bufferbuilder.vertex(this.x0, this.y1, 0.0D).color(0, 0, 0, 255).endVertex();
+            bufferbuilder.vertex(this.x1, this.y1, 0.0D).color(0, 0, 0, 255).endVertex();
+            bufferbuilder.vertex(this.x1, (this.y1 - 4), 0.0D).color(0, 0, 0, 0).endVertex();
+            bufferbuilder.vertex(this.x0, (this.y1 - 4), 0.0D).color(0, 0, 0, 0).endVertex();
+            tesselator.end();
+        }
+
+        int scrollbarPosition = this.getScrollbarPosition();
+        int j = scrollbarPosition + 6;
+        int maxScroll = this.getMaxScroll();
+        if(maxScroll > 0)
         {
             RenderSystem.disableTexture();
+            RenderSystem.setShader(GameRenderer::getPositionColorShader);
             int l1 = (int) ((float) ((this.y1 - this.y0) * (this.y1 - this.y0)) / (float) this.getMaxPosition());
             l1 = Mth.clamp(l1, 32, this.y1 - this.y0 - 8);
-            int i2 = (int) this.getScrollAmount() * (this.y1 - this.y0 - l1) / k1 + this.y0;
+            int i2 = (int) this.getScrollAmount() * (this.y1 - this.y0 - l1) / maxScroll + this.y0;
             if(i2 < this.y0)
             {
                 i2 = this.y0;
             }
 
-            bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-
-            bufferbuilder.vertex(scrollBarPosX, this.y1, 0.0D).uv(0.0F, 1.0F).color(0, 0, 0, 100).endVertex();
-            bufferbuilder.vertex(scrollBarPosXWidth, this.y1, 0.0D).uv(1.0F, 1.0F).color(0, 0, 0, 100).endVertex();
-            bufferbuilder.vertex(scrollBarPosXWidth, this.y0, 0.0D).uv(1.0F, 0.0F).color(0, 0, 0, 100).endVertex();
-            bufferbuilder.vertex(scrollBarPosX, this.y0, 0.0D).uv(0.0F, 0.0F).color(0, 0, 0, 100).endVertex();
-
-            bufferbuilder.vertex(scrollBarPosX, i2 + l1, 0.0D).uv(0.0F, 1.0F).color(128, 128, 128, 100).endVertex();
-            bufferbuilder.vertex(scrollBarPosXWidth, i2 + l1, 0.0D).uv(1.0F, 1.0F).color(128, 128, 128, 100).endVertex();
-            bufferbuilder.vertex(scrollBarPosXWidth, i2, 0.0D).uv(1.0F, 0.0F).color(128, 128, 128, 100).endVertex();
-            bufferbuilder.vertex(scrollBarPosX, i2, 0.0D).uv(0.0F, 0.0F).color(128, 128, 128, 100).endVertex();
-            bufferbuilder.vertex(scrollBarPosX, i2 + l1 - 1, 0.0D).uv(0.0F, 1.0F).color(192, 192, 192, 100).endVertex();
-            bufferbuilder.vertex(scrollBarPosXWidth - 1, i2 + l1 - 1, 0.0D).uv(1.0F, 1.0F).color(192, 192, 192, 100).endVertex();
-            bufferbuilder.vertex(scrollBarPosXWidth - 1, i2, 0.0D).uv(1.0F, 0.0F).color(192, 192, 192, 100).endVertex();
-            bufferbuilder.vertex(scrollBarPosX, i2, 0.0D).uv(0.0F, 0.0F).color(192, 192, 192, 100).endVertex();
-            tessellator.end();
+            bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+            bufferbuilder.vertex(scrollbarPosition, this.y1, 0.0D).color(0, 0, 0, 255).endVertex();
+            bufferbuilder.vertex(j, this.y1, 0.0D).color(0, 0, 0, 255).endVertex();
+            bufferbuilder.vertex(j, this.y0, 0.0D).color(0, 0, 0, 255).endVertex();
+            bufferbuilder.vertex(scrollbarPosition, this.y0, 0.0D).color(0, 0, 0, 255).endVertex();
+            bufferbuilder.vertex(scrollbarPosition, (i2 + l1), 0.0D).color(128, 128, 128, 255).endVertex();
+            bufferbuilder.vertex(j, (i2 + l1), 0.0D).color(128, 128, 128, 255).endVertex();
+            bufferbuilder.vertex(j, i2, 0.0D).color(128, 128, 128, 255).endVertex();
+            bufferbuilder.vertex(scrollbarPosition, i2, 0.0D).color(128, 128, 128, 255).endVertex();
+            bufferbuilder.vertex(scrollbarPosition, (i2 + l1 - 1), 0.0D).color(192, 192, 192, 255).endVertex();
+            bufferbuilder.vertex((j - 1), (i2 + l1 - 1), 0.0D).color(192, 192, 192, 255).endVertex();
+            bufferbuilder.vertex((j - 1), i2, 0.0D).color(192, 192, 192, 255).endVertex();
+            bufferbuilder.vertex(scrollbarPosition, i2, 0.0D).color(192, 192, 192, 255).endVertex();
+            tesselator.end();
         }
 
-        this.renderDecorations(matrixStack, mouseX, mouseY);
+        this.renderDecorations(pPoseStack, pMouseX, pMouseY);
         RenderSystem.enableTexture();
-        // RenderSystem.shadeModel(7424);
-        // RenderSystem.enableAlphaTest();
         RenderSystem.disableBlend();
     }
 
@@ -167,45 +208,45 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
     protected void renderList(@Nonnull PoseStack matrixStack, int x, int y, int mouseX, int mouseY, float partialTicks)
     {
         int itemCount = this.getItemCount();
-        Tesselator tessellator = Tesselator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuilder();
+        Tesselator tesselator = Tesselator.getInstance();
+        BufferBuilder bufferbuilder = tesselator.getBuilder();
 
-        for(int index = 0; index < itemCount; index++)
+        for(int itemIndex = 0; itemIndex < itemCount; ++itemIndex)
         {
-            int rowTop = this.getRowTop(index);
-            int rowBottom = this.getRowTop(index) + this.itemHeight;
-            if(rowBottom <= this.y1 && rowTop >= this.y0)
+            int rowTop = this.getRowTop(itemIndex);
+            int rowBottom = this.getRowTop(itemIndex) + this.itemHeight;
+            if(rowBottom >= this.y0 + this.itemHeight && rowTop <= this.y1 - this.itemHeight)
             {
-                int i1 = y + index * this.itemHeight + this.headerHeight;
+                int i1 = y + itemIndex * this.itemHeight + this.headerHeight;
                 int j1 = this.itemHeight - 4;
-                Entry e = this.getEntry(index);
+                Entry entry = this.getEntry(itemIndex);
                 int rowWidth = this.getRowWidth();
-                boolean isSelected = this.isSelectedItem(index);
-                if(isSelected && canHaveSelected)
+                if(canHaveSelected && this.isSelectedItem(itemIndex))
                 {
                     int l1 = this.x0 + this.width / 2 - rowWidth / 2;
                     int i2 = this.x0 + this.width / 2 + rowWidth / 2;
                     RenderSystem.disableTexture();
+                    RenderSystem.setShader(GameRenderer::getPositionShader);
                     float f = this.isFocused() ? 1.0F : 0.5F;
                     RenderSystem.setShaderColor(f, f, f, 1.0F);
                     bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
-                    bufferbuilder.vertex(l1, i1 + j1 + 2, 0.0D).endVertex();
-                    bufferbuilder.vertex(i2, i1 + j1 + 2, 0.0D).endVertex();
-                    bufferbuilder.vertex(i2, i1 - 2, 0.0D).endVertex();
-                    bufferbuilder.vertex(l1, i1 - 2, 0.0D).endVertex();
-                    tessellator.end();
+                    bufferbuilder.vertex(l1, (i1 + j1 + 2), 0.0D).endVertex();
+                    bufferbuilder.vertex(i2, (i1 + j1 + 2), 0.0D).endVertex();
+                    bufferbuilder.vertex(i2, (i1 - 2), 0.0D).endVertex();
+                    bufferbuilder.vertex(l1, (i1 - 2), 0.0D).endVertex();
+                    tesselator.end();
                     RenderSystem.setShaderColor(0.0F, 0.0F, 0.0F, 1.0F);
                     bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
-                    bufferbuilder.vertex(l1 + 1, i1 + j1 + 1, 0.0D).endVertex();
-                    bufferbuilder.vertex(i2 - 1, i1 + j1 + 1, 0.0D).endVertex();
-                    bufferbuilder.vertex(i2 - 1, i1 - 1, 0.0D).endVertex();
-                    bufferbuilder.vertex(l1 + 1, i1 - 1, 0.0D).endVertex();
-                    tessellator.end();
+                    bufferbuilder.vertex((l1 + 1), (i1 + j1 + 1), 0.0D).endVertex();
+                    bufferbuilder.vertex((i2 - 1), (i1 + j1 + 1), 0.0D).endVertex();
+                    bufferbuilder.vertex((i2 - 1), (i1 - 1), 0.0D).endVertex();
+                    bufferbuilder.vertex((l1 + 1), (i1 - 1), 0.0D).endVertex();
+                    tesselator.end();
                     RenderSystem.enableTexture();
                 }
 
-                int j2 = this.getRowLeft();
-                e.render(matrixStack, index, rowTop, j2, rowWidth, j1, mouseX, mouseY, GuiUtils.isMouseHover(x0, y0, mouseX, mouseY, width, height) && Objects.equals(this.getEntryAtPosition(mouseX, mouseY), e), partialTicks);
+                int rowLeft = this.getRowLeft();
+                entry.render(matrixStack, itemIndex, rowTop, rowLeft, rowWidth, j1, mouseX, mouseY, Objects.equals(this.hoveredEntry, entry), partialTicks);
             }
         }
     }
@@ -233,11 +274,9 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
 
         if(canHaveSelected)
         {
-            Entry entry = getEntryAtPosition(mouseX, mouseY);
-
-            if(entry != null)
+            if(hoveredEntry != null)
             {
-                this.setSelected(entry);
+                this.setSelected(hoveredEntry);
             }
         }
 
@@ -344,14 +383,17 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
 
             ItemStack item = ModDispatcher.getOneOutput(recipe);
 
+            matrixStack.pushPose();
+            float scale = 1F;
             int yPos = height / 2 - 16 / 2;
-            minecraft.getItemRenderer().renderAndDecorateFakeItem(item, left + yPos, top + yPos);
+            minecraft.getItemRenderer().renderAndDecorateItem(item, (int) ((left + 1) / scale), (int) ((top + yPos) / scale));
+            matrixStack.popPose();
         }
 
         @Override
         public String toString()
         {
-            return null;
+            return recipe.getId().toString();
         }
 
         public void renderTooltip(PoseStack matrixStack, int mouseX, int mouseY)
@@ -430,7 +472,10 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
                 try
                 {
                     item = ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(recipe.getInputItem()));
-                } catch(Exception ignored) {}
+                }
+                catch(Exception ignored)
+                {
+                }
             }
 
             int yPos = height / 2 - 16 / 2;
@@ -495,7 +540,7 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
             matrixStack.pushPose();
             float scale = 1F;
             matrixStack.scale(scale, scale, scale);
-            Screen.drawCenteredString(matrixStack, minecraft.font, displayStr, (int) ((left + width / 2) / scale), (int) ((top + height / 2 - ((double) minecraft.font.lineHeight * scale) / 2) / scale) + 2, color);
+            Screen.drawCenteredString(matrixStack, minecraft.font, displayStr, (int) ((left + width / 2) / scale), (int) ((top + height / 2 - (minecraft.font.lineHeight * scale) / 2) / scale) + 2, color);
             matrixStack.popPose();
         }
 
@@ -579,7 +624,7 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
             matrixStack.pushPose();
             float scale = 1.1F;
             matrixStack.scale(scale, scale, scale);
-            Screen.drawCenteredString(matrixStack, minecraft.font, displayStr, (int) ((left + width / 2) / scale), (int) ((top + height / 2 - ((double) minecraft.font.lineHeight * scale) / 2) / scale), color);
+            Screen.drawCenteredString(matrixStack, minecraft.font, displayStr, (int) ((left + width / 2) / scale), (int) ((top + height / 2 - (minecraft.font.lineHeight * scale) / 2) / scale), color);
             matrixStack.popPose();
 
             Item item = ForgeRegistries.ITEMS.getValue(getResourceLocation());

@@ -15,23 +15,17 @@
 	"block.craftcreator.crafting_table_recipe_creator": "§lCrafting Table Recipe Creator",
 	"block.craftcreator.stone_cutter_recipe_creator": "§lStone Cutter Recipe Creator",
 	"block.craftcreator.smithing_table_recipe_creator": "§lSmithing Table Recipe Creator",
+
 	"block.craftcreator.botania_recipe_creator": "§lBotania Recipe Creator",
+	"block.craftcreator.thermal_recipe_creator": "§lThermal Recipe Creator",
 
 	"craftcreator.container.crafting_table_recipe_creator.title": "Crafting Table Recipe Creator",
 	"craftcreator.container.stone_cutter_recipe_creator.title": "Cutter Recipe Creator",
 	"craftcreator.container.furnace_recipe_creator.title": "Furnace Recipe Creator",
 	"craftcreator.container.smithing_table_recipe_creator.title": "Smithing Recipe Creator",
 
-	"craftcreator.screen.botania_recipe_creator.button.next": ">",
-	"craftcreator.screen.botania_recipe_creator.button.previous": "<",
-
-	"craftcreator.screen.botania_recipe_creator.mana_infusion.title": "Mana Infusion Recipe Creator",
-	"craftcreator.screen.botania_recipe_creator.elven_trade.title": "Elven Trade Recipe Creator",
-	"craftcreator.screen.botania_recipe_creator.pure_daisy.title": "Pure Daisy Recipe Creator",
-	"craftcreator.screen.botania_recipe_creator.brew.title": "Brew Recipe Creator",
-	"craftcreator.screen.botania_recipe_creator.petal_apothecary.title": "Petal Recipe Creator",
-	"craftcreator.screen.botania_recipe_creator.runic_altar.title": "Rune Recipe Creator",
-	"craftcreator.screen.botania_recipe_creator.terra_plate.title": "Terra Plate Recipe Creator",
+	"craftcreator.screen.recipe_creator.button.next": ">",
+	"craftcreator.screen.recipe_creator.button.previous": "<",
 
 	"craftcreator.screen.recipe_manager.button.remove_recipe": "Remove Recipe...",
 
@@ -59,5 +53,15 @@
 	"craftcreator.screen.remove_manager.button.remove": "Remove Recipe",
 	"craftcreator.screen.remove_manager.button.back": "Back",
 
-	"craftcreator.screen.recipe_creator_screen.kube_js_button": "Is KubeJS Recipe"
+	"craftcreator.screen.recipe_creator_screen.kube_js_button": "Is KubeJS Recipe",
+
+	"craftcreator.screen.botania_recipe_creator.mana_infusion.title": "Mana Infusion Recipe Creator",
+	"craftcreator.screen.botania_recipe_creator.elven_trade.title": "Elven Trade Recipe Creator",
+	"craftcreator.screen.botania_recipe_creator.pure_daisy.title": "Pure Daisy Recipe Creator",
+	"craftcreator.screen.botania_recipe_creator.brew.title": "Brew Recipe Creator",
+	"craftcreator.screen.botania_recipe_creator.petal_apothecary.title": "Petal Recipe Creator",
+	"craftcreator.screen.botania_recipe_creator.runic_altar.title": "Rune Recipe Creator",
+	"craftcreator.screen.botania_recipe_creator.terra_plate.title": "Terra Plate Recipe Creator",
+
+	"craftcreator.screen.thermal_recipe_creator.tree_extractor.title": "Tree Extractor Recipe Creator"
 }

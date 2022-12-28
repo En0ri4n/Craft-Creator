@@ -49,7 +49,7 @@ public class PositionnedSlot
         return slots.get(slots.size() - 1).getIndex() == index;
     }
 
-    public static List<Slot> getValidSlots(List<PositionnedSlot> positionnedSlots, List<Slot> slots)
+    public static List<Slot> getSlotsFor(List<PositionnedSlot> positionnedSlots, List<Slot> slots)
     {
         List<Slot> finalSlots = new ArrayList<>();
 

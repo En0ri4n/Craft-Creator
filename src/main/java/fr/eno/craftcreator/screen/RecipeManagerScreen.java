@@ -7,6 +7,7 @@ import fr.eno.craftcreator.kubejs.utils.DeserializerHelper;
 import fr.eno.craftcreator.kubejs.utils.ModDispatcher;
 import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;
+import fr.eno.craftcreator.screen.utils.ListScreen;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
 import net.minecraft.network.chat.TextComponent;

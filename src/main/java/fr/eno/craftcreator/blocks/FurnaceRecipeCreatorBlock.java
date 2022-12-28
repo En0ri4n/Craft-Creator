@@ -97,15 +97,15 @@ public class FurnaceRecipeCreatorBlock extends RecipeCreatorBlock
 	}
 
 	@Override
-	public @Nullable BlockEntity newBlockEntity(@NotNull BlockPos pPos, @NotNull BlockState pState)
-	{
-		return new FurnaceRecipeCreatorTile(pPos, pState);
-	}
-
-	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder)
 	{
 		pBuilder.add(FACING);
 		super.createBlockStateDefinition(pBuilder);
+	}
+
+	@Override
+	public @Nullable BlockEntity newBlockEntity(@NotNull BlockPos pPos, @NotNull BlockState pState)
+	{
+		return new FurnaceRecipeCreatorTile(pPos, pState);
 	}
 }

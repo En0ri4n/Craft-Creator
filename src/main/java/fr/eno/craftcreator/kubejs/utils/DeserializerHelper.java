@@ -11,6 +11,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @SuppressWarnings("unchecked")
 public class DeserializerHelper
@@ -19,7 +20,7 @@ public class DeserializerHelper
     {
         List<T> entries = new ArrayList<>();
 
-        List.of(mods).forEach(mod -> entries.add((T) new SimpleListWidget.StringEntry(mod.getModId())));
+        Stream.of(mods).filter(mod -> mod != SupportedMods.KUBE_JS).forEach(mod -> entries.add((T) new SimpleListWidget.StringEntry(mod.getModId())));
 
         return entries;
     }

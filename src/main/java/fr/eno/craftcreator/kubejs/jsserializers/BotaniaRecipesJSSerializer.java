@@ -25,8 +25,7 @@ import java.util.*;
 
 public class BotaniaRecipesJSSerializer extends ModRecipesJSSerializer
 {
-    private static BotaniaRecipesJSSerializer INSTANCE;
-    private static final Gson gson = new GsonBuilder().create();
+    private static final BotaniaRecipesJSSerializer INSTANCE = new BotaniaRecipesJSSerializer();
 
     private BotaniaRecipesJSSerializer()
     {
@@ -169,6 +168,6 @@ public class BotaniaRecipesJSSerializer extends ModRecipesJSSerializer
 
     public static BotaniaRecipesJSSerializer get()
     {
-        return INSTANCE == null ? INSTANCE = new BotaniaRecipesJSSerializer() : INSTANCE;
+        return INSTANCE;
     }
 }

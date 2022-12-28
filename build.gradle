@@ -27,7 +27,8 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 
 minecraft {
-    mappings channel: 'parchment', version: "1.18.1-2022.03.06-1.18.2"
+    // mappings channel: 'parchment', version: "1.18.1-2022.03.06-1.18.2"
+    mappings channel: 'official', version: "1.18.2"
 
     runs {
         client {
@@ -109,19 +110,21 @@ repositories {
 
     // Curios Maven (Botania Dependency)
     maven { url = "https://maven.theillusivec4.top/" }
+
+    // CoFH Maven
+    maven { url = "https://maven.covers1624.net" }
+
+    // Curseforge Maven
+    maven {
+        url "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
 }
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.18.2-40.1.80'
-
-    // Botania
-    implementation fg.deobf("vazkii.botania:Botania:${botania_version}")
-
-    // Botania Dependencies
-    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}")
-    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}:api")
-    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}")
-    compileOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}:api")
 
     // KubeJS
     implementation fg.deobf("dev.latvian.mods:kubejs-forge:${kubejs_version}")
@@ -129,6 +132,28 @@ dependencies {
     // KubeJS Dependencies
     implementation fg.deobf("dev.latvian.mods:rhino-forge:${rhino_version}")
     implementation fg.deobf("dev.architectury:architectury-forge:${architectury_version}")
+
+    /*
+     * Mods and their dependencies
+     */
+
+    implementation fg.deobf("vazkii.botania:Botania:${botania_version}") // Botania
+
+    // Botania Dependency
+    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}")
+    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}:api")
+    runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}")
+    compileOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}:api")
+
+
+    // Thermal Expansion
+    implementation fg.deobf("curse.maven:Thermal-Expansion-69163:${thermal_expansion_cursefileid}")
+
+    // Thermal Foundation
+    implementation fg.deobf("curse.maven:Thermal-Foundation-222880:${thermal_foundation_cursefileid}")
+
+    // Thermal Depedency
+    implementation fg.deobf("curse.maven:CoFH-Core-69162:${cofh_core_cursefileid}")
 }
 
 jar {
