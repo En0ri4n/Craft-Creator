@@ -145,7 +145,6 @@ dependencies {
     runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}")
     compileOnly fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}:api")
 
-
     // Thermal Expansion
     implementation fg.deobf("curse.maven:Thermal-Expansion-69163:${thermal_expansion_cursefileid}")
 
