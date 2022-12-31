@@ -8,7 +8,6 @@ import fr.eno.craftcreator.kubejs.utils.ModDispatcher;
 import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;
 import fr.eno.craftcreator.screen.buttons.SimpleCheckBox;
-import fr.eno.craftcreator.screen.buttons.SimpleTextButton;
 import fr.eno.craftcreator.screen.utils.ChildrenScreen;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import fr.eno.craftcreator.screen.widgets.SimpleTextFieldWidget;

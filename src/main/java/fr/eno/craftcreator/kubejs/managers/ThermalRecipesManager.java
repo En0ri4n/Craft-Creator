@@ -71,10 +71,10 @@ public class ThermalRecipesManager extends BaseRecipesManager
     {
         ResourceLocation input = slots.get(0).getItem().getItem().getRegistryName();
         Map<ItemStack, Double> outputs = new HashMap<>();
-        double energy = Math.round(recipeInfos.getDouble("energy"));
+        double energy = recipeInfos.contains("energy") ? Math.round(recipeInfos.getDouble("energy")) : 0D;
         for(int i = 0; i < slots.size() - 1; i++)
         {
-            if(slots.get(i + 1).hasItem())
+            if(slots.get(i + 1).hasItem() && recipeInfos.contains("chance_" + i))
                 outputs.put(slots.get(i + 1).getItem(), recipeInfos.getDouble("chance_" + i));
         }
 

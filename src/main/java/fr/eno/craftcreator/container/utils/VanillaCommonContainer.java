@@ -24,28 +24,33 @@ public abstract class VanillaCommonContainer extends AbstractContainerMenu
 
     protected void bindPlayerInventory(Inventory playerInventory)
     {
+        bindPlayerInventory(playerInventory, 0, 0);
+    }
+
+    protected void bindPlayerInventory(Inventory playerInventory, int x, int y)
+    {
         for(int i = 0; i < 3; ++i)
         {
             for(int j = 0; j < 9; ++j)
             {
-                this.addSlot(new Slot(playerInventory, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
+                this.addSlot(new Slot(playerInventory, j + i * 9 + 9, x + 8 + j * 18, y + 84 + i * 18));
             }
         }
 
         for(int k = 0; k < 9; ++k)
         {
-            this.addSlot(new Slot(playerInventory, k, 8 + k * 18, 142));
+            this.addSlot(new Slot(playerInventory, k, x + 8 + k * 18, y + 142));
         }
     }
 
     /**
      * Vanilla only
      */
-    protected void activeSlots()
+    public void activeSlots(boolean active)
     {
         for(Slot slot : slots)
             if(slot instanceof SimpleSlotItemHandler slotItemHandler)
-                slotItemHandler.setActive(true);
+                slotItemHandler.setActive(active);
     }
 
     @Override

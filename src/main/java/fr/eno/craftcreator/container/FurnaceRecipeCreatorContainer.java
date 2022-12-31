@@ -29,6 +29,6 @@ public class FurnaceRecipeCreatorContainer extends VanillaCommonContainer
 		
 		this.bindPlayerInventory(inventory);
 
-		activeSlots();
+		activeSlots(true);
 	}
 }

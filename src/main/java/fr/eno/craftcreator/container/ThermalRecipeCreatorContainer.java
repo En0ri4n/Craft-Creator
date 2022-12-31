@@ -35,7 +35,7 @@ public class ThermalRecipeCreatorContainer extends CommonContainer
             this.addSlot(new SimpleSlotItemHandler(tile, i, 40, 40));
         }
 
-        this.bindPlayerInventory(inventory);
+        this.bindPlayerInventory(inventory, 60, 90);
     }
 
     @Override

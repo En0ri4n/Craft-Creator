@@ -47,6 +47,11 @@ public class RecipeInfos
         return parameter instanceof RecipeParameterInteger ? ((RecipeParameterInteger) parameter).getIntValue() : 0;
     }
 
+    public boolean contains(String name)
+    {
+        return this.getRecipeParameter(name) != null;
+    }
+
     public static class RecipeParameter
     {
         private final RecipeParameterType type;

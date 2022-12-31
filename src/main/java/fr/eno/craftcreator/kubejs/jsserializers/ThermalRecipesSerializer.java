@@ -52,14 +52,14 @@ public class ThermalRecipesSerializer extends ModRecipesJSSerializer
         {
             JsonObject itemResultObj = new JsonObject();
             itemResultObj.addProperty("item", output.getKey().getItem().getRegistryName().toString());
-            if(output.getKey().getCount() > 1) itemResultObj.addProperty("count", output.getKey().getCount());
+            itemResultObj.addProperty("count", output.getKey().getCount());
             if(output.getValue() != 1D) itemResultObj.addProperty("chance", output.getValue());
             resultObj.add(itemResultObj);
         }
         obj.add("result", resultObj);
 
         addRecipeToFile(gson.toJson(obj), TCoreRecipeTypes.RECIPE_PULVERIZER);
-        sendSuccessMessage(TCoreRecipeTypes.RECIPE_PULVERIZER, input);
+        sendSuccessMessage(TCoreRecipeTypes.RECIPE_PULVERIZER, outputs.keySet().stream().findFirst().get().getItem().getRegistryName());
     }
 
     public void createSawmillRecipe(ResourceLocation input, Map<ItemStack, Double> outputs, Double energy)
@@ -73,14 +73,14 @@ public class ThermalRecipesSerializer extends ModRecipesJSSerializer
         {
             JsonObject itemResultObj = new JsonObject();
             itemResultObj.addProperty("item", output.getKey().getItem().getRegistryName().toString());
-            if(output.getKey().getCount() > 1) itemResultObj.addProperty("count", output.getKey().getCount());
+            itemResultObj.addProperty("count", output.getKey().getCount());
             if(output.getValue() != 1D) itemResultObj.addProperty("chance", output.getValue());
             resultObj.add(itemResultObj);
         }
         obj.add("result", resultObj);
 
         addRecipeToFile(gson.toJson(obj), TCoreRecipeTypes.RECIPE_SAWMILL);
-        sendSuccessMessage(TCoreRecipeTypes.RECIPE_SAWMILL, input);
+        sendSuccessMessage(TCoreRecipeTypes.RECIPE_SAWMILL, outputs.keySet().stream().findFirst().get().getItem().getRegistryName());
     }
 
     @Override
