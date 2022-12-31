@@ -1,6 +1,7 @@
 package fr.eno.craftcreator.screen.container;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.container.BotaniaRecipeCreatorContainer;
 import fr.eno.craftcreator.kubejs.utils.RecipeInfos;
 import fr.eno.craftcreator.screen.utils.ModRecipeCreatorScreens;
@@ -8,7 +9,9 @@ import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import vazkii.botania.common.block.ModBlocks;
 import vazkii.botania.common.block.ModSubtiles;
 import vazkii.botania.common.item.ModItems;
@@ -30,7 +33,7 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     {
         super.init();
 
-        addTextField(leftPos + imageWidth - 44, topPos + imageHeight / 2 - 16, 35, 10, 100);
+        addTextField(leftPos + imageWidth - 44, topPos + imageHeight / 2 - 16, 35, 10, 100, 1);
 
         updateScreen();
     }
@@ -104,12 +107,12 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
             case MANA_INFUSION ->
             {
                 minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(ModBlocks.creativePool), this.leftPos + imageWidth / 2 - 8, this.topPos + 14);
-                renderTextfieldTitle(MANA_FIELD, "Mana :", matrixStack);
+                renderTextFieldTitle(MANA_FIELD, References.getTranslate("screen.botania_recipe_creator.field.mana"), matrixStack);
             }
             case ELVEN_TRADE ->
             {
                 minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(ModBlocks.livingwoodGlimmering), this.leftPos + imageWidth / 2 - 8, this.topPos + 14);
-                renderTextfieldTitle(MANA_FIELD, "Mana :", matrixStack);
+                renderTextFieldTitle(MANA_FIELD, References.getTranslate("screen.botania_recipe_creator.field.mana"), matrixStack);
             }
             case PURE_DAISY ->
             {
@@ -132,7 +135,7 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
                     }
 
                 renderTextField(MANA_FIELD, matrixStack, mouseX, mouseY, partialTicks);
-                renderTextfieldTitle(MANA_FIELD, "Time :", matrixStack);
+                renderTextFieldTitle(MANA_FIELD, References.getTranslate("screen.botania_recipe_creator.field.time"), matrixStack);
             }
             case BREWERY ->
             {
@@ -146,16 +149,22 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
             {
                 minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(ModBlocks.runeAltar), this.leftPos + Math.floorDiv(imageWidth, 2) + 16, this.topPos + 4);
                 renderTextField(MANA_FIELD, matrixStack, mouseX, mouseY, partialTicks);
-                renderTextfieldTitle(MANA_FIELD, "Mana :", matrixStack);
+                renderTextFieldTitle(MANA_FIELD, References.getTranslate("screen.botania_recipe_creator.field.mana"), matrixStack);
             }
             case TERRA_PLATE ->
             {
                 minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(ModItems.spark), this.leftPos + 34, this.topPos + 34);
                 renderTextField(MANA_FIELD, matrixStack, mouseX, mouseY, partialTicks);
-                renderTextfieldTitle(MANA_FIELD, "Mana :", matrixStack);
+                renderTextFieldTitle(MANA_FIELD, References.getTranslate("screen.botania_recipe_creator.field.mana"), matrixStack);
             }
         }
 
         this.renderTooltip(matrixStack, mouseX, mouseY);
+    }
+
+    @Override
+    protected Item getRecipeIcon()
+    {
+        return Items.AIR;
     }
 }

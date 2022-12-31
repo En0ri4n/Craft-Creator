@@ -22,6 +22,6 @@ public class StoneCutterRecipeCreatorContainer extends VanillaCommonContainer
 		
 		this.bindPlayerInventory(playerInventory);
 
-		activeSlots();
+		activeSlots(true);
 	}
 }

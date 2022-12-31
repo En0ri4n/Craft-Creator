@@ -2,11 +2,8 @@ package fr.eno.craftcreator.kubejs.utils;
 
 import net.minecraftforge.fml.ModList;
 
-import java.util.List;
-
 public enum SupportedMods
 {
-    KUBE_JS("kubejs"),
     MINECRAFT("minecraft"),
     BOTANIA("botania"),
     THERMAL("thermal");
@@ -48,6 +45,6 @@ public enum SupportedMods
 
     public static boolean isKubeJSLoaded()
     {
-        return ModList.get().isLoaded(KUBE_JS.getModId());
+        return ModList.get().isLoaded("kubejs");
     }
 }

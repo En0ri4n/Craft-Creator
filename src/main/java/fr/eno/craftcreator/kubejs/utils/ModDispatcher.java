@@ -14,7 +14,7 @@ public class ModDispatcher
                 {
                     case BOTANIA -> BotaniaRecipesSerializer.get();
                     case THERMAL -> ThermalRecipesSerializer.get();
-                    case MINECRAFT, default -> MinecraftRecipeSerializer.get();
+                    default -> MinecraftRecipeSerializer.get();
                 };
     }
 

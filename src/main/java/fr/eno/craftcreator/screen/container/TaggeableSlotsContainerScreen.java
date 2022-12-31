@@ -56,14 +56,14 @@ public abstract class TaggeableSlotsContainerScreen<T extends AbstractContainerM
 
         super.render(matrixStack, mouseX, mouseY, partialTicks);
 
-        if(this.guiTagList.getKeys() != null)
-            this.guiTagList.render(matrixStack, mouseX, mouseY);
+        if(this.guiTagList.getKeys() != null) this.guiTagList.render(matrixStack, mouseX, mouseY);
     }
 
     @Override
     protected void renderLabels(PoseStack matrixStack, int pMouseX, int pMouseY)
     {
-        if(Screen.hasShiftDown() || Screen.hasControlDown()) drawString(matrixStack, this.font, References.getTranslate("screen.crafting.info").getString(), 0, this.imageHeight, 0x707370);
+        if(Screen.hasShiftDown() || Screen.hasControlDown())
+            drawString(matrixStack, this.font, References.getTranslate("screen.crafting.info").getString(), 0, this.imageHeight, 0x707370);
     }
 
     private void updateServerTileData()
@@ -137,14 +137,9 @@ public abstract class TaggeableSlotsContainerScreen<T extends AbstractContainerM
             updateServerTileData();
         });
 
-        if(mouseX <= this.leftPos || mouseX >= this.leftPos + this.imageWidth || mouseY <= this.topPos || mouseY >= this.topPos + this.imageHeight)
-        {
-            this.guiTagList.setKeys(null);
-            this.guiTagList.setSelectedKey(null);
-            this.selectedSlot = null;
-            return super.mouseClicked(mouseX, mouseY, button);
-        }
-
+        this.guiTagList.setKeys(null);
+        this.guiTagList.setSelectedKey(null);
+        this.selectedSlot = null;
         return super.mouseClicked(mouseX, mouseY, button);
     }
 

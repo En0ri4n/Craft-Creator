@@ -75,5 +75,16 @@
 	"craftcreator.screen.thermal_recipe_creator.brewer.title": "Brewer Recipe Creator",
 	"craftcreator.screen.thermal_recipe_creator.fermenter.title": "Fermenter Recipe Creator",
 	"craftcreator.screen.thermal_recipe_creator.carpenter.title": "Carpenter Recipe Creator",
-	"craftcreator.screen.thermal_recipe_creator.sawmill.title": "Sawmill Recipe Creator"
+	"craftcreator.screen.thermal_recipe_creator.sawmill.title": "Sawmill Recipe Creator",
+
+	"craftcreator.screen.recipe_creator.label.input": "§6Input",
+	"craftcreator.screen.recipe_creator.label.output": "§2Output",
+
+	"craftcreator.screen.botania_recipe_creator.field.mana": "Mana :",
+	"craftcreator.screen.botania_recipe_creator.field.time": "Time :",
+
+	"craftcreator.screen.thermal_recipe_creator.field.energy": "Energy Used :",
+	"craftcreator.screen.thermal_recipe_creator.field.experience": "Exp. Gained :",
+	"craftcreator.screen.thermal_recipe_creator.field.chances": "Luck :",
+	"craftcreator.screen.thermal_recipe_creator.field.resin_amount": "Resin (mb) :"
 }

@@ -14,7 +14,9 @@ import fr.eno.craftcreator.packets.SetModRecipeCreatorScreenIndexServerPacket;
 import fr.eno.craftcreator.screen.buttons.ExecuteButton;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;
 import fr.eno.craftcreator.screen.utils.ModRecipeCreatorScreens;
-import fr.eno.craftcreator.utils.FieldAccessor;
+import fr.eno.craftcreator.utils.PairValue;
+import fr.eno.craftcreator.utils.PositionnedSlot;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -24,13 +26,19 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
@@ -38,6 +46,8 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
 {
     private static final Field SLOT_POS_X_FIELD = ObfuscationReflectionHelper.findField(Slot.class, "f_40220_");
     private static final Field SLOT_POS_Y_FIELD = ObfuscationReflectionHelper.findField(Slot.class, "f_40221_");
+
+    int guiTextureSize = 256;
 
     protected ExecuteButton executeButton;
     protected SimpleButton nextButton;
@@ -65,10 +75,15 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
 
         InitPackets.getNetWork().send(PacketDistributor.SERVER.noArg(), new GetModRecipeCreatorScreenIndexPacket(this.getMenu().getTile().getBlockPos()));
 
-        this.addRenderableWidget(executeButton = new ExecuteButton(this.leftPos + this.imageWidth / 2 - 20, this.topPos + 35,40, (button) -> RecipeManagerDispatcher.createRecipe(this.getMenu().getMod(), getCurrentRecipe(), this.getMenu().slots.stream().filter(slot -> slot instanceof SimpleSlotItemHandler).collect(Collectors.toList()), getTagged(), getRecipeInfos())));
+        this.addRenderableWidget(executeButton = new ExecuteButton(this.leftPos + this.imageWidth / 2 - 20, this.topPos + 35,42, (button) -> RecipeManagerDispatcher.createRecipe(this.getMenu().getMod(), getCurrentRecipe(), this.getMenu().slots.stream().filter(slot -> slot instanceof SimpleSlotItemHandler).collect(Collectors.toList()), getTagged(), getRecipeInfos())));
 
-        this.addRenderableWidget(nextButton = new SimpleButton(References.getTranslate("screen.recipe_creator.button.next"), this.leftPos + this.imageWidth + 3, this.topPos + this.imageHeight - 66, 10, 20, (button) -> nextPage()));
-        this.addRenderableWidget(previousButton = new SimpleButton(References.getTranslate("screen.recipe_creator.button.previous"),  this.leftPos - 3 - 10, this.topPos + this.imageHeight - 66,10, 20, (button) -> previousPage()));
+        this.addRenderableWidget(nextButton = new SimpleButton(References.getTranslate("screen.recipe_creator.button.next"), getArrowXPos(true), this.topPos + this.imageHeight - 66, 10, 20, (button) -> nextPage()));
+        this.addRenderableWidget(previousButton = new SimpleButton(References.getTranslate("screen.recipe_creator.button.previous"),  getArrowXPos(false), this.topPos + this.imageHeight - 66,10, 20, (button) -> previousPage()));
+    }
+
+    public int getArrowXPos(boolean right)
+    {
+        return right ? this.leftPos + this.imageWidth + 3 : this.leftPos - 3 - 10;
     }
 
     protected abstract RecipeInfos getRecipeInfos();
@@ -128,15 +143,28 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         textFields.get(index).y = y;
     }
 
+    protected void setTextFieldSize(int index, int width, int height)
+    {
+        textFields.get(index).setWidth(width);
+        textFields.get(index).setHeight(height);
+    }
+
+    protected void setTextFieldPosAndSize(int index, int x, int y, int width, int height)
+    {
+        setTextFieldPos(index, x, y);
+        setTextFieldSize(index, width, height);
+    }
+
+    protected void setTextField(int index, int x, int y, int width, int height, Object value)
+    {
+        setTextFieldPosAndSize(index, x, y ,width, height);
+        textFields.get(index).setValue(String.valueOf(value));
+    }
+
     protected void setExecuteButtonPos(int x, int y)
     {
         executeButton.x = x;
         executeButton.y = y;
-    }
-
-    protected void setSlot(int index, int x, int y)
-    {
-        this.getMenu().slots.stream().filter(s -> s.getSlotIndex() == index && s instanceof SimpleSlotItemHandler).findFirst().ifPresent(slot -> setPos((SimpleSlotItemHandler) slot, x, y));
     }
 
     protected ModRecipeCreatorScreens getCurrentRecipe()
@@ -170,12 +198,12 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         this.textFields.get(index).render(matrixStack, mouseX, mouseY, partialTicks);
     }
 
-    protected void renderTextfieldTitle(int index, String text, PoseStack matrixStack)
+    protected void renderTextFieldTitle(int index, Component text, PoseStack matrixStack)
     {
         matrixStack.pushPose();
-        float scale = 0.85F;
+        float scale = 1F;
         matrixStack.scale(scale, scale, scale);
-        Screen.drawString(matrixStack, font, new TextComponent(text), (int) (textFields.get(index).x / scale), (int) ((textFields.get(index).y - font.lineHeight * scale) / scale), 0xFFFFFF);
+        Screen.drawString(matrixStack, font, text.copy().withStyle(ChatFormatting.ITALIC), (int) (textFields.get(index).x / scale), (int) ((textFields.get(index).y - font.lineHeight * scale - 1) / scale), 0xFF88AEC1);
         matrixStack.popPose();
     }
 
@@ -216,10 +244,25 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         int i = this.leftPos;
         int j = (this.height - this.imageHeight) / 2;
         RenderSystem.setShaderTexture(0, getCurrentRecipe().getGuiTexture());
-
-        this.blit(matrixStack, i, j, 0, 0, this.imageWidth, this.imageHeight);
+        blit(matrixStack, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, this.guiTextureSize, this.guiTextureSize);
 
         super.renderBg(matrixStack, pPartialTick, pMouseX, pMouseY);
+    }
+
+    protected abstract Item getRecipeIcon();
+
+    protected PairValue<Integer, Integer> getIconPos()
+    {
+        return PairValue.create(0, 0);
+    }
+
+    @Override
+    protected void renderTooltip(PoseStack poseStack, int mouseX, int mouseY)
+    {
+        if(getRecipeIcon() != Items.AIR)
+            this.minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(getRecipeIcon()), getIconPos().getFirstValue(), getIconPos().getSecondValue());
+        super.renderTooltip(poseStack, mouseX, mouseY);
+        this.textFields.forEach(field -> field.renderToolTip(poseStack, mouseX, mouseY));
     }
 
     @Override
@@ -230,16 +273,16 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         super.renderLabels(matrixStack, pMouseX, pMouseY);
     }
 
-    private void setPos(SimpleSlotItemHandler slot, int x, int y)
+    /**
+     *
+     * @param index the index of the slot IN the available recipe slots
+     * @param name name to render
+     * @param matrixStack the matrix stack
+     */
+    protected void renderSlotTitle(int index, Component name, PoseStack matrixStack)
     {
-        slot.setActive(true);
-        // Set x pos
-        new FieldAccessor(SLOT_POS_X_FIELD).set(slot, x);
-        // ReflectUtils.setField(SLOT_POS_X_FIELD, slot, x);
-
-        // Set y pos
-        new FieldAccessor(SLOT_POS_Y_FIELD).set(slot, y);
-        // ReflectUtils.setField(SLOT_POS_Y_FIELD, slot, y);
+        SimpleSlotItemHandler slot = (SimpleSlotItemHandler) PositionnedSlot.getSlotsFor(getCurrentRecipe().getSlots(), this.getMenu().slots).get(index);
+        Screen.drawCenteredString(matrixStack, font, name, slot.x + 8, slot.y - font.lineHeight - 1, 0xFFFFFFFF);
     }
 
     private boolean hasNext()
@@ -272,11 +315,14 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         updateScreen();
     }
 
-    protected void addTextField(int x, int y, int width, int height, Object defaultValue)
+    protected void addTextField(int x, int y, int width, int height, Object defaultValue, int count)
     {
-        EditBox textfield = new EditBox(this.font, x, y, width, height, new TextComponent(""));
-        textfield.setValue(String.valueOf(defaultValue));
-        this.textFields.add(textfield);
+        for(int i = 0; i < count; i++)
+        {
+            EditBox textfield = new EditBox(this.font, x, y, width, height, new TextComponent(""));
+            textfield.setValue(String.valueOf(defaultValue));
+            this.textFields.add(textfield);
+        }
     }
 
     private void updateServerIndex()
@@ -286,7 +332,11 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
 
     protected void updateSlots()
     {
-        this.getMenu().slots.forEach(slot -> { if(slot instanceof SimpleSlotItemHandler) ((SimpleSlotItemHandler) slot).setActive(false); });
-        getCurrentRecipe().getSlots().forEach(ds -> setSlot(ds.getIndex(), ds.getxPos(), ds.getyPos()));
+        this.getMenu().activeSlots(false);
+        this.getCurrentRecipe().getSlots().forEach(ds ->
+                this.getMenu().slots.stream().filter(s ->
+                                s.getSlotIndex() == ds.getIndex() && s instanceof SimpleSlotItemHandler)
+                .findFirst().ifPresent(slot ->
+                                ((SimpleSlotItemHandler) slot).setActive(true)));
     }
 }

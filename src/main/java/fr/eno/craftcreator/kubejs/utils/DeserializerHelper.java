@@ -21,7 +21,7 @@ public class DeserializerHelper
     {
         List<T> entries = new ArrayList<>();
 
-        Stream.of(mods).filter(mod -> mod != SupportedMods.KUBE_JS).forEach(mod -> entries.add((T) new SimpleListWidget.StringEntry(mod.getModId())));
+        Stream.of(mods).forEach(mod -> entries.add((T) new SimpleListWidget.StringEntry(mod.getModId())));
 
         return entries;
     }
