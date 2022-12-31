@@ -87,7 +87,7 @@ public class RemoveRecipeManagerScreen extends ChildrenScreen
             this.updateList(ModRecipesJSSerializer.RecipeDescriptors.RECIPE_ID, simpleEditBox.x, simpleEditBox.y, simpleEditBox, EntryHelper.getStringEntryListWith(EntryHelper.getRecipeIds()));
         }));
 
-        this.addRenderableWidget(new SimpleTextButton(References.getTranslate("screen.remove_manager.button.remove"), this.width / 2 - 80, this.height - 50, 160, 15, (button) -> sendRemovedRecipe()));
+        this.addRenderableWidget(new SimpleButton(References.getTranslate("screen.remove_manager.button.remove"), this.width / 2 - 80, this.height - 50, 160, 20, (button) -> sendRemovedRecipe()));
         this.addRenderableWidget(new SimpleButton(References.getTranslate("screen.remove_manager.button.back"), this.width - 97, this.height - 35, 80, 20, (button) -> this.minecraft.setScreen(new ModSelectionScreen())));
 
         this.addList(new SimpleListWidget(minecraft, 200, 200, 100, 100, 15,  4, null));

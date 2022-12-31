@@ -9,6 +9,7 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -72,6 +73,6 @@ public class DeserializerHelper
                         entries.add((E) new SimpleListWidget.RecipeEntry(recipe));
                 });
 
-        return entries.stream().sorted((object1, object2) -> ((SimpleListWidget.RecipeEntry) object1).getRecipe().getId().toString().compareTo(((SimpleListWidget.RecipeEntry) object2).getRecipe().getId().toString())).collect(Collectors.toList());
+        return entries.stream().sorted(Comparator.comparing(object -> ((SimpleListWidget.RecipeEntry) object).getRecipe().getId().toString())).collect(Collectors.toList());
     }
 }

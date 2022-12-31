@@ -20,5 +20,7 @@ public class SmithingTableRecipeCreatorContainer extends VanillaCommonContainer
 		this.addSlot(new SimpleSlotItemHandler(tile, index, 134, 47));
 		
 		this.bindPlayerInventory(playerInventory);
+
+		activeSlots();
 	}
 }

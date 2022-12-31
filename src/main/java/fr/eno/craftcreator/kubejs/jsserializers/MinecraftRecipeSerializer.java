@@ -1,22 +1,28 @@
 package fr.eno.craftcreator.kubejs.jsserializers;
 
+import fr.eno.craftcreator.kubejs.utils.CraftIngredients;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import fr.eno.craftcreator.serializer.CraftingTableRecipeSerializer;
 import fr.eno.craftcreator.serializer.FurnaceRecipeSerializer;
 import fr.eno.craftcreator.serializer.SmithingTableRecipeSerializer;
 import fr.eno.craftcreator.serializer.StoneCutterRecipeSerializer;
 import fr.eno.craftcreator.utils.CraftType;
-import fr.eno.craftcreator.utils.PairValue;
+import io.netty.buffer.Unpooled;
 import net.minecraft.core.NonNullList;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.UpgradeRecipe;
 import net.minecraftforge.items.SlotItemHandler;
-import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
 {
@@ -80,33 +86,40 @@ public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
     }
 
     @Override
-    public PairValue<String, Integer> getParam(Recipe<?> recipe)
-    {
-        return null;
-    }
-
-    @Override
     public void sendSuccessMessage(RecipeType<?> type, ResourceLocation result)
     {
         super.sendSuccessMessage(type, result);
     }
 
     @Override
-    public Map<String, ResourceLocation> getOutput(Recipe<?> recipe)
+    public CraftIngredients getInput(Recipe<?> recipe)
     {
-        return Collections.singletonMap("Item", recipe.getResultItem().getItem().getRegistryName());
+        CraftIngredients ingredients = CraftIngredients.create();
+
+        if(recipe instanceof UpgradeRecipe smithRecipe) // Fields are not accessible so we need to do this :(
+        {
+            FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
+            UpgradeRecipe.Serializer serializer = (UpgradeRecipe.Serializer) smithRecipe.getSerializer();
+            serializer.toNetwork(buffer, smithRecipe);
+            Ingredient base = Ingredient.fromNetwork(buffer);
+            Ingredient addition = Ingredient.fromNetwork(buffer);
+            ingredients.addIngredient(new CraftIngredients.ItemIngredient(base.getItems()[0].getItem().getRegistryName(), 1));
+            ingredients.addIngredient(new CraftIngredients.ItemIngredient(addition.getItems()[0].getItem().getRegistryName(), 1));
+        }
+
+        if(ingredients.isEmpty())
+            putIfNotEmpty(ingredients, recipe.getIngredients());
+
+        return ingredients;
     }
 
     @Override
-    public ItemStack getOneOutput(Map.Entry<String, ResourceLocation> entry)
+    public CraftIngredients getOutput(Recipe<?> recipe)
     {
-        return switch(Objects.requireNonNull(entry).getKey())
-                {
-                    case "Block" -> new ItemStack(ForgeRegistries.BLOCKS.getValue(entry.getValue()));
-                    case "Item" -> new ItemStack(ForgeRegistries.ITEMS.getValue(entry.getValue()));
-                    default -> ItemStack.EMPTY;
-                };
+        CraftIngredients ingredients = CraftIngredients.create();
+        ingredients.addIngredient(new CraftIngredients.ItemIngredient(recipe.getResultItem().getItem().getRegistryName(), recipe.getResultItem().getCount()));
 
+        return ingredients;
     }
 
     public static MinecraftRecipeSerializer get()

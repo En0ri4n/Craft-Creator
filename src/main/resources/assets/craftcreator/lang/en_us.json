@@ -27,7 +27,7 @@
 	"craftcreator.screen.recipe_creator.button.next": ">",
 	"craftcreator.screen.recipe_creator.button.previous": "<",
 
-	"craftcreator.screen.recipe_manager.button.remove_recipe": "Remove Recipe...",
+	"craftcreator.screen.recipe_manager.button.remove_recipe": "Remove Recipe",
 
 	"craftcreator.screen.recipe_manager.button.back": "Back",
 	"craftcreator.screen.recipe_manager.button.modifier_manager": "Modifier Manager",
@@ -63,5 +63,17 @@
 	"craftcreator.screen.botania_recipe_creator.runic_altar.title": "Rune Recipe Creator",
 	"craftcreator.screen.botania_recipe_creator.terra_plate.title": "Terra Plate Recipe Creator",
 
-	"craftcreator.screen.thermal_recipe_creator.tree_extractor.title": "Tree Extractor Recipe Creator"
+	"craftcreator.screen.thermal_recipe_creator.tree_extractor.title": "Tree Extractor Recipe Creator",
+	"craftcreator.screen.thermal_recipe_creator.pulverizer.title": "Pulverizer Recipe Creator",
+	"craftcreator.screen.thermal_recipe_creator.smelter.title": "Smelter Recipe Creator",
+	"craftcreator.screen.thermal_recipe_creator.insolator.title": "Insolator Recipe Creator",
+	"craftcreator.screen.thermal_recipe_creator.chiller.title": "Chiller Recipe Creator",
+	"craftcreator.screen.thermal_recipe_creator.refinery.title": "Refinery Recipe Creator",
+	"craftcreator.screen.thermal_recipe_creator.crucible.title": "Crucible Recipe Creator",
+	"craftcreator.screen.thermal_recipe_creator.press.title": "Press Recipe Creator",
+	"craftcreator.screen.thermal_recipe_creator.centrifuge.title": "Centrifuge Recipe Creator",
+	"craftcreator.screen.thermal_recipe_creator.brewer.title": "Brewer Recipe Creator",
+	"craftcreator.screen.thermal_recipe_creator.fermenter.title": "Fermenter Recipe Creator",
+	"craftcreator.screen.thermal_recipe_creator.carpenter.title": "Carpenter Recipe Creator",
+	"craftcreator.screen.thermal_recipe_creator.sawmill.title": "Sawmill Recipe Creator"
 }

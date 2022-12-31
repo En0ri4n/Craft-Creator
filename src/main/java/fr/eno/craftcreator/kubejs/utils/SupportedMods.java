@@ -38,7 +38,7 @@ public enum SupportedMods
             }
         }
 
-        return null;
+        return SupportedMods.MINECRAFT;
     }
 
     public boolean isLoaded()

@@ -67,7 +67,6 @@ public class CraftingTableRecipeCreatorScreen extends TaggeableSlotsContainerScr
     @Override
     protected void renderBg(@Nonnull PoseStack matrixStack, float partialTicks, int mouseX, int mouseY)
     {
-        this.renderBackground(matrixStack);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, CRAFT_CREATOR_TABLE_GUI_TEXTURES);
         int x = this.leftPos;

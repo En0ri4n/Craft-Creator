@@ -28,7 +28,9 @@ public class SlotHelper
     public static final int THERMAL_SLOTS_SIZE;
     public static final List<PositionnedSlot> THERMAL_SLOTS;
     public static final List<PositionnedSlot> TREE_EXTRACTOR_SLOTS;
-
+    public static final List<PositionnedSlot> PULVERIZER_SLOTS;
+    public static final List<PositionnedSlot> SAWMILL_SLOTS;
+    public static final List<PositionnedSlot> SMELTER_SLOTS;
 
 
     static
@@ -46,8 +48,11 @@ public class SlotHelper
         
         int thermalSlots = 0;
         TREE_EXTRACTOR_SLOTS = Arrays.asList(new PositionnedSlot(thermalSlots++, 26, 53), new PositionnedSlot(thermalSlots++, 26, 24), new PositionnedSlot(thermalSlots++, 134, 24));
+        PULVERIZER_SLOTS = Arrays.asList(new PositionnedSlot(thermalSlots++, 26, 35), new PositionnedSlot(thermalSlots++, 98, 6), new PositionnedSlot(thermalSlots++, 98, 25), new PositionnedSlot(thermalSlots++, 98, 44), new PositionnedSlot(thermalSlots++, 98, 63));
+        SAWMILL_SLOTS = Arrays.asList(new PositionnedSlot(thermalSlots++, 26, 35), new PositionnedSlot(thermalSlots++, 98, 6), new PositionnedSlot(thermalSlots++, 98, 25), new PositionnedSlot(thermalSlots++, 98, 44), new PositionnedSlot(thermalSlots++, 98, 63));
+        SMELTER_SLOTS = Arrays.asList(new PositionnedSlot(thermalSlots, 10, 14), new PositionnedSlot(thermalSlots++, 28, 14), new PositionnedSlot(thermalSlots++, 46, 14), new PositionnedSlot(thermalSlots++, 10, 34), new PositionnedSlot(thermalSlots++, 28, 34), new PositionnedSlot(thermalSlots++, 46, 34), new PositionnedSlot(thermalSlots++, 10, 54), new PositionnedSlot(thermalSlots++, 28, 54), new PositionnedSlot(thermalSlots++, 46, 54), new PositionnedSlot(thermalSlots++, 126, 24), new PositionnedSlot(thermalSlots++, 145, 24), new PositionnedSlot(thermalSlots++, 126, 43), new PositionnedSlot(thermalSlots++, 145, 43));
 
-        THERMAL_SLOTS = Stream.of(TREE_EXTRACTOR_SLOTS).flatMap(Collection::stream).collect(Collectors.toList());
+        THERMAL_SLOTS = Stream.of(TREE_EXTRACTOR_SLOTS, PULVERIZER_SLOTS, SAWMILL_SLOTS, SMELTER_SLOTS).flatMap(Collection::stream).collect(Collectors.toList());
         THERMAL_SLOTS_SIZE = thermalSlots;
     }
 }

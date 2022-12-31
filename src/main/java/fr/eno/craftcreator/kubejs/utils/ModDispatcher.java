@@ -1,48 +1,24 @@
 package fr.eno.craftcreator.kubejs.utils;
 
-import fr.eno.craftcreator.kubejs.jsserializers.BotaniaRecipesJSSerializer;
+import fr.eno.craftcreator.kubejs.jsserializers.BotaniaRecipesSerializer;
 import fr.eno.craftcreator.kubejs.jsserializers.MinecraftRecipeSerializer;
 import fr.eno.craftcreator.kubejs.jsserializers.ModRecipesJSSerializer;
-import fr.eno.craftcreator.kubejs.jsserializers.ThermalRecipesJSSerializer;
-import fr.eno.craftcreator.utils.PairValue;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
+import fr.eno.craftcreator.kubejs.jsserializers.ThermalRecipesSerializer;
 import net.minecraft.world.item.crafting.Recipe;
-
-import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ModDispatcher
 {
     public static ModRecipesJSSerializer getSeralizer(String modId)
     {
-        switch(SupportedMods.getMod(modId))
-        {
-            case BOTANIA:
-                return BotaniaRecipesJSSerializer.get();
-            case THERMAL:
-                return ThermalRecipesJSSerializer.get();
-            case MINECRAFT:
-            default:
-                return MinecraftRecipeSerializer.get();
-        }
+        return switch(SupportedMods.getMod(modId))
+                {
+                    case BOTANIA -> BotaniaRecipesSerializer.get();
+                    case THERMAL -> ThermalRecipesSerializer.get();
+                    case MINECRAFT, default -> MinecraftRecipeSerializer.get();
+                };
     }
 
-    @Nullable
-    public static PairValue<String, Integer> getParameters(Recipe<?> recipe)
-    {
-        String modId = recipe.getId().getNamespace();
-
-        if(SupportedMods.isModLoaded(modId))
-        {
-            return getSeralizer(modId).getParam(recipe);
-        }
-
-        return PairValue.create("Unknown", 0);
-    }
-
-    public static Map<String, ResourceLocation> getOutput(Recipe<?> recipe)
+    public static CraftIngredients getOutput(Recipe<?> recipe)
     {
         String modId = recipe.getId().getNamespace();
 
@@ -51,21 +27,18 @@ public class ModDispatcher
             return getSeralizer(modId).getOutput(recipe);
         }
 
-        return new HashMap<>();
+        return CraftIngredients.create();
     }
 
-    public static ItemStack getOneOutput(Recipe<?> recipe)
+    public static CraftIngredients getInputs(Recipe<?> recipe)
     {
-        ItemStack stack = ItemStack.EMPTY;
-        Map<String, ResourceLocation> locations = getOutput(recipe);
+        String modId = recipe.getId().getNamespace();
 
-        Map.Entry<String, ResourceLocation> entry = locations.entrySet().stream().findFirst().orElse(null);
-
-        if(SupportedMods.isModLoaded(entry.getValue().getNamespace()))
+        if(SupportedMods.isModLoaded(modId))
         {
-            return getSeralizer(entry.getValue().getNamespace()).getOneOutput(entry);
+            return getSeralizer(modId).getInput(recipe);
         }
 
-        return stack;
+        return CraftIngredients.create();
     }
 }

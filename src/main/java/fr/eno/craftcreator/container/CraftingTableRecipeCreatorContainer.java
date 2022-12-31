@@ -28,5 +28,7 @@ public class CraftingTableRecipeCreatorContainer extends VanillaCommonContainer
 		this.addSlot(new SimpleSlotItemHandler(tile, index, 124, 35));
 		
 		this.bindPlayerInventory(inventory);
+
+		activeSlots();
 	}
 }

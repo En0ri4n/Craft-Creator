@@ -1,8 +1,8 @@
 package fr.eno.craftcreator.kubejs.managers;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import fr.eno.craftcreator.kubejs.jsserializers.BotaniaRecipesJSSerializer;
+import fr.eno.craftcreator.kubejs.jsserializers.BotaniaRecipesSerializer;
+import fr.eno.craftcreator.kubejs.utils.RecipeInfos;
 import fr.eno.craftcreator.screen.utils.ModRecipeCreatorScreens;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
@@ -16,8 +16,6 @@ import net.minecraft.world.level.block.Blocks;
 import vazkii.botania.api.brew.Brew;
 import vazkii.botania.api.brew.IBrewItem;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,30 +23,28 @@ public class BotaniaRecipesManager extends BaseRecipesManager
 {
     private static final BotaniaRecipesManager INSTANCE = new BotaniaRecipesManager();
 
-    private final int MANA_INDEX = 0;
-
     @Override
-    public void createRecipe(ModRecipeCreatorScreens recipe, List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, List<Integer> param)
+    public void createRecipe(ModRecipeCreatorScreens recipe, List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, RecipeInfos recipeInfos)
     {
         switch(recipe)
         {
             case MANA_INFUSION ->
-                    createManaInfusionRecipe(PositionnedSlot.getSlotsFor(SlotHelper.MANA_INFUSION_SLOTS, slots), param);
+                    createManaInfusionRecipe(PositionnedSlot.getSlotsFor(SlotHelper.MANA_INFUSION_SLOTS, slots), recipeInfos.getInteger("mana"));
             case ELVEN_TRADE ->
-                    createElvenTradeRecipe(PositionnedSlot.getSlotsFor(SlotHelper.ELVEN_TRADE_SLOTS, slots), param);
+                    createElvenTradeRecipe(PositionnedSlot.getSlotsFor(SlotHelper.ELVEN_TRADE_SLOTS, slots));
             case PURE_DAISY ->
-                    createPureDaisyRecipe(PositionnedSlot.getSlotsFor(SlotHelper.PURE_DAISY_SLOTS, slots), param);
+                    createPureDaisyRecipe(PositionnedSlot.getSlotsFor(SlotHelper.PURE_DAISY_SLOTS, slots), recipeInfos.getInteger("time"));
             case BREWERY -> createBreweryRecipe(PositionnedSlot.getSlotsFor(SlotHelper.BREWERY_SLOTS, slots));
             case PETAL_APOTHECARY ->
                     createPetalRecipe(PositionnedSlot.getSlotsFor(SlotHelper.PETAL_APOTHECARY_SLOTS, slots), taggedSlots);
             case RUNIC_ALTAR ->
-                    createRuneRecipe(PositionnedSlot.getSlotsFor(SlotHelper.RUNIC_ALTAR_SLOTS, slots), taggedSlots, param);
+                    createRuneRecipe(PositionnedSlot.getSlotsFor(SlotHelper.RUNIC_ALTAR_SLOTS, slots), taggedSlots, recipeInfos.getInteger("mana"));
             case TERRA_PLATE ->
-                    createTerraPlateRecipe(PositionnedSlot.getSlotsFor(SlotHelper.TERRA_PLATE_SLOTS, slots), taggedSlots, param);
+                    createTerraPlateRecipe(PositionnedSlot.getSlotsFor(SlotHelper.TERRA_PLATE_SLOTS, slots), taggedSlots, recipeInfos.getInteger("mana"));
         }
     }
 
-    private void createManaInfusionRecipe(List<Slot> slots, List<Integer> param)
+    private void createManaInfusionRecipe(List<Slot> slots, int mana)
     {
         if(getValidOutput(slots) == null)
             return;
@@ -58,23 +54,23 @@ public class BotaniaRecipesManager extends BaseRecipesManager
         ItemStack output = getValidOutput(slots);
 
         if(catalystItem instanceof BlockItem)
-            BotaniaRecipesJSSerializer.get().createInfusionRecipe(input, ((BlockItem) catalystItem).getBlock(), output, param.get(MANA_INDEX));
+            BotaniaRecipesSerializer.get().createInfusionRecipe(input, ((BlockItem) catalystItem).getBlock(), output, mana);
         else
-            BotaniaRecipesJSSerializer.get().createInfusionRecipe(input, Blocks.AIR, output, param.get(MANA_INDEX));
+            BotaniaRecipesSerializer.get().createInfusionRecipe(input, Blocks.AIR, output, mana);
     }
 
-    private void createElvenTradeRecipe(List<Slot> slots, List<Integer> param)
+    private void createElvenTradeRecipe(List<Slot> slots)
     {
         List<Item> input = getValidList(slots, 0, 5);
         List<Item> output = getValidList(slots, 5, 10);
 
         if(!input.isEmpty() && !output.isEmpty())
         {
-            BotaniaRecipesJSSerializer.get().createElvenTradeRecipe(input, output);
+            BotaniaRecipesSerializer.get().createElvenTradeRecipe(input, output);
         }
     }
 
-    private void createPureDaisyRecipe(List<Slot> slots, List<Integer> param)
+    private void createPureDaisyRecipe(List<Slot> slots, int time)
     {
         if(getValidOutput(slots) == null)
             return;
@@ -87,7 +83,7 @@ public class BotaniaRecipesManager extends BaseRecipesManager
             Block inputBlock = ((BlockItem) input).getBlock();
             Block outputBlock = ((BlockItem) output).getBlock();
 
-            BotaniaRecipesJSSerializer.get().createPureDaisyRecipe(inputBlock, outputBlock, param.get(MANA_INDEX));
+            BotaniaRecipesSerializer.get().createPureDaisyRecipe(inputBlock, outputBlock, time);
         }
     }
 
@@ -103,7 +99,7 @@ public class BotaniaRecipesManager extends BaseRecipesManager
         {
             Brew brew = ((IBrewItem) brewItem).getBrew(getValidOutput(slots));
 
-            BotaniaRecipesJSSerializer.get().createBrewRecipe(ingredients, brew);
+            BotaniaRecipesSerializer.get().createBrewRecipe(ingredients, brew);
         }
     }
 
@@ -115,10 +111,10 @@ public class BotaniaRecipesManager extends BaseRecipesManager
         ItemStack output = getValidOutput(slots);
         Multimap<ResourceLocation, Boolean> input = getValidIngredients(slots, taggedSlots);
 
-        BotaniaRecipesJSSerializer.get().createPetalRecipe(input, output);
+        BotaniaRecipesSerializer.get().createPetalRecipe(input, output);
     }
 
-    private void createRuneRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, List<Integer> param)
+    private void createRuneRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, int mana)
     {
         if(getValidOutput(slots) == null)
             return;
@@ -126,10 +122,10 @@ public class BotaniaRecipesManager extends BaseRecipesManager
         ItemStack output = getValidOutput(slots);
         Multimap<ResourceLocation, Boolean> input = getValidIngredients(slots, taggedSlots);
 
-        BotaniaRecipesJSSerializer.get().createRuneRecipe(input, output, param.get(MANA_INDEX));
+        BotaniaRecipesSerializer.get().createRuneRecipe(input, output, mana);
     }
 
-    private void createTerraPlateRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, List<Integer> param)
+    private void createTerraPlateRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, int mana)
     {
         if(getValidOutput(slots) == null)
             return;
@@ -137,7 +133,7 @@ public class BotaniaRecipesManager extends BaseRecipesManager
         ItemStack output = getValidOutput(slots);
         Multimap<ResourceLocation, Boolean> input = getValidIngredients(slots, taggedSlots);
 
-        BotaniaRecipesJSSerializer.get().createTerraPlateRecipe(input, output, param.get(MANA_INDEX));
+        BotaniaRecipesSerializer.get().createTerraPlateRecipe(input, output, mana);
     }
 
     public static BotaniaRecipesManager get()

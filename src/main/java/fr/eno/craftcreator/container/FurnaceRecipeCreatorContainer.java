@@ -2,13 +2,12 @@ package fr.eno.craftcreator.container;
 
 import fr.eno.craftcreator.container.slot.LockedSlot;
 import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
-import fr.eno.craftcreator.container.utils.CommonContainer;
 import fr.eno.craftcreator.container.utils.VanillaCommonContainer;
 import fr.eno.craftcreator.init.InitContainers;
-import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import fr.eno.craftcreator.tileentity.vanilla.FurnaceRecipeCreatorTile;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -24,10 +23,12 @@ public class FurnaceRecipeCreatorContainer extends VanillaCommonContainer
 		this.addSlot(new SimpleSlotItemHandler(tile, index++, 56, 17));
 		this.addSlot(new SimpleSlotItemHandler(tile, index++, 116, 35));
 		
-		ItemStack fuel = new ItemStack(Items.COAL_BLOCK);
+		ItemStack fuel = new ItemStack(Items.COAL_BLOCK, 1);
 		fuel.enchant(Enchantments.ALL_DAMAGE_PROTECTION, 10);
 		this.addSlot(new LockedSlot(tile, index, 56, 53, fuel));
 		
 		this.bindPlayerInventory(inventory);
+
+		activeSlots();
 	}
 }

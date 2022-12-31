@@ -8,11 +8,12 @@ import fr.eno.craftcreator.container.utils.CommonContainer;
 import fr.eno.craftcreator.init.InitPackets;
 import fr.eno.craftcreator.kubejs.managers.RecipeManagerDispatcher;
 import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
+import fr.eno.craftcreator.kubejs.utils.RecipeInfos;
 import fr.eno.craftcreator.packets.GetModRecipeCreatorScreenIndexPacket;
 import fr.eno.craftcreator.packets.SetModRecipeCreatorScreenIndexServerPacket;
-import fr.eno.craftcreator.screen.utils.ModRecipeCreatorScreens;
 import fr.eno.craftcreator.screen.buttons.ExecuteButton;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;
+import fr.eno.craftcreator.screen.utils.ModRecipeCreatorScreens;
 import fr.eno.craftcreator.utils.FieldAccessor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
@@ -43,6 +44,8 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     protected SimpleButton previousButton;
 
     protected final List<EditBox> textFields;
+
+    protected final RecipeInfos recipeInfos;
     
     private int currentScreenIndex;
 
@@ -51,6 +54,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         super(screenContainer, inv, titleIn, pos);
         this.textFields = new ArrayList<>();
         this.currentScreenIndex = 0;
+        this.recipeInfos = RecipeInfos.create();
     }
 
     @Override
@@ -61,25 +65,13 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
 
         InitPackets.getNetWork().send(PacketDistributor.SERVER.noArg(), new GetModRecipeCreatorScreenIndexPacket(this.getMenu().getTile().getBlockPos()));
 
-        this.addRenderableWidget(executeButton = new ExecuteButton(this.leftPos + this.imageWidth / 2 - 20, this.topPos + 35,40, (button) -> RecipeManagerDispatcher.createRecipe(this.getMenu().getMod(), getCurrentRecipe(), this.getMenu().slots.stream().filter(slot -> slot instanceof SimpleSlotItemHandler).collect(Collectors.toList()), getTagged(), getParametersValue())));
+        this.addRenderableWidget(executeButton = new ExecuteButton(this.leftPos + this.imageWidth / 2 - 20, this.topPos + 35,40, (button) -> RecipeManagerDispatcher.createRecipe(this.getMenu().getMod(), getCurrentRecipe(), this.getMenu().slots.stream().filter(slot -> slot instanceof SimpleSlotItemHandler).collect(Collectors.toList()), getTagged(), getRecipeInfos())));
 
         this.addRenderableWidget(nextButton = new SimpleButton(References.getTranslate("screen.recipe_creator.button.next"), this.leftPos + this.imageWidth + 3, this.topPos + this.imageHeight - 66, 10, 20, (button) -> nextPage()));
         this.addRenderableWidget(previousButton = new SimpleButton(References.getTranslate("screen.recipe_creator.button.previous"),  this.leftPos - 3 - 10, this.topPos + this.imageHeight - 66,10, 20, (button) -> previousPage()));
-
-        nextButton.visible = hasNext();
-        previousButton.visible = hasPrevious();
     }
 
-    private List<Integer> getParametersValue()
-    {
-        try
-        {
-            return textFields.stream().map(editBox -> Integer.parseInt(editBox.getValue())).collect(Collectors.toList());
-        }
-        catch(NumberFormatException ignored) {}
-
-        return Collections.singletonList(-1);
-    }
+    protected abstract RecipeInfos getRecipeInfos();
 
     private Map<Integer, ResourceLocation> getTagged()
     {
@@ -90,7 +82,39 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         return map;
     }
 
-    protected abstract void updateScreen();
+    /**
+     * This method is called when the arrow buttons are pressed.
+     * It is used to change the screen. To Override.
+     */
+    protected void updateScreen()
+    {
+        hideTextFields();
+        this.updateSlots();
+
+        nextButton.visible = hasNext();
+        previousButton.visible = hasPrevious();
+    }
+
+    protected void hideTextFields()
+    {
+        this.textFields.forEach(textField -> textField.active = textField.visible = false);
+    }
+
+    protected void showTextField(int... index)
+    {
+        for(int i : index)
+        {
+            this.textFields.get(i).active = this.textFields.get(i).visible = true;
+        }
+    }
+
+    protected void setTextFieldValue(Object defaultValue, int... index)
+    {
+        for(int i : index)
+        {
+            this.textFields.get(i).setValue(String.valueOf(defaultValue.toString()));
+        }
+    }
 
     public void setCurrentScreenIndex(int index)
     {
@@ -124,7 +148,6 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         assert minecraft != null;
-        this.renderBackground(matrixStack);
 
         super.render(matrixStack, mouseX, mouseY, partialTicks);
         
@@ -142,13 +165,23 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         super.renderComponentHoverEffect(pPoseStack, pStyle, pMouseX, pMouseY);
     }
 
-    void renderTextfieldTitle(int index, String text, PoseStack matrixStack)
+    protected void renderTextField(int index, PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    {
+        this.textFields.get(index).render(matrixStack, mouseX, mouseY, partialTicks);
+    }
+
+    protected void renderTextfieldTitle(int index, String text, PoseStack matrixStack)
     {
         matrixStack.pushPose();
         float scale = 0.85F;
         matrixStack.scale(scale, scale, scale);
         Screen.drawString(matrixStack, font, new TextComponent(text), (int) (textFields.get(index).x / scale), (int) ((textFields.get(index).y - font.lineHeight * scale) / scale), 0xFFFFFF);
         matrixStack.popPose();
+    }
+
+    protected EditBox getTextField(int index)
+    {
+        return this.textFields.get(index);
     }
 
     @Override
@@ -161,7 +194,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     @Override
     public boolean charTyped(char codePoint, int modifiers)
     {
-        if(Character.isDigit(codePoint))
+        if(Character.isDigit(codePoint) || codePoint == '.')
             this.textFields.forEach(field -> field.charTyped(codePoint, modifiers));
         return super.charTyped(codePoint, modifiers);
     }
@@ -193,7 +226,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     protected void renderLabels(PoseStack matrixStack, int pMouseX, int pMouseY)
     {
         assert minecraft != null;
-        drawCenteredString(matrixStack, minecraft.font, References.getTranslate("screen."+ this.getMenu().getMod().getModId() + "_recipe_creator." + RecipeFileUtils.getName(getCurrentRecipe().getRecipeType()).getPath() + ".title"), this.imageWidth / 2, -15, 0xFFFFFF);
+        drawCenteredString(matrixStack, minecraft.font, References.getTranslate("screen." + this.getMenu().getMod().getModId() + "_recipe_creator." + RecipeFileUtils.getName(getCurrentRecipe().getRecipeType()).getPath() + ".title"), this.imageWidth / 2, -15, 0xFFFFFF);
         super.renderLabels(matrixStack, pMouseX, pMouseY);
     }
 
@@ -237,6 +270,13 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         this.currentScreenIndex--;
         updateServerIndex();
         updateScreen();
+    }
+
+    protected void addTextField(int x, int y, int width, int height, Object defaultValue)
+    {
+        EditBox textfield = new EditBox(this.font, x, y, width, height, new TextComponent(""));
+        textfield.setValue(String.valueOf(defaultValue));
+        this.textFields.add(textfield);
     }
 
     private void updateServerIndex()

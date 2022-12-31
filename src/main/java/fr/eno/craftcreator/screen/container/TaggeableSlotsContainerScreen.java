@@ -52,6 +52,8 @@ public abstract class TaggeableSlotsContainerScreen<T extends AbstractContainerM
     @Override
     public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
+        this.renderBackground(matrixStack);
+
         super.render(matrixStack, mouseX, mouseY, partialTicks);
 
         if(this.guiTagList.getKeys() != null)
