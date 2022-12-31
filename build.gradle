@@ -28,7 +28,7 @@ println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty '
 
 minecraft {
     // mappings channel: 'parchment', version: "1.18.1-2022.03.06-1.18.2"
-    mappings channel: 'official', version: "1.18.2"
+    mappings channel: 'official', version: "1.19.2"
 
     runs {
         client {
@@ -124,7 +124,7 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.18.2-40.1.80'
+    minecraft 'net.minecraftforge:forge:1.19.2-43.2.0'
 
     // KubeJS
     implementation fg.deobf("dev.latvian.mods:kubejs-forge:${kubejs_version}")
