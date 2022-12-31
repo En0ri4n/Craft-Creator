@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import fr.eno.craftcreator.References;
+import fr.eno.craftcreator.kubejs.utils.CraftIngredients;
 import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
@@ -17,16 +18,15 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public abstract class ModRecipesJSSerializer
@@ -72,8 +72,6 @@ public abstract class ModRecipesJSSerializer
     {
         RecipeFileUtils.insertAndWriteLines(this.mod.getModId(), recipeType, "event.custom(" + recipeJson + ")");
     }
-
-    public abstract PairValue<String, Integer> getParam(Recipe<?> recipe);
 
     protected void sendSuccessMessage(RecipeType<?> type, @Nullable ResourceLocation result)
     {
@@ -136,6 +134,16 @@ public abstract class ModRecipesJSSerializer
         return obj;
     }
 
+    protected boolean isItem(ResourceLocation resourceLocation)
+    {
+        return ForgeRegistries.ITEMS.containsKey(resourceLocation);
+    }
+
+    protected <T, V> List<PairValue<T, V>> singletonList(PairValue<T, V> value)
+    {
+        return Collections.singletonList(value);
+    }
+
     boolean isRecipeExists(RecipeType<?> recipeType, ResourceLocation resultOutput)
     {
         return recipeType != null && resultOutput != null;
@@ -146,9 +154,35 @@ public abstract class ModRecipesJSSerializer
         Objects.requireNonNull(Minecraft.getInstance().player).sendMessage(References.getTranslate("js_serializer.fail.recipe_exists"), Minecraft.getInstance().player.getUUID());
     }
 
-    public abstract Map<String, ResourceLocation> getOutput(Recipe<?> recipe);
+    protected void putIfNotEmpty(CraftIngredients inputIngredients, List<Ingredient> ingredients)
+    {
+        for(Ingredient ingredient : ingredients)
+        {
+            if(ingredient.toJson().isJsonObject() && ingredient.toJson().getAsJsonObject().has("tag"))
+            {
+                inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(ResourceLocation.tryParse(ingredient.toJson().getAsJsonObject().get("tag").getAsString()), 0, "Tag", true));
+            }
+            else
+            {
+                for(ItemStack stack : ingredient.getItems())
+                    if(!stack.isEmpty()) inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(stack.getItem().getRegistryName(), stack.getCount()));
+            }
+        }
+    }
 
-    public abstract ItemStack getOneOutput(Map.Entry<String, ResourceLocation> entry);
+    protected void putIfNotEmptyLuckedItems(CraftIngredients inputIngredients, List<ItemStack> stacks, List<Float> chances, String description)
+    {
+        for(int i = 0; i < stacks.size();  i++)
+        {
+            ItemStack stack = stacks.get(i);
+            if(!stack.isEmpty())
+                inputIngredients.addIngredient(new CraftIngredients.ItemLuckIngredient(stack.getItem().getRegistryName(), stack.getCount(), chances.get(i), description));
+        }
+    }
+
+    public abstract CraftIngredients getOutput(Recipe<?> recipe);
+
+    public abstract CraftIngredients getInput(Recipe<?> recipe);
 
     public enum RecipeDescriptors
     {

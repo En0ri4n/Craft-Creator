@@ -33,9 +33,8 @@ public class SetModRecipeCreatorScreenIndexClientPacket
     {
         Screen screen = Minecraft.getInstance().screen;
 
-        if(screen instanceof BotaniaRecipeCreatorScreen)
+        if(screen instanceof BotaniaRecipeCreatorScreen botaniaRecipeCreatorScreen)
         {
-            BotaniaRecipeCreatorScreen botaniaRecipeCreatorScreen = (BotaniaRecipeCreatorScreen) screen;
             botaniaRecipeCreatorScreen.setCurrentScreenIndex(msg.index);
         }
 

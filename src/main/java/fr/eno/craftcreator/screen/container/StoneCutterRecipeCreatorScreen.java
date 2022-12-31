@@ -54,6 +54,7 @@ public class StoneCutterRecipeCreatorScreen extends AbstractContainerScreen<Ston
 	@Override
 	protected void renderBg(@Nonnull PoseStack matrixStack, float partialTicks, int mouseX, int mouseY)
 	{
+		this.renderBackground(matrixStack);
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.setShaderTexture(0, GUI_TEXTURES);
 		int i = this.leftPos;

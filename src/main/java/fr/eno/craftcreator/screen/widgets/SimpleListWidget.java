@@ -1,16 +1,14 @@
 package fr.eno.craftcreator.screen.widgets;
 
-import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.kubejs.jsserializers.ModRecipesJSSerializer;
+import fr.eno.craftcreator.kubejs.utils.CraftIngredients;
 import fr.eno.craftcreator.kubejs.utils.ModDispatcher;
-import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
 import fr.eno.craftcreator.utils.Callable;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
-import fr.eno.craftcreator.utils.PairValue;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
@@ -18,6 +16,7 @@ import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -381,7 +380,7 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
 
             Screen.drawString(matrixStack, minecraft.font, displayStr, left + 16 + 5, (top + height / 2 - minecraft.font.lineHeight / 2), color);
 
-            ItemStack item = ModDispatcher.getOneOutput(recipe);
+            ItemStack item = ModDispatcher.getOutput(recipe).getIcon();
 
             matrixStack.pushPose();
             float scale = 1F;
@@ -399,27 +398,84 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
         public void renderTooltip(PoseStack matrixStack, int mouseX, int mouseY)
         {
             tooltips.clear();
-            Multimap<String, ResourceLocation> input = RecipeFileUtils.getInput(recipe);
-            Map<String, ResourceLocation> output = ModDispatcher.getOutput(recipe);
+            CraftIngredients input = ModDispatcher.getInputs(recipe);
+            CraftIngredients output = ModDispatcher.getOutput(recipe);
 
             tooltips.add(new TextComponent(this.recipe.getId().toString()).withStyle(ChatFormatting.GREEN, ChatFormatting.UNDERLINE));
             tooltips.add(new TextComponent(""));
             tooltips.add(References.getTranslate("screen.widget.simple_list.tooltip.input"));
-            input.forEach((typeName, loc) -> tooltips.add(new TextComponent(typeName).withStyle(typeName.equalsIgnoreCase("item") ? ChatFormatting.AQUA : typeName.equalsIgnoreCase("block") ? ChatFormatting.LIGHT_PURPLE : ChatFormatting.DARK_PURPLE).append(new TextComponent(" : ")).append(new TextComponent(loc.toString()).withStyle(ChatFormatting.DARK_AQUA))));
+            addToTooltip(input);
 
             tooltips.add(new TextComponent(""));
             tooltips.add(References.getTranslate("screen.widget.simple_list.tooltip.output"));
-            output.forEach((typeName, loc) -> tooltips.add(new TextComponent(typeName).withStyle(typeName.equalsIgnoreCase("item") ? ChatFormatting.AQUA : typeName.equalsIgnoreCase("block") ? ChatFormatting.LIGHT_PURPLE : ChatFormatting.DARK_PURPLE).append(new TextComponent(" : ")).append(new TextComponent(loc.toString()).withStyle(ChatFormatting.DARK_AQUA))));
-
-            PairValue<String, Integer> param = RecipeFileUtils.getParam(recipe);
-
-            if(param != null)
-            {
-                tooltips.add(new TextComponent(""));
-                tooltips.add(new TextComponent(param.getFirstValue()).withStyle(ChatFormatting.DARK_GRAY).append(new TextComponent(" : ")).append(new TextComponent(String.valueOf(param.getSecondValue())).withStyle(ChatFormatting.GRAY)));
-            }
+            addToTooltip(output);
 
             minecraft.screen.renderTooltip(matrixStack, tooltips, Optional.empty(), mouseX, mouseY);
+        }
+
+        private void addToTooltip(CraftIngredients input)
+        {
+            input.getIngredients().forEach(craftIngredient ->
+            {
+                MutableComponent base = new TextComponent(craftIngredient.getDescription());
+                ChatFormatting baseColor = ChatFormatting.AQUA;
+                base.withStyle(baseColor);
+
+                MutableComponent separator = new TextComponent(" : ");
+                separator.withStyle(ChatFormatting.WHITE);
+                base.append(separator);
+
+                MutableComponent value = new TextComponent("");
+
+                if(craftIngredient instanceof CraftIngredients.BlockIngredient blockIngredient)
+                {
+                    value.append(new TextComponent(blockIngredient.getId().toString()));
+                    value.withStyle(ChatFormatting.DARK_AQUA);
+                }
+                else if(craftIngredient instanceof CraftIngredients.ItemLuckIngredient itemLuckIngredient)
+                {
+                    value.append(new TextComponent(itemLuckIngredient.getId().toString())).withStyle(ChatFormatting.DARK_AQUA);
+                    if(itemLuckIngredient.getCount() > 0)
+                    {
+                        MutableComponent component = new TextComponent(" (x").append(String.valueOf(itemLuckIngredient.getCount())).append(")").withStyle(ChatFormatting.GRAY);
+                        value.append(component);
+                    }
+                    if(itemLuckIngredient.getLuck() != 1D && itemLuckIngredient.getLuck() > 0D)
+                    {
+                        MutableComponent component = new TextComponent(" ").append(String.valueOf(itemLuckIngredient.getLuck() * 100)).append("%").withStyle(ChatFormatting.DARK_GRAY);
+                        value.append(component);
+                    }
+                }
+                else if(craftIngredient instanceof CraftIngredients.ItemIngredient itemIngredient)
+                {
+                    value.append(new TextComponent(itemIngredient.getId().toString())).withStyle(ChatFormatting.DARK_AQUA);
+                    if(itemIngredient.getCount() > 0)
+                    {
+                        MutableComponent component = new TextComponent(" (x").append(String.valueOf(itemIngredient.getCount())).append(")").withStyle(ChatFormatting.GRAY);
+                        value.append(component);
+                    }
+                }
+                else if(craftIngredient instanceof CraftIngredients.FluidIngredient fluidIngredient)
+                {
+                    value.append(new TextComponent(fluidIngredient.getId().toString()));
+                    value.withStyle(ChatFormatting.BLUE);
+
+                    MutableComponent component = new TextComponent(" (");
+                    component.append(String.valueOf(fluidIngredient.getAmount()));
+                    component.append(new TextComponent("mb)"));
+                    component.withStyle(ChatFormatting.GRAY);
+                    value.append(component);
+                }
+                else if(craftIngredient instanceof CraftIngredients.DataIngredient dataIngredient)
+                {
+                    value.append(new TextComponent(String.valueOf(dataIngredient.getCount())));
+                    value.withStyle(ChatFormatting.LIGHT_PURPLE);
+                }
+
+                base.append(value);
+
+                tooltips.add(base);
+            });
         }
 
         public Recipe<?> getRecipe()

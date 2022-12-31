@@ -6,7 +6,6 @@ import com.google.gson.*;
 import fr.eno.craftcreator.kubejs.KubeJSManager;
 import fr.eno.craftcreator.kubejs.jsserializers.ModRecipesJSSerializer;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
-import fr.eno.craftcreator.utils.PairValue;
 import io.netty.buffer.Unpooled;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.NonNullList;
@@ -24,7 +23,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 import vazkii.botania.api.recipe.IPureDaisyRecipe;
 import vazkii.botania.common.crafting.StateIngredientTag;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -76,11 +74,6 @@ public class RecipeFileUtils
         return recipe;
     }
 
-    /*
-     * This method is used to get the recipe file of a mod
-     * It will create the file if it doesn't exist
-     * It will also add the start of the file if it doesn't exist
-     */
     public static <T extends Recipe<?>> List<T> getAddedRecipesFor(String modId, RecipeType<T> recipeType)
     {
         List<T> recipes = new ArrayList<>();
@@ -125,14 +118,11 @@ public class RecipeFileUtils
         return recipes;
     }
 
-    /*
-     * This method is used to get the modified recipes of a mod
-     */
     private static <T extends Recipe<?>> void addRecipesTo(String modId, List<T> recipes, JsonObject jsonObject, RecipeSerializer<T> craftingTableSerializer)
     {
         assert craftingTableSerializer != null;
         T tempRecipe = craftingTableSerializer.fromJson(new ResourceLocation(modId, "recipe"), jsonObject);
-        T recipe = craftingTableSerializer.fromJson(new ResourceLocation(modId, Objects.requireNonNull(ModDispatcher.getOutput(tempRecipe)).values().stream().findAny().orElse(null).getPath()), jsonObject);
+        T recipe = craftingTableSerializer.fromJson(new ResourceLocation(modId, ModDispatcher.getOutput(tempRecipe).getIngredients().stream().findAny().orElse(CraftIngredients.CraftIngredient.EMPTY).getId().getPath()), jsonObject);
         recipes.add(recipe);
     }
 
@@ -190,7 +180,7 @@ public class RecipeFileUtils
         T tempRecipe;
         T recipe;
         tempRecipe = serializer.fromJson(new ResourceLocation(modId, "recipe"), jsonObject);
-        recipe = serializer.fromJson(new ResourceLocation(modId, Objects.requireNonNull(ModDispatcher.getOutput(tempRecipe)).values().stream().findAny().orElse(null).getPath()), jsonObject);
+        recipe = serializer.fromJson(new ResourceLocation(modId, ModDispatcher.getOutput(tempRecipe).getIngredients().stream().findAny().orElse(null).getId().getPath()), jsonObject);
 
         FriendlyByteBuf existingRecipeBuffer = new FriendlyByteBuf(Unpooled.buffer());
         FriendlyByteBuf jsonRecipeBuffer = new FriendlyByteBuf(Unpooled.buffer());
@@ -391,12 +381,6 @@ public class RecipeFileUtils
                 modifiedRecipe.setDescriptor(descriptor, json.get(descriptor.getTag()).getAsString());
             }
         }
-    }
-
-    @Nullable
-    public static PairValue<String, Integer> getParam(Recipe<?> recipe)
-    {
-        return ModDispatcher.getParameters(recipe);
     }
 
     public static Multimap<String, ResourceLocation> getInput(Recipe<?> recipe)

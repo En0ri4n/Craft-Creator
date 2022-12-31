@@ -24,7 +24,11 @@ public enum ModRecipeCreatorScreens
     TERRA_PLATE(SupportedMods.BOTANIA, ModRecipeTypes.TERRA_PLATE_TYPE, Utilities.getGuiContainerTexture(SupportedMods.BOTANIA.getModId(), "terra_plate_recipe_creator.png"), SlotHelper.TERRA_PLATE_SLOTS),
 
     // Thermal
-    TREE_EXTRACTOR(SupportedMods.THERMAL, TCoreRecipeTypes.MAPPING_TREE_EXTRACTOR, Utilities.getGuiContainerTexture(SupportedMods.THERMAL.getModId(), "arboreal_extractor_recipe_creator.png"), SlotHelper.TREE_EXTRACTOR_SLOTS);
+    TREE_EXTRACTOR(SupportedMods.THERMAL, TCoreRecipeTypes.MAPPING_TREE_EXTRACTOR, Utilities.getGuiContainerTexture(SupportedMods.THERMAL.getModId(), "tree_extractor_recipe_creator.png"), SlotHelper.TREE_EXTRACTOR_SLOTS),
+    PULVERIZER(SupportedMods.THERMAL, TCoreRecipeTypes.RECIPE_PULVERIZER, Utilities.getGuiContainerTexture(SupportedMods.THERMAL.getModId(), "pulverizer_recipe_creator.png"), SlotHelper.PULVERIZER_SLOTS),
+    SAWMILL(SupportedMods.THERMAL, TCoreRecipeTypes.RECIPE_SAWMILL, Utilities.getGuiContainerTexture(SupportedMods.THERMAL.getModId(), "sawmill_recipe_creator.png"), SlotHelper.SAWMILL_SLOTS),
+    SMELTER(SupportedMods.THERMAL, TCoreRecipeTypes.RECIPE_SMELTER, Utilities.getGuiContainerTexture(SupportedMods.THERMAL.getModId(), "smelter_recipe_creator.png"), SlotHelper.SMELTER_SLOTS);
+
 
     private final SupportedMods mod;
     private final RecipeType<?> recipeType;

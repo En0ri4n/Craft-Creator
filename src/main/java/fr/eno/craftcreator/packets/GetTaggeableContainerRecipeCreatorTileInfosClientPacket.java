@@ -54,9 +54,8 @@ public class GetTaggeableContainerRecipeCreatorTileInfosClientPacket
         {
             Minecraft mc = Minecraft.getInstance();
 
-            if(mc.screen instanceof TaggeableSlotsContainerScreen)
+            if(mc.screen instanceof TaggeableSlotsContainerScreen screen)
             {
-                TaggeableSlotsContainerScreen screen = (TaggeableSlotsContainerScreen) mc.screen;
 
                 if(screen.getMenu().containerId == msg.windowId)
                 {

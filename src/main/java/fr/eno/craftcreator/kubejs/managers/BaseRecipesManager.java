@@ -2,6 +2,7 @@ package fr.eno.craftcreator.kubejs.managers;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import fr.eno.craftcreator.kubejs.utils.RecipeInfos;
 import fr.eno.craftcreator.screen.utils.ModRecipeCreatorScreens;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.Slot;
@@ -15,7 +16,7 @@ import java.util.Map;
 
 public abstract class BaseRecipesManager
 {
-    public abstract void createRecipe(ModRecipeCreatorScreens recipe, List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, List<Integer> param);
+    public abstract void createRecipe(ModRecipeCreatorScreens recipe, List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, RecipeInfos param);
 
     @Nullable
     protected ItemStack getValidOutput(List<Slot> slots)
@@ -59,6 +60,22 @@ public abstract class BaseRecipesManager
         return list;
     }
 
+    protected boolean hasItems(List<Slot> slots)
+    {
+        boolean hasItems = false;
+
+        for(Slot slot : slots.subList(1, slots.size()))
+        {
+            if(slot.hasItem())
+            {
+                hasItems = true;
+                break;
+            }
+        }
+
+        return hasItems && slots.get(0).hasItem();
+    }
+
     protected boolean isValid(ItemStack stack)
     {
         return stack != null && !stack.isEmpty();
@@ -70,7 +87,7 @@ public abstract class BaseRecipesManager
 
         for(int i = 0; i < slots.size() - 1; i++)
         {
-            if(taggedSlots.containsKey(i))
+            if(taggedSlots.containsKey(slots.get(i).getSlotIndex()))
             {
                 map.put(taggedSlots.get(i), true);
                 continue;

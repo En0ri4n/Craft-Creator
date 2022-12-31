@@ -38,9 +38,8 @@ public class GetCraftingTableRecipeCreatorTileInfosClientPacket
         {
             Minecraft mc = Minecraft.getInstance();
 
-            if(mc.screen instanceof CraftingTableRecipeCreatorScreen)
+            if(mc.screen instanceof CraftingTableRecipeCreatorScreen screen)
             {
-                CraftingTableRecipeCreatorScreen screen = (CraftingTableRecipeCreatorScreen) mc.screen;
 
                 if(screen.getMenu().containerId == msg.windowId)
                 {

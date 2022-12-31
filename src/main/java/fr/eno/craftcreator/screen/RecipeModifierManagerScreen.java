@@ -44,6 +44,8 @@ public class RecipeModifierManagerScreen extends ChildrenScreen
     public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         this.renderBackground(matrixStack);
+        String msg = "NOT IMPLEMENTED YET";
+        Screen.drawString(matrixStack, this.font, msg, this.width / 2 - this.font.width(msg) / 2, this.height / 2 - this.font.lineHeight / 2, 0xFFFF0000);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
     }
 }

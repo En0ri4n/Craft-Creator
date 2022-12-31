@@ -2,12 +2,10 @@ package fr.eno.craftcreator.kubejs.jsserializers;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import fr.eno.craftcreator.kubejs.utils.CraftIngredients;
 import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
-import fr.eno.craftcreator.utils.PairValue;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -18,16 +16,17 @@ import vazkii.botania.api.BotaniaAPI;
 import vazkii.botania.api.brew.Brew;
 import vazkii.botania.api.recipe.*;
 import vazkii.botania.common.crafting.ModRecipeTypes;
-import vazkii.botania.common.item.ModItems;
-import vazkii.botania.common.item.brew.ItemVial;
+import vazkii.botania.common.crafting.recipe.AncientWillRecipe;
+import vazkii.botania.common.crafting.recipe.ManaGunLensRecipe;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 
-public class BotaniaRecipesJSSerializer extends ModRecipesJSSerializer
+public class BotaniaRecipesSerializer extends ModRecipesJSSerializer
 {
-    private static final BotaniaRecipesJSSerializer INSTANCE = new BotaniaRecipesJSSerializer();
+    private static final BotaniaRecipesSerializer INSTANCE = new BotaniaRecipesSerializer();
 
-    private BotaniaRecipesJSSerializer()
+    private BotaniaRecipesSerializer()
     {
         super(SupportedMods.BOTANIA);
     }
@@ -124,49 +123,76 @@ public class BotaniaRecipesJSSerializer extends ModRecipesJSSerializer
     }
 
     @Override
-    public PairValue<String, Integer> getParam(Recipe<?> recipe)
+    public CraftIngredients getInput(Recipe<?> recipe)
     {
-        if(recipe instanceof IManaInfusionRecipe manaInfusionRecipe)
-            return PairValue.create("Mana", manaInfusionRecipe.getManaToConsume());
-        else if(recipe instanceof IRuneAltarRecipe runeAltarRecipe)
-            return PairValue.create("Mana", runeAltarRecipe.getManaUsage());
-        else if(recipe instanceof ITerraPlateRecipe terraPlateRecipe)
-            return PairValue.create("Mana", terraPlateRecipe.getMana());
-        else if(recipe instanceof IPureDaisyRecipe pureDaisyRecipe)
-            return PairValue.create("Time", pureDaisyRecipe.getTime());
+        CraftIngredients inputIngredients = CraftIngredients.create();
 
-        return null;
-    }
-
-    @Override
-    public Map<String, ResourceLocation> getOutput(Recipe<?> recipe)
-    {
-        Map<String, ResourceLocation> locations = new HashMap<>();
-
-        if(recipe instanceof IPureDaisyRecipe recipePureDaisy)
-            locations.put("Block", recipePureDaisy.getOutputState().getBlock().getRegistryName());
-
-        else if(recipe instanceof IElvenTradeRecipe recipeElvenTrade)
-            recipeElvenTrade.getOutputs().forEach(is -> locations.put("Item", is.getItem().getRegistryName()));
-
-        else if(recipe instanceof IBrewRecipe recipeBrew)
-            locations.put("Brew", BotaniaAPI.instance().getBrewRegistry().getKey(recipeBrew.getBrew()));
-
-        return !locations.isEmpty() ? locations : Collections.singletonMap("Item", recipe.getResultItem().getItem().getRegistryName());
-    }
-
-    @Override
-    public ItemStack getOneOutput(Map.Entry<String, ResourceLocation> entry)
-    {
-        if("Brew".equals(Objects.requireNonNull(entry).getKey()))
+        if(recipe instanceof IPureDaisyRecipe pureDaisyRecipe)
         {
-            return ((ItemVial) ModItems.flask).getItemForBrew(BotaniaAPI.instance().getBrewRegistry().get(entry.getValue()), new ItemStack(ModItems.flask));
+            inputIngredients.addIngredient(new CraftIngredients.BlockIngredient(pureDaisyRecipe.getInput().getDisplayed().get(0).getBlock().getRegistryName()));
+            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Time", pureDaisyRecipe.getTime()));
+        }
+        else if(recipe instanceof IElvenTradeRecipe elvenTradeRecipe)
+        {
+            putIfNotEmpty(inputIngredients, elvenTradeRecipe.getIngredients());
+        }
+        else if(recipe instanceof IBrewRecipe brewRecipe)
+        {
+            putIfNotEmpty(inputIngredients, brewRecipe.getIngredients());
+        }
+        else if(recipe instanceof IManaInfusionRecipe manaInfusionRecipe)
+        {
+            putIfNotEmpty(inputIngredients, manaInfusionRecipe.getIngredients());
+            if(manaInfusionRecipe.getRecipeCatalyst() != null)
+                inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(manaInfusionRecipe.getRecipeCatalyst().getDisplayedStacks().get(0).getItem().getRegistryName(), 1, "Catalyst"));
+            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Mana", manaInfusionRecipe.getManaToConsume()));
+        }
+        else if(recipe instanceof IPetalRecipe petalRecipe)
+        {
+            putIfNotEmpty(inputIngredients, petalRecipe.getIngredients());
+        }
+        else if(recipe instanceof IRuneAltarRecipe runeAltarRecipe)
+        {
+            putIfNotEmpty(inputIngredients, runeAltarRecipe.getIngredients());
+            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Mana", runeAltarRecipe.getManaUsage()));
+        }
+        else if(recipe instanceof ITerraPlateRecipe terraPlateRecipe)
+        {
+            putIfNotEmpty(inputIngredients, terraPlateRecipe.getIngredients());
+            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Mana", terraPlateRecipe.getMana()));
         }
 
-        return ItemStack.EMPTY;
+        if(inputIngredients.isEmpty())
+            putIfNotEmpty(inputIngredients, recipe.getIngredients());
+
+        return inputIngredients;
     }
 
-    public static BotaniaRecipesJSSerializer get()
+    @Override
+    public CraftIngredients getOutput(Recipe<?> recipe)
+    {
+        CraftIngredients outputIngredients = CraftIngredients.create();
+
+        if(recipe instanceof IPureDaisyRecipe recipePureDaisy)
+        {
+            outputIngredients.addIngredient(new CraftIngredients.BlockIngredient(recipePureDaisy.getOutputState().getBlock().getRegistryName()));
+        }
+        else if(recipe instanceof IElvenTradeRecipe recipeElvenTrade)
+        {
+            recipeElvenTrade.getOutputs().forEach(is -> outputIngredients.addIngredient(new CraftIngredients.ItemIngredient(is.getItem().getRegistryName(), is.getCount())));
+        }
+        else if(recipe instanceof IBrewRecipe recipeBrew)
+        {
+            outputIngredients.addIngredient(new CraftIngredients.ItemIngredient(BotaniaAPI.instance().getBrewRegistry().getKey(recipeBrew.getBrew()), 1, "Brew"));
+        }
+
+        if(outputIngredients.isEmpty())
+            outputIngredients.addIngredient(new CraftIngredients.ItemIngredient(recipe.getResultItem().getItem().getRegistryName(), recipe.getResultItem().getCount()));
+
+        return outputIngredients;
+    }
+
+    public static BotaniaRecipesSerializer get()
     {
         return INSTANCE;
     }

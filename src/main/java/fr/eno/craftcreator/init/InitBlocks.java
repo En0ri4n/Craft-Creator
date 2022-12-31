@@ -2,7 +2,6 @@ package fr.eno.craftcreator.init;
 
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.blocks.*;
-import fr.eno.craftcreator.kubejs.jsserializers.BotaniaRecipesJSSerializer;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.DeferredRegister;

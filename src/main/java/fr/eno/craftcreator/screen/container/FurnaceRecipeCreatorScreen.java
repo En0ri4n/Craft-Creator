@@ -45,7 +45,6 @@ public class FurnaceRecipeCreatorScreen extends AbstractContainerScreen<FurnaceR
 		super.init();
 		this.addRenderableWidget(recipeTypeButton = new MultipleItemChoiceButton<>(this.leftPos + imageWidth - 20, topPos, 20, 20, RECIPE_TYPE_MAP));
 
-
 		this.addRenderableWidget(isKubeJSRecipeButton = new SimpleCheckBox(5, this.height - 20, 15, 15, References.getTranslate("screen.recipe_creator_screen.kube_js_button"), false));
 		this.addRenderableWidget(new ExecuteButton(leftPos + 76, topPos + 33, 32, button -> MinecraftRecipeSerializer.createFurnaceRecipe(this.getMenu().getItems(), this.getRecipeType(), expField.getValue(), cookTimeField.getValue(), isKubeJSRecipeButton.selected())));
 		
@@ -73,18 +72,21 @@ public class FurnaceRecipeCreatorScreen extends AbstractContainerScreen<FurnaceR
 		matrixStack.popPose();
 		this.expField.render(matrixStack, mouseX, mouseY, partialTicks);
 		this.cookTimeField.render(matrixStack, mouseX, mouseY, partialTicks);
-		RenderSystem.setShaderTexture(0, GUI_TEXTURES);
-		blit(matrixStack, this.leftPos + 57, this.topPos + 37, 176, 0, 14, 14, 256, 256);
+
+		this.renderTooltip(matrixStack, mouseX, mouseY);
 	}
 
 	@Override
 	protected void renderBg(@Nonnull PoseStack matrixStack, float partialTicks, int mouseX, int mouseY)
 	{
+		this.renderBackground(matrixStack);
+
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.setShaderTexture(0, GUI_TEXTURES);
 		int i = this.leftPos;
 		int j = (this.height - this.imageHeight) / 2;
 		this.blit(matrixStack, i, j, 0, 0, this.imageWidth, this.imageHeight);
+		blit(matrixStack, this.leftPos + 57, this.topPos + 37, 176, 0, 14, 14, 256, 256);
 	}
 	
 	@Override
@@ -122,5 +124,5 @@ public class FurnaceRecipeCreatorScreen extends AbstractContainerScreen<FurnaceR
 	}
 
 	@Override
-	protected void renderLabels(@Nonnull PoseStack matrixStack, int x, int y) {}
+	protected void renderLabels(@Nonnull PoseStack matrixStack, int x, int y) { }
 }

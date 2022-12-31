@@ -1,5 +1,6 @@
 package fr.eno.craftcreator.container.utils;
 
+import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -35,6 +36,16 @@ public abstract class VanillaCommonContainer extends AbstractContainerMenu
         {
             this.addSlot(new Slot(playerInventory, k, 8 + k * 18, 142));
         }
+    }
+
+    /**
+     * Vanilla only
+     */
+    protected void activeSlots()
+    {
+        for(Slot slot : slots)
+            if(slot instanceof SimpleSlotItemHandler slotItemHandler)
+                slotItemHandler.setActive(true);
     }
 
     @Override
