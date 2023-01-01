@@ -90,8 +90,8 @@ public class ThermalRecipesSerializer extends ModRecipesJSSerializer
 
         if(recipe instanceof TreeExtractorMapping treeExtractorRecipe)
         {
-            inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(treeExtractorRecipe.getTrunk().getRegistryName(), 1, "Trunk"));
-            inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(treeExtractorRecipe.getLeaves().getRegistryName(), 1, "Leaves"));
+            inputIngredients.addIngredient(new CraftIngredients.BlockIngredient(treeExtractorRecipe.getTrunk().getRegistryName(), 1, "Trunk"));
+            inputIngredients.addIngredient(new CraftIngredients.BlockIngredient(treeExtractorRecipe.getLeaves().getRegistryName(), 1, "Leaves"));
         }
         else if(recipe instanceof PulverizerRecipe pulverizerRecipe)
         {
@@ -100,12 +100,12 @@ public class ThermalRecipesSerializer extends ModRecipesJSSerializer
         else if(recipe instanceof SawmillRecipe sawmillRecipe)
         {
             putIfNotEmpty(inputIngredients, sawmillRecipe.getInputItems());
-            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", sawmillRecipe.getEnergy()));
+            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", CraftIngredients.DataIngredient.DataUnit.ENERGY, sawmillRecipe.getEnergy()));
         }
         else if(recipe instanceof SmelterRecipe smelterRecipe)
         {
             putIfNotEmpty(inputIngredients, smelterRecipe.getInputItems());
-            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", smelterRecipe.getEnergy()));
+            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", CraftIngredients.DataIngredient.DataUnit.ENERGY, smelterRecipe.getEnergy()));
         }
 
         if(inputIngredients.isEmpty())
@@ -126,7 +126,7 @@ public class ThermalRecipesSerializer extends ModRecipesJSSerializer
         else if(recipe instanceof PulverizerRecipe pulverizerRecipe)
         {
             putIfNotEmptyLuckedItems(outputsIngredient, pulverizerRecipe.getOutputItems(), pulverizerRecipe.getOutputItemChances(), "Item");
-            outputsIngredient.addIngredient(new CraftIngredients.DataIngredient("Experience", pulverizerRecipe.getXp()));
+            outputsIngredient.addIngredient(new CraftIngredients.DataIngredient("Experience", CraftIngredients.DataIngredient.DataUnit.EXPERIENCE, pulverizerRecipe.getXp()));
         }
         else if(recipe instanceof SawmillRecipe sawmillRecipe)
         {
@@ -135,7 +135,7 @@ public class ThermalRecipesSerializer extends ModRecipesJSSerializer
         else if(recipe instanceof SmelterRecipe smelterRecipe)
         {
             putIfNotEmptyLuckedItems(outputsIngredient, smelterRecipe.getOutputItems(), smelterRecipe.getOutputItemChances(), "Item");
-            outputsIngredient.addIngredient(new CraftIngredients.DataIngredient("Experience", smelterRecipe.getXp()));
+            outputsIngredient.addIngredient(new CraftIngredients.DataIngredient("Experience", CraftIngredients.DataIngredient.DataUnit.EXPERIENCE, smelterRecipe.getXp()));
         }
 
         if(outputsIngredient.isEmpty())

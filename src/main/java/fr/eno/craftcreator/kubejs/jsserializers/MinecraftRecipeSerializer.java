@@ -13,10 +13,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.item.crafting.UpgradeRecipe;
+import net.minecraft.world.item.crafting.*;
 import net.minecraftforge.items.SlotItemHandler;
 
 import java.util.ArrayList;
@@ -94,7 +91,7 @@ public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
     @Override
     public CraftIngredients getInput(Recipe<?> recipe)
     {
-        CraftIngredients ingredients = CraftIngredients.create();
+        CraftIngredients inputIngredients = CraftIngredients.create();
 
         if(recipe instanceof UpgradeRecipe smithRecipe) // Fields are not accessible so we need to do this :(
         {
@@ -103,14 +100,20 @@ public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
             serializer.toNetwork(buffer, smithRecipe);
             Ingredient base = Ingredient.fromNetwork(buffer);
             Ingredient addition = Ingredient.fromNetwork(buffer);
-            ingredients.addIngredient(new CraftIngredients.ItemIngredient(base.getItems()[0].getItem().getRegistryName(), 1));
-            ingredients.addIngredient(new CraftIngredients.ItemIngredient(addition.getItems()[0].getItem().getRegistryName(), 1));
+            inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(base.getItems()[0].getItem().getRegistryName(), 1));
+            inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(addition.getItems()[0].getItem().getRegistryName(), 1));
+        }
+        else if(recipe instanceof AbstractCookingRecipe abstractCookingRecipe)
+        {
+            putIfNotEmpty(inputIngredients, abstractCookingRecipe.getIngredients());
+            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Cooking Time", CraftIngredients.DataIngredient.DataUnit.TICK, abstractCookingRecipe.getCookingTime()));
+            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Experience", CraftIngredients.DataIngredient.DataUnit.EXPERIENCE, abstractCookingRecipe.getExperience()));
         }
 
-        if(ingredients.isEmpty())
-            putIfNotEmpty(ingredients, recipe.getIngredients());
+        if(inputIngredients.isEmpty())
+            putIfNotEmpty(inputIngredients, recipe.getIngredients());
 
-        return ingredients;
+        return inputIngredients;
     }
 
     @Override

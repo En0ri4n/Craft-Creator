@@ -1,6 +1,9 @@
 {
 	"itemGroup.craftcreator": "§lCraft Creator",
 
+	"craftcreator.world.on_join_message": "Thanks for downloading §aCraft Creator §r!\nPress §e'K' §rto open the recipes menu",
+	"craftcreator.world.on_join_message_issue": "§nYou can report any issue here",
+
 	"craftcreator.button.boolean.craftType.on": "Shaped",
 	"craftcreator.button.boolean.craftType.off": "Shapeless",
 
