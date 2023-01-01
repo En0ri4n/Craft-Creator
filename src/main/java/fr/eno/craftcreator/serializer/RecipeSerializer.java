@@ -54,7 +54,7 @@ public abstract class RecipeSerializer
 			if(!isKubeJSRecipe)
 			{
 				gson.toJson(recipe, writer);
-				Objects.requireNonNull(mc.player).sendMessage(Utilities.createClickableComponent(Utils.getS("serializer.success", this.getOutputFile().getName()), this.getOutputFile()), mc.player.getUUID());
+				Objects.requireNonNull(mc.player).sendMessage(Utilities.createComponentFileOpener(Utils.get("serializer.success", this.getOutputFile().getName()), this.getOutputFile()), mc.player.getUUID());
 			}
 			else
 			{

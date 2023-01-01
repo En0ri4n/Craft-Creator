@@ -159,6 +159,7 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
             case TREE_EXTRACTOR -> ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:device_tree_extractor"));
             case PULVERIZER -> ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:machine_pulverizer"));
             case SAWMILL -> ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:machine_sawmill"));
+            case SMELTER -> ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:machine_smelter"));
             default -> Items.AIR;
         };
     }

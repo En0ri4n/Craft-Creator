@@ -18,6 +18,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
@@ -160,12 +161,21 @@ public abstract class ModRecipesJSSerializer
         {
             if(ingredient.toJson().isJsonObject() && ingredient.toJson().getAsJsonObject().has("tag"))
             {
-                inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(ResourceLocation.tryParse(ingredient.toJson().getAsJsonObject().get("tag").getAsString()), 0, "Tag", true));
+                inputIngredients.addIngredient(new CraftIngredients.TagIngredient(ResourceLocation.tryParse(ingredient.toJson().getAsJsonObject().get("tag").getAsString()), 1));
             }
             else
             {
-                for(ItemStack stack : ingredient.getItems())
-                    if(!stack.isEmpty()) inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(stack.getItem().getRegistryName(), stack.getCount()));
+                if(ingredient.getItems().length <= 0) continue;
+                else if(ingredient.getItems().length == 1)
+                    inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(ingredient.getItems()[0].getItem().getRegistryName(), 1));
+                else
+                {
+                    CraftIngredients.MultiItemIngredient multiItemIngredient = new CraftIngredients.MultiItemIngredient(1);
+                    for(ItemStack stack : ingredient.getItems())
+                        if(!stack.isEmpty()) multiItemIngredient.addItem(stack.getItem().getRegistryName());
+
+                    inputIngredients.addIngredient(multiItemIngredient);
+                }
             }
         }
     }

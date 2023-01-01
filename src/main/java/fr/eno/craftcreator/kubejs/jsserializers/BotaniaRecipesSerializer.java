@@ -16,8 +16,6 @@ import vazkii.botania.api.BotaniaAPI;
 import vazkii.botania.api.brew.Brew;
 import vazkii.botania.api.recipe.*;
 import vazkii.botania.common.crafting.ModRecipeTypes;
-import vazkii.botania.common.crafting.recipe.AncientWillRecipe;
-import vazkii.botania.common.crafting.recipe.ManaGunLensRecipe;
 
 import java.util.List;
 import java.util.Objects;
@@ -130,7 +128,7 @@ public class BotaniaRecipesSerializer extends ModRecipesJSSerializer
         if(recipe instanceof IPureDaisyRecipe pureDaisyRecipe)
         {
             inputIngredients.addIngredient(new CraftIngredients.BlockIngredient(pureDaisyRecipe.getInput().getDisplayed().get(0).getBlock().getRegistryName()));
-            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Time", pureDaisyRecipe.getTime()));
+            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Time", CraftIngredients.DataIngredient.DataUnit.TICK, pureDaisyRecipe.getTime()));
         }
         else if(recipe instanceof IElvenTradeRecipe elvenTradeRecipe)
         {
@@ -145,7 +143,7 @@ public class BotaniaRecipesSerializer extends ModRecipesJSSerializer
             putIfNotEmpty(inputIngredients, manaInfusionRecipe.getIngredients());
             if(manaInfusionRecipe.getRecipeCatalyst() != null)
                 inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(manaInfusionRecipe.getRecipeCatalyst().getDisplayedStacks().get(0).getItem().getRegistryName(), 1, "Catalyst"));
-            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Mana", manaInfusionRecipe.getManaToConsume()));
+            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Mana", CraftIngredients.DataIngredient.DataUnit.EMPTY, manaInfusionRecipe.getManaToConsume()));
         }
         else if(recipe instanceof IPetalRecipe petalRecipe)
         {
@@ -154,12 +152,17 @@ public class BotaniaRecipesSerializer extends ModRecipesJSSerializer
         else if(recipe instanceof IRuneAltarRecipe runeAltarRecipe)
         {
             putIfNotEmpty(inputIngredients, runeAltarRecipe.getIngredients());
-            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Mana", runeAltarRecipe.getManaUsage()));
+            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Mana", CraftIngredients.DataIngredient.DataUnit.EMPTY, runeAltarRecipe.getManaUsage()));
         }
         else if(recipe instanceof ITerraPlateRecipe terraPlateRecipe)
         {
             putIfNotEmpty(inputIngredients, terraPlateRecipe.getIngredients());
-            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Mana", terraPlateRecipe.getMana()));
+            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Mana", CraftIngredients.DataIngredient.DataUnit.EMPTY, terraPlateRecipe.getMana()));
+        }
+        else if(recipe instanceof IOrechidRecipe orechidRecipe)
+        {
+            inputIngredients.addIngredient(new CraftIngredients.BlockIngredient(orechidRecipe.getInput().getRegistryName()));
+            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Weight", CraftIngredients.DataIngredient.DataUnit.EMPTY, orechidRecipe.getWeight()));
         }
 
         if(inputIngredients.isEmpty())
@@ -184,6 +187,10 @@ public class BotaniaRecipesSerializer extends ModRecipesJSSerializer
         else if(recipe instanceof IBrewRecipe recipeBrew)
         {
             outputIngredients.addIngredient(new CraftIngredients.ItemIngredient(BotaniaAPI.instance().getBrewRegistry().getKey(recipeBrew.getBrew()), 1, "Brew"));
+        }
+        else if(recipe instanceof IOrechidRecipe orechidRecipe)
+        {
+            outputIngredients.addIngredient(new CraftIngredients.BlockIngredient(orechidRecipe.getOutput().getDisplayed().get(0).getBlock().getRegistryName()));
         }
 
         if(outputIngredients.isEmpty())

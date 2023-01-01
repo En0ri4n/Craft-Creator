@@ -84,6 +84,6 @@ public abstract class VanillaCommonContainer extends AbstractContainerMenu
             slot.onTake(player, stack);
         }
 
-        return retStack;
+        return super.quickMoveStack(player, index);
     }
 }

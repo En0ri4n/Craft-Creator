@@ -8,6 +8,7 @@ import fr.eno.craftcreator.kubejs.jsserializers.ModRecipesJSSerializer;
 import fr.eno.craftcreator.kubejs.utils.CraftIngredients;
 import fr.eno.craftcreator.kubejs.utils.ModDispatcher;
 import fr.eno.craftcreator.utils.Callable;
+import fr.eno.craftcreator.utils.GuiUtils;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -45,6 +46,7 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
     private boolean isVisible;
     private Callable<Entry> onDelete;
     private Entry hoveredEntry;
+    private boolean isListHovered;
 
     public SimpleListWidget(Minecraft mcIn, int leftIn, int topIn, int widthIn, int heightIn, int slotHeightIn, int titleBoxHeight, int scrollBarWidth, Component titleIn, @Nullable Callable<Entry> onDelete)
     {
@@ -108,6 +110,7 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
         }
 
         this.hoveredEntry = this.isMouseOver(pMouseX, pMouseY) ? this.getEntryAtPosition(pMouseX, pMouseY) : null;
+        this.isListHovered = GuiUtils.isMouseHover(this.x0, this.y0 - titleBoxHeight, this.x1, this.y1, pMouseX, pMouseY);
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder bufferbuilder = tesselator.getBuilder();
 
@@ -261,7 +264,13 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
                 this.setSelected(null);
             }
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+
+        if(this.isListHovered)
+        {
+            return super.keyPressed(keyCode, scanCode, modifiers);
+        }
+
+        return true;
     }
 
     @Override
@@ -406,7 +415,7 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
             tooltips.add(References.getTranslate("screen.widget.simple_list.tooltip.input"));
             addToTooltip(input);
 
-            tooltips.add(new TextComponent(""));
+            tooltips.add(new TextComponent("").withStyle(ChatFormatting.DARK_AQUA));
             tooltips.add(References.getTranslate("screen.widget.simple_list.tooltip.output"));
             addToTooltip(output);
 
@@ -415,66 +424,89 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
 
         private void addToTooltip(CraftIngredients input)
         {
-            input.getIngredients().forEach(craftIngredient ->
+            input.getIngredientsWithCount().forEach(craftIngredient ->
             {
-                MutableComponent base = new TextComponent(craftIngredient.getDescription());
+                MutableComponent ingredientTooltipLine = new TextComponent(craftIngredient.getDescription());
                 ChatFormatting baseColor = ChatFormatting.AQUA;
-                base.withStyle(baseColor);
+                ingredientTooltipLine.withStyle(baseColor);
 
                 MutableComponent separator = new TextComponent(" : ");
                 separator.withStyle(ChatFormatting.WHITE);
-                base.append(separator);
+                ingredientTooltipLine.append(separator);
 
-                MutableComponent value = new TextComponent("");
+                MutableComponent ingredientValue = new TextComponent("");
 
                 if(craftIngredient instanceof CraftIngredients.BlockIngredient blockIngredient)
                 {
-                    value.append(new TextComponent(blockIngredient.getId().toString()));
-                    value.withStyle(ChatFormatting.DARK_AQUA);
+                    ingredientValue.append(new TextComponent(blockIngredient.getId().toString()));
+                    ingredientValue.withStyle(ChatFormatting.DARK_AQUA);
                 }
                 else if(craftIngredient instanceof CraftIngredients.ItemLuckIngredient itemLuckIngredient)
                 {
-                    value.append(new TextComponent(itemLuckIngredient.getId().toString())).withStyle(ChatFormatting.DARK_AQUA);
-                    if(itemLuckIngredient.getCount() > 0)
-                    {
-                        MutableComponent component = new TextComponent(" (x").append(String.valueOf(itemLuckIngredient.getCount())).append(")").withStyle(ChatFormatting.GRAY);
-                        value.append(component);
-                    }
+                    ingredientValue.append(new TextComponent(itemLuckIngredient.getId().toString())).withStyle(ChatFormatting.DARK_AQUA);
+
+                    MutableComponent countComponent = new TextComponent(" (x").append(String.valueOf(itemLuckIngredient.getCount())).append(")").withStyle(ChatFormatting.GRAY);
+                    ingredientValue.append(countComponent);
+
                     if(itemLuckIngredient.getLuck() != 1D && itemLuckIngredient.getLuck() > 0D)
                     {
-                        MutableComponent component = new TextComponent(" ").append(String.valueOf(itemLuckIngredient.getLuck() * 100)).append("%").withStyle(ChatFormatting.DARK_GRAY);
-                        value.append(component);
+                        MutableComponent luckComponent = new TextComponent(" ").append(String.valueOf(itemLuckIngredient.getLuck() * 100)).append("%").withStyle(ChatFormatting.DARK_GRAY);
+                        ingredientValue.append(luckComponent);
                     }
                 }
                 else if(craftIngredient instanceof CraftIngredients.ItemIngredient itemIngredient)
                 {
-                    value.append(new TextComponent(itemIngredient.getId().toString())).withStyle(ChatFormatting.DARK_AQUA);
-                    if(itemIngredient.getCount() > 0)
+                    ingredientValue.append(new TextComponent(itemIngredient.getId().toString())).withStyle(ChatFormatting.DARK_AQUA);
+
+                    MutableComponent countComponent = new TextComponent(" (x").append(String.valueOf(itemIngredient.getCount())).append(")").withStyle(ChatFormatting.GRAY);
+                    ingredientValue.append(countComponent);
+                }
+                else if(craftIngredient instanceof CraftIngredients.MultiItemIngredient multiItemIngredient)
+                {
+                    //ingredientValue.append(new TextComponent(multiItemIngredient.getId().toString())).withStyle(ChatFormatting.DARK_AQUA);
+
+                    MutableComponent countComponent = new TextComponent(" (x").append(String.valueOf(multiItemIngredient.getCount())).append(")").withStyle(ChatFormatting.GRAY);
+                    ingredientValue.append(countComponent);
+
+                    MutableComponent itemListComponent = new TextComponent("");
+                    multiItemIngredient.getIds().forEach(item ->
                     {
-                        MutableComponent component = new TextComponent(" (x").append(String.valueOf(itemIngredient.getCount())).append(")").withStyle(ChatFormatting.GRAY);
-                        value.append(component);
-                    }
+                        MutableComponent itemEntryComponent = new TextComponent("\n    ").append(new TextComponent("- ").withStyle(ChatFormatting.WHITE));
+                        itemEntryComponent.append(new TextComponent("Item").withStyle(ChatFormatting.YELLOW));
+                        itemEntryComponent.append(new TextComponent(" : ").withStyle(ChatFormatting.WHITE));
+                        itemEntryComponent.append(new TextComponent(item.toString()).withStyle(ChatFormatting.GOLD));
+                        itemListComponent.append(itemEntryComponent);
+                    });
+
+                    ingredientValue.append(itemListComponent);
+                }
+                else if(craftIngredient instanceof CraftIngredients.TagIngredient tagIngredient)
+                {
+                    ingredientValue.append(new TextComponent(tagIngredient.getId().toString())).withStyle(ChatFormatting.DARK_AQUA);
+
+                    MutableComponent countComponent = new TextComponent(" (x").append(String.valueOf(tagIngredient.getCount())).append(")").withStyle(ChatFormatting.GRAY);
+                    ingredientValue.append(countComponent);
                 }
                 else if(craftIngredient instanceof CraftIngredients.FluidIngredient fluidIngredient)
                 {
-                    value.append(new TextComponent(fluidIngredient.getId().toString()));
-                    value.withStyle(ChatFormatting.BLUE);
+                    ingredientValue.append(new TextComponent(fluidIngredient.getId().toString()));
+                    ingredientValue.withStyle(ChatFormatting.BLUE);
 
                     MutableComponent component = new TextComponent(" (");
                     component.append(String.valueOf(fluidIngredient.getAmount()));
                     component.append(new TextComponent("mb)"));
                     component.withStyle(ChatFormatting.GRAY);
-                    value.append(component);
+                    ingredientValue.append(component);
                 }
                 else if(craftIngredient instanceof CraftIngredients.DataIngredient dataIngredient)
                 {
-                    value.append(new TextComponent(String.valueOf(dataIngredient.getCount())));
-                    value.withStyle(ChatFormatting.LIGHT_PURPLE);
+                    ingredientValue.append(new TextComponent(String.valueOf(dataIngredient.getData())).withStyle(ChatFormatting.LIGHT_PURPLE));
+                    ingredientValue.append(new TextComponent(" ").append(dataIngredient.getUnit().getDisplayUnit()).withStyle(ChatFormatting.DARK_GRAY));
                 }
 
-                base.append(value);
+                ingredientTooltipLine.append(ingredientValue);
 
-                tooltips.add(base);
+                tooltips.add(ingredientTooltipLine);
             });
         }
 

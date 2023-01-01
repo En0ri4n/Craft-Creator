@@ -3,8 +3,8 @@ package fr.eno.craftcreator.utils;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 
 import java.io.File;
@@ -49,8 +49,13 @@ public class Utilities
 		return parts;
 	}
 	
-	public static MutableComponent createClickableComponent(String component, File toOpen)
+	public static MutableComponent createComponentFileOpener(Component component, File toOpen)
 	{
-		return new TextComponent(component).withStyle((msg) -> msg.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, toOpen.getAbsolutePath())));
+		return component.copy().withStyle((msg) -> msg.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, toOpen.getAbsolutePath())));
+	}
+
+	public static MutableComponent createComponentUrlOpener(Component component, String urlToOpen)
+	{
+		return component.copy().withStyle((msg) -> msg.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, urlToOpen)));
 	}
 }
