@@ -17,6 +17,26 @@ public abstract class MultiScreenRecipeCreatorTile extends TaggeableInventoryCon
         this.screenIndex = 0;
     }
 
+    @Override
+    public void setData(String dataName, Object data)
+    {
+        super.setData(dataName, data);
+
+        if(dataName.equals("screen_index"))
+        {
+            this.setScreenIndex((Integer) data);
+        }
+    }
+
+    @Override
+    public Object getData(String dataName)
+    {
+        if(dataName.equals("screen_index"))
+            return this.getScreenIndex();
+
+        return super.getData(dataName);
+    }
+
     public void setScreenIndex(int index)
     {
         this.screenIndex = index;

@@ -13,11 +13,6 @@ public class ChildrenScreen extends ListScreen
         this.parent = parentIn;
     }
 
-    public void leaveGUI()
-    {
-        minecraft.setScreen(parent);
-    }
-
     @Override
     public boolean isPauseScreen()
     {
