@@ -1,11 +1,11 @@
 package fr.eno.craftcreator.utils;
 
-public class PairValue<K, V>
+public class PairValues<K, V>
 {
     private final K firstValue;
     private final V secondValue;
 
-    private PairValue(K firstValue, V secondValue)
+    private PairValues(K firstValue, V secondValue)
     {
         this.firstValue = firstValue;
         this.secondValue = secondValue;
@@ -21,8 +21,8 @@ public class PairValue<K, V>
         return secondValue;
     }
 
-    public static <K, V> PairValue<K, V> create(K firstValue, V secondValue)
+    public static <K, V> PairValues<K, V> create(K firstValue, V secondValue)
     {
-        return new PairValue<>(firstValue, secondValue);
+        return new PairValues<>(firstValue, secondValue);
     }
 }
