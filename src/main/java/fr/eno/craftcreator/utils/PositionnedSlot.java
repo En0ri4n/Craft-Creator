@@ -44,11 +44,6 @@ public class PositionnedSlot
         return slots.stream().anyMatch(positionnedSlot -> positionnedSlot.getIndex() == index);
     }
 
-    public static boolean isSlotOutput(List<PositionnedSlot> slots, int index)
-    {
-        return slots.get(slots.size() - 1).getIndex() == index;
-    }
-
     public static List<Slot> getSlotsFor(List<PositionnedSlot> positionnedSlots, List<Slot> slots)
     {
         List<Slot> finalSlots = new ArrayList<>();
@@ -57,8 +52,7 @@ public class PositionnedSlot
         {
             Optional<PositionnedSlot> optionalPositionnedSlot = positionnedSlots.stream().filter(ps -> ps.getIndex() == slot.getSlotIndex()).findFirst();
 
-            if(optionalPositionnedSlot.isPresent())
-                finalSlots.add(slot);
+            if(optionalPositionnedSlot.isPresent()) finalSlots.add(slot);
         }
 
         return finalSlots;

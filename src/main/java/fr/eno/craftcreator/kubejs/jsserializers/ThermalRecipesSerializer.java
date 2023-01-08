@@ -2,9 +2,11 @@ package fr.eno.craftcreator.kubejs.jsserializers;
 
 import cofh.thermal.core.init.TCoreRecipeTypes;
 import cofh.thermal.core.util.recipes.device.TreeExtractorMapping;
+import cofh.thermal.core.util.recipes.machine.InsolatorRecipe;
 import cofh.thermal.core.util.recipes.machine.PulverizerRecipe;
 import cofh.thermal.core.util.recipes.machine.SawmillRecipe;
 import cofh.thermal.core.util.recipes.machine.SmelterRecipe;
+import cofh.thermal.lib.util.recipes.ThermalRecipe;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -62,7 +64,7 @@ public class ThermalRecipesSerializer extends ModRecipesJSSerializer
         sendSuccessMessage(TCoreRecipeTypes.RECIPE_PULVERIZER, outputs.keySet().stream().findFirst().get().getItem().getRegistryName());
     }
 
-    public void createSawmillRecipe(ResourceLocation input, Map<ItemStack, Double> outputs, Double energy)
+    public void createSawmillRecipe(ResourceLocation input, Map<ItemStack, Double> outputs, Integer energy)
     {
         JsonObject obj = new JsonObject();
         RecipeFileUtils.setRecipeType(obj, TCoreRecipeTypes.RECIPE_SAWMILL);
@@ -107,9 +109,14 @@ public class ThermalRecipesSerializer extends ModRecipesJSSerializer
             putIfNotEmpty(inputIngredients, smelterRecipe.getInputItems());
             inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", CraftIngredients.DataIngredient.DataUnit.ENERGY, smelterRecipe.getEnergy()));
         }
+        else if(recipe instanceof InsolatorRecipe insolatorRecipe)
+        {
+            putIfNotEmpty(inputIngredients, insolatorRecipe.getInputItems());
+            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", CraftIngredients.DataIngredient.DataUnit.ENERGY, insolatorRecipe.getEnergy()));
+        }
 
-        if(inputIngredients.isEmpty())
-            putIfNotEmpty(inputIngredients, recipe.getIngredients());
+        if(inputIngredients.isEmpty() && recipe instanceof ThermalRecipe thermalRecipe)
+            putIfNotEmpty(inputIngredients, thermalRecipe.getInputItems());
 
         return inputIngredients;
     }

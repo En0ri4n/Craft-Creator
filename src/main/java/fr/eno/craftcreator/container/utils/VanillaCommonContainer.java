@@ -9,6 +9,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
+//TODO: resolve shift-clicking items not working
 public abstract class VanillaCommonContainer extends AbstractContainerMenu
 {
     public VanillaCommonContainer(@Nullable MenuType<?> pMenuType, int pContainerId)
@@ -44,7 +45,8 @@ public abstract class VanillaCommonContainer extends AbstractContainerMenu
     }
 
     /**
-     * Vanilla only
+     * Active slots
+     * @param active if true, the slots will be activated
      */
     public void activeSlots(boolean active)
     {
@@ -84,6 +86,6 @@ public abstract class VanillaCommonContainer extends AbstractContainerMenu
             slot.onTake(player, stack);
         }
 
-        return super.quickMoveStack(player, index);
+        return retStack;
     }
 }

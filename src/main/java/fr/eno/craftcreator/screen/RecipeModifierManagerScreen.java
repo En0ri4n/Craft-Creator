@@ -1,51 +1,127 @@
 package fr.eno.craftcreator.screen;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
+import fr.eno.craftcreator.container.RecipeModifierContainer;
 import fr.eno.craftcreator.kubejs.utils.DeserializerHelper;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;
-import fr.eno.craftcreator.screen.utils.ChildrenScreen;
+import fr.eno.craftcreator.screen.container.TaggeableSlotsContainerScreen;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
+import fr.eno.craftcreator.utils.ClientUtils;
+import fr.eno.craftcreator.utils.PositionnedSlot;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-public class RecipeModifierManagerScreen extends ChildrenScreen
+public class RecipeModifierManagerScreen extends TaggeableSlotsContainerScreen<RecipeModifierContainer> implements MenuProvider
 {
-    private final String modId;
-    private final ResourceLocation recipeType;
+    private static final ResourceLocation GUI_TEXTURE = References.getLoc("textures/gui/container/recipe_modifier.png");
+    private final List<SimpleListWidget> lists;
+    private final Screen parent;
 
-    public RecipeModifierManagerScreen(Screen parentIn, String modId, ResourceLocation recipeType)
+    public RecipeModifierManagerScreen(Screen parent)
     {
-        super(new TextComponent(""), parentIn);
-        this.modId = modId;
-        this.recipeType = recipeType;
+        super(RecipeModifierContainer.create(), ClientUtils.getClientPlayer().getInventory(), new TextComponent("Recipe Modifier Manager"));
+        this.leftPos = (this.width - (this.width / 4 + 5)) / 2 + (this.width / 4 + 5) - 256 / 2;
+        this.topPos = 5 + (this.height - 20 - 5) / 2 - 256 / 2;
+        this.lists = new ArrayList<>();
+        this.parent = parent;
     }
 
     @Override
     protected void init()
     {
-        this.clearLists();
+        super.init();
+
+        this.lists.clear();
 
         int bottomHeight = 20;
 
-        this.addList(new SimpleListWidget(minecraft, 5, 5, this.width / 4, this.height - bottomHeight, 15, 15, 5, References.getTranslate("screen.recipe_manager.list.recipes"), null));
-        this.addList(new SimpleListWidget(minecraft, this.width - 5 - this.width / 4, 5, this.width / 4, this.height - bottomHeight, 15, 15, 5, References.getTranslate("screen.recipe_manager.list.modified_recipes"), null));
+        this.lists.add(new SimpleListWidget(minecraft, 5, 5, this.width / 4, this.height - bottomHeight, 15, 15, 5, References.getTranslate("screen.recipe_manager.list.modified_recipes"), null));
 
-        this.setEntries(0, DeserializerHelper.getRecipes(this.recipeType));
-        this.setEntries(1, DeserializerHelper.getModifiedRecipesEntryList(this.modId, this.recipeType));
+        this.lists.get(0).setEntries(DeserializerHelper.getModifiedRecipesEntryList());
 
-        this.addRenderableWidget(new SimpleButton(References.getTranslate("screen.recipe_manager.button.back"), this.width / 2 - 40, this.height - bottomHeight - 7, 80, 20, button -> minecraft.setScreen(new ModSelectionScreen())));
+        this.addRenderableWidget(new SimpleButton(References.getTranslate("screen.recipe_modifier.button.back"), this.width / 2 - 40, this.height - bottomHeight - 7, 80, 20, button -> ClientUtils.openScreen(this.parent)));
     }
 
     @Override
     public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        this.renderBackground(matrixStack);
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
+
+        this.lists.get(0).render(matrixStack, mouseX, mouseY, partialTicks);
         String msg = "NOT IMPLEMENTED YET";
         Screen.drawString(matrixStack, this.font, msg, this.width / 2 - this.font.width(msg) / 2, this.height / 2 - this.font.lineHeight / 2, 0xFFFF0000);
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
+        ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(Items.POINTED_DRIPSTONE), 100, 100);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button)
+    {
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseReleased(double p_97812_, double p_97813_, int p_97814_)
+    {
+        return super.mouseReleased(p_97812_, p_97813_, p_97814_);
+    }
+
+    @Override
+    public boolean mouseDragged(double p_97752_, double p_97753_, int p_97754_, double p_97755_, double p_97756_)
+    {
+        return super.mouseDragged(p_97752_, p_97753_, p_97754_, p_97755_, p_97756_);
+    }
+
+    @Override
+    public boolean keyPressed(int p_97765_, int p_97766_, int p_97767_)
+    {
+        return super.keyPressed(p_97765_, p_97766_, p_97767_);
+    }
+
+    @Override
+    protected void renderBg(PoseStack matrixStack, float pPartialTick, int pMouseX, int pMouseY)
+    {
+        RenderSystem.setShaderTexture(0, GUI_TEXTURE);
+        int size = 256;
+        int wantedSize = this.height - 35;
+        int x = (this.width - (this.width / 4 + 5)) / 2 + (this.width / 4 + 5) - size / 2;
+        int y = 5 + (this.height - 20 - 5) / 2 - size / 2;
+        blit(matrixStack, x, y, size, size, 0, 0, size, size, size, size);
+
+        super.renderBg(matrixStack, pPartialTick, pMouseX, pMouseY);
+    }
+
+    @Override
+    protected List<PositionnedSlot> getTaggeableSlots()
+    {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Component getDisplayName()
+    {
+        return References.getTranslate("screen.recipe_modifier.title");
+    }
+
+    @Nullable
+    @Override
+    public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player)
+    {
+        return RecipeModifierContainer.create();
     }
 }

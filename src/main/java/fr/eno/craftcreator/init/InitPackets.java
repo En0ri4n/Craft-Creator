@@ -1,18 +1,27 @@
 package fr.eno.craftcreator.init;
 
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.kubejs.utils.SupportedMods;
-import fr.eno.craftcreator.packets.*;
+import fr.eno.craftcreator.packets.RetrieveRecipeCreatorTileDataServerPacket;
+import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataClientPacket;
+import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataServerPacket;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class InitPackets
 {
     private static final String PROTOCOL_VERSION = Integer.toString(1);
     private static SimpleChannel network = null;
+    private static int packetId;
 
     public static void initNetwork()
     {
@@ -27,9 +36,10 @@ public class InitPackets
                 .serverAcceptedVersions(PROTOCOL_VERSION::equals)
                 .networkProtocolVersion(() -> PROTOCOL_VERSION)
                 .simpleChannel();
+        packetId = 0;
     }
 
-    public static SimpleChannel getNetWork()
+    private static SimpleChannel getNetWork()
     {
         if(network == null)
         {
@@ -41,26 +51,46 @@ public class InitPackets
 
     public static void registerMessages()
     {
-        int id = 0;
+        registerServerMessage(RetrieveRecipeCreatorTileDataServerPacket.class, RetrieveRecipeCreatorTileDataServerPacket::encode, RetrieveRecipeCreatorTileDataServerPacket::decode, RetrieveRecipeCreatorTileDataServerPacket.ServerHandler::handle);
 
-        network.registerMessage(id++, UpdateCraftingTableRecipeCreatorTilePacket.class, UpdateCraftingTableRecipeCreatorTilePacket::encode, UpdateCraftingTableRecipeCreatorTilePacket::decode, UpdateCraftingTableRecipeCreatorTilePacket.ServerHandler::handle, distServer());
-
-        network.registerMessage(id++, GetCraftingTableRecipeCreatorTileInfosServerPacket.class, GetCraftingTableRecipeCreatorTileInfosServerPacket::encode, GetCraftingTableRecipeCreatorTileInfosServerPacket::decode, GetCraftingTableRecipeCreatorTileInfosServerPacket.ServerHandler::handle, distServer());
-        network.registerMessage(id++, GetCraftingTableRecipeCreatorTileInfosClientPacket.class, GetCraftingTableRecipeCreatorTileInfosClientPacket::encode, GetCraftingTableRecipeCreatorTileInfosClientPacket::decode, GetCraftingTableRecipeCreatorTileInfosClientPacket.ClientHandler::handle, distClient());
-
-        network.registerMessage(id++, OpenGuiPacket.class, OpenGuiPacket::encode, OpenGuiPacket::decode, OpenGuiPacket.ServerHandler::handle, distServer());
-
-        network.registerMessage(id++, GetTaggeableContainerRecipeCreatorTileInfosClientPacket.class, GetTaggeableContainerRecipeCreatorTileInfosClientPacket::encode, GetTaggeableContainerRecipeCreatorTileInfosClientPacket::decode, GetTaggeableContainerRecipeCreatorTileInfosClientPacket.ClientHandler::handle, distClient());
-        network.registerMessage(id++, GetTaggeableContainerRecipeCreatorTileInfosServerPacket.class, GetTaggeableContainerRecipeCreatorTileInfosServerPacket::encode, GetTaggeableContainerRecipeCreatorTileInfosServerPacket::decode, GetTaggeableContainerRecipeCreatorTileInfosServerPacket.ServerHandler::handle, distServer());
-
-        network.registerMessage(id, UpdateTaggeableContainerRecipeCreatorTilePacket.class, UpdateTaggeableContainerRecipeCreatorTilePacket::encode, UpdateTaggeableContainerRecipeCreatorTilePacket::decode, UpdateTaggeableContainerRecipeCreatorTilePacket.ServerHandler::handle, distServer());
-
-        // Index packets for screens
-        network.registerMessage(id++, SetModRecipeCreatorScreenIndexServerPacket.class, SetModRecipeCreatorScreenIndexServerPacket::encode, SetModRecipeCreatorScreenIndexServerPacket::decode, SetModRecipeCreatorScreenIndexServerPacket::serverHandle, distServer());
-        network.registerMessage(id++, SetModRecipeCreatorScreenIndexClientPacket.class, SetModRecipeCreatorScreenIndexClientPacket::encode, SetModRecipeCreatorScreenIndexClientPacket::decode, SetModRecipeCreatorScreenIndexClientPacket::clientHandle, distClient());
-        network.registerMessage(id, GetModRecipeCreatorScreenIndexPacket.class, GetModRecipeCreatorScreenIndexPacket::encode, GetModRecipeCreatorScreenIndexPacket::decode, GetModRecipeCreatorScreenIndexPacket.ServerHandler::handle, distServer());
+        registerClientMessage(UpdateRecipeCreatorTileDataClientPacket.class, UpdateRecipeCreatorTileDataClientPacket::encode, UpdateRecipeCreatorTileDataClientPacket::decode, UpdateRecipeCreatorTileDataClientPacket.ClientHandler::handle);
+        registerServerMessage(UpdateRecipeCreatorTileDataServerPacket.class, UpdateRecipeCreatorTileDataServerPacket::encode, UpdateRecipeCreatorTileDataServerPacket::decode, UpdateRecipeCreatorTileDataServerPacket.ServerHandler::handle);
     }
 
     private static Optional<NetworkDirection> distClient() { return Optional.of(NetworkDirection.PLAY_TO_CLIENT); }
     private static Optional<NetworkDirection> distServer() { return Optional.of(NetworkDirection.PLAY_TO_SERVER); }
+
+    private static <MSG> void registerClientMessage(Class<MSG> messageType, BiConsumer<MSG, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, MSG> decoder, BiConsumer<MSG, Supplier<NetworkEvent.Context>> messageConsumer)
+    {
+        network.registerMessage(packetId++, messageType, encoder, decoder, messageConsumer, distClient());
+    }
+
+    private static <MSG> void registerServerMessage(Class<MSG> messageType, BiConsumer<MSG, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, MSG> decoder, BiConsumer<MSG, Supplier<NetworkEvent.Context>> messageConsumer)
+    {
+        network.registerMessage(packetId++, messageType, encoder, decoder, messageConsumer, distServer());
+    }
+
+    public static class NetworkHelper
+    {
+        public static <MSG> void sendToPlayer(ServerPlayer player, MSG message)
+        {
+            getNetWork().send(PacketDistributor.PLAYER.with(() -> player), message);
+        }
+
+        public static <MSG> void sendToServer(MSG message)
+        {
+            getNetWork().send(PacketDistributor.SERVER.noArg(), message);
+        }
+    }
+
+    public enum PacketDataType
+    {
+        INT,
+        INT_ARRAY,
+        STRING,
+        BOOLEAN,
+        FLOAT,
+        DOUBLE,
+        MAP_INT_STRING
+    }
 }

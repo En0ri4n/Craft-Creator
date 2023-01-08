@@ -22,8 +22,7 @@ import net.minecraft.world.item.Items;
 
 import javax.annotation.Nonnull;
 import java.util.Map;
-
-@SuppressWarnings("deprecation")
+//TODO: remove duplicate code in vanilla screens render method
 public class FurnaceRecipeCreatorScreen extends AbstractContainerScreen<FurnaceRecipeCreatorContainer>
 {
 	private MultipleItemChoiceButton<Item, CraftType> recipeTypeButton;

@@ -41,6 +41,7 @@ public class StoneCutterRecipeCreatorBlock extends RecipeCreatorBlock
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext)
 	{
 		return SHAPE;

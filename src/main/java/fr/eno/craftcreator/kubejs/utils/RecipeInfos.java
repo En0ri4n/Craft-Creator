@@ -3,7 +3,9 @@ package fr.eno.craftcreator.kubejs.utils;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("unused")
 public class RecipeInfos
@@ -35,16 +37,23 @@ public class RecipeInfos
         return this.parameters.stream().filter(p -> p.getName().equals(name)).findFirst().orElse(null);
     }
 
-    public double getDouble(String name)
+    public Number getValue(String name)
     {
         RecipeParameter parameter = this.getRecipeParameter(name);
-        return parameter instanceof RecipeParameterDouble ? ((RecipeParameterDouble) parameter).getDoubleValue() : 0D;
+        return parameter instanceof RecipeParameterNumber ? ((RecipeParameterNumber) parameter).getNumberValue() : -1;
     }
 
-    public int getInteger(String name)
+    public boolean getBoolean(String name)
     {
         RecipeParameter parameter = this.getRecipeParameter(name);
-        return parameter instanceof RecipeParameterInteger ? ((RecipeParameterInteger) parameter).getIntValue() : 0;
+        return parameter instanceof RecipeParameterBoolean && ((RecipeParameterBoolean) parameter).getBoolean();
+    }
+
+    @SuppressWarnings("unchecked")
+    public <K, V> Map<K, V> getMap(String name)
+    {
+        RecipeParameter parameter = this.getRecipeParameter(name);
+        return parameter instanceof RecipeParameterMap ? ((RecipeParameterMap<K, V>) parameter).getMap() : new HashMap<>();
     }
 
     public boolean contains(String name)
@@ -74,43 +83,17 @@ public class RecipeInfos
         }
     }
 
-    public static class RecipeParameterDouble extends RecipeParameter
+    public static class RecipeParameterNumber extends RecipeParameter
     {
-        private final double value;
+        private final Number value;
 
-        public RecipeParameterDouble(String name, double value)
+        public RecipeParameterNumber(String name, Number value)
         {
-            super(RecipeParameterType.DOUBLE, name);
+            super(RecipeParameterType.NUMBER, name);
             this.value = value;
         }
 
-        public RecipeParameterDouble(String name, String value)
-        {
-            this(name, value.isEmpty() ? -1D : Double.parseDouble(value));
-        }
-
-        public double getDoubleValue()
-        {
-            return value;
-        }
-    }
-
-    public static class RecipeParameterInteger extends RecipeParameter
-    {
-        private final int value;
-
-        public RecipeParameterInteger(String name, int value)
-        {
-            super(RecipeParameterType.INTEGER, name);
-            this.value = value;
-        }
-
-        public RecipeParameterInteger(String name, String value)
-        {
-            this(name, value.isEmpty() ? -1 : Integer.parseInt(value));
-        }
-
-        public int getIntValue()
+        public Number getNumberValue()
         {
             return value;
         }
@@ -180,13 +163,49 @@ public class RecipeInfos
         }
     }
 
+    public static class RecipeParameterMap<K, V> extends RecipeParameter
+    {
+        private final Map<K, V> map;
+
+        public RecipeParameterMap(String name, Map<K, V> map)
+        {
+            super(RecipeParameterType.MAP, name);
+            this.map = map;
+        }
+
+        public RecipeParameterMap(String name)
+        {
+            this(name, new HashMap<>());
+        }
+
+        public Map<K, V> getMap()
+        {
+            return this.map;
+        }
+    }
+
+    public static class RecipeParameterIntList extends RecipeParameter
+    {
+        private final List<Integer> nbtSlots;
+
+        public RecipeParameterIntList(String name, List<Integer> nbtSlots)
+        {
+            super(RecipeParameterType.INT_LIST, name);
+            this.nbtSlots = nbtSlots;
+        }
+
+        public List<Integer> getIntList()
+        {
+            return nbtSlots;
+        }
+    }
+
     public enum RecipeParameterType
     {
-        DOUBLE,
-        INTEGER,
+        NUMBER,
         STRING,
         BOOLEAN,
         RESOURCE_LOCATION,
-        STRING_LIST
+        STRING_LIST, INT_LIST, MAP
     }
 }

@@ -6,7 +6,7 @@ import fr.eno.craftcreator.kubejs.jsserializers.ModRecipesJSSerializer;
 import fr.eno.craftcreator.kubejs.jsserializers.ThermalRecipesSerializer;
 import net.minecraft.world.item.crafting.Recipe;
 
-public class ModDispatcher
+public class ModRecipeCreatorDispatcher
 {
     public static ModRecipesJSSerializer getSeralizer(String modId)
     {

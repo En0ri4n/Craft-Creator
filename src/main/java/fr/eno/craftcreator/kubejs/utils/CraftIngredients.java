@@ -12,6 +12,7 @@ import vazkii.botania.common.item.brew.ItemBrewBase;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class CraftIngredients
 {
     public static final CraftIngredient EMPTY = new CraftIngredients.ItemIngredient(Items.AIR.getRegistryName(), 0);

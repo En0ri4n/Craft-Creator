@@ -7,6 +7,7 @@ import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;
 import fr.eno.craftcreator.screen.utils.ListScreen;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
+import fr.eno.craftcreator.utils.ClientUtils;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -30,7 +31,7 @@ public class ModSelectionScreen extends ListScreen
 
         this.addList(new SimpleListWidget(minecraft, this.width / 4 + 20, this.height / 2, this.width - (this.width / 4 + 20) - 10, this.height / 2 - 10, 20, 14, 5, References.getTranslate("screen.mod_selection.list.recipe_type"), null));
 
-        this.addRenderableWidget(new SimpleButton(References.getTranslate("screen.recipe_manager.button.remove_recipe"), this.width - 123 - 10, this.height - 23, 120, 20, button -> minecraft.setScreen(new RemoveRecipeManagerScreen(this))));
+        this.addRenderableWidget(new SimpleButton(References.getTranslate("screen.recipe_manager.button.remove_recipe"), this.width - 123 - 10, this.height - 23, 120, 20, button -> ClientUtils.openScreen(new RemoveRecipeManagerScreen(this))));
     }
 
     @Override
@@ -64,7 +65,7 @@ public class ModSelectionScreen extends ListScreen
             this.getList(1).setEntries(DeserializerHelper.getRecipeTypes(this.getModId()));
 
         if(this.doubleClickCounter > 0 && this.getList(1).getSelected() != null)
-            minecraft.setScreen(new RecipeManagerScreen(this.getModId(), this.getRecipeType()));
+            ClientUtils.openScreen(new RecipeManagerScreen(this.getModId(), this.getRecipeType()));
 
         return bool;
     }
