@@ -5,47 +5,73 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.container.CraftingTableRecipeCreatorContainer;
 import fr.eno.craftcreator.init.InitPackets;
-import fr.eno.craftcreator.kubejs.jsserializers.MinecraftRecipeSerializer;
+import fr.eno.craftcreator.kubejs.utils.RecipeInfos;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
-import fr.eno.craftcreator.packets.GetCraftingTableRecipeCreatorTileInfosServerPacket;
-import fr.eno.craftcreator.packets.UpdateCraftingTableRecipeCreatorTilePacket;
+import fr.eno.craftcreator.packets.RetrieveRecipeCreatorTileDataServerPacket;
+import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.screen.buttons.BooleanButton;
 import fr.eno.craftcreator.screen.buttons.ExecuteButton;
 import fr.eno.craftcreator.screen.buttons.SimpleCheckBox;
+import fr.eno.craftcreator.utils.PairValues;
+import fr.eno.craftcreator.utils.PositionnedSlot;
+import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.network.PacketDistributor;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
-public class CraftingTableRecipeCreatorScreen extends TaggeableSlotsContainerScreen<CraftingTableRecipeCreatorContainer>
+public class CraftingTableRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen<CraftingTableRecipeCreatorContainer>
 {
     private BooleanButton craftTypeButton;
-    private static final ResourceLocation CRAFT_CREATOR_TABLE_GUI_TEXTURES = References.getLoc("textures/gui/container/crafting_table_recipe_creator.png");
     private SimpleCheckBox isKubeJSRecipeButton;
 
     public CraftingTableRecipeCreatorScreen(CraftingTableRecipeCreatorContainer screenContainer, Inventory inv, Component titleIn)
     {
-        super(screenContainer, inv, titleIn, screenContainer.tile.getBlockPos());
+        super(screenContainer, inv, titleIn, screenContainer.getTile().getBlockPos());
     }
 
     @Override
     protected void init()
     {
         super.init();
-        InitPackets.getNetWork().send(PacketDistributor.SERVER.noArg(), new GetCraftingTableRecipeCreatorTileInfosServerPacket(this.getMenu().tile.getBlockPos(), this.getMenu().containerId));
-
+        InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("shaped", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.BOOLEAN));
 
         this.addRenderableWidget(isKubeJSRecipeButton = new SimpleCheckBox(5, this.height - 20, 15, 15, References.getTranslate("screen.recipe_creator_screen.kube_js_button"), false));
-        this.addRenderableWidget(craftTypeButton = new BooleanButton("craftType", leftPos + 100, topPos + 60, 68, 20, true, button -> InitPackets.getNetWork().send(PacketDistributor.SERVER.noArg(), new UpdateCraftingTableRecipeCreatorTilePacket(this.getMenu().tile.getBlockPos(), this.isShaped()))));
-        this.addRenderableWidget(new ExecuteButton(leftPos + 86, topPos + 33, 30, button -> MinecraftRecipeSerializer.createCraftingTableRecipe(this.getMenu().getItems(), this.getTaggedSlots(), this.isShaped(), isKubeJSRecipeButton.selected())));
+        this.addRenderableWidget(craftTypeButton = new BooleanButton("craftType", leftPos + 100, topPos + 60, 68, 20, true, (button) -> {}));
 
-        if(!SupportedMods.isKubeJSLoaded())
-            this.isKubeJSRecipeButton.visible = false;
+        updateScreen();
+    }
+
+    @Override
+    public void setData(String dataName, Object data)
+    {
+        super.setData(dataName, data);
+        if(dataName.equals("shaped"))
+            this.setShaped((boolean) data);
+    }
+
+    @Override
+    protected void updateScreen()
+    {
+        super.updateScreen();
+
+        if(!SupportedMods.isKubeJSLoaded()) this.isKubeJSRecipeButton.visible = false;
+        executeButton.setWidth(30);
+        setExecuteButtonPos(leftPos + 86, topPos + 33);
+
+    }
+
+    @Override
+    protected RecipeInfos getRecipeInfos()
+    {
+        super.getRecipeInfos();
+        recipeInfos.addParameter(new RecipeInfos.RecipeParameterBoolean("shaped", this.craftTypeButton.isOn()));
+        recipeInfos.addParameter(new RecipeInfos.RecipeParameterBoolean("kubejs_recipe", this.isKubeJSRecipeButton.selected()));
+        return this.recipeInfos;
     }
 
     @Override
@@ -55,8 +81,10 @@ public class CraftingTableRecipeCreatorScreen extends TaggeableSlotsContainerScr
 
         int yTextureOffset = ExecuteButton.isMouseHover(this.leftPos + imageWidth - 20, topPos, mouseX, mouseY, 20, 20) ? 20 : 0;
         RenderSystem.setShaderTexture(0, References.getLoc("textures/gui/buttons/item_button.png"));
+        RenderSystem.enableBlend();
         Screen.blit(matrixStack, this.leftPos + imageWidth - 20, topPos, 20, 20, 0, yTextureOffset, 20, 20, 20, 40);
-        minecraft.getItemRenderer().renderGuiItem(new ItemStack(Items.CRAFTING_TABLE), this.leftPos + imageWidth - 18, topPos + 2);
+
+        renderTooltip(matrixStack, mouseX, mouseY);
     }
 
     private boolean isShaped()
@@ -67,17 +95,42 @@ public class CraftingTableRecipeCreatorScreen extends TaggeableSlotsContainerScr
     @Override
     protected void renderBg(@Nonnull PoseStack matrixStack, float partialTicks, int mouseX, int mouseY)
     {
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, CRAFT_CREATOR_TABLE_GUI_TEXTURES);
-        int x = this.leftPos;
-        int j = (this.height - this.imageHeight) / 2;
-        this.blit(matrixStack, x, j, 0, 0, this.imageWidth, this.imageHeight);
-
         super.renderBg(matrixStack, partialTicks, mouseX, mouseY);
+    }
+
+    @Override
+    protected List<PositionnedSlot> getTaggeableSlots()
+    {
+        return SlotHelper.CRAFTING_TABLE_SLOTS;
+    }
+
+    @Override
+    protected PairValues<Integer, Integer> getIconPos()
+    {
+        return PairValues.create(this.leftPos + imageWidth - 18, topPos + 2);
+    }
+
+    @Override
+    protected Item getRecipeIcon()
+    {
+        return Items.CRAFTING_TABLE;
     }
 
     public void setShaped(boolean isShaped)
     {
         this.craftTypeButton.setOn(isShaped);
+    }
+
+    @Override
+    protected void updateSlots()
+    {
+        this.getMenu().activeSlots(true);
+    }
+
+    @Override
+    public void onClose()
+    {
+        super.onClose();
+        InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("shaped", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.BOOLEAN, isShaped()));
     }
 }

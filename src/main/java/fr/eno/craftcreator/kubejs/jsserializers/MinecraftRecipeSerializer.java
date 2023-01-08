@@ -1,6 +1,7 @@
 package fr.eno.craftcreator.kubejs.jsserializers;
 
 import fr.eno.craftcreator.kubejs.utils.CraftIngredients;
+import fr.eno.craftcreator.kubejs.utils.RecipeInfos;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import fr.eno.craftcreator.serializer.CraftingTableRecipeSerializer;
 import fr.eno.craftcreator.serializer.FurnaceRecipeSerializer;
@@ -11,15 +12,14 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
-import net.minecraftforge.items.SlotItemHandler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
 {
@@ -36,8 +36,20 @@ public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
         Item output = inventory.get(1).getItem();
         FurnaceRecipeSerializer recipe = FurnaceRecipeSerializer.create(type, output);
 
-        try { recipe.setExperience(Double.parseDouble(exp)); } catch(Exception ignored) {}
-        try { recipe.setCookingTime(Integer.parseInt(cookTime)); } catch(Exception ignored) {}
+        try
+        {
+            recipe.setExperience(Double.parseDouble(exp));
+        }
+        catch(Exception ignored)
+        {
+        }
+        try
+        {
+            recipe.setCookingTime(Integer.parseInt(cookTime));
+        }
+        catch(Exception ignored)
+        {
+        }
 
         recipe.setIngredient(input);
 
@@ -61,20 +73,23 @@ public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
         StoneCutterRecipeSerializer.create(output.getItem(), output.getCount()).setIngredient(input).serializeRecipe(isKubeJSRecipe);
     }
 
-    public static void createCraftingTableRecipe(NonNullList<ItemStack> inventory, Map<SlotItemHandler, ResourceLocation> taggedSlots, boolean isShaped, boolean isKubeJSRecipe)
+    public static void createCraftingTableRecipe(List<Slot> slots, RecipeInfos infos)
     {
-        ItemStack output = inventory.get(9);
+        ItemStack output = slots.get(9).getItem();
 
-        CraftingTableRecipeSerializer recipe = CraftingTableRecipeSerializer.create(isShaped ? CraftType.CRAFTING_TABLE_SHAPED : CraftType.CRAFTING_TABLE_SHAPELESS, output.getItem(), output.getCount());
+        boolean shaped = infos.getBoolean("shaped");
+        boolean isKubeJSRecipe = infos.getBoolean("kubejs_recipe");
+
+        CraftingTableRecipeSerializer recipeSerializer = CraftingTableRecipeSerializer.create(shaped ? CraftType.CRAFTING_TABLE_SHAPED : CraftType.CRAFTING_TABLE_SHAPELESS, output.getItem(), output.getCount());
 
         List<Item> ingredients = new ArrayList<>();
 
-        for (int i = 0; i < 9; i++)
-            ingredients.add(inventory.get(i).getItem());
+        for(int i = 0; i < slots.size() - 1; i++)
+            ingredients.add(slots.get(i).getItem().getItem());
 
-        recipe.setIngredients(ingredients, taggedSlots);
+        recipeSerializer.setIngredients(ingredients, infos.getMap("tagged_slots"));
 
-        recipe.serializeRecipe(isKubeJSRecipe);
+        recipeSerializer.serializeRecipe(isKubeJSRecipe);
     }
 
     public void addMinecraftRecipe(String recipeJson, RecipeType<?> recipeType)
@@ -110,8 +125,7 @@ public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
             inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Experience", CraftIngredients.DataIngredient.DataUnit.EXPERIENCE, abstractCookingRecipe.getExperience()));
         }
 
-        if(inputIngredients.isEmpty())
-            putIfNotEmpty(inputIngredients, recipe.getIngredients());
+        if(inputIngredients.isEmpty()) putIfNotEmpty(inputIngredients, recipe.getIngredients());
 
         return inputIngredients;
     }
