@@ -13,6 +13,8 @@ public class InitContainers
 {
 	public static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.CONTAINERS, References.MOD_ID);
 
+	public static final RegistryObject<MenuType<RecipeModifierContainer>> RECIPE_MODIFIER = CONTAINERS.register("recipe_modifier", () -> IForgeMenuType.create(RecipeModifierContainer::new));
+
 	public static final RegistryObject<MenuType<CraftingTableRecipeCreatorContainer>> CRAFTING_TABLE_RECIPE_CREATOR = CONTAINERS.register("crafting_table_recipe_creator", () -> IForgeMenuType.create(CraftingTableRecipeCreatorContainer::new));
 	public static final RegistryObject<MenuType<FurnaceRecipeCreatorContainer>> FURNACE_RECIPE_CREATOR = CONTAINERS.register("furnace_recipe_creator", () -> IForgeMenuType.create(FurnaceRecipeCreatorContainer::new));
 	public static final RegistryObject<MenuType<StoneCutterRecipeCreatorContainer>> STONE_CUTTER_RECIPE_CREATOR = CONTAINERS.register("stone_cutter_recipe_creator", () -> IForgeMenuType.create(StoneCutterRecipeCreatorContainer::new));

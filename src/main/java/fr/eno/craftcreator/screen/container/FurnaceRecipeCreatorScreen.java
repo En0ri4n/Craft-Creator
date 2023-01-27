@@ -5,7 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.container.FurnaceRecipeCreatorContainer;
-import fr.eno.craftcreator.kubejs.jsserializers.MinecraftRecipeSerializer;
+import fr.eno.craftcreator.kubejs.serializers.MinecraftRecipeSerializer;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import fr.eno.craftcreator.screen.buttons.ExecuteButton;
 import fr.eno.craftcreator.screen.buttons.MultipleItemChoiceButton;
@@ -22,8 +22,7 @@ import net.minecraft.world.item.Items;
 
 import javax.annotation.Nonnull;
 import java.util.Map;
-
-@SuppressWarnings("deprecation")
+//TODO: remove duplicate code in vanilla screens render method
 public class FurnaceRecipeCreatorScreen extends AbstractContainerScreen<FurnaceRecipeCreatorContainer>
 {
 	private MultipleItemChoiceButton<Item, CraftType> recipeTypeButton;

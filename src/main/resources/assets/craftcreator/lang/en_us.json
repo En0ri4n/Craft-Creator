@@ -1,17 +1,20 @@
 {
 	"itemGroup.craftcreator": "§lCraft Creator",
 
-	"craftcreator.world.on_join_message": "Thanks for downloading §aCraft Creator §r!\nPress §e'K' §rto open the recipes menu",
-	"craftcreator.world.on_join_message_issue": "§nYou can report any issue here",
+	"craftcreator.message.join": "Thanks for downloading §aCraft Creator §r!\nPress §e'K' §rto open the recipes menu",
+	"craftcreator.message.join_issue": "§nYou can report any issue here",
+
+	"craftcreator.message.recipe_added": "Successfully added %s's recipe in '%s'",
 
 	"craftcreator.button.boolean.craftType.on": "Shaped",
 	"craftcreator.button.boolean.craftType.off": "Shapeless",
 
 	"craftcreator.serializer.success": "Recipe saved at : §a§n%s",
 	"craftcreator.js_serializer.success": "Recipe %s -> %s successfully generated !",
-	"craftcreator.js_serializer.fail.recipe_exists": "§cA recipe with the same output already exists !",
+	"craftcreator.message.recipe_failed": "§cA recipe with the same output already exists !",
 
-	"craftcreator.screen.crafting.info": "§oCtrl + Click on slot to use tag instead of item",
+	"craftcreator.screen.crafting.info.msg": "§oCtrl + Click on slot to use tag instead of item",
+	"craftcreator.screen.crafting.info.nbt": "§oUse NBT tags for this item",
 	"craftcreator.screen.guiList.reset": "§cReset Tag",
 
 	"block.craftcreator.furnace_recipe_creator": "§lFurnace Recipe Creator",
@@ -22,7 +25,7 @@
 	"block.craftcreator.botania_recipe_creator": "§lBotania Recipe Creator",
 	"block.craftcreator.thermal_recipe_creator": "§lThermal Recipe Creator",
 
-	"craftcreator.container.crafting_table_recipe_creator.title": "Crafting Table Recipe Creator",
+	"craftcreator.screen.minecraft_recipe_creator.crafting.title": "Crafting Table Recipe Creator",
 	"craftcreator.container.stone_cutter_recipe_creator.title": "Cutter Recipe Creator",
 	"craftcreator.container.furnace_recipe_creator.title": "Furnace Recipe Creator",
 	"craftcreator.container.smithing_table_recipe_creator.title": "Smithing Recipe Creator",

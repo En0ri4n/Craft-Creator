@@ -1,7 +1,7 @@
 package fr.eno.craftcreator.kubejs.utils;
 
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
-import net.minecraft.client.Minecraft;
+import fr.eno.craftcreator.utils.ClientUtils;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @SuppressWarnings("unchecked")
-public class DeserializerHelper
+public class ListEntriesHelper
 {
     public static <T extends SimpleListWidget.Entry> List<T> getStringEntryList(SupportedMods[] mods)
     {
@@ -38,10 +38,8 @@ public class DeserializerHelper
         return entries;
     }
 
-    public static <T extends SimpleListWidget.Entry> List<T> getModifiedRecipesEntryList(String modId, ResourceLocation recipeTypeLoc)
+    public static <T extends SimpleListWidget.Entry> List<T> getModifiedRecipesEntryList()
     {
-        RecipeType<? extends Recipe<?>> recipeType = RecipeFileUtils.byName(recipeTypeLoc);
-
         List<T> entries = new ArrayList<>();
 
         RecipeFileUtils.getModifiedRecipesFor().forEach(modifiedRecipe ->
@@ -66,7 +64,7 @@ public class DeserializerHelper
 
         List<E> entries = new ArrayList<>();
 
-        Minecraft.getInstance().level.getRecipeManager().getAllRecipesFor(recipeType)
+        ClientUtils.getClientLevel().getRecipeManager().getAllRecipesFor(recipeType)
                 .forEach(recipe ->
                 {
                     if(!recipe.getId().toString().contains("kjs"))

@@ -2,6 +2,7 @@ package fr.eno.craftcreator.tileentity.vanilla;
 
 import fr.eno.craftcreator.container.CraftingTableRecipeCreatorContainer;
 import fr.eno.craftcreator.init.InitTileEntities;
+import fr.eno.craftcreator.tileentity.MultiScreenRecipeCreatorTile;
 import fr.eno.craftcreator.utils.SlotHelper;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
@@ -18,13 +19,30 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class CraftingTableRecipeCreatorTile extends TaggeableInventoryContainerTileEntity
+public class CraftingTableRecipeCreatorTile extends MultiScreenRecipeCreatorTile
 {
 	private boolean shapedRecipe;
 
 	public CraftingTableRecipeCreatorTile(BlockPos pWorldPosition, BlockState pBlockState)
 	{
 		super(InitTileEntities.CRAFTING_TABLE_RECIPE_CREATOR.get(), pWorldPosition, pBlockState, SlotHelper.CRAFTING_TABLE_SLOTS_SIZE);
+	}
+
+	@Override
+	public void setData(String dataName, Object data)
+	{
+		super.setData(dataName, data);
+		if(dataName.equals("shaped"))
+			setShapedRecipe((boolean) data);
+	}
+
+	@Override
+	public Object getData(String dataName)
+	{
+		if(dataName.equals("shaped"))
+			return isShapedRecipe();
+
+		return super.getData(dataName);
 	}
 
 	@Override

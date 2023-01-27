@@ -4,7 +4,6 @@ import fr.eno.craftcreator.commands.TestRecipesCommand;
 import fr.eno.craftcreator.init.*;
 import fr.eno.craftcreator.kubejs.KubeJSManager;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
-import fr.eno.craftcreator.screen.container.ThermalRecipeCreatorScreen;
 import fr.eno.craftcreator.screen.container.*;
 import fr.eno.craftcreator.utils.EntryHelper;
 import net.minecraft.client.gui.screens.MenuScreens;

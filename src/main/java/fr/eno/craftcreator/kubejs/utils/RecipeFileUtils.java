@@ -4,7 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.gson.*;
 import fr.eno.craftcreator.kubejs.KubeJSManager;
-import fr.eno.craftcreator.kubejs.jsserializers.ModRecipesJSSerializer;
+import fr.eno.craftcreator.kubejs.serializers.ModRecipesJSSerializer;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
 import io.netty.buffer.Unpooled;
 import net.minecraft.ChatFormatting;
@@ -122,7 +122,7 @@ public class RecipeFileUtils
     {
         assert craftingTableSerializer != null;
         T tempRecipe = craftingTableSerializer.fromJson(new ResourceLocation(modId, "recipe"), jsonObject);
-        T recipe = craftingTableSerializer.fromJson(new ResourceLocation(modId, ModDispatcher.getOutput(tempRecipe).getIngredientsWithCount().stream().findAny().orElse(CraftIngredients.CraftIngredient.EMPTY).getId().getPath()), jsonObject);
+        T recipe = craftingTableSerializer.fromJson(new ResourceLocation(modId, ModRecipeCreatorDispatcher.getOutput(tempRecipe).getIngredientsWithCount().stream().findAny().orElse(CraftIngredients.CraftIngredient.EMPTY).getId().getPath()), jsonObject);
         recipes.add(recipe);
     }
 
@@ -180,7 +180,7 @@ public class RecipeFileUtils
         T tempRecipe;
         T recipe;
         tempRecipe = serializer.fromJson(new ResourceLocation(modId, "recipe"), jsonObject);
-        recipe = serializer.fromJson(new ResourceLocation(modId, ModDispatcher.getOutput(tempRecipe).getIngredientsWithCount().stream().findAny().orElse(null).getId().getPath()), jsonObject);
+        recipe = serializer.fromJson(new ResourceLocation(modId, ModRecipeCreatorDispatcher.getOutput(tempRecipe).getIngredientsWithCount().stream().findAny().orElse(null).getId().getPath()), jsonObject);
 
         FriendlyByteBuf existingRecipeBuffer = new FriendlyByteBuf(Unpooled.buffer());
         FriendlyByteBuf jsonRecipeBuffer = new FriendlyByteBuf(Unpooled.buffer());

@@ -3,7 +3,7 @@ package fr.eno.craftcreator.serializer;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import fr.eno.craftcreator.utils.CraftType;
-import fr.eno.craftcreator.utils.PairValue;
+import fr.eno.craftcreator.utils.PairValues;
 import fr.eno.craftcreator.utils.Utilities;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
@@ -18,14 +18,26 @@ import java.util.*;
 
 public class CraftingTableRecipeSerializer extends RecipeSerializer
 {
+	// Keys for the shaped recipe
 	private static final List<Character> keyList = Arrays.asList('G', 'E', 'X', 'M', 'B', 'D', 'W', 'O', 'A');
 
+	/**
+	 *
+	 * @param type The type of the recipe (shaped or shapeless)
+	 * @param output The output of the recipe
+	 * @param count The number of output
+	 */
 	private CraftingTableRecipeSerializer(CraftType type, ItemLike output, int count)
 	{
 		super(type, output);
 		this.setOutput(output, count);
 	}
 
+	/**
+	 * set the ingredient of the recipe
+	 * @param list The list of the ingredient
+	 * @param taggedSlot The list of the tagged slots (for tags)
+	 */
 	public void setIngredients(List<Item> list, Map<SlotItemHandler, ResourceLocation> taggedSlot)
 	{
 		if(type.equals(CraftType.CRAFTING_TABLE_SHAPED))
@@ -57,11 +69,11 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 
 	private void createShapedIngredients(List<Item> items, Map<SlotItemHandler, ResourceLocation> taggedSlot)
 	{
-		Map<ResourceLocation, PairValue<Boolean, Character>> pattern = createPattern(items, taggedSlot);
+		Map<ResourceLocation, PairValues<Boolean, Character>> pattern = createPattern(items, taggedSlot);
 		createKeys(pattern);
 	}
 
-	private void createKeys(Map<ResourceLocation, PairValue<Boolean, Character>> map)
+	private void createKeys(Map<ResourceLocation, PairValues<Boolean, Character>> map)
 	{
 		JsonObject symbolListObj = new JsonObject();
 		List<ResourceLocation> list = new ArrayList<>(map.keySet());
@@ -91,9 +103,9 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 		recipe.add("key", symbolListObj);
 	}
 
-	private Map<ResourceLocation, PairValue<Boolean, Character>> createPattern(List<Item> list, Map<SlotItemHandler, ResourceLocation> taggedSlot)
+	private Map<ResourceLocation, PairValues<Boolean, Character>> createPattern(List<Item> list, Map<SlotItemHandler, ResourceLocation> taggedSlot)
 	{
-		Map<ResourceLocation, PairValue<Boolean, Character>> patterns = new HashMap<>();
+		Map<ResourceLocation, PairValues<Boolean, Character>> patterns = new HashMap<>();
 		JsonArray array = new JsonArray();
 
 		String str = "";
@@ -116,7 +128,7 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 
 						if(!patterns.containsKey(loc))
 						{
-							patterns.put(loc, PairValue.create(true, key));
+							patterns.put(loc, PairValues.create(true, key));
 						}
 
 						str = str.concat(String.valueOf(patterns.get(loc).getSecondValue()));
@@ -125,7 +137,7 @@ public class CraftingTableRecipeSerializer extends RecipeSerializer
 
 					if(!patterns.containsKey(list.get(index).getRegistryName()))
 					{
-						patterns.put(list.get(index).getRegistryName(), PairValue.create(false, keyList.get(index)));
+						patterns.put(list.get(index).getRegistryName(), PairValues.create(false, keyList.get(index)));
 					}
 
 					str = str.concat(String.valueOf(patterns.get(list.get(index).getRegistryName()).getSecondValue()));

@@ -1,9 +1,10 @@
-package fr.eno.craftcreator.utils;
+package fr.eno.craftcreator.screen.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.screen.buttons.ExecuteButton;
+import fr.eno.craftcreator.utils.Callable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;

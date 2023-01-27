@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.kubejs.jsserializers;
+package fr.eno.craftcreator.kubejs.serializers;
 
 import com.google.common.collect.Multimap;
 import com.google.gson.Gson;
@@ -10,15 +10,13 @@ import fr.eno.craftcreator.kubejs.utils.CraftIngredients;
 import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
-import fr.eno.craftcreator.utils.PairValue;
-import net.minecraft.ChatFormatting;
+import fr.eno.craftcreator.utils.PairValues;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
@@ -26,14 +24,13 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import javax.annotation.Nullable;
 import java.util.*;
 
-@SuppressWarnings("unused")
+@SuppressWarnings("ALL")
 public abstract class ModRecipesJSSerializer
 {
     protected static final Gson gson = new GsonBuilder().create();
-    protected SupportedMods mod;
+    protected final SupportedMods mod;
 
     public ModRecipesJSSerializer(SupportedMods mod)
     {
@@ -74,18 +71,10 @@ public abstract class ModRecipesJSSerializer
         RecipeFileUtils.insertAndWriteLines(this.mod.getModId(), recipeType, "event.custom(" + recipeJson + ")");
     }
 
-    protected void sendSuccessMessage(RecipeType<?> type, @Nullable ResourceLocation result)
+    public void sendSuccessMessage(RecipeType<?> type, ResourceLocation result)
     {
-        TextComponent baseComponent = new TextComponent("Recipe ");
-        TextComponent recipeNameComp = new TextComponent(Objects.requireNonNull(result).getPath() + "_from_" + RecipeFileUtils.getName(type).getPath());
-        recipeNameComp.withStyle(style ->
-        {
-            style.applyFormat(ChatFormatting.GREEN);
-            style.withUnderlined(true);
-            return style;
-        });
-        TextComponent endComp = new TextComponent(" Successfully generated !");
-        Objects.requireNonNull(Minecraft.getInstance().player).sendMessage(baseComponent.append(recipeNameComp).append(endComp), Minecraft.getInstance().player.getUUID());
+        MutableComponent message = References.getTranslate("message.recipe.added", result.getPath(), RecipeFileUtils.getName(type).getPath());
+        Objects.requireNonNull(Minecraft.getInstance().player).sendMessage(message, Minecraft.getInstance().player.getUUID());
     }
 
     protected JsonArray getArray(Multimap<ResourceLocation, Boolean> ingredients)
@@ -140,7 +129,7 @@ public abstract class ModRecipesJSSerializer
         return ForgeRegistries.ITEMS.containsKey(resourceLocation);
     }
 
-    protected <T, V> List<PairValue<T, V>> singletonList(PairValue<T, V> value)
+    protected <T, V> List<PairValues<T, V>> singletonList(PairValues<T, V> value)
     {
         return Collections.singletonList(value);
     }
@@ -152,7 +141,7 @@ public abstract class ModRecipesJSSerializer
 
     protected void sendFailMessage()
     {
-        Objects.requireNonNull(Minecraft.getInstance().player).sendMessage(References.getTranslate("js_serializer.fail.recipe_exists"), Minecraft.getInstance().player.getUUID());
+        Objects.requireNonNull(Minecraft.getInstance().player).sendMessage(References.getTranslate("message.recipe_failed"), Minecraft.getInstance().player.getUUID());
     }
 
     protected void putIfNotEmpty(CraftIngredients inputIngredients, List<Ingredient> ingredients)
@@ -165,7 +154,7 @@ public abstract class ModRecipesJSSerializer
             }
             else
             {
-                if(ingredient.getItems().length <= 0) continue;
+                if(ingredient.getItems().length == 0) {}
                 else if(ingredient.getItems().length == 1)
                     inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(ingredient.getItems()[0].getItem().getRegistryName(), 1));
                 else
@@ -188,6 +177,11 @@ public abstract class ModRecipesJSSerializer
             if(!stack.isEmpty())
                 inputIngredients.addIngredient(new CraftIngredients.ItemLuckIngredient(stack.getItem().getRegistryName(), stack.getCount(), chances.get(i), description));
         }
+    }
+
+    public void addRecipeToKubeJS(String recipeJson, RecipeType<?> recipeType)
+    {
+        addRecipeToFile(recipeJson, recipeType);
     }
 
     public abstract CraftIngredients getOutput(Recipe<?> recipe);

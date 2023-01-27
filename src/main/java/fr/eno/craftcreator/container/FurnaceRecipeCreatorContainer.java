@@ -7,7 +7,6 @@ import fr.eno.craftcreator.init.InitContainers;
 import fr.eno.craftcreator.tileentity.vanilla.FurnaceRecipeCreatorTile;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -18,6 +17,7 @@ public class FurnaceRecipeCreatorContainer extends VanillaCommonContainer
 	{
 		super(InitContainers.FURNACE_RECIPE_CREATOR.get(), containerId);
 		FurnaceRecipeCreatorTile tile = (FurnaceRecipeCreatorTile) inventory.player.level.getBlockEntity(packet.readBlockPos());
+
 		int index = 0;
 
 		this.addSlot(new SimpleSlotItemHandler(tile, index++, 56, 17));
@@ -26,7 +26,7 @@ public class FurnaceRecipeCreatorContainer extends VanillaCommonContainer
 		ItemStack fuel = new ItemStack(Items.COAL_BLOCK, 1);
 		fuel.enchant(Enchantments.ALL_DAMAGE_PROTECTION, 10);
 		this.addSlot(new LockedSlot(tile, index, 56, 53, fuel));
-		
+
 		this.bindPlayerInventory(inventory);
 
 		activeSlots(true);

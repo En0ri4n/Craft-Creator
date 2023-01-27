@@ -13,12 +13,13 @@ public class SmithingTableRecipeCreatorContainer extends VanillaCommonContainer
 	{
 		super(InitContainers.SMITHING_TABLE_RECIPE_CREATOR.get(), windowId);
 		SmithingTableRecipeCreatorTile tile = (SmithingTableRecipeCreatorTile) playerInventory.player.level.getBlockEntity(packet.readBlockPos());
+
 		int index = 0;
 
 		this.addSlot(new SimpleSlotItemHandler(tile, index++, 27, 47));
 		this.addSlot(new SimpleSlotItemHandler(tile, index++, 76, 47));
 		this.addSlot(new SimpleSlotItemHandler(tile, index, 134, 47));
-		
+
 		this.bindPlayerInventory(playerInventory);
 
 		activeSlots(true);

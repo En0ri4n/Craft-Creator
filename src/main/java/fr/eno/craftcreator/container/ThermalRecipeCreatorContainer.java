@@ -23,7 +23,7 @@ public class ThermalRecipeCreatorContainer extends CommonContainer
         {
             if(PositionnedSlot.contains(SlotHelper.TREE_EXTRACTOR_SLOTS, i))
             {
-                if(PositionnedSlot.isSlotOutput(SlotHelper.TREE_EXTRACTOR_SLOTS, i))
+                if(PositionnedSlot.contains(SlotHelper.TREE_EXTRACTOR_SLOTS_OUTPUT, i))
                 {
                     this.addSlot(new DefinedSlot(tile, i, SlotHelper.THERMAL_SLOTS.get(i).getxPos(), SlotHelper.THERMAL_SLOTS.get(i).getyPos(), stack -> stack.getItem() instanceof BucketItem));
                     continue;

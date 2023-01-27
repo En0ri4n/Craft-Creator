@@ -1,12 +1,12 @@
 package fr.eno.craftcreator.kubejs.utils;
 
-import fr.eno.craftcreator.kubejs.jsserializers.BotaniaRecipesSerializer;
-import fr.eno.craftcreator.kubejs.jsserializers.MinecraftRecipeSerializer;
-import fr.eno.craftcreator.kubejs.jsserializers.ModRecipesJSSerializer;
-import fr.eno.craftcreator.kubejs.jsserializers.ThermalRecipesSerializer;
+import fr.eno.craftcreator.kubejs.serializers.BotaniaRecipesSerializer;
+import fr.eno.craftcreator.kubejs.serializers.MinecraftRecipeSerializer;
+import fr.eno.craftcreator.kubejs.serializers.ModRecipesJSSerializer;
+import fr.eno.craftcreator.kubejs.serializers.ThermalRecipesSerializer;
 import net.minecraft.world.item.crafting.Recipe;
 
-public class ModDispatcher
+public class ModRecipeCreatorDispatcher
 {
     public static ModRecipesJSSerializer getSeralizer(String modId)
     {

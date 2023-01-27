@@ -2,11 +2,12 @@ package fr.eno.craftcreator.screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.kubejs.utils.DeserializerHelper;
+import fr.eno.craftcreator.kubejs.utils.ListEntriesHelper;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;
 import fr.eno.craftcreator.screen.utils.ListScreen;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
+import fr.eno.craftcreator.utils.ClientUtils;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -26,11 +27,11 @@ public class ModSelectionScreen extends ListScreen
         this.clearLists();
 
         this.addList(new SimpleListWidget(minecraft, 10, 10, this.width / 4, this.height - 20, 20, 14, 5, References.getTranslate("screen.mod_selection.list.mod"), null));
-        this.getList(0).setEntries(DeserializerHelper.getStringEntryList(SupportedMods.values()));
+        this.getList(0).setEntries(ListEntriesHelper.getStringEntryList(SupportedMods.values()));
 
         this.addList(new SimpleListWidget(minecraft, this.width / 4 + 20, this.height / 2, this.width - (this.width / 4 + 20) - 10, this.height / 2 - 10, 20, 14, 5, References.getTranslate("screen.mod_selection.list.recipe_type"), null));
 
-        this.addRenderableWidget(new SimpleButton(References.getTranslate("screen.recipe_manager.button.remove_recipe"), this.width - 123 - 10, this.height - 23, 120, 20, button -> minecraft.setScreen(new RemoveRecipeManagerScreen(this))));
+        this.addRenderableWidget(new SimpleButton(References.getTranslate("screen.recipe_manager.button.remove_recipe"), this.width - 123 - 10, this.height - 23, 120, 20, button -> ClientUtils.openScreen(new RemoveRecipeManagerScreen(this))));
     }
 
     @Override
@@ -61,10 +62,10 @@ public class ModSelectionScreen extends ListScreen
         boolean bool = super.mouseClicked(mouseX, mouseY, button);
 
         if(this.getList(0).getSelected() != null)
-            this.getList(1).setEntries(DeserializerHelper.getRecipeTypes(this.getModId()));
+            this.getList(1).setEntries(ListEntriesHelper.getRecipeTypes(this.getModId()));
 
         if(this.doubleClickCounter > 0 && this.getList(1).getSelected() != null)
-            minecraft.setScreen(new RecipeManagerScreen(this.getModId(), this.getRecipeType()));
+            ClientUtils.openScreen(new RecipeManagerScreen(this.getModId(), this.getRecipeType()));
 
         return bool;
     }

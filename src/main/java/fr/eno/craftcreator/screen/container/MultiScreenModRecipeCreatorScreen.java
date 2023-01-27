@@ -9,32 +9,28 @@ import fr.eno.craftcreator.init.InitPackets;
 import fr.eno.craftcreator.kubejs.managers.RecipeManagerDispatcher;
 import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
 import fr.eno.craftcreator.kubejs.utils.RecipeInfos;
-import fr.eno.craftcreator.packets.GetModRecipeCreatorScreenIndexPacket;
-import fr.eno.craftcreator.packets.SetModRecipeCreatorScreenIndexServerPacket;
+import fr.eno.craftcreator.packets.RetrieveRecipeCreatorTileDataServerPacket;
+import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.screen.buttons.ExecuteButton;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;
-import fr.eno.craftcreator.screen.utils.ModRecipeCreatorScreens;
-import fr.eno.craftcreator.utils.PairValue;
+import fr.eno.craftcreator.screen.utils.ModRecipeCreator;
+import fr.eno.craftcreator.screen.widgets.NumberDataFieldWidget;
+import fr.eno.craftcreator.utils.PairValues;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
-import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,25 +40,22 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContainer> extends TaggeableSlotsContainerScreen<T>
 {
-    private static final Field SLOT_POS_X_FIELD = ObfuscationReflectionHelper.findField(Slot.class, "f_40220_");
-    private static final Field SLOT_POS_Y_FIELD = ObfuscationReflectionHelper.findField(Slot.class, "f_40221_");
-
     int guiTextureSize = 256;
 
     protected ExecuteButton executeButton;
     protected SimpleButton nextButton;
     protected SimpleButton previousButton;
 
-    protected final List<EditBox> textFields;
+    protected final List<NumberDataFieldWidget> dataFields;
 
     protected final RecipeInfos recipeInfos;
-    
+
     private int currentScreenIndex;
 
     public MultiScreenModRecipeCreatorScreen(T screenContainer, Inventory inv, Component titleIn, BlockPos pos)
     {
         super(screenContainer, inv, titleIn, pos);
-        this.textFields = new ArrayList<>();
+        this.dataFields = new ArrayList<>();
         this.currentScreenIndex = 0;
         this.recipeInfos = RecipeInfos.create();
     }
@@ -73,12 +66,23 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         super.init();
         assert this.minecraft != null;
 
-        InitPackets.getNetWork().send(PacketDistributor.SERVER.noArg(), new GetModRecipeCreatorScreenIndexPacket(this.getMenu().getTile().getBlockPos()));
+        InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("screen_index", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.INT));
 
-        this.addRenderableWidget(executeButton = new ExecuteButton(this.leftPos + this.imageWidth / 2 - 20, this.topPos + 35,42, (button) -> RecipeManagerDispatcher.createRecipe(this.getMenu().getMod(), getCurrentRecipe(), this.getMenu().slots.stream().filter(slot -> slot instanceof SimpleSlotItemHandler).collect(Collectors.toList()), getTagged(), getRecipeInfos())));
+        this.addRenderableWidget(executeButton = new ExecuteButton(this.leftPos + this.imageWidth / 2 - 20, this.topPos + 35, 42, (button) -> RecipeManagerDispatcher.createRecipe(this.getMenu().getMod(), getCurrentRecipe(), this.getMenu().slots.stream().filter(slot -> slot instanceof SimpleSlotItemHandler).collect(Collectors.toList()), getRecipeInfos())));
 
         this.addRenderableWidget(nextButton = new SimpleButton(References.getTranslate("screen.recipe_creator.button.next"), getArrowXPos(true), this.topPos + this.imageHeight - 66, 10, 20, (button) -> nextPage()));
-        this.addRenderableWidget(previousButton = new SimpleButton(References.getTranslate("screen.recipe_creator.button.previous"),  getArrowXPos(false), this.topPos + this.imageHeight - 66,10, 20, (button) -> previousPage()));
+        this.addRenderableWidget(previousButton = new SimpleButton(References.getTranslate("screen.recipe_creator.button.previous"), getArrowXPos(false), this.topPos + this.imageHeight - 66, 10, 20, (button) -> previousPage()));
+    }
+
+    @Override
+    public void setData(String dataName, Object data)
+    {
+        super.setData(dataName, data);
+
+        if(dataName.equals("screen_index"))
+        {
+            this.setCurrentScreenIndex((Integer) data);
+        }
     }
 
     public int getArrowXPos(boolean right)
@@ -86,7 +90,14 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         return right ? this.leftPos + this.imageWidth + 3 : this.leftPos - 3 - 10;
     }
 
-    protected abstract RecipeInfos getRecipeInfos();
+    protected RecipeInfos getRecipeInfos()
+    {
+        this.recipeInfos.getParameters().clear();
+
+        this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterMap<>("tagged_slots", this.getTagged()));
+        this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterIntList("nbt_slots", this.nbtSlots));
+        return this.recipeInfos;
+    }
 
     private Map<Integer, ResourceLocation> getTagged()
     {
@@ -103,31 +114,31 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
      */
     protected void updateScreen()
     {
-        hideTextFields();
+        hideDataFields();
         this.updateSlots();
 
         nextButton.visible = hasNext();
         previousButton.visible = hasPrevious();
     }
 
-    protected void hideTextFields()
+    protected void hideDataFields()
     {
-        this.textFields.forEach(textField -> textField.active = textField.visible = false);
+        this.dataFields.forEach(textField -> textField.active = textField.visible = false);
     }
 
-    protected void showTextField(int... index)
+    protected void showDataField(int... index)
     {
         for(int i : index)
         {
-            this.textFields.get(i).active = this.textFields.get(i).visible = true;
+            this.dataFields.get(i).active = this.dataFields.get(i).visible = true;
         }
     }
 
-    protected void setTextFieldValue(Object defaultValue, int... index)
+    protected void setDataFieldValue(Number defaultValue, int... index)
     {
         for(int i : index)
         {
-            this.textFields.get(i).setValue(String.valueOf(defaultValue.toString()));
+            this.dataFields.get(i).setNumberValue(defaultValue);
         }
     }
 
@@ -137,28 +148,28 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         updateScreen();
     }
 
-    protected void setTextFieldPos(int index, int x, int y)
+    protected void setDataFieldPos(int index, int x, int y)
     {
-        textFields.get(index).x = x;
-        textFields.get(index).y = y;
+        dataFields.get(index).x = x;
+        dataFields.get(index).y = y;
     }
 
-    protected void setTextFieldSize(int index, int width, int height)
+    protected void setDataFieldSize(int index, int width, int height)
     {
-        textFields.get(index).setWidth(width);
-        textFields.get(index).setHeight(height);
+        dataFields.get(index).setWidth(width);
+        dataFields.get(index).setHeight(height);
     }
 
-    protected void setTextFieldPosAndSize(int index, int x, int y, int width, int height)
+    protected void setDataFieldPosAndSize(int index, int x, int y, int width, int height)
     {
-        setTextFieldPos(index, x, y);
-        setTextFieldSize(index, width, height);
+        setDataFieldPos(index, x, y);
+        setDataFieldSize(index, width, height);
     }
 
-    protected void setTextField(int index, int x, int y, int width, int height, Object value)
+    protected void setDataField(int index, int x, int y, int width, int height, Object value)
     {
-        setTextFieldPosAndSize(index, x, y ,width, height);
-        textFields.get(index).setValue(String.valueOf(value));
+        setDataFieldPosAndSize(index, x, y, width, height);
+        dataFields.get(index).setValue(String.valueOf(value));
     }
 
     protected void setExecuteButtonPos(int x, int y)
@@ -167,9 +178,9 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         executeButton.y = y;
     }
 
-    protected ModRecipeCreatorScreens getCurrentRecipe()
+    protected ModRecipeCreator getCurrentRecipe()
     {
-        return ModRecipeCreatorScreens.getRecipeCreatorScreens(this.getMenu().getMod()).get(currentScreenIndex);
+        return ModRecipeCreator.getRecipeCreatorScreens(this.getMenu().getMod()).get(currentScreenIndex);
     }
 
     @Override
@@ -178,11 +189,10 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         assert minecraft != null;
 
         super.render(matrixStack, mouseX, mouseY, partialTicks);
-        
-        this.textFields.forEach(field ->
+
+        this.dataFields.forEach(field ->
         {
-            if(field.visible)
-                field.render(matrixStack, mouseX, mouseY, partialTicks);
+            if(field.visible) field.render(matrixStack, mouseX, mouseY, partialTicks);
         });
     }
 
@@ -193,29 +203,30 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         super.renderComponentHoverEffect(pPoseStack, pStyle, pMouseX, pMouseY);
     }
 
-    protected void renderTextField(int index, PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    protected void renderDataFieldAndTitle(int index, Component fieldTitle, PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        this.textFields.get(index).render(matrixStack, mouseX, mouseY, partialTicks);
+        this.dataFields.get(index).render(matrixStack, mouseX, mouseY, partialTicks);
+        renderDataFieldTitle(index, fieldTitle, matrixStack);
     }
 
-    protected void renderTextFieldTitle(int index, Component text, PoseStack matrixStack)
+    protected void renderDataFieldTitle(int index, Component fieldTitle, PoseStack matrixStack)
     {
         matrixStack.pushPose();
         float scale = 1F;
         matrixStack.scale(scale, scale, scale);
-        Screen.drawString(matrixStack, font, text.copy().withStyle(ChatFormatting.ITALIC), (int) (textFields.get(index).x / scale), (int) ((textFields.get(index).y - font.lineHeight * scale - 1) / scale), 0xFF88AEC1);
+        Screen.drawString(matrixStack, font, fieldTitle.copy().withStyle(ChatFormatting.ITALIC), (int) (dataFields.get(index).x / scale), (int) ((dataFields.get(index).y - font.lineHeight * scale - 1) / scale), 0xFF88AEC1);
         matrixStack.popPose();
     }
 
-    protected EditBox getTextField(int index)
+    protected NumberDataFieldWidget getNumberField(int index)
     {
-        return this.textFields.get(index);
+        return this.dataFields.get(index);
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers)
     {
-        this.textFields.forEach(field -> field.keyPressed(keyCode, scanCode, modifiers));
+        this.dataFields.forEach(field -> field.keyPressed(keyCode, scanCode, modifiers));
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
@@ -223,14 +234,14 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     public boolean charTyped(char codePoint, int modifiers)
     {
         if(Character.isDigit(codePoint) || codePoint == '.')
-            this.textFields.forEach(field -> field.charTyped(codePoint, modifiers));
+            this.dataFields.forEach(field -> field.charTyped(codePoint, modifiers));
         return super.charTyped(codePoint, modifiers);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button)
     {
-        this.textFields.forEach(field -> field.mouseClicked(mouseX, mouseY, button));
+        this.dataFields.forEach(field -> field.mouseClicked(mouseX, mouseY, button));
         boolean flag = super.mouseClicked(mouseX, mouseY, button);
         nextButton.visible = hasNext();
         previousButton.visible = hasPrevious();
@@ -251,18 +262,18 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
 
     protected abstract Item getRecipeIcon();
 
-    protected PairValue<Integer, Integer> getIconPos()
+    protected PairValues<Integer, Integer> getIconPos()
     {
-        return PairValue.create(0, 0);
+        return PairValues.create(0, 0);
     }
 
     @Override
     protected void renderTooltip(PoseStack poseStack, int mouseX, int mouseY)
     {
         if(getRecipeIcon() != Items.AIR)
-            this.minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(getRecipeIcon()), getIconPos().getFirstValue(), getIconPos().getSecondValue());
+            getItemRenderer().renderAndDecorateFakeItem(new ItemStack(getRecipeIcon()), getIconPos().getFirstValue(), getIconPos().getSecondValue());
         super.renderTooltip(poseStack, mouseX, mouseY);
-        this.textFields.forEach(field -> field.renderToolTip(poseStack, mouseX, mouseY));
+        this.dataFields.forEach(field -> field.renderToolTip(poseStack, mouseX, mouseY));
     }
 
     @Override
@@ -274,26 +285,39 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     }
 
     /**
-     *
-     * @param index the index of the slot IN the available recipe slots
-     * @param name name to render
+     * @param index       the index of the slot IN the available recipe slots
+     * @param name        name to render
      * @param matrixStack the matrix stack
      */
     protected void renderSlotTitle(int index, Component name, PoseStack matrixStack)
     {
-        SimpleSlotItemHandler slot = (SimpleSlotItemHandler) PositionnedSlot.getSlotsFor(getCurrentRecipe().getSlots(), this.getMenu().slots).get(index);
-        Screen.drawCenteredString(matrixStack, font, name, slot.x + 8, slot.y - font.lineHeight - 1, 0xFFFFFFFF);
+        SimpleSlotItemHandler slot = getCurrentSlot(index);
+        Screen.drawCenteredString(matrixStack, font, name.copy().withStyle(ChatFormatting.DARK_PURPLE), this.leftPos + slot.x + 8, this.topPos + slot.y - font.lineHeight - 1, 0xFFFFFFFF);
+    }
+
+    /**
+     * @param index the index of the slot IN the available recipe slots
+     * @return the slot at the given index
+     */
+    protected SimpleSlotItemHandler getCurrentSlot(int index)
+    {
+        return (SimpleSlotItemHandler) PositionnedSlot.getSlotsFor(getCurrentRecipe().getSlots(), this.getMenu().slots).get(index);
+    }
+
+    protected ItemRenderer getItemRenderer()
+    {
+        assert minecraft != null;
+        return minecraft.getItemRenderer();
     }
 
     private boolean hasNext()
     {
-        return currentScreenIndex < ModRecipeCreatorScreens.getRecipeCreatorScreens(this.getMenu().getMod()).size() - 1;
+        return currentScreenIndex < ModRecipeCreator.getRecipeCreatorScreens(this.getMenu().getMod()).size() - 1;
     }
 
     private void nextPage()
     {
-        if(!hasNext())
-            return;
+        if(!hasNext()) return;
 
         this.currentScreenIndex++;
         updateServerIndex();
@@ -307,36 +331,31 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
 
     private void previousPage()
     {
-        if(!hasPrevious())
-            return;
+        if(!hasPrevious()) return;
 
         this.currentScreenIndex--;
         updateServerIndex();
         updateScreen();
     }
 
-    protected void addTextField(int x, int y, int width, int height, Object defaultValue, int count)
+    protected void addNumberField(int x, int y, int width, int height, Number defaultValue, int count)
     {
         for(int i = 0; i < count; i++)
         {
-            EditBox textfield = new EditBox(this.font, x, y, width, height, new TextComponent(""));
-            textfield.setValue(String.valueOf(defaultValue));
-            this.textFields.add(textfield);
+            NumberDataFieldWidget numberDataFieldWidget = new NumberDataFieldWidget(this.font, x, y, width, height, defaultValue);
+            numberDataFieldWidget.setValue(String.valueOf(defaultValue));
+            this.dataFields.add(numberDataFieldWidget);
         }
     }
 
     private void updateServerIndex()
     {
-        InitPackets.getNetWork().send(PacketDistributor.SERVER.noArg(), new SetModRecipeCreatorScreenIndexServerPacket(this.currentScreenIndex, this.getMenu().getTile().getBlockPos()));
+        InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("screen_index", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.INT, this.currentScreenIndex));
     }
 
     protected void updateSlots()
     {
         this.getMenu().activeSlots(false);
-        this.getCurrentRecipe().getSlots().forEach(ds ->
-                this.getMenu().slots.stream().filter(s ->
-                                s.getSlotIndex() == ds.getIndex() && s instanceof SimpleSlotItemHandler)
-                .findFirst().ifPresent(slot ->
-                                ((SimpleSlotItemHandler) slot).setActive(true)));
+        this.getCurrentRecipe().getSlots().forEach(ds -> this.getMenu().slots.stream().filter(s -> s.getSlotIndex() == ds.getIndex() && s instanceof SimpleSlotItemHandler).findFirst().ifPresent(slot -> ((SimpleSlotItemHandler) slot).setActive(true)));
     }
 }

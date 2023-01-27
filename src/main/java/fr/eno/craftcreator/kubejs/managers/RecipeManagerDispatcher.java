@@ -2,21 +2,26 @@ package fr.eno.craftcreator.kubejs.managers;
 
 import fr.eno.craftcreator.kubejs.utils.RecipeInfos;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
-import fr.eno.craftcreator.screen.utils.ModRecipeCreatorScreens;
-import net.minecraft.resources.ResourceLocation;
+import fr.eno.craftcreator.screen.utils.ModRecipeCreator;
 import net.minecraft.world.inventory.Slot;
 
 import java.util.List;
-import java.util.Map;
 
 public class RecipeManagerDispatcher
 {
-    public static void createRecipe(SupportedMods mod, ModRecipeCreatorScreens recipe, List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, RecipeInfos recipeInfos)
+    /**
+     * @param mod         The mod to which the recipe belongs
+     * @param recipe      The type of recipe to create
+     * @param slots       The slots of the container
+     * @param recipeInfos The infos of the recipe (energy, experience, chance, etc...)
+     */
+    public static void createRecipe(SupportedMods mod, ModRecipeCreator recipe, List<Slot> slots, RecipeInfos recipeInfos)
     {
         switch(mod)
         {
-            case BOTANIA -> BotaniaRecipesManager.get().createRecipe(recipe, slots, taggedSlots, recipeInfos);
-            case THERMAL -> ThermalRecipesManager.get().createRecipe(recipe, slots, taggedSlots, recipeInfos);
+            case BOTANIA -> BotaniaRecipesManager.get().createRecipe(recipe, slots, recipeInfos);
+            case THERMAL -> ThermalRecipesManager.get().createRecipe(recipe, slots, recipeInfos);
+            case MINECRAFT -> MinecraftRecipeManager.get().createRecipe(recipe, slots, recipeInfos);
         }
     }
 }

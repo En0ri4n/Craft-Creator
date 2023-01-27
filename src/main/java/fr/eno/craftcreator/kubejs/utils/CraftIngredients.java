@@ -12,6 +12,7 @@ import vazkii.botania.common.item.brew.ItemBrewBase;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class CraftIngredients
 {
     public static final CraftIngredient EMPTY = new CraftIngredients.ItemIngredient(Items.AIR.getRegistryName(), 0);
@@ -129,7 +130,7 @@ public class CraftIngredients
 
     public static class CraftIngredient
     {
-        public static final CraftIngredient EMPTY = new CraftIngredient(CraftIngredientType.ITEM, new ResourceLocation(References.MOD_ID, "empty"), "empty");
+        public static final CraftIngredient EMPTY = new CraftIngredient(CraftIngredientType.ITEM, References.getLoc("empty"), "empty");
         private final CraftIngredientType type;
         private final ResourceLocation id;
         private String description;

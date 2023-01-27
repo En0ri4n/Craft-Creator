@@ -3,6 +3,7 @@ package fr.eno.craftcreator.init;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import fr.eno.craftcreator.tileentity.BotaniaRecipeCreatorTile;
+import fr.eno.craftcreator.tileentity.ThermalRecipeCreatorTile;
 import fr.eno.craftcreator.tileentity.vanilla.CraftingTableRecipeCreatorTile;
 import fr.eno.craftcreator.tileentity.vanilla.FurnaceRecipeCreatorTile;
 import fr.eno.craftcreator.tileentity.vanilla.SmithingTableRecipeCreatorTile;
@@ -27,6 +28,6 @@ public class InitTileEntities
 	static
 	{
 		BOTANIA_RECIPE_CREATOR = SupportedMods.BOTANIA.isLoaded() ? TILE_ENTITY.register("botania_recipe_creator", () -> BlockEntityType.Builder.of(BotaniaRecipeCreatorTile::new, InitBlocks.BOTANIA_RECIPE_CREATOR.get()).build(null)) : null;
-		THERMAL_RECIPE_CREATOR = SupportedMods.THERMAL.isLoaded() ? TILE_ENTITY.register("thermal_recipe_creator", () -> BlockEntityType.Builder.of(BotaniaRecipeCreatorTile::new, InitBlocks.THERMAL_RECIPE_CREATOR.get()).build(null)) : null;
+		THERMAL_RECIPE_CREATOR = SupportedMods.THERMAL.isLoaded() ? TILE_ENTITY.register("thermal_recipe_creator", () -> BlockEntityType.Builder.of(ThermalRecipeCreatorTile::new, InitBlocks.THERMAL_RECIPE_CREATOR.get()).build(null)) : null;
 	}
 }
