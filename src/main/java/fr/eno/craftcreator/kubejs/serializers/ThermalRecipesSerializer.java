@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.kubejs.jsserializers;
+package fr.eno.craftcreator.kubejs.serializers;
 
 import cofh.thermal.core.init.TCoreRecipeTypes;
 import cofh.thermal.core.util.recipes.device.TreeExtractorMapping;

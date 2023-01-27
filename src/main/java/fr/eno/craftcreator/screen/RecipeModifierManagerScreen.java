@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.container.RecipeModifierContainer;
-import fr.eno.craftcreator.kubejs.utils.DeserializerHelper;
+import fr.eno.craftcreator.kubejs.utils.ListEntriesHelper;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;
 import fr.eno.craftcreator.screen.container.TaggeableSlotsContainerScreen;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
@@ -53,7 +53,7 @@ public class RecipeModifierManagerScreen extends TaggeableSlotsContainerScreen<R
 
         this.lists.add(new SimpleListWidget(minecraft, 5, 5, this.width / 4, this.height - bottomHeight, 15, 15, 5, References.getTranslate("screen.recipe_manager.list.modified_recipes"), null));
 
-        this.lists.get(0).setEntries(DeserializerHelper.getModifiedRecipesEntryList());
+        this.lists.get(0).setEntries(ListEntriesHelper.getModifiedRecipesEntryList());
 
         this.addRenderableWidget(new SimpleButton(References.getTranslate("screen.recipe_modifier.button.back"), this.width / 2 - 40, this.height - bottomHeight - 7, 80, 20, button -> ClientUtils.openScreen(this.parent)));
     }

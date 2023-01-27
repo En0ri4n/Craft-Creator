@@ -2,8 +2,8 @@ package fr.eno.craftcreator.screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.kubejs.jsserializers.ModRecipesJSSerializer;
-import fr.eno.craftcreator.kubejs.utils.DeserializerHelper;
+import fr.eno.craftcreator.kubejs.serializers.ModRecipesJSSerializer;
+import fr.eno.craftcreator.kubejs.utils.ListEntriesHelper;
 import fr.eno.craftcreator.kubejs.utils.ModRecipeCreatorDispatcher;
 import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;
@@ -63,9 +63,9 @@ public class RecipeManagerScreen extends ListScreen
 
     private void updateLists()
     {
-        this.setEntries(0, DeserializerHelper.getRecipes(this.recipeType));
-        this.setEntries(1, DeserializerHelper.getAddedRecipesEntryList(this.modId, this.recipeType));
-        this.setEntries(2, DeserializerHelper.getModifiedRecipesEntryList());
+        this.setEntries(0, ListEntriesHelper.getRecipes(this.recipeType));
+        this.setEntries(1, ListEntriesHelper.getAddedRecipesEntryList(this.modId, this.recipeType));
+        this.setEntries(2, ListEntriesHelper.getModifiedRecipesEntryList());
     }
 
     @Override

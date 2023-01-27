@@ -3,6 +3,9 @@ package fr.eno.craftcreator.utils;
 import fr.eno.craftcreator.References;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 /**
  * 
@@ -14,6 +17,21 @@ import net.minecraft.network.chat.Component;
 public class Utils
 {
 	static final Minecraft mc = Minecraft.getInstance();
+
+	/**
+	 * Verify that the object is not null
+	 * call {@link Objects#requireNonNull(Object)} with the object
+	 * @see Objects#requireNonNull(Object)
+	 *
+	 * @param obj The object to verify
+	 * @return the object
+	 * @param <T> the type of the object
+	 */
+	@NotNull
+	public static <T> T notNull(T obj)
+	{
+		return Objects.requireNonNull(obj);
+	}
 	
 	/**
 	 * call {@link References#getTranslate(String, Object...)}

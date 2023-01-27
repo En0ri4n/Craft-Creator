@@ -3,7 +3,7 @@ package fr.eno.craftcreator.screen.widgets;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.kubejs.jsserializers.ModRecipesJSSerializer;
+import fr.eno.craftcreator.kubejs.serializers.ModRecipesJSSerializer;
 import fr.eno.craftcreator.kubejs.utils.CraftIngredients;
 import fr.eno.craftcreator.kubejs.utils.ModRecipeCreatorDispatcher;
 import fr.eno.craftcreator.utils.Callable;

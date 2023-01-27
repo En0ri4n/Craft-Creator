@@ -34,7 +34,7 @@ public class RecipeInfos
 
     public RecipeParameter getRecipeParameter(String name)
     {
-        return this.parameters.stream().filter(p -> p.getName().equals(name)).findFirst().orElse(null);
+        return this.parameters.stream().filter(p -> p.getName().equals(name)).findFirst().orElse(RecipeParameter.EMPTY);
     }
 
     public Number getValue(String name)
@@ -63,6 +63,7 @@ public class RecipeInfos
 
     public static class RecipeParameter
     {
+        public static final RecipeParameter EMPTY = new RecipeParameter(RecipeParameterType.EMPTY, "empty");
         private final RecipeParameterType type;
         private final String name;
 
@@ -206,6 +207,6 @@ public class RecipeInfos
         STRING,
         BOOLEAN,
         RESOURCE_LOCATION,
-        STRING_LIST, INT_LIST, MAP
+        STRING_LIST, INT_LIST, EMPTY, MAP
     }
 }

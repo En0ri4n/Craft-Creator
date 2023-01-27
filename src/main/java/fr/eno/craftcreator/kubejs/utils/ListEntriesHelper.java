@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @SuppressWarnings("unchecked")
-public class DeserializerHelper
+public class ListEntriesHelper
 {
     public static <T extends SimpleListWidget.Entry> List<T> getStringEntryList(SupportedMods[] mods)
     {

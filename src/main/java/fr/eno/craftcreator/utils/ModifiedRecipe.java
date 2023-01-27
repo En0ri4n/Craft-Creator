@@ -1,6 +1,6 @@
 package fr.eno.craftcreator.utils;
 
-import fr.eno.craftcreator.kubejs.jsserializers.ModRecipesJSSerializer;
+import fr.eno.craftcreator.kubejs.serializers.ModRecipesJSSerializer;
 import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.crafting.Recipe;

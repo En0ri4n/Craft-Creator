@@ -1,6 +1,6 @@
 package fr.eno.craftcreator.kubejs.managers;
 
-import fr.eno.craftcreator.kubejs.jsserializers.ThermalRecipesSerializer;
+import fr.eno.craftcreator.kubejs.serializers.ThermalRecipesSerializer;
 import fr.eno.craftcreator.kubejs.utils.RecipeInfos;
 import fr.eno.craftcreator.screen.utils.ModRecipeCreator;
 import fr.eno.craftcreator.utils.PairValues;

@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.kubejs.jsserializers;
+package fr.eno.craftcreator.kubejs.serializers;
 
 import fr.eno.craftcreator.kubejs.utils.CraftIngredients;
 import fr.eno.craftcreator.kubejs.utils.RecipeInfos;
@@ -11,11 +11,13 @@ import fr.eno.craftcreator.utils.CraftType;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.AbstractCookingRecipe;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.UpgradeRecipe;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +25,7 @@ import java.util.List;
 
 public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
 {
-    private static MinecraftRecipeSerializer INSTANCE;
+    private static final MinecraftRecipeSerializer INSTANCE = new MinecraftRecipeSerializer();
 
     private MinecraftRecipeSerializer()
     {
@@ -92,17 +94,6 @@ public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
         recipeSerializer.serializeRecipe(isKubeJSRecipe);
     }
 
-    public void addMinecraftRecipe(String recipeJson, RecipeType<?> recipeType)
-    {
-        addRecipeToFile(recipeJson, recipeType);
-    }
-
-    @Override
-    public void sendSuccessMessage(RecipeType<?> type, ResourceLocation result)
-    {
-        super.sendSuccessMessage(type, result);
-    }
-
     @Override
     public CraftIngredients getInput(Recipe<?> recipe)
     {
@@ -141,6 +132,6 @@ public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
 
     public static MinecraftRecipeSerializer get()
     {
-        return INSTANCE == null ? INSTANCE = new MinecraftRecipeSerializer() : INSTANCE;
+        return INSTANCE;
     }
 }

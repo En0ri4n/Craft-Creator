@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.kubejs.jsserializers;
+package fr.eno.craftcreator.kubejs.serializers;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import fr.eno.craftcreator.kubejs.utils.CraftIngredients;
 import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
+import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -42,7 +43,7 @@ public class BotaniaRecipesSerializer extends ModRecipesJSSerializer
 
         addRecipeToFile(gson.toJson(obj), ModRecipeTypes.MANA_INFUSION_TYPE);
 
-        sendSuccessMessage(ModRecipeTypes.MANA_INFUSION_TYPE, result.getItem().getRegistryName());
+        sendSuccessMessage(ModRecipeTypes.MANA_INFUSION_TYPE, Utils.notNull(result.getItem().getRegistryName()));
     }
 
     public void createElvenTradeRecipe(List<Item> ingredients, List<Item> results)
@@ -54,7 +55,7 @@ public class BotaniaRecipesSerializer extends ModRecipesJSSerializer
 
         addRecipeToFile(gson.toJson(obj), ModRecipeTypes.ELVEN_TRADE_TYPE);
 
-        sendSuccessMessage(ModRecipeTypes.MANA_INFUSION_TYPE, results.get(0).getRegistryName());
+        sendSuccessMessage(ModRecipeTypes.MANA_INFUSION_TYPE, Utils.notNull(results.get(0).getRegistryName()));
     }
 
     public void createPureDaisyRecipe(Block input, Block output, int time)
@@ -79,7 +80,7 @@ public class BotaniaRecipesSerializer extends ModRecipesJSSerializer
 
         addRecipeToFile(gson.toJson(obj), ModRecipeTypes.BREW_TYPE);
 
-        sendSuccessMessage(ModRecipeTypes.BREW_TYPE, BotaniaAPI.instance().getBrewRegistry().getKey(brew));
+        sendSuccessMessage(ModRecipeTypes.BREW_TYPE, Utils.notNull(BotaniaAPI.instance().getBrewRegistry().getKey(brew)));
     }
 
     public void createPetalRecipe(Multimap<ResourceLocation, Boolean> ingredients, ItemStack result)
@@ -91,7 +92,7 @@ public class BotaniaRecipesSerializer extends ModRecipesJSSerializer
 
         addRecipeToFile(gson.toJson(obj), ModRecipeTypes.PETAL_TYPE);
 
-        sendSuccessMessage(ModRecipeTypes.PETAL_TYPE, result.getItem().getRegistryName());
+        sendSuccessMessage(ModRecipeTypes.PETAL_TYPE, Utils.notNull(result.getItem().getRegistryName()));
     }
 
     public void createRuneRecipe(Multimap<ResourceLocation, Boolean> ingredients, ItemStack result, int mana)
@@ -104,7 +105,7 @@ public class BotaniaRecipesSerializer extends ModRecipesJSSerializer
 
         addRecipeToFile(gson.toJson(obj), ModRecipeTypes.RUNE_TYPE);
 
-        sendSuccessMessage(ModRecipeTypes.RUNE_TYPE, result.getItem().getRegistryName());
+        sendSuccessMessage(ModRecipeTypes.RUNE_TYPE, Utils.notNull(result.getItem().getRegistryName()));
     }
 
     public void createTerraPlateRecipe(Multimap<ResourceLocation, Boolean> ingredients, ItemStack result, int mana)
@@ -117,7 +118,7 @@ public class BotaniaRecipesSerializer extends ModRecipesJSSerializer
 
         addRecipeToFile(gson.toJson(obj), ModRecipeTypes.TERRA_PLATE_TYPE);
 
-        sendSuccessMessage(ModRecipeTypes.TERRA_PLATE_TYPE, result.getItem().getRegistryName());
+        sendSuccessMessage(ModRecipeTypes.TERRA_PLATE_TYPE, Utils.notNull(result.getItem().getRegistryName()));
     }
 
     @Override

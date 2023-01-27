@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 import fr.eno.craftcreator.CraftCreator;
-import fr.eno.craftcreator.kubejs.jsserializers.MinecraftRecipeSerializer;
+import fr.eno.craftcreator.kubejs.serializers.MinecraftRecipeSerializer;
 import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
 import fr.eno.craftcreator.utils.CraftType;
 import fr.eno.craftcreator.utils.Utilities;
@@ -63,8 +63,8 @@ public abstract class RecipeSerializer
 				if(type.equals(CraftType.CRAFTING_TABLE_SHAPED) || type.equals(CraftType.CRAFTING_TABLE_SHAPELESS))
 					recipeType = RecipeFileUtils.byName(new ResourceLocation("minecraft", "crafting"));
 
-				MinecraftRecipeSerializer.get().addMinecraftRecipe(gson.toJson(recipe), recipeType);
-				MinecraftRecipeSerializer.get().sendSuccessMessage(recipeType, this.output.asItem().getRegistryName());
+				MinecraftRecipeSerializer.get().addRecipeToKubeJS(gson.toJson(recipe), recipeType);
+				MinecraftRecipeSerializer.get().sendSuccessMessage(recipeType, Utils.notNull(this.output.asItem().getRegistryName()));
 			}
 		}
 		catch(JsonIOException | IOException e)

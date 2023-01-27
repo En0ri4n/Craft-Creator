@@ -67,13 +67,7 @@ public class KubeJSManager
 
     private static void check()
     {
-        if(!isInitialized()) try
-        {
-            throw new Exception("The mod KubeJS is not installed !");
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
+        if(!isInitialized())
+            throw new RuntimeException("The mod KubeJS is not installed! (if you're seeing this, this is a bug!)");
     }
 }

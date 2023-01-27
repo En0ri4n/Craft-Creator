@@ -1,6 +1,6 @@
 package fr.eno.craftcreator.kubejs.managers;
 
-import fr.eno.craftcreator.kubejs.jsserializers.MinecraftRecipeSerializer;
+import fr.eno.craftcreator.kubejs.serializers.MinecraftRecipeSerializer;
 import fr.eno.craftcreator.kubejs.utils.RecipeInfos;
 import fr.eno.craftcreator.screen.utils.ModRecipeCreator;
 import net.minecraft.world.inventory.Slot;

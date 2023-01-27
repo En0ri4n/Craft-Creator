@@ -130,7 +130,7 @@ public class CraftIngredients
 
     public static class CraftIngredient
     {
-        public static final CraftIngredient EMPTY = new CraftIngredient(CraftIngredientType.ITEM, new ResourceLocation(References.MOD_ID, "empty"), "empty");
+        public static final CraftIngredient EMPTY = new CraftIngredient(CraftIngredientType.ITEM, References.getLoc("empty"), "empty");
         private final CraftIngredientType type;
         private final ResourceLocation id;
         private String description;

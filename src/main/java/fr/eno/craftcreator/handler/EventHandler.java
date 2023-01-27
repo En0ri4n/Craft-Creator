@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.test;
+package fr.eno.craftcreator.handler;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import fr.eno.craftcreator.References;
@@ -17,29 +17,15 @@ import net.minecraftforge.fml.common.Mod;
 import org.lwjgl.glfw.GLFW;
 
 @Mod.EventBusSubscriber(modid = References.MOD_ID)
-public class EventTest
+public class EventHandler
 {
     @SubscribeEvent
     public static void onKey(TickEvent.ClientTickEvent e)
     {
-        if(InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_KEY_K))
+        if(InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), InputConstants.KEY_K))
         {
             if(Minecraft.getInstance().screen == null)
                 Minecraft.getInstance().setScreen(new ModSelectionScreen());
-        }
-    }
-
-    @SubscribeEvent
-    public static void onClick(PlayerInteractEvent event)
-    {
-        if(event.getPlayer().isCrouching() && event.getHand() == InteractionHand.OFF_HAND && !event.getWorld().isClientSide)
-        {
-            if(event.getItemStack().getItem() instanceof BucketItem bucket)
-            {
-                System.out.println(bucket.getFluid().getRegistryName());
-
-                onPlayerJoin(new PlayerEvent.PlayerLoggedInEvent(event.getPlayer()));
-            }
         }
     }
 
@@ -48,9 +34,9 @@ public class EventTest
     {
         Player player = event.getPlayer();
 
-        MutableComponent issueMsg = Utilities.createComponentUrlOpener(References.getTranslate("world.on_join_message_issue"), "https://github.com/En0ri4n/Craft-Creator/issues");
+        MutableComponent issueMsg = Utilities.createComponentUrlOpener(References.getTranslate("message.join_issue"), "https://github.com/En0ri4n/Craft-Creator/issues");
 
-        player.sendMessage(References.getTranslate("world.on_join_message"), player.getUUID());
+        player.sendMessage(References.getTranslate("message.join"), player.getUUID());
         player.sendMessage(issueMsg, player.getUUID());
     }
 }

@@ -15,14 +15,19 @@ public enum SupportedMods
         this.modId = modId;
     }
 
-    public static boolean isModLoaded(String modId)
-    {
-        return ModList.get().isLoaded(modId);
-    }
-
     public String getModId()
     {
         return modId;
+    }
+
+    public boolean isLoaded()
+    {
+        return ModList.get().isLoaded(this.getModId());
+    }
+
+    public static boolean isModLoaded(String modId)
+    {
+        return ModList.get().isLoaded(modId);
     }
 
     public static SupportedMods getMod(String modId)
@@ -36,11 +41,6 @@ public enum SupportedMods
         }
 
         return SupportedMods.MINECRAFT;
-    }
-
-    public boolean isLoaded()
-    {
-        return ModList.get().isLoaded(this.getModId());
     }
 
     public static boolean isKubeJSLoaded()
