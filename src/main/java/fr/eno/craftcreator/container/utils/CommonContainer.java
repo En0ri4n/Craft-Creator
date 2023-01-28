@@ -11,10 +11,10 @@ public abstract class CommonContainer extends VanillaCommonContainer
 {
     protected final MultiScreenRecipeCreatorTile tile;
 
-    public CommonContainer(@Nullable MenuType<?> pMenuType, int pContainerId, Inventory inventory, FriendlyByteBuf packet)
+    public CommonContainer(@Nullable MenuType<?> pMenuType, int pContainerId, Inventory inventory, FriendlyByteBuf byteBuf)
     {
         super(pMenuType, pContainerId);
-        this.tile = (MultiScreenRecipeCreatorTile) inventory.player.level.getBlockEntity(packet.readBlockPos());
+        this.tile = (MultiScreenRecipeCreatorTile) inventory.player.level.getBlockEntity(byteBuf.readBlockPos());
     }
 
     public abstract SupportedMods getMod();

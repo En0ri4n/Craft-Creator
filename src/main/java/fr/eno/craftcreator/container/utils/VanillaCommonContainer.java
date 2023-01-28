@@ -58,6 +58,7 @@ public abstract class VanillaCommonContainer extends AbstractContainerMenu
     @Override
     public ItemStack quickMoveStack(Player player, int index)
     {
+        int playerInvIndexStart = player.getInventory().getContainerSize();
         var retStack = ItemStack.EMPTY;
         final Slot slot = this.slots.get(index);
         if(slot.hasItem())
@@ -65,10 +66,10 @@ public abstract class VanillaCommonContainer extends AbstractContainerMenu
             final ItemStack stack = slot.getItem();
             retStack = stack.copy();
 
-            final int size = this.slots.size() - player.getInventory().getContainerSize();
+            final int size = this.slots.size() - playerInvIndexStart;
             if(index < size)
             {
-                if(!moveItemStackTo(stack, 0, this.slots.size(), false)) return ItemStack.EMPTY;
+                if(!moveItemStackTo(stack, size, this.slots.size(), false)) return ItemStack.EMPTY;
             }
             else if(!moveItemStackTo(stack, 0, size, false)) return ItemStack.EMPTY;
 

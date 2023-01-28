@@ -11,6 +11,7 @@ import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
 import fr.eno.craftcreator.utils.PairValues;
+import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -66,12 +67,13 @@ public abstract class ModRecipesJSSerializer
         RecipeManager manager = Objects.requireNonNull(Minecraft.getInstance().level).getRecipeManager();
         return manager.getAllRecipesFor(type).stream().filter(Recipe -> Recipe.getResultItem().getItem() == result.asItem()).findFirst().orElse(null);
     }
-    protected void addRecipeToFile(String recipeJson, RecipeType<?> recipeType)
+    protected void addRecipeToFile(String recipeJson, RecipeType<?> recipeType, ResourceLocation result)
     {
         RecipeFileUtils.insertAndWriteLines(this.mod.getModId(), recipeType, "event.custom(" + recipeJson + ")");
+        sendSuccessMessage(recipeType, result);
     }
 
-    public void sendSuccessMessage(RecipeType<?> type, ResourceLocation result)
+    private void sendSuccessMessage(RecipeType<?> type, ResourceLocation result)
     {
         MutableComponent message = References.getTranslate("message.recipe.added", result.getPath(), RecipeFileUtils.getName(type).getPath());
         Objects.requireNonNull(Minecraft.getInstance().player).sendMessage(message, Minecraft.getInstance().player.getUUID());
@@ -80,8 +82,14 @@ public abstract class ModRecipesJSSerializer
     protected JsonArray getArray(Multimap<ResourceLocation, Boolean> ingredients)
     {
         JsonArray array = new JsonArray();
-        ingredients.forEach((loc, isTag) -> array.add(singletonJsonObject(isTag ? "tag" : "item", loc.toString())));
+        ingredients.forEach((loc, isTag) -> array.add(singletonItemJsonObject(isTag ? "tag" : "item", loc)));
         return array;
+    }
+
+    protected void addNbtToResult(JsonObject result, String nbt)
+    {
+        result.addProperty("type", "forge:nbt");
+        result.addProperty("nbt", nbt.replace("\"", "\\\""));
     }
 
     protected JsonObject getResult(ItemStack result)
@@ -98,15 +106,20 @@ public abstract class ModRecipesJSSerializer
     protected JsonArray listWithSingletonItems(List<Item> items, String key)
     {
         JsonArray array = new JsonArray();
-        items.forEach(item -> array.add(singletonJsonObject(key, Objects.requireNonNull(item.getRegistryName()).toString())));
+        items.forEach(item -> array.add(singletonItemJsonObject(key, Utils.notNull(item.getRegistryName()))));
         return array;
     }
 
-    protected JsonObject singletonJsonObject(String key, String value)
+    protected JsonObject singletonItemJsonObject(String key, ResourceLocation value)
     {
         JsonObject obj = new JsonObject();
-        obj.addProperty(key, value);
+        obj.addProperty(key, value.toString());
         return obj;
+    }
+
+    protected JsonObject singletonItemJsonObject(ResourceLocation key)
+    {
+        return singletonItemJsonObject(isItem(key) ? "item" : "tag", key);
     }
 
     protected JsonObject mapToJsonObject(Map<String, Object> map)
@@ -121,6 +134,13 @@ public abstract class ModRecipesJSSerializer
             else if(o instanceof JsonArray array) obj.add(s, array);
             else if(o instanceof JsonObject object) obj.add(s, object);
         });
+        return obj;
+    }
+
+    protected JsonObject createBaseJson(RecipeType<?> recipeType)
+    {
+        JsonObject obj = new JsonObject();
+        RecipeFileUtils.setRecipeType(obj, recipeType);
         return obj;
     }
 
@@ -177,11 +197,6 @@ public abstract class ModRecipesJSSerializer
             if(!stack.isEmpty())
                 inputIngredients.addIngredient(new CraftIngredients.ItemLuckIngredient(stack.getItem().getRegistryName(), stack.getCount(), chances.get(i), description));
         }
-    }
-
-    public void addRecipeToKubeJS(String recipeJson, RecipeType<?> recipeType)
-    {
-        addRecipeToFile(recipeJson, recipeType);
     }
 
     public abstract CraftIngredients getOutput(Recipe<?> recipe);

@@ -25,10 +25,16 @@
 	"block.craftcreator.botania_recipe_creator": "§lBotania Recipe Creator",
 	"block.craftcreator.thermal_recipe_creator": "§lThermal Recipe Creator",
 
+	"craftcreator.screen.furnace_recipe_creator_screen.experience": "Exp. :",
+	"craftcreator.screen.furnace_recipe_creator_screen.cooking_time": "Time :",
+
 	"craftcreator.screen.minecraft_recipe_creator.crafting.title": "Crafting Table Recipe Creator",
-	"craftcreator.container.stone_cutter_recipe_creator.title": "Cutter Recipe Creator",
-	"craftcreator.container.furnace_recipe_creator.title": "Furnace Recipe Creator",
-	"craftcreator.container.smithing_table_recipe_creator.title": "Smithing Recipe Creator",
+	"craftcreator.screen.minecraft_recipe_creator.stonecutting.title": "Stone Cutter Recipe Creator",
+	"craftcreator.screen.minecraft_recipe_creator.smelting.title": "Furnace Recipe Creator",
+	"craftcreator.screen.minecraft_recipe_creator.blasting.title": "Blast Furnace Recipe Creator",
+	"craftcreator.screen.minecraft_recipe_creator.smoking.title": "Smoker Recipe Creator",
+	"craftcreator.screen.minecraft_recipe_creator.campfire_cooking.title": "Campfire Recipe Creator",
+	"craftcreator.screen.minecraft_recipe_creator.smithing.title": "Smithing Recipe Creator",
 
 	"craftcreator.screen.recipe_creator.button.next": ">",
 	"craftcreator.screen.recipe_creator.button.previous": "<",

@@ -11,7 +11,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import fr.eno.craftcreator.kubejs.utils.CraftIngredients;
-import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -21,6 +20,7 @@ import net.minecraft.world.level.material.Fluid;
 
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public class ThermalRecipesSerializer extends ModRecipesJSSerializer
 {
     private static final ThermalRecipesSerializer INSTANCE = new ThermalRecipesSerializer();
@@ -30,46 +30,41 @@ public class ThermalRecipesSerializer extends ModRecipesJSSerializer
         super(SupportedMods.THERMAL);
     }
 
-    public void createTreeExtractorRecipe(Block trunk, Block leaves, Fluid fluidResult, int fluidAmount)
+    public void serializeTreeExtractorRecipe(Block trunk, Block leaves, Fluid fluidResult, int fluidAmount)
     {
-        JsonObject obj = new JsonObject();
-        RecipeFileUtils.setRecipeType(obj, TCoreRecipeTypes.MAPPING_TREE_EXTRACTOR);
+        JsonObject obj = createBaseJson(TCoreRecipeTypes.MAPPING_TREE_EXTRACTOR);
         obj.addProperty("trunk", trunk.getRegistryName().toString());
         obj.addProperty("leaves", leaves.getRegistryName().toString());
         obj.add("result", mapToJsonObject(ImmutableMap.of("fluid", fluidResult.getRegistryName().toString(), "amount", fluidAmount)));
 
-        addRecipeToFile(gson.toJson(obj), TCoreRecipeTypes.MAPPING_TREE_EXTRACTOR);
-
-        sendSuccessMessage(TCoreRecipeTypes.MAPPING_TREE_EXTRACTOR, fluidResult.getRegistryName());
+        addRecipeToFile(gson.toJson(obj), TCoreRecipeTypes.MAPPING_TREE_EXTRACTOR, fluidResult.getRegistryName());
     }
 
-    public void createPulverizerRecipe(ResourceLocation input, Map<ItemStack, Double> outputs, double exp)
+    public void serializecreatePulverizerRecipe(ResourceLocation input, Map<ItemStack, Double> outputs, double exp)
     {
-        JsonObject obj = new JsonObject();
-        RecipeFileUtils.setRecipeType(obj, TCoreRecipeTypes.RECIPE_PULVERIZER);
+        JsonObject obj = createBaseJson(TCoreRecipeTypes.RECIPE_PULVERIZER);
         obj.addProperty("experience", exp);
-        obj.add("ingredient", singletonJsonObject(isItem(input) ? "item" : "tag", input.toString()));
-        JsonArray resultObj = new JsonArray();
-        for(Map.Entry<ItemStack, Double> output : outputs.entrySet())
-        {
-            JsonObject itemResultObj = new JsonObject();
-            itemResultObj.addProperty("item", output.getKey().getItem().getRegistryName().toString());
-            itemResultObj.addProperty("count", output.getKey().getCount());
-            if(output.getValue() != 1D) itemResultObj.addProperty("chance", output.getValue());
-            resultObj.add(itemResultObj);
-        }
-        obj.add("result", resultObj);
+        addIngredients(input, outputs, obj);
 
-        addRecipeToFile(gson.toJson(obj), TCoreRecipeTypes.RECIPE_PULVERIZER);
-        sendSuccessMessage(TCoreRecipeTypes.RECIPE_PULVERIZER, outputs.keySet().stream().findFirst().get().getItem().getRegistryName());
+        addRecipeToFile(gson.toJson(obj), TCoreRecipeTypes.RECIPE_PULVERIZER, outputs.keySet().stream().findFirst().orElse(ItemStack.EMPTY).getItem().getRegistryName());
     }
 
-    public void createSawmillRecipe(ResourceLocation input, Map<ItemStack, Double> outputs, Integer energy)
+    public void serializeSawmillRecipe(ResourceLocation input, Map<ItemStack, Double> outputs, Integer energy)
     {
-        JsonObject obj = new JsonObject();
-        RecipeFileUtils.setRecipeType(obj, TCoreRecipeTypes.RECIPE_SAWMILL);
+        JsonObject obj = createBaseJson(TCoreRecipeTypes.RECIPE_SAWMILL);
         obj.addProperty("energy", energy);
-        obj.add("ingredient", singletonJsonObject(isItem(input) ? "item" : "tag", input.toString()));
+        addIngredients(input, outputs, obj);
+
+        addRecipeToFile(gson.toJson(obj), TCoreRecipeTypes.RECIPE_SAWMILL, outputs.keySet().stream().findFirst().orElse(ItemStack.EMPTY).getItem().getRegistryName());
+    }
+
+    public void serializeSmelterRecipe(ItemStack input, ItemStack output, int energy, double experience)
+    {
+    }
+
+    private void addIngredients(ResourceLocation input, Map<ItemStack, Double> outputs, JsonObject obj)
+    {
+        obj.add("ingredient", singletonItemJsonObject(isItem(input) ? "item" : "tag", input));
         JsonArray resultObj = new JsonArray();
         for(Map.Entry<ItemStack, Double> output : outputs.entrySet())
         {
@@ -80,9 +75,6 @@ public class ThermalRecipesSerializer extends ModRecipesJSSerializer
             resultObj.add(itemResultObj);
         }
         obj.add("result", resultObj);
-
-        addRecipeToFile(gson.toJson(obj), TCoreRecipeTypes.RECIPE_SAWMILL);
-        sendSuccessMessage(TCoreRecipeTypes.RECIPE_SAWMILL, outputs.keySet().stream().findFirst().get().getItem().getRegistryName());
     }
 
     @Override

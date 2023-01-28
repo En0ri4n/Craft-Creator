@@ -41,7 +41,7 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     {
         super.init();
 
-        addNumberField( leftPos + imageWidth - 44, topPos + imageHeight / 2, 35, 10, -1, 6);
+        addNumberField( leftPos + imageWidth - 44, topPos + imageHeight / 2, 35, -1, 6);
 
         updateScreen();
     }
@@ -55,8 +55,8 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     @Override
     protected RecipeInfos getRecipeInfos()
     {
-        this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber("experience", getNumberField(EXPERIENCE_FIELD).getDoubleValue()));
-        this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber("energy", getNumberField(ENERGY_FIELD).getIntValue()));
+        this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.EXPERIENCE, getNumberField(EXPERIENCE_FIELD).getDoubleValue()));
+        this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.ENERGY, getNumberField(ENERGY_FIELD).getIntValue()));
 
         switch(getCurrentRecipe())
         {
@@ -77,8 +77,8 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
         super.updateScreen();
 
         showDataField(ENERGY_FIELD, EXPERIENCE_FIELD);
-        setDataField(ENERGY_FIELD, this.leftPos + 8, this.topPos + this.imageHeight / 2 + 23, 73, 16, 100);
-        setDataField(EXPERIENCE_FIELD, this.leftPos + this.imageWidth - 73 - 8, this.topPos + this.imageHeight / 2 + 23, 73, 16, 0.1D);
+        setDataField(ENERGY_FIELD, this.leftPos + 8, this.topPos + this.imageHeight / 2 + 23, 73, 100);
+        setDataField(EXPERIENCE_FIELD, this.leftPos + this.imageWidth - 73 - 8, this.topPos + this.imageHeight / 2 + 23, 73, 0.1D);
         setExecuteButtonPos(this.leftPos + this.imageWidth / 2 - this.executeButton.getWidth() / 2, this.topPos + this.imageHeight / 2 - this.executeButton.getHeight() / 2 + 22);
 
         switch(getCurrentRecipe())
@@ -86,14 +86,14 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
             case TREE_EXTRACTOR ->
             {
                 showDataField(RESIN_FIELD);
-                setDataField(RESIN_FIELD, leftPos + imageWidth / 4 * 3 - 12, topPos + imageHeight / 3 - 13, 55, 16, 25);
+                setDataField(RESIN_FIELD, leftPos + imageWidth / 4 * 3 - 12, topPos + imageHeight / 3 - 13, 55, 25);
             }
             case SAWMILL, PULVERIZER, SMELTER, INSOLATOR ->
             {
                 for(int i = 0; i < 4; i++)
                 {
                     showDataField(i + CHANCES_FIELD);
-                    setDataField(i + CHANCES_FIELD, leftPos + imageWidth / 4 * 3 - 12, topPos + 33 + i * 26, 40, 16, 1D);
+                    setDataField(i + CHANCES_FIELD, leftPos + imageWidth / 4 * 3 - 12, topPos + 33 + i * 26, 40, 1D);
                 }
             }
         }

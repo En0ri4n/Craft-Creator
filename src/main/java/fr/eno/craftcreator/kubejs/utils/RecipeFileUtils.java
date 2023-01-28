@@ -20,15 +20,16 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.registries.ForgeRegistries;
-import vazkii.botania.api.recipe.IPureDaisyRecipe;
-import vazkii.botania.common.crafting.StateIngredientTag;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -381,25 +382,6 @@ public class RecipeFileUtils
                 modifiedRecipe.setDescriptor(descriptor, json.get(descriptor.getTag()).getAsString());
             }
         }
-    }
-
-    public static Multimap<String, ResourceLocation> getInput(Recipe<?> recipe)
-    {
-        Multimap<String, ResourceLocation> locations = ArrayListMultimap.create();
-
-        if(recipe instanceof IPureDaisyRecipe recipePureDaisy)
-        {
-            if(recipePureDaisy.getInput() instanceof StateIngredientTag)
-                locations.put("Tag", ((StateIngredientTag) recipePureDaisy.getInput()).getTagId());
-            else locations.put("Block", recipePureDaisy.getInput().pick(new Random()).getBlock().getRegistryName());
-            return locations;
-        }
-
-        locations.putAll(getIngredients(recipe.getIngredients()));
-
-        if(locations.isEmpty()) locations.put("Item", recipe.getResultItem().getItem().getRegistryName());
-
-        return locations;
     }
 
     private static Multimap<String, ResourceLocation> getIngredients(NonNullList<Ingredient> ingredients)

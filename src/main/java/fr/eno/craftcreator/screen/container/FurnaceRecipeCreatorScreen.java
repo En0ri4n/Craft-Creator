@@ -1,127 +1,118 @@
 package fr.eno.craftcreator.screen.container;
 
-import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.container.FurnaceRecipeCreatorContainer;
-import fr.eno.craftcreator.kubejs.serializers.MinecraftRecipeSerializer;
+import fr.eno.craftcreator.kubejs.utils.RecipeInfos;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import fr.eno.craftcreator.screen.buttons.ExecuteButton;
-import fr.eno.craftcreator.screen.buttons.MultipleItemChoiceButton;
 import fr.eno.craftcreator.screen.buttons.SimpleCheckBox;
-import fr.eno.craftcreator.utils.CraftType;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import fr.eno.craftcreator.screen.utils.ModRecipeCreator;
+import fr.eno.craftcreator.utils.PairValues;
+import fr.eno.craftcreator.utils.PositionnedSlot;
+import fr.eno.craftcreator.utils.SlotHelper;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 
 import javax.annotation.Nonnull;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.List;
+
 //TODO: remove duplicate code in vanilla screens render method
-public class FurnaceRecipeCreatorScreen extends AbstractContainerScreen<FurnaceRecipeCreatorContainer>
+public class FurnaceRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen<FurnaceRecipeCreatorContainer>
 {
-	private MultipleItemChoiceButton<Item, CraftType> recipeTypeButton;
-	private static final ResourceLocation GUI_TEXTURES = new ResourceLocation(References.MOD_ID, "textures/gui/container/furnace_recipe_creator.png");
-	private final Map<Item, CraftType> RECIPE_TYPE_MAP = ImmutableMap.of(Items.FURNACE, CraftType.FURNACE_SMELTING, Items.BLAST_FURNACE, CraftType.FURNACE_BLASTING, Items.SMOKER, CraftType.FURNACE_SMOKING, Items.CAMPFIRE, CraftType.CAMPFIRE_COOKING);
+    private SimpleCheckBox isKubeJSRecipeButton;
 
-	private SimpleCheckBox isKubeJSRecipeButton;
-	private EditBox expField;
-	private EditBox cookTimeField;
-	
-	public FurnaceRecipeCreatorScreen(FurnaceRecipeCreatorContainer screenContainer, Inventory inv, Component titleIn)
-	{
-		super(screenContainer, inv, titleIn);
-	}
+    private final List<ModRecipeCreator> FURNACES = Arrays.asList(ModRecipeCreator.FURNACE_BLASTING, ModRecipeCreator.FURNACE_SMELTING, ModRecipeCreator.FURNACE_SMOKING, ModRecipeCreator.CAMPFIRE_COOKING);
 
-	@Override
-	protected void init()
-	{
-		super.init();
-		this.addRenderableWidget(recipeTypeButton = new MultipleItemChoiceButton<>(this.leftPos + imageWidth - 20, topPos, 20, 20, RECIPE_TYPE_MAP));
+    public FurnaceRecipeCreatorScreen(FurnaceRecipeCreatorContainer screenContainer, Inventory inv, Component titleIn)
+    {
+        super(screenContainer, inv, titleIn, screenContainer.getTile().getBlockPos());
+    }
 
-		this.addRenderableWidget(isKubeJSRecipeButton = new SimpleCheckBox(5, this.height - 20, 15, 15, References.getTranslate("screen.recipe_creator_screen.kube_js_button"), false));
-		this.addRenderableWidget(new ExecuteButton(leftPos + 76, topPos + 33, 32, button -> MinecraftRecipeSerializer.createFurnaceRecipe(this.getMenu().getItems(), this.getRecipeType(), expField.getValue(), cookTimeField.getValue(), isKubeJSRecipeButton.selected())));
-		
-		expField = new EditBox(font, leftPos + 8, topPos + 30, 40, 10, new TextComponent(""));
-		expField.setValue("0.1");
-		cookTimeField = new EditBox(font, leftPos + 8, topPos + 60, 40, 10, new TextComponent(""));
-		cookTimeField.setValue("200");
+    @Override
+    protected void init()
+    {
+        super.init();
+        this.addRenderableWidget(isKubeJSRecipeButton = new SimpleCheckBox(5, this.height - 20, 15, 15, References.getTranslate("screen.recipe_creator_screen.kube_js_button"), false));
 
-		if(!SupportedMods.isKubeJSLoaded())
-			this.isKubeJSRecipeButton.visible = false;
-	}
-	
-	@Override
-	public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
-	{
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
+        addNumberField(leftPos + 8, topPos + 30, 40, 0.1D, 1);
+        addNumberField(leftPos + 8, topPos + 60, 40, 200, 1);
 
-		float scale = 0.7F;
-		matrixStack.pushPose();
-		matrixStack.scale(scale, scale, scale);
-		String expStr = "Exp. Gained :";
-		String cookTimeStr = "Cook Time :";
-		font.drawShadow(matrixStack, expStr, (int) ((leftPos + 8) / scale), (int) ((topPos + 30 - font.lineHeight * scale) / scale), 0xFFFFFF);
-		font.drawShadow(matrixStack, cookTimeStr, (int) ((leftPos + 8) / scale), (int) ((topPos + 60 - font.lineHeight * scale) / scale), 0xFFFFFF);
-		matrixStack.popPose();
-		this.expField.render(matrixStack, mouseX, mouseY, partialTicks);
-		this.cookTimeField.render(matrixStack, mouseX, mouseY, partialTicks);
+        if(!SupportedMods.isKubeJSLoaded()) this.isKubeJSRecipeButton.visible = false;
+    }
 
-		this.renderTooltip(matrixStack, mouseX, mouseY);
-	}
+    @Override
+    protected void updateScreen()
+    {
+        super.updateScreen();
 
-	@Override
-	protected void renderBg(@Nonnull PoseStack matrixStack, float partialTicks, int mouseX, int mouseY)
-	{
-		this.renderBackground(matrixStack);
+        setExecuteButtonPos(this.leftPos + this.imageWidth / 2 - 14, this.topPos + 33);
+        executeButton.setWidth(35);
+        showDataField(0, 1);
+    }
 
-		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-		RenderSystem.setShaderTexture(0, GUI_TEXTURES);
-		int i = this.leftPos;
-		int j = (this.height - this.imageHeight) / 2;
-		this.blit(matrixStack, i, j, 0, 0, this.imageWidth, this.imageHeight);
-		blit(matrixStack, this.leftPos + 57, this.topPos + 37, 176, 0, 14, 14, 256, 256);
-	}
-	
-	@Override
-	public boolean charTyped(char code, int p_charTyped_2_)
-	{
-		if(Character.isDigit(code) || code == '.')
-		{
-			this.expField.charTyped(code, p_charTyped_2_);
-			this.cookTimeField.charTyped(code, p_charTyped_2_);
-		}
-		
-		return super.charTyped(code, p_charTyped_2_);
-	}
-	
-	@Override
-	public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_)
-	{
-		this.expField.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
-		this.cookTimeField.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
-		
-		return super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
-	}
-	
-	@Override
-	public boolean mouseClicked(double p_mouseClicked_1_, double p_mouseClicked_3_, int p_mouseClicked_5_)
-	{
-		this.expField.mouseClicked(p_mouseClicked_1_, p_mouseClicked_3_, p_mouseClicked_5_);
-		this.cookTimeField.mouseClicked(p_mouseClicked_1_, p_mouseClicked_3_, p_mouseClicked_5_);
-		return super.mouseClicked(p_mouseClicked_1_, p_mouseClicked_3_, p_mouseClicked_5_);
-	}
-	
-	private CraftType getRecipeType()
-	{
-		return recipeTypeButton.getCurrentValue();
-	}
+    @Override
+    protected List<ModRecipeCreator> getAvailableRecipesCreator()
+    {
+        return FURNACES;
+    }
 
-	@Override
-	protected void renderLabels(@Nonnull PoseStack matrixStack, int x, int y) { }
+    @Override
+    protected RecipeInfos getRecipeInfos()
+    {
+        recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.EXPERIENCE, getNumberField(0).getDoubleValue()));
+        recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.COOKING_TIME, getNumberField(1).getIntValue()));
+        recipeInfos.addParameter(new RecipeInfos.RecipeParameterBoolean(RecipeInfos.Parameters.IS_KUBEJS_RECIPE, isKubeJSRecipeButton.selected()));
+
+        return super.getRecipeInfos();
+    }
+
+    @Override
+    public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    {
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
+
+        int yTextureOffset = ExecuteButton.isMouseHover(this.leftPos + imageWidth - 20, topPos, mouseX, mouseY, 20, 20) ? 20 : 0;
+        RenderSystem.setShaderTexture(0, References.getLoc("textures/gui/buttons/item_button.png"));
+        RenderSystem.enableBlend();
+        Screen.blit(matrixStack, this.leftPos + imageWidth - 20, topPos, 20, 20, 0, yTextureOffset, 20, 20, 20, 40);
+
+        // Only for >> FLAMES <<
+        RenderSystem.setShaderTexture(0, References.getLoc("textures/gui/container/minecraft/furnace_recipe_creator.png"));
+        blit(matrixStack, this.leftPos + 57, this.topPos + 37, 176, 0, 14, 14, 256, 256);
+
+        renderDataFieldAndTitle(0, References.getTranslate("screen.furnace_recipe_creator_screen.experience"), matrixStack, mouseX, mouseY, partialTicks);
+        renderDataFieldAndTitle(1, References.getTranslate("screen.furnace_recipe_creator_screen.cooking_time"), matrixStack, mouseX, mouseY, partialTicks);
+
+        this.renderTooltip(matrixStack, mouseX, mouseY);
+    }
+
+    @Override
+    protected Item getRecipeIcon()
+    {
+        return switch(getCurrentRecipe())
+                {
+                    case FURNACE_BLASTING -> Items.BLAST_FURNACE;
+                    case FURNACE_SMOKING -> Items.SMOKER;
+                    case CAMPFIRE_COOKING -> Items.CAMPFIRE;
+                    default -> Items.FURNACE;
+                };
+    }
+
+    @Override
+    protected PairValues<Integer, Integer> getIconPos()
+    {
+        return PairValues.create(this.leftPos + imageWidth - 18, topPos + 2);
+    }
+
+    @Override
+    protected List<PositionnedSlot> getTaggeableSlots()
+    {
+        return SlotHelper.FURNACE_SLOTS.stream().findFirst().stream().toList();
+    }
 }

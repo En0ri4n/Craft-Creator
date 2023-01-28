@@ -201,6 +201,18 @@ public class RecipeInfos
         }
     }
 
+    public static class Parameters
+    {
+        public static final String SHAPED = "shaped";
+        public static final String EXPERIENCE = "experience";
+        public static final String COOKING_TIME = "cooking_time";
+        public static final String TIME = "time";
+        public static final String MANA = "mana";
+        public static final String ENERGY = "energy";
+        public static final String TAGGED_SLOTS = "tagged_slots";
+        public static final String IS_KUBEJS_RECIPE = "kubejs_recipe";
+    }
+
     public enum RecipeParameterType
     {
         NUMBER,

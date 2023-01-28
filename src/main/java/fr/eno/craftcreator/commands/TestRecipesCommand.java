@@ -4,20 +4,18 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
-import fr.eno.craftcreator.utils.ReflectUtils;
+import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.server.level.ChunkMap;
+import net.minecraft.world.level.storage.LevelResource;
 import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.Objects;
 
 public class TestRecipesCommand
 {
@@ -30,7 +28,7 @@ public class TestRecipesCommand
 	public static int execute(CommandContext<CommandSourceStack> ctx)
 	{
 		File recipeFolder = createDatapack(ctx);
-		File generatorFolder = new File(ctx.getSource().getServer().getServerDirectory(), "Craft-Generator");
+		File generatorFolder = new File(ctx.getSource().getServer().getServerDirectory(), "Craft-Creator");
 
 		File[] datapackRecipeFolder = recipeFolder.listFiles();
 
@@ -38,10 +36,10 @@ public class TestRecipesCommand
 			for (File f : datapackRecipeFolder)
 				f.delete();
 
-		for (File file : Objects.requireNonNull(generatorFolder.listFiles()))
+		for (File file : Utils.notNull(generatorFolder.listFiles()))
 			try
 			{
-				FileUtils.copyFileToDirectory(file, recipeFolder);
+				FileUtils.copyFileToDirectory(file, recipeFolder, false);
 			}
 			catch(IOException e)
 			{
@@ -57,12 +55,11 @@ public class TestRecipesCommand
 
 	private static File createDatapack(CommandContext<CommandSourceStack> ctx)
 	{
-		Field worldDirField = ReflectUtils.getFieldAndSetAccessible(ChunkMap.class, "f_182284_");
-		File worldDir = new File(Objects.requireNonNull(ReflectUtils.getFieldValue(worldDirField, ctx.getSource().getLevel().getChunkSource().chunkMap, String.class)));
-
-		File datapackFolder = new File(worldDir, "datapacks");
+		File datapackFolder = ctx.getSource().getServer().getWorldPath(LevelResource.DATAPACK_DIR).toFile();
 		File packFolder = new File(datapackFolder, "Craft-Creator");
 		packFolder.mkdirs();
+
+		// Create pack.mcmeta file
 		File packMCMeta = new File(packFolder, "pack.mcmeta");
 
 		try
@@ -73,7 +70,7 @@ public class TestRecipesCommand
 			JsonObject obj = new JsonObject();
 			JsonObject packObj = new JsonObject();
 			packObj.addProperty("pack_format", 1);
-			packObj.addProperty("description", "A basic datapack made by the mod Craft Creator - by Eno_gamer10");
+			packObj.addProperty("description", "A basic datapack made by the mod Craft Creator - by En0ri4n");
 			obj.add("pack", packObj);
 
 			try (BufferedWriter writer = new BufferedWriter(new FileWriter(packMCMeta)))
@@ -90,11 +87,7 @@ public class TestRecipesCommand
 			e.printStackTrace();
 		}
 
-		File dataFolder = new File(packFolder, "data");
-		dataFolder.mkdirs();
-		File craftCreatorDataFolder = new File(dataFolder, "craft_creator");
-		craftCreatorDataFolder.mkdirs();
-		File recipeFolder = new File(craftCreatorDataFolder, "recipes");
+		File recipeFolder = new File(packFolder, "data\\craft_creator\\recipes");
 		recipeFolder.mkdirs();
 
 		return recipeFolder;

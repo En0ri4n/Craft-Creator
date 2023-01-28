@@ -12,6 +12,7 @@ import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.screen.buttons.BooleanButton;
 import fr.eno.craftcreator.screen.buttons.ExecuteButton;
 import fr.eno.craftcreator.screen.buttons.SimpleCheckBox;
+import fr.eno.craftcreator.screen.utils.ModRecipeCreator;
 import fr.eno.craftcreator.utils.PairValues;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
@@ -47,6 +48,12 @@ public class CraftingTableRecipeCreatorScreen extends MultiScreenModRecipeCreato
     }
 
     @Override
+    protected ModRecipeCreator getCurrentRecipe()
+    {
+        return ModRecipeCreator.CRAFTING_TABLE;
+    }
+
+    @Override
     public void setData(String dataName, Object data)
     {
         super.setData(dataName, data);
@@ -57,20 +64,21 @@ public class CraftingTableRecipeCreatorScreen extends MultiScreenModRecipeCreato
     @Override
     protected void updateScreen()
     {
-        super.updateScreen();
+        nextButton.visible = false;
+        previousButton.visible = false;
+        updateSlots();
 
         if(!SupportedMods.isKubeJSLoaded()) this.isKubeJSRecipeButton.visible = false;
         executeButton.setWidth(30);
         setExecuteButtonPos(leftPos + 86, topPos + 33);
-
     }
 
     @Override
     protected RecipeInfos getRecipeInfos()
     {
         super.getRecipeInfos();
-        recipeInfos.addParameter(new RecipeInfos.RecipeParameterBoolean("shaped", this.craftTypeButton.isOn()));
-        recipeInfos.addParameter(new RecipeInfos.RecipeParameterBoolean("kubejs_recipe", this.isKubeJSRecipeButton.selected()));
+        recipeInfos.addParameter(new RecipeInfos.RecipeParameterBoolean(RecipeInfos.Parameters.SHAPED, this.craftTypeButton.isOn()));
+        recipeInfos.addParameter(new RecipeInfos.RecipeParameterBoolean(RecipeInfos.Parameters.IS_KUBEJS_RECIPE, this.isKubeJSRecipeButton.selected()));
         return this.recipeInfos;
     }
 
@@ -84,6 +92,7 @@ public class CraftingTableRecipeCreatorScreen extends MultiScreenModRecipeCreato
         RenderSystem.enableBlend();
         Screen.blit(matrixStack, this.leftPos + imageWidth - 20, topPos, 20, 20, 0, yTextureOffset, 20, 20, 20, 40);
 
+        craftTypeButton.render(matrixStack, mouseX, mouseY, partialTicks);
         renderTooltip(matrixStack, mouseX, mouseY);
     }
 

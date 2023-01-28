@@ -2,6 +2,7 @@ package fr.eno.craftcreator.tileentity.vanilla;
 
 import fr.eno.craftcreator.container.FurnaceRecipeCreatorContainer;
 import fr.eno.craftcreator.init.InitTileEntities;
+import fr.eno.craftcreator.tileentity.MultiScreenRecipeCreatorTile;
 import fr.eno.craftcreator.utils.SlotHelper;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
@@ -15,7 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nonnull;
 
-public class FurnaceRecipeCreatorTile extends InventoryContainerTileEntity
+public class FurnaceRecipeCreatorTile extends MultiScreenRecipeCreatorTile
 {
 	public FurnaceRecipeCreatorTile(BlockPos pWorldPosition, BlockState pBlockState)
 	{

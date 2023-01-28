@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public class ThermalRecipesManager extends BaseRecipesManager
 {
     private static final ThermalRecipesManager INSTANCE = new ThermalRecipesManager();
@@ -27,10 +28,10 @@ public class ThermalRecipesManager extends BaseRecipesManager
         switch(recipe)
         {
             case TREE_EXTRACTOR -> createTreeExtractorRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getValue("resin_amount").intValue());
-            case PULVERIZER -> createPulverizerRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap("tagged_slots"), recipeInfos);
-            case SAWMILL -> createSawmillRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap("tagged_slots"), recipeInfos);
-            case SMELTER -> createSmelterRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap("tagged_slots"), recipeInfos);
-            case INSOLATOR -> createInsolatorRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap("tagged_slots"), recipeInfos);
+            case PULVERIZER -> createPulverizerRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos);
+            case SAWMILL -> createSawmillRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos);
+            case SMELTER -> createSmelterRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos);
+            case INSOLATOR -> createInsolatorRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos);
         }
     }
 
@@ -53,7 +54,7 @@ public class ThermalRecipesManager extends BaseRecipesManager
 
         if (secondaryOutput.isEmpty())
         {
-            // ThermalRecipesSerializer.get().createSmelterRecipe(input, output, energy, experience);
+            ThermalRecipesSerializer.get().serializeSmelterRecipe(input, output, energy, experience);
         }
     }
 
@@ -69,7 +70,7 @@ public class ThermalRecipesManager extends BaseRecipesManager
         if(trunk.isEmpty() || leaves.isEmpty() || fluid == Fluids.EMPTY || resin_amount <= 0)
             return;
 
-        ThermalRecipesSerializer.get().createTreeExtractorRecipe(Block.byItem(trunk.getItem()), Block.byItem(leaves.getItem()), fluid, resin_amount);
+        ThermalRecipesSerializer.get().serializeTreeExtractorRecipe(Block.byItem(trunk.getItem()), Block.byItem(leaves.getItem()), fluid, resin_amount);
     }
 
     private void createPulverizerRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, RecipeInfos recipeInfos)
@@ -79,7 +80,7 @@ public class ThermalRecipesManager extends BaseRecipesManager
 
         PairValues<ResourceLocation, PairValues<Map<ItemStack, Double>, Integer>> values = processRecipe(slots, taggedSlots, recipeInfos);
 
-        ThermalRecipesSerializer.get().createPulverizerRecipe(values.getFirstValue(), values.getSecondValue().getFirstValue(), values.getSecondValue().getSecondValue());
+        ThermalRecipesSerializer.get().serializecreatePulverizerRecipe(values.getFirstValue(), values.getSecondValue().getFirstValue(), values.getSecondValue().getSecondValue());
     }
 
     private void createSawmillRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, RecipeInfos recipeInfos)
@@ -89,7 +90,7 @@ public class ThermalRecipesManager extends BaseRecipesManager
 
         PairValues<ResourceLocation, PairValues<Map<ItemStack, Double>, Integer>> values = processRecipe(slots, taggedSlots, recipeInfos);
 
-        ThermalRecipesSerializer.get().createSawmillRecipe(values.getFirstValue(), values.getSecondValue().getFirstValue(), values.getSecondValue().getSecondValue());
+        ThermalRecipesSerializer.get().serializeSawmillRecipe(values.getFirstValue(), values.getSecondValue().getFirstValue(), values.getSecondValue().getSecondValue());
     }
 
     private static PairValues<ResourceLocation, PairValues<Map<ItemStack, Double>, Integer>> processRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, RecipeInfos recipeInfos)

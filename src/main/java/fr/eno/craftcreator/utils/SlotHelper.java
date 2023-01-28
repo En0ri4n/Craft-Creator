@@ -12,9 +12,12 @@ public class SlotHelper
     // Minecraft
     public static final int CRAFTING_TABLE_SLOTS_SIZE;
     public static final List<PositionnedSlot> CRAFTING_TABLE_SLOTS;
-    public static final int FURNACE_SLOTS_SIZE = 3;
-    public static final int SMITHING_TABLE_SLOTS_SIZE = 3;
-    public static final int STONECUTTER_SLOTS_SIZE = 2;
+    public static final int FURNACE_SLOTS_SIZE;
+    public static final List<PositionnedSlot> FURNACE_SLOTS;
+    public static final int SMITHING_TABLE_SLOTS_SIZE;
+    public static final List<PositionnedSlot> SMITHING_TABLE_SLOTS;
+    public static final int STONECUTTER_SLOTS_SIZE;
+    public static final List<PositionnedSlot> STONECUTTER_SLOTS;
 
     // Botania
     public static final int BOTANIA_SLOTS_SIZE;
@@ -71,6 +74,29 @@ public class SlotHelper
                 CRAFTING_TABLE_SLOTS.add(new PositionnedSlot(craftingTableSlots++, 30 + y * 18, 17 + x * 18));
         CRAFTING_TABLE_SLOTS.add(new PositionnedSlot(craftingTableSlots++, 124, 35));
         CRAFTING_TABLE_SLOTS_SIZE = craftingTableSlots;
+
+        int furnaceSlots = 0;
+        FURNACE_SLOTS = new ArrayList<>();
+        FURNACE_SLOTS.add(new PositionnedSlot(furnaceSlots++, 56, 17));
+        FURNACE_SLOTS.add(new PositionnedSlot(furnaceSlots++, 116, 35));
+        FURNACE_SLOTS.add(new PositionnedSlot(furnaceSlots++, 56, 53));
+        FURNACE_SLOTS_SIZE = furnaceSlots;
+
+        int smithingTableSlots = 0;
+        SMITHING_TABLE_SLOTS = Arrays.asList(
+                new PositionnedSlot(smithingTableSlots++, 27, 47),
+                new PositionnedSlot(smithingTableSlots++, 76, 47),
+                new PositionnedSlot(smithingTableSlots++, 134, 47)
+        );
+        SMITHING_TABLE_SLOTS_SIZE = smithingTableSlots;
+
+        int stonecutterSlots = 0;
+        STONECUTTER_SLOTS = Arrays.asList(
+                new PositionnedSlot(stonecutterSlots++, 39, 33),
+                new PositionnedSlot(stonecutterSlots++, 114, 33)
+        );
+        STONECUTTER_SLOTS_SIZE = stonecutterSlots;
+
 
         int botaniaSlots = 0;
         MANA_INFUSION_SLOTS_INPUT = Arrays.asList(new PositionnedSlot(botaniaSlots++, 44, 37), new PositionnedSlot(botaniaSlots++, 80, 61));

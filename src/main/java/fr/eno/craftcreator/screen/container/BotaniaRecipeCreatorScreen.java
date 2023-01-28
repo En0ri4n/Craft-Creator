@@ -37,7 +37,7 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     {
         super.init();
 
-        addNumberField(leftPos + imageWidth - 44, topPos + imageHeight / 2 - 16, 35, 10, 100, 1);
+        addNumberField(leftPos + imageWidth - 44, topPos + imageHeight / 2 - 16, 35, 100, 1);
 
         updateScreen();
     }
@@ -54,11 +54,11 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
 
                 if(this.getCurrentRecipe().equals(ModRecipeCreator.PURE_DAISY))
                 {
-                    this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber("time", textField.getIntValue()));
+                    this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.TIME, textField.getIntValue()));
                     continue;
                 }
 
-                this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber("mana", textField.getIntValue()));
+                this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.MANA, textField.getIntValue()));
             }
         }
 
@@ -68,7 +68,7 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     @Override
     protected void updateScreen()
     {
-        this.updateSlots();
+        super.updateScreen();
 
         switch(getCurrentRecipe())
         {

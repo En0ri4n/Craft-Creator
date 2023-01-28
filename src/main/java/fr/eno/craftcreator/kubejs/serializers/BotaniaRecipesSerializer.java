@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import com.google.gson.JsonObject;
 import fr.eno.craftcreator.kubejs.utils.CraftIngredients;
-import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
 import fr.eno.craftcreator.kubejs.utils.SupportedMods;
 import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.resources.ResourceLocation;
@@ -32,93 +31,72 @@ public class BotaniaRecipesSerializer extends ModRecipesJSSerializer
 
     public void createInfusionRecipe(Item ingredient, Block catalyst, ItemStack result, int mana)
     {
-        JsonObject obj = new JsonObject();
-        RecipeFileUtils.setRecipeType(obj, ModRecipeTypes.MANA_INFUSION_TYPE);
+        JsonObject obj = createBaseJson(ModRecipeTypes.MANA_INFUSION_TYPE);
         obj.addProperty("mana", mana);
         if(catalyst != Blocks.AIR)
             obj.add("catalyst", mapToJsonObject(ImmutableMap.of("type", "block", "block", Objects.requireNonNull(catalyst.getRegistryName()).toString())));
 
-        obj.add("input", singletonJsonObject("item", Objects.requireNonNull(ingredient.getRegistryName()).toString()));
+        obj.add("input", singletonItemJsonObject("item", Utils.notNull(ingredient.getRegistryName())));
         obj.add("output", getResult(result));
 
-        addRecipeToFile(gson.toJson(obj), ModRecipeTypes.MANA_INFUSION_TYPE);
-
-        sendSuccessMessage(ModRecipeTypes.MANA_INFUSION_TYPE, Utils.notNull(result.getItem().getRegistryName()));
+        addRecipeToFile(gson.toJson(obj), ModRecipeTypes.MANA_INFUSION_TYPE, result.getItem().getRegistryName());
     }
 
     public void createElvenTradeRecipe(List<Item> ingredients, List<Item> results)
     {
-        JsonObject obj = new JsonObject();
-        RecipeFileUtils.setRecipeType(obj, ModRecipeTypes.ELVEN_TRADE_TYPE);
+        JsonObject obj = createBaseJson(ModRecipeTypes.ELVEN_TRADE_TYPE);
         obj.add("ingredients", listWithSingletonItems(ingredients, "item"));
         obj.add("output", listWithSingletonItems(results, "item"));
 
-        addRecipeToFile(gson.toJson(obj), ModRecipeTypes.ELVEN_TRADE_TYPE);
-
-        sendSuccessMessage(ModRecipeTypes.MANA_INFUSION_TYPE, Utils.notNull(results.get(0).getRegistryName()));
+        addRecipeToFile(gson.toJson(obj), ModRecipeTypes.ELVEN_TRADE_TYPE, results.get(0).getRegistryName());
     }
 
     public void createPureDaisyRecipe(Block input, Block output, int time)
     {
-        JsonObject obj = new JsonObject();
-        RecipeFileUtils.setRecipeType(obj, ModRecipeTypes.PURE_DAISY_TYPE);
+        JsonObject obj = createBaseJson(ModRecipeTypes.PURE_DAISY_TYPE);
         obj.addProperty("time", time);
         obj.add("input", mapToJsonObject(ImmutableMap.of("type", "block", "block", Objects.requireNonNull(input.getRegistryName()).toString())));
-        obj.add("output", singletonJsonObject("name", Objects.requireNonNull(output.getRegistryName()).toString()));
+        obj.add("output", singletonItemJsonObject("name", Utils.notNull(output.getRegistryName())));
 
-        addRecipeToFile(gson.toJson(obj), ModRecipeTypes.PURE_DAISY_TYPE);
-
-        sendSuccessMessage(ModRecipeTypes.MANA_INFUSION_TYPE, output.getRegistryName());
+        addRecipeToFile(gson.toJson(obj), ModRecipeTypes.PURE_DAISY_TYPE, output.getRegistryName());
     }
 
     public void createBrewRecipe(List<Item> ingredients, Brew brew)
     {
-        JsonObject obj = new JsonObject();
-        RecipeFileUtils.setRecipeType(obj, ModRecipeTypes.BREW_TYPE);
+        JsonObject obj = createBaseJson(ModRecipeTypes.BREW_TYPE);
         obj.addProperty("brew", Objects.requireNonNull(BotaniaAPI.instance().getBrewRegistry().getKey(brew)).toString());
         obj.add("ingredients", listWithSingletonItems(ingredients, "item"));
 
-        addRecipeToFile(gson.toJson(obj), ModRecipeTypes.BREW_TYPE);
-
-        sendSuccessMessage(ModRecipeTypes.BREW_TYPE, Utils.notNull(BotaniaAPI.instance().getBrewRegistry().getKey(brew)));
+        addRecipeToFile(gson.toJson(obj), ModRecipeTypes.BREW_TYPE, BotaniaAPI.instance().getBrewRegistry().getKey(brew));
     }
 
     public void createPetalRecipe(Multimap<ResourceLocation, Boolean> ingredients, ItemStack result)
     {
-        JsonObject obj = new JsonObject();
-        RecipeFileUtils.setRecipeType(obj, ModRecipeTypes.PETAL_TYPE);
+        JsonObject obj = createBaseJson(ModRecipeTypes.PETAL_TYPE);
         obj.add("output", getResult(result));
         obj.add("ingredients", getArray(ingredients));
 
-        addRecipeToFile(gson.toJson(obj), ModRecipeTypes.PETAL_TYPE);
-
-        sendSuccessMessage(ModRecipeTypes.PETAL_TYPE, Utils.notNull(result.getItem().getRegistryName()));
+        addRecipeToFile(gson.toJson(obj), ModRecipeTypes.PETAL_TYPE, result.getItem().getRegistryName());
     }
 
     public void createRuneRecipe(Multimap<ResourceLocation, Boolean> ingredients, ItemStack result, int mana)
     {
-        JsonObject obj = new JsonObject();
-        RecipeFileUtils.setRecipeType(obj, ModRecipeTypes.RUNE_TYPE);
+        JsonObject obj = createBaseJson(ModRecipeTypes.RUNE_TYPE);
         obj.add("output", getResult(result));
         obj.addProperty("mana", mana);
         obj.add("ingredients", getArray(ingredients));
 
-        addRecipeToFile(gson.toJson(obj), ModRecipeTypes.RUNE_TYPE);
-
-        sendSuccessMessage(ModRecipeTypes.RUNE_TYPE, Utils.notNull(result.getItem().getRegistryName()));
+        addRecipeToFile(gson.toJson(obj), ModRecipeTypes.RUNE_TYPE, result.getItem().getRegistryName());
     }
 
     public void createTerraPlateRecipe(Multimap<ResourceLocation, Boolean> ingredients, ItemStack result, int mana)
     {
-        JsonObject obj = new JsonObject();
-        RecipeFileUtils.setRecipeType(obj, ModRecipeTypes.TERRA_PLATE_TYPE);
+        JsonObject obj = createBaseJson(ModRecipeTypes.TERRA_PLATE_TYPE);
         obj.addProperty("mana", mana);
         obj.add("result", getResult(result));
         obj.add("ingredients", getArray(ingredients));
 
-        addRecipeToFile(gson.toJson(obj), ModRecipeTypes.TERRA_PLATE_TYPE);
-
-        sendSuccessMessage(ModRecipeTypes.TERRA_PLATE_TYPE, Utils.notNull(result.getItem().getRegistryName()));
+        addRecipeToFile(gson.toJson(obj), ModRecipeTypes.TERRA_PLATE_TYPE, result.getItem().getRegistryName());
     }
 
     @Override

@@ -16,6 +16,12 @@ public enum ModRecipeCreator
 {
     // Minecraft
     CRAFTING_TABLE(SupportedMods.MINECRAFT, RecipeType.CRAFTING, Utilities.getGuiContainerTexture(SupportedMods.MINECRAFT.getModId(), "crafting_table_recipe_creator.png"), SlotHelper.CRAFTING_TABLE_SLOTS),
+    FURNACE_SMELTING(SupportedMods.MINECRAFT, RecipeType.SMELTING, Utilities.getGuiContainerTexture(SupportedMods.MINECRAFT.getModId(), "furnace_recipe_creator.png"), SlotHelper.FURNACE_SLOTS),
+    FURNACE_BLASTING(SupportedMods.MINECRAFT, RecipeType.BLASTING, Utilities.getGuiContainerTexture(SupportedMods.MINECRAFT.getModId(), "furnace_recipe_creator.png"), SlotHelper.FURNACE_SLOTS),
+    FURNACE_SMOKING(SupportedMods.MINECRAFT, RecipeType.SMOKING, Utilities.getGuiContainerTexture(SupportedMods.MINECRAFT.getModId(), "furnace_recipe_creator.png"), SlotHelper.FURNACE_SLOTS),
+    CAMPFIRE_COOKING(SupportedMods.MINECRAFT, RecipeType.CAMPFIRE_COOKING, Utilities.getGuiContainerTexture(SupportedMods.MINECRAFT.getModId(), "furnace_recipe_creator.png"), SlotHelper.FURNACE_SLOTS),
+    SMITHING_TABLE(SupportedMods.MINECRAFT, RecipeType.SMITHING, Utilities.getGuiContainerTexture(SupportedMods.MINECRAFT.getModId(), "smithing_table_recipe_creator.png"), SlotHelper.SMITHING_TABLE_SLOTS),
+    STONECUTTER(SupportedMods.MINECRAFT, RecipeType.STONECUTTING, Utilities.getGuiContainerTexture(SupportedMods.MINECRAFT.getModId(), "stonecutter_recipe_creator.png"), SlotHelper.STONECUTTER_SLOTS),
 
     // Botania
     MANA_INFUSION(SupportedMods.BOTANIA, ModRecipeTypes.MANA_INFUSION_TYPE, Utilities.getGuiContainerTexture(SupportedMods.BOTANIA.getModId(), "mana_infusion_recipe_creator.png"), SlotHelper.MANA_INFUSION_SLOTS),

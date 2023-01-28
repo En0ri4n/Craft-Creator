@@ -50,7 +50,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
 
     protected final RecipeInfos recipeInfos;
 
-    private int currentScreenIndex;
+    protected int currentScreenIndex;
 
     public MultiScreenModRecipeCreatorScreen(T screenContainer, Inventory inv, Component titleIn, BlockPos pos)
     {
@@ -154,21 +154,21 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         dataFields.get(index).y = y;
     }
 
-    protected void setDataFieldSize(int index, int width, int height)
+    protected void setDataFieldSize(int index, int width)
     {
         dataFields.get(index).setWidth(width);
-        dataFields.get(index).setHeight(height);
+        dataFields.get(index).setHeight(16);
     }
 
-    protected void setDataFieldPosAndSize(int index, int x, int y, int width, int height)
+    protected void setDataFieldPosAndSize(int index, int x, int y, int width)
     {
         setDataFieldPos(index, x, y);
-        setDataFieldSize(index, width, height);
+        setDataFieldSize(index, width);
     }
 
-    protected void setDataField(int index, int x, int y, int width, int height, Object value)
+    protected void setDataField(int index, int x, int y, int width, Object value)
     {
-        setDataFieldPosAndSize(index, x, y, width, height);
+        setDataFieldPosAndSize(index, x, y, width);
         dataFields.get(index).setValue(String.valueOf(value));
     }
 
@@ -180,7 +180,12 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
 
     protected ModRecipeCreator getCurrentRecipe()
     {
-        return ModRecipeCreator.getRecipeCreatorScreens(this.getMenu().getMod()).get(currentScreenIndex);
+        return getAvailableRecipesCreator().get(currentScreenIndex);
+    }
+
+    protected List<ModRecipeCreator> getAvailableRecipesCreator()
+    {
+        return ModRecipeCreator.getRecipeCreatorScreens(this.getMenu().getMod());
     }
 
     @Override
@@ -243,8 +248,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     {
         this.dataFields.forEach(field -> field.mouseClicked(mouseX, mouseY, button));
         boolean flag = super.mouseClicked(mouseX, mouseY, button);
-        nextButton.visible = hasNext();
-        previousButton.visible = hasPrevious();
+        updateScreen();
         return flag;
     }
 
@@ -252,8 +256,6 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     protected void renderBg(PoseStack matrixStack, float pPartialTick, int pMouseX, int pMouseY)
     {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        int i = this.leftPos;
-        int j = (this.height - this.imageHeight) / 2;
         RenderSystem.setShaderTexture(0, getCurrentRecipe().getGuiTexture());
         blit(matrixStack, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, this.guiTextureSize, this.guiTextureSize);
 
@@ -312,7 +314,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
 
     private boolean hasNext()
     {
-        return currentScreenIndex < ModRecipeCreator.getRecipeCreatorScreens(this.getMenu().getMod()).size() - 1;
+        return currentScreenIndex < getAvailableRecipesCreator().size() - 1;
     }
 
     private void nextPage()
@@ -338,11 +340,11 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         updateScreen();
     }
 
-    protected void addNumberField(int x, int y, int width, int height, Number defaultValue, int count)
+    protected void addNumberField(int x, int y, int width, Number defaultValue, int count)
     {
         for(int i = 0; i < count; i++)
         {
-            NumberDataFieldWidget numberDataFieldWidget = new NumberDataFieldWidget(this.font, x, y, width, height, defaultValue);
+            NumberDataFieldWidget numberDataFieldWidget = new NumberDataFieldWidget(this.font, x, y, width, 10, defaultValue);
             numberDataFieldWidget.setValue(String.valueOf(defaultValue));
             this.dataFields.add(numberDataFieldWidget);
         }
