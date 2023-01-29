@@ -3,7 +3,7 @@ package fr.eno.craftcreator.screen.container;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.container.ThermalRecipeCreatorContainer;
-import fr.eno.craftcreator.kubejs.utils.RecipeInfos;
+import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import fr.eno.craftcreator.utils.PairValues;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
@@ -23,10 +23,7 @@ import java.util.List;
 
 public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen<ThermalRecipeCreatorContainer>
 {
-    private static final int ENERGY_FIELD = 0;
-    private static final int EXPERIENCE_FIELD = 1;
-    private static final int CHANCES_FIELD = 2;
-    private static final int RESIN_FIELD = 2;
+    private static final int ENERGY_FIELD = 0, EXPERIENCE_FIELD = 1,  CHANCES_FIELD = 2, RESIN_FIELD = 2, SPEED_FIELD = 6;
 
     public ThermalRecipeCreatorScreen(ThermalRecipeCreatorContainer screenContainer, Inventory inv, Component titleIn)
     {
@@ -41,7 +38,7 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     {
         super.init();
 
-        addNumberField( leftPos + imageWidth - 44, topPos + imageHeight / 2, 35, -1, 6);
+        addNumberField( leftPos + imageWidth - 44, topPos + imageHeight / 2, 35, -1, 7);
 
         updateScreen();
     }
@@ -55,12 +52,15 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     @Override
     protected RecipeInfos getRecipeInfos()
     {
+        super.getRecipeInfos();
+
+        this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.ENERGY_MOD, getNumberField(SPEED_FIELD).getDoubleValue()));
         this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.EXPERIENCE, getNumberField(EXPERIENCE_FIELD).getDoubleValue()));
         this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.ENERGY, getNumberField(ENERGY_FIELD).getIntValue()));
 
         switch(getCurrentRecipe())
         {
-            case TREE_EXTRACTOR -> this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber("resin_amount", getNumberField(0).getIntValue()));
+            case TREE_EXTRACTOR -> this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.RESIN_AMOUNT, getNumberField(RESIN_FIELD).getIntValue()));
             case PULVERIZER, SAWMILL, SMELTER, INSOLATOR ->
             {
                 for(int i = 0; i < 4; i++)
@@ -76,9 +76,11 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     {
         super.updateScreen();
 
-        showDataField(ENERGY_FIELD, EXPERIENCE_FIELD);
-        setDataField(ENERGY_FIELD, this.leftPos + 8, this.topPos + this.imageHeight / 2 + 23, 73, 100);
+        showDataField(ENERGY_FIELD, EXPERIENCE_FIELD, SPEED_FIELD);
+        setDataField(ENERGY_FIELD, this.leftPos + 8, this.topPos + this.imageHeight / 2 + 23, 45, 100);
         setDataField(EXPERIENCE_FIELD, this.leftPos + this.imageWidth - 73 - 8, this.topPos + this.imageHeight / 2 + 23, 73, 0.1D);
+        setDataField(SPEED_FIELD, this.leftPos + 65, this.topPos + this.imageHeight / 2 + 23, 45, 1D);
+
         setExecuteButtonPos(this.leftPos + this.imageWidth / 2 - this.executeButton.getWidth() / 2, this.topPos + this.imageHeight / 2 - this.executeButton.getHeight() / 2 + 22);
 
         switch(getCurrentRecipe())
@@ -92,8 +94,8 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
             {
                 for(int i = 0; i < 4; i++)
                 {
-                    showDataField(i + CHANCES_FIELD);
-                    setDataField(i + CHANCES_FIELD, leftPos + imageWidth / 4 * 3 - 12, topPos + 33 + i * 26, 40, 1D);
+                    showDataField(CHANCES_FIELD + i);
+                    setDataField(CHANCES_FIELD + i, leftPos + imageWidth / 4 * 3 - 12, topPos + 33 + i * 26, 40, 1D);
                 }
             }
         }
@@ -113,11 +115,14 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
                 renderDataFieldTitle(RESIN_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.resin_amount"), matrixStack);
             }
             case PULVERIZER, SAWMILL, SMELTER, INSOLATOR ->
-                    renderDataFieldTitle(CHANCES_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.chances"), matrixStack);
+            {
+                renderDataFieldTitle(CHANCES_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.chances"), matrixStack);
+            }
         }
 
         renderDataFieldTitle(ENERGY_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.energy"), matrixStack);
         renderDataFieldTitle(EXPERIENCE_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.experience"), matrixStack);
+        renderDataFieldTitle(SPEED_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.mod_energy"), matrixStack);
 
         this.renderTooltip(matrixStack, mouseX, mouseY);
     }

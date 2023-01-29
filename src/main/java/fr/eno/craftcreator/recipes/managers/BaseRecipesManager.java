@@ -1,8 +1,8 @@
-package fr.eno.craftcreator.kubejs.managers;
+package fr.eno.craftcreator.recipes.managers;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import fr.eno.craftcreator.kubejs.utils.RecipeInfos;
+import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import fr.eno.craftcreator.screen.utils.ModRecipeCreator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.Slot;
@@ -26,17 +26,6 @@ public abstract class BaseRecipesManager
         }
 
         return ItemStack.EMPTY;
-    }
-
-    protected boolean hasEmptyOutput(List<Slot> slots, int outputCount)
-    {
-        for(int i = outputCount; i < slots.size(); i++)
-        {
-            if(slots.get(i).hasItem())
-                return false;
-        }
-
-        return true;
     }
 
     protected List<Item> getValidList(List<Slot> slots, int start, int end)
@@ -65,16 +54,28 @@ public abstract class BaseRecipesManager
         return list;
     }
 
+    protected List<Slot> getValidSlots(List<Slot> slots)
+    {
+        List<Slot> list = new ArrayList<>();
+
+        for(int i = 0; i < slots.size() - 1; i++)
+        {
+            if(slots.get(i).hasItem()) list.add(slots.get(i));
+        }
+
+        return list;
+    }
+
     protected boolean isSlotsEmpty(List<Slot> slots, int inputSlotsCount, int outputSlotsCount)
     {
-        boolean hasInput = true;
-        boolean hasOutput = true;
+        boolean hasNoInput = true;
+        boolean hasNoOutput = true;
 
         for(int i = 0; i < inputSlotsCount; i++)
         {
             if(slots.get(i).hasItem())
             {
-                hasInput = false;
+                hasNoInput = false;
                 break;
             }
         }
@@ -83,12 +84,12 @@ public abstract class BaseRecipesManager
         {
             if(slots.get(i).hasItem())
             {
-                hasOutput = false;
+                hasNoOutput = false;
                 break;
             }
         }
 
-        return hasInput || hasOutput;
+        return hasNoInput || hasNoOutput;
     }
 
     protected boolean isValid(ItemStack stack)

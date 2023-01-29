@@ -2,8 +2,8 @@ package fr.eno.craftcreator.screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.kubejs.utils.ListEntriesHelper;
-import fr.eno.craftcreator.kubejs.utils.SupportedMods;
+import fr.eno.craftcreator.recipes.utils.ListEntriesHelper;
+import fr.eno.craftcreator.recipes.utils.SupportedMods;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;
 import fr.eno.craftcreator.screen.utils.ListScreen;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;

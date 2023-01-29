@@ -1,7 +1,10 @@
 {
 	"itemGroup.craftcreator": "§lCraft Creator",
 
-	"craftcreator.message.join": "Thanks for downloading §aCraft Creator §r!\nPress §e'K' §rto open the recipes menu",
+	"key.categories.craft_creator": "Craft Creator",
+	"key.craftcreator.open_recipes_menu": "Open Recipes Menu",
+
+	"craftcreator.message.join": "Thanks for downloading §aCraft Creator §r!\nPress '%s' §rto open the recipes menu",
 	"craftcreator.message.join_issue": "§nYou can report any issue here",
 
 	"craftcreator.message.recipe_added": "Successfully added %s's recipe in '%s'",
@@ -10,10 +13,10 @@
 	"craftcreator.button.boolean.craftType.off": "Shapeless",
 
 	"craftcreator.serializer.success": "Recipe saved at : §a§n%s",
-	"craftcreator.js_serializer.success": "Recipe %s -> %s successfully generated !",
+	"craftcreator.message.recipe.added": "Recipe %s -> %s successfully generated !",
 	"craftcreator.message.recipe_failed": "§cA recipe with the same output already exists !",
 
-	"craftcreator.screen.crafting.info.msg": "§oCtrl + Click on slot to use tag instead of item",
+	"craftcreator.screen.crafting.info.msg": "§oCtrl + Click on slot to see more options",
 	"craftcreator.screen.crafting.info.nbt": "§oUse NBT tags for this item",
 	"craftcreator.screen.guiList.reset": "§cReset Tag",
 
@@ -95,8 +98,9 @@
 	"craftcreator.screen.botania_recipe_creator.field.mana": "Mana :",
 	"craftcreator.screen.botania_recipe_creator.field.time": "Time :",
 
-	"craftcreator.screen.thermal_recipe_creator.field.energy": "Energy Used :",
+	"craftcreator.screen.thermal_recipe_creator.field.energy": "Energy :",
 	"craftcreator.screen.thermal_recipe_creator.field.experience": "Exp. Gained :",
 	"craftcreator.screen.thermal_recipe_creator.field.chances": "Luck :",
-	"craftcreator.screen.thermal_recipe_creator.field.resin_amount": "Resin (mb) :"
+	"craftcreator.screen.thermal_recipe_creator.field.resin_amount": "Resin (mb) :",
+	"craftcreator.screen.thermal_recipe_creator.field.mod_energy": "Speed :"
 }

@@ -2,7 +2,7 @@ package fr.eno.craftcreator.tileentity.vanilla;
 
 import fr.eno.craftcreator.container.SmithingTableRecipeCreatorContainer;
 import fr.eno.craftcreator.init.InitTileEntities;
-import fr.eno.craftcreator.tileentity.MultiScreenRecipeCreatorTile;
+import fr.eno.craftcreator.tileentity.utils.MultiScreenRecipeCreatorTile;
 import fr.eno.craftcreator.utils.SlotHelper;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;

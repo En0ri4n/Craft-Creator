@@ -1,10 +1,10 @@
-package fr.eno.craftcreator.kubejs.serializers;
+package fr.eno.craftcreator.recipes.serializers;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import com.google.gson.JsonObject;
-import fr.eno.craftcreator.kubejs.utils.CraftIngredients;
-import fr.eno.craftcreator.kubejs.utils.SupportedMods;
+import fr.eno.craftcreator.recipes.utils.CraftIngredients;
+import fr.eno.craftcreator.recipes.utils.SupportedMods;
 import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -39,7 +39,7 @@ public class BotaniaRecipesSerializer extends ModRecipesJSSerializer
         obj.add("input", singletonItemJsonObject("item", Utils.notNull(ingredient.getRegistryName())));
         obj.add("output", getResult(result));
 
-        addRecipeToFile(gson.toJson(obj), ModRecipeTypes.MANA_INFUSION_TYPE, result.getItem().getRegistryName());
+        addRecipeToKubeJS(gson.toJson(obj), ModRecipeTypes.MANA_INFUSION_TYPE, result.getItem().getRegistryName());
     }
 
     public void createElvenTradeRecipe(List<Item> ingredients, List<Item> results)
@@ -48,7 +48,7 @@ public class BotaniaRecipesSerializer extends ModRecipesJSSerializer
         obj.add("ingredients", listWithSingletonItems(ingredients, "item"));
         obj.add("output", listWithSingletonItems(results, "item"));
 
-        addRecipeToFile(gson.toJson(obj), ModRecipeTypes.ELVEN_TRADE_TYPE, results.get(0).getRegistryName());
+        addRecipeToKubeJS(gson.toJson(obj), ModRecipeTypes.ELVEN_TRADE_TYPE, results.get(0).getRegistryName());
     }
 
     public void createPureDaisyRecipe(Block input, Block output, int time)
@@ -58,7 +58,7 @@ public class BotaniaRecipesSerializer extends ModRecipesJSSerializer
         obj.add("input", mapToJsonObject(ImmutableMap.of("type", "block", "block", Objects.requireNonNull(input.getRegistryName()).toString())));
         obj.add("output", singletonItemJsonObject("name", Utils.notNull(output.getRegistryName())));
 
-        addRecipeToFile(gson.toJson(obj), ModRecipeTypes.PURE_DAISY_TYPE, output.getRegistryName());
+        addRecipeToKubeJS(gson.toJson(obj), ModRecipeTypes.PURE_DAISY_TYPE, output.getRegistryName());
     }
 
     public void createBrewRecipe(List<Item> ingredients, Brew brew)
@@ -67,7 +67,7 @@ public class BotaniaRecipesSerializer extends ModRecipesJSSerializer
         obj.addProperty("brew", Objects.requireNonNull(BotaniaAPI.instance().getBrewRegistry().getKey(brew)).toString());
         obj.add("ingredients", listWithSingletonItems(ingredients, "item"));
 
-        addRecipeToFile(gson.toJson(obj), ModRecipeTypes.BREW_TYPE, BotaniaAPI.instance().getBrewRegistry().getKey(brew));
+        addRecipeToKubeJS(gson.toJson(obj), ModRecipeTypes.BREW_TYPE, BotaniaAPI.instance().getBrewRegistry().getKey(brew));
     }
 
     public void createPetalRecipe(Multimap<ResourceLocation, Boolean> ingredients, ItemStack result)
@@ -76,7 +76,7 @@ public class BotaniaRecipesSerializer extends ModRecipesJSSerializer
         obj.add("output", getResult(result));
         obj.add("ingredients", getArray(ingredients));
 
-        addRecipeToFile(gson.toJson(obj), ModRecipeTypes.PETAL_TYPE, result.getItem().getRegistryName());
+        addRecipeToKubeJS(gson.toJson(obj), ModRecipeTypes.PETAL_TYPE, result.getItem().getRegistryName());
     }
 
     public void createRuneRecipe(Multimap<ResourceLocation, Boolean> ingredients, ItemStack result, int mana)
@@ -86,7 +86,7 @@ public class BotaniaRecipesSerializer extends ModRecipesJSSerializer
         obj.addProperty("mana", mana);
         obj.add("ingredients", getArray(ingredients));
 
-        addRecipeToFile(gson.toJson(obj), ModRecipeTypes.RUNE_TYPE, result.getItem().getRegistryName());
+        addRecipeToKubeJS(gson.toJson(obj), ModRecipeTypes.RUNE_TYPE, result.getItem().getRegistryName());
     }
 
     public void createTerraPlateRecipe(Multimap<ResourceLocation, Boolean> ingredients, ItemStack result, int mana)
@@ -96,7 +96,7 @@ public class BotaniaRecipesSerializer extends ModRecipesJSSerializer
         obj.add("result", getResult(result));
         obj.add("ingredients", getArray(ingredients));
 
-        addRecipeToFile(gson.toJson(obj), ModRecipeTypes.TERRA_PLATE_TYPE, result.getItem().getRegistryName());
+        addRecipeToKubeJS(gson.toJson(obj), ModRecipeTypes.TERRA_PLATE_TYPE, result.getItem().getRegistryName());
     }
 
     @Override

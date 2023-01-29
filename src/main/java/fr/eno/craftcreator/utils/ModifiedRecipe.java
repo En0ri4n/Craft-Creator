@@ -1,13 +1,14 @@
 package fr.eno.craftcreator.utils;
 
-import fr.eno.craftcreator.kubejs.serializers.ModRecipesJSSerializer;
-import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
+import fr.eno.craftcreator.recipes.serializers.ModRecipesJSSerializer;
+import fr.eno.craftcreator.recipes.utils.RecipeFileUtils;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.crafting.Recipe;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public class ModifiedRecipe
 {
     private final RecipeFileUtils.ModifiedRecipeType type;

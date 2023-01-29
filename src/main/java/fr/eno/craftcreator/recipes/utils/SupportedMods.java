@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.kubejs.utils;
+package fr.eno.craftcreator.recipes.utils;
 
 import net.minecraftforge.fml.ModList;
 

@@ -4,7 +4,7 @@ import fr.eno.craftcreator.container.slot.LockedSlot;
 import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
 import fr.eno.craftcreator.container.utils.CommonContainer;
 import fr.eno.craftcreator.init.InitContainers;
-import fr.eno.craftcreator.kubejs.utils.SupportedMods;
+import fr.eno.craftcreator.recipes.utils.SupportedMods;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;

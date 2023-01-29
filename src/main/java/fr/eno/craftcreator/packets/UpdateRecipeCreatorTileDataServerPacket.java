@@ -1,7 +1,7 @@
 package fr.eno.craftcreator.packets;
 
 import fr.eno.craftcreator.init.InitPackets;
-import fr.eno.craftcreator.tileentity.vanilla.InventoryDataContainerTileEntity;
+import fr.eno.craftcreator.tileentity.utils.InventoryDataContainerTileEntity;
 import fr.eno.craftcreator.utils.ServerUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;

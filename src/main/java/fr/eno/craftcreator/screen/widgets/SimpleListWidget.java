@@ -1,11 +1,14 @@
 package fr.eno.craftcreator.screen.widgets;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.kubejs.serializers.ModRecipesJSSerializer;
-import fr.eno.craftcreator.kubejs.utils.CraftIngredients;
-import fr.eno.craftcreator.kubejs.utils.ModRecipeCreatorDispatcher;
+import fr.eno.craftcreator.recipes.serializers.ModRecipesJSSerializer;
+import fr.eno.craftcreator.recipes.utils.CraftIngredients;
+import fr.eno.craftcreator.recipes.utils.ModRecipeCreatorDispatcher;
 import fr.eno.craftcreator.utils.Callable;
 import fr.eno.craftcreator.utils.ClientUtils;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
@@ -30,6 +33,8 @@ import org.lwjgl.glfw.GLFW;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @SuppressWarnings("unused")
 public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry>
@@ -328,7 +333,8 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
 
         protected void displayTruncatedString(PoseStack matrixStack, String stringToDisplay, int leftPos, int topPos, int width, int height, boolean hasItemDisplay, boolean isMouseOver)
         {
-            if(stringToDisplay.contains("/")) stringToDisplay = stringToDisplay.substring(stringToDisplay.indexOf('/') + 1);
+            if(stringToDisplay.contains("/"))
+                stringToDisplay = stringToDisplay.substring(stringToDisplay.indexOf('/') + 1);
 
             stringToDisplay = getString(width, stringToDisplay);
 
@@ -356,6 +362,9 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
 
     public static class RecipeEntry extends Entry
     {
+        private final Gson gson = new GsonBuilder().setLenient().create();
+        private final Pattern numberPattern = Pattern.compile("[0-9]+");
+
         private final Recipe<?> recipe;
 
         public RecipeEntry(Recipe<?> recipe)
@@ -436,25 +445,18 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
                         ingredientValue.append(luckComponent);
                     }
                 }
-                else if(craftIngredient instanceof CraftIngredients.ItemIngredient itemIngredient)
-                {
-                    ingredientValue.append(new TextComponent(itemIngredient.getId().toString())).withStyle(ChatFormatting.DARK_AQUA);
-
-                    MutableComponent countComponent = new TextComponent(" (x").append(String.valueOf(itemIngredient.getCount())).append(")").withStyle(ChatFormatting.GRAY);
-                    ingredientValue.append(countComponent);
-                }
                 else if(craftIngredient instanceof CraftIngredients.MultiItemIngredient multiItemIngredient)
                 {
                     MutableComponent countComponent = new TextComponent(" (x").append(String.valueOf(multiItemIngredient.getCount())).append(")").withStyle(ChatFormatting.GRAY);
                     ingredientTooltipLine.append(countComponent);
                     tooltips.add(ingredientTooltipLine);
 
-                    multiItemIngredient.getIds().forEach(item ->
+                    multiItemIngredient.getIds().forEach((resourceLocation, isTag) ->
                     {
                         MutableComponent itemEntryComponent = new TextComponent("    ").append(new TextComponent("- ").withStyle(ChatFormatting.WHITE));
-                        itemEntryComponent.append(new TextComponent("Item").withStyle(ChatFormatting.YELLOW));
+                        itemEntryComponent.append(new TextComponent(isTag ? "Tag" : "Item").withStyle(ChatFormatting.YELLOW));
                         itemEntryComponent.append(new TextComponent(" : ").withStyle(ChatFormatting.WHITE));
-                        itemEntryComponent.append(new TextComponent(item.toString()).withStyle(ChatFormatting.GOLD));
+                        itemEntryComponent.append(new TextComponent(resourceLocation.toString()).withStyle(ChatFormatting.GOLD));
                         tooltips.add(itemEntryComponent);
                     });
                     continue;
@@ -464,6 +466,13 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
                     ingredientValue.append(new TextComponent(tagIngredient.getId().toString())).withStyle(ChatFormatting.DARK_AQUA);
 
                     MutableComponent countComponent = new TextComponent(" (x").append(String.valueOf(tagIngredient.getCount())).append(")").withStyle(ChatFormatting.GRAY);
+                    ingredientValue.append(countComponent);
+                }
+                else if(craftIngredient instanceof CraftIngredients.ItemIngredient itemIngredient)
+                {
+                    ingredientValue.append(new TextComponent(itemIngredient.getId().toString())).withStyle(ChatFormatting.DARK_AQUA);
+
+                    MutableComponent countComponent = new TextComponent(" (x").append(String.valueOf(itemIngredient.getCount())).append(")").withStyle(ChatFormatting.GRAY);
                     ingredientValue.append(countComponent);
                 }
                 else if(craftIngredient instanceof CraftIngredients.FluidIngredient fluidIngredient)
@@ -482,10 +491,68 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
                     ingredientValue.append(new TextComponent(String.valueOf(dataIngredient.getData())).withStyle(ChatFormatting.LIGHT_PURPLE));
                     ingredientValue.append(new TextComponent(" ").append(dataIngredient.getUnit().getDisplayUnit()).withStyle(ChatFormatting.DARK_GRAY));
                 }
+                else if(craftIngredient instanceof CraftIngredients.NBTIngredient nbtIngredient)
+                {
+                    tooltips.add(ingredientTooltipLine);
+
+                    getNbtComponent(tooltips, gson.fromJson(nbtIngredient.getNbt().getAsString(), JsonObject.class), 1);
+                    continue;
+                }
 
                 ingredientTooltipLine.append(ingredientValue);
 
                 tooltips.add(ingredientTooltipLine);
+            }
+        }
+
+        public void getNbtComponent(List<Component> parent, JsonObject compoundTag, int step)
+        {
+            for(String nbtKey : compoundTag.keySet())
+            {
+                MutableComponent itemEntryKey = new TextComponent("    ".repeat(step)).append(new TextComponent(nbtKey).withStyle(ChatFormatting.RED)).append(new TextComponent(" : ").withStyle(ChatFormatting.WHITE));
+
+                parent.add(itemEntryKey);
+
+                if(compoundTag.get(nbtKey).isJsonObject())
+                {
+                    getNbtComponent(parent, compoundTag.get(nbtKey).getAsJsonObject(), step + 1);
+                }
+                else if(compoundTag.get(nbtKey).isJsonArray())
+                {
+                    compoundTag.get(nbtKey).getAsJsonArray().forEach(je ->
+                    {
+                        if(je.isJsonObject()) getNbtComponent(parent, je.getAsJsonObject(), step + 1);
+                        else if(je.isJsonPrimitive())
+                        {
+                            if(je.getAsJsonPrimitive().isString())
+                            {
+                                String str = je.getAsJsonPrimitive().getAsString().replace("\"", "");
+                                Matcher matcher = numberPattern.matcher(str);
+                                TextComponent value = new TextComponent("");
+
+                                if(matcher.find())
+                                    value.append(matcher.group());
+                                else
+                                    value.append(je.getAsJsonPrimitive().getAsString());
+
+                                itemEntryKey.append(value.withStyle(ChatFormatting.GOLD));
+                            }
+                        }
+                    });
+                }
+                else if(compoundTag.get(nbtKey).isJsonPrimitive())
+                {
+                    String str = compoundTag.get(nbtKey).getAsJsonPrimitive().getAsString().replace("\"", "");
+                    Matcher matcher = numberPattern.matcher(str);
+                    TextComponent value = new TextComponent("");
+
+                    if(matcher.find())
+                        value.append(matcher.group());
+                    else
+                        value.append(compoundTag.get(nbtKey).getAsJsonPrimitive().getAsString());
+
+                    itemEntryKey.append(value.withStyle(ChatFormatting.GOLD));
+                }
             }
         }
 

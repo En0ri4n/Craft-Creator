@@ -1,8 +1,8 @@
-package fr.eno.craftcreator.kubejs.managers;
+package fr.eno.craftcreator.recipes.managers;
 
 import com.google.common.collect.Multimap;
-import fr.eno.craftcreator.kubejs.serializers.BotaniaRecipesSerializer;
-import fr.eno.craftcreator.kubejs.utils.RecipeInfos;
+import fr.eno.craftcreator.recipes.serializers.BotaniaRecipesSerializer;
+import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import fr.eno.craftcreator.screen.utils.ModRecipeCreator;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;

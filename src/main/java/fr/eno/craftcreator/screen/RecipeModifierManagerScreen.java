@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.container.RecipeModifierContainer;
-import fr.eno.craftcreator.kubejs.utils.ListEntriesHelper;
+import fr.eno.craftcreator.recipes.utils.ListEntriesHelper;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;
 import fr.eno.craftcreator.screen.container.TaggeableSlotsContainerScreen;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
@@ -98,7 +98,6 @@ public class RecipeModifierManagerScreen extends TaggeableSlotsContainerScreen<R
     {
         RenderSystem.setShaderTexture(0, GUI_TEXTURE);
         int size = 256;
-        int wantedSize = this.height - 35;
         int x = (this.width - (this.width / 4 + 5)) / 2 + (this.width / 4 + 5) - size / 2;
         int y = 5 + (this.height - 20 - 5) / 2 - size / 2;
         blit(matrixStack, x, y, size, size, 0, 0, size, size, size, size);

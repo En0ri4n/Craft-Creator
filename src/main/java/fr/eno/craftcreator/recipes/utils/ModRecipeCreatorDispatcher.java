@@ -1,9 +1,9 @@
-package fr.eno.craftcreator.kubejs.utils;
+package fr.eno.craftcreator.recipes.utils;
 
-import fr.eno.craftcreator.kubejs.serializers.BotaniaRecipesSerializer;
-import fr.eno.craftcreator.kubejs.serializers.MinecraftRecipeSerializer;
-import fr.eno.craftcreator.kubejs.serializers.ModRecipesJSSerializer;
-import fr.eno.craftcreator.kubejs.serializers.ThermalRecipesSerializer;
+import fr.eno.craftcreator.recipes.serializers.BotaniaRecipesSerializer;
+import fr.eno.craftcreator.recipes.serializers.MinecraftRecipeSerializer;
+import fr.eno.craftcreator.recipes.serializers.ModRecipesJSSerializer;
+import fr.eno.craftcreator.recipes.serializers.ThermalRecipesSerializer;
 import net.minecraft.world.item.crafting.Recipe;
 
 public class ModRecipeCreatorDispatcher
@@ -20,7 +20,7 @@ public class ModRecipeCreatorDispatcher
 
     public static CraftIngredients getOutput(Recipe<?> recipe)
     {
-        String modId = recipe.getId().getNamespace();
+        String modId = RecipeFileUtils.getName(recipe.getType()).getNamespace();
 
         if(SupportedMods.isModLoaded(modId))
         {
@@ -32,7 +32,7 @@ public class ModRecipeCreatorDispatcher
 
     public static CraftIngredients getInputs(Recipe<?> recipe)
     {
-        String modId = recipe.getId().getNamespace();
+        String modId = RecipeFileUtils.getName(recipe.getType()).getNamespace();
 
         if(SupportedMods.isModLoaded(modId))
         {

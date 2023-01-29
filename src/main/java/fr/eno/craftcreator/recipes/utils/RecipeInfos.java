@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.kubejs.utils;
+package fr.eno.craftcreator.recipes.utils;
 
 import net.minecraft.resources.ResourceLocation;
 
@@ -54,6 +54,13 @@ public class RecipeInfos
     {
         RecipeParameter parameter = this.getRecipeParameter(name);
         return parameter instanceof RecipeParameterMap ? ((RecipeParameterMap<K, V>) parameter).getMap() : new HashMap<>();
+    }
+
+    @SuppressWarnings("unchecked")
+    public <K> List<K> getList(String name)
+    {
+        RecipeParameter parameter = this.getRecipeParameter(name);
+        return parameter instanceof RecipeParameterList ? ((RecipeParameterList<K>) parameter).getList() : new ArrayList<>();
     }
 
     public boolean contains(String name)
@@ -185,32 +192,43 @@ public class RecipeInfos
         }
     }
 
-    public static class RecipeParameterIntList extends RecipeParameter
+    public static class RecipeParameterList<T> extends RecipeParameter
     {
-        private final List<Integer> nbtSlots;
+        private final List<T> list;
 
-        public RecipeParameterIntList(String name, List<Integer> nbtSlots)
+        public RecipeParameterList(String name, List<T> list)
         {
             super(RecipeParameterType.INT_LIST, name);
-            this.nbtSlots = nbtSlots;
+            this.list = list;
         }
 
-        public List<Integer> getIntList()
+        public List<T> getList()
         {
-            return nbtSlots;
+            return list;
         }
     }
 
     public static class Parameters
     {
+        // Base Parameters
         public static final String SHAPED = "shaped";
+        public static final String TAGGED_SLOTS = "tagged_slots";
+        public static final String KUBEJS_RECIPE = "kubejs_recipe";
+        public static final String NBT_SLOTS = "nbt_slots";
+
+        // Vanilla Furnace Parameters
         public static final String EXPERIENCE = "experience";
         public static final String COOKING_TIME = "cooking_time";
+
+        // Botania Parameters
         public static final String TIME = "time";
         public static final String MANA = "mana";
+
+        // Thermal Parameters
         public static final String ENERGY = "energy";
-        public static final String TAGGED_SLOTS = "tagged_slots";
-        public static final String IS_KUBEJS_RECIPE = "kubejs_recipe";
+        public static final String RESIN_AMOUNT = "resin_amount";
+        public static final String ENERGY_MOD = "energy_mod";
+        public static final String WATER_MOD = "water_mod";
     }
 
     public enum RecipeParameterType

@@ -1,22 +1,16 @@
 package fr.eno.craftcreator.screen.container;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.container.CraftingTableRecipeCreatorContainer;
 import fr.eno.craftcreator.init.InitPackets;
-import fr.eno.craftcreator.kubejs.utils.RecipeInfos;
-import fr.eno.craftcreator.kubejs.utils.SupportedMods;
+import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import fr.eno.craftcreator.packets.RetrieveRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.screen.buttons.BooleanButton;
-import fr.eno.craftcreator.screen.buttons.ExecuteButton;
-import fr.eno.craftcreator.screen.buttons.SimpleCheckBox;
 import fr.eno.craftcreator.screen.utils.ModRecipeCreator;
 import fr.eno.craftcreator.utils.PairValues;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
@@ -28,11 +22,11 @@ import java.util.List;
 public class CraftingTableRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen<CraftingTableRecipeCreatorContainer>
 {
     private BooleanButton craftTypeButton;
-    private SimpleCheckBox isKubeJSRecipeButton;
 
     public CraftingTableRecipeCreatorScreen(CraftingTableRecipeCreatorContainer screenContainer, Inventory inv, Component titleIn)
     {
         super(screenContainer, inv, titleIn, screenContainer.getTile().getBlockPos());
+        isVanillaScreen = true;
     }
 
     @Override
@@ -40,8 +34,6 @@ public class CraftingTableRecipeCreatorScreen extends MultiScreenModRecipeCreato
     {
         super.init();
         InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("shaped", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.BOOLEAN));
-
-        this.addRenderableWidget(isKubeJSRecipeButton = new SimpleCheckBox(5, this.height - 20, 15, 15, References.getTranslate("screen.recipe_creator_screen.kube_js_button"), false));
         this.addRenderableWidget(craftTypeButton = new BooleanButton("craftType", leftPos + 100, topPos + 60, 68, 20, true, (button) -> {}));
 
         updateScreen();
@@ -64,13 +56,10 @@ public class CraftingTableRecipeCreatorScreen extends MultiScreenModRecipeCreato
     @Override
     protected void updateScreen()
     {
-        nextButton.visible = false;
-        previousButton.visible = false;
-        updateSlots();
+        super.updateScreen();
 
-        if(!SupportedMods.isKubeJSLoaded()) this.isKubeJSRecipeButton.visible = false;
-        executeButton.setWidth(30);
         setExecuteButtonPos(leftPos + 86, topPos + 33);
+        executeButton.setWidth(30);
     }
 
     @Override
@@ -78,7 +67,6 @@ public class CraftingTableRecipeCreatorScreen extends MultiScreenModRecipeCreato
     {
         super.getRecipeInfos();
         recipeInfos.addParameter(new RecipeInfos.RecipeParameterBoolean(RecipeInfos.Parameters.SHAPED, this.craftTypeButton.isOn()));
-        recipeInfos.addParameter(new RecipeInfos.RecipeParameterBoolean(RecipeInfos.Parameters.IS_KUBEJS_RECIPE, this.isKubeJSRecipeButton.selected()));
         return this.recipeInfos;
     }
 
@@ -86,12 +74,6 @@ public class CraftingTableRecipeCreatorScreen extends MultiScreenModRecipeCreato
     public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         super.render(matrixStack, mouseX, mouseY, partialTicks);
-
-        int yTextureOffset = ExecuteButton.isMouseHover(this.leftPos + imageWidth - 20, topPos, mouseX, mouseY, 20, 20) ? 20 : 0;
-        RenderSystem.setShaderTexture(0, References.getLoc("textures/gui/buttons/item_button.png"));
-        RenderSystem.enableBlend();
-        Screen.blit(matrixStack, this.leftPos + imageWidth - 20, topPos, 20, 20, 0, yTextureOffset, 20, 20, 20, 40);
-
         craftTypeButton.render(matrixStack, mouseX, mouseY, partialTicks);
         renderTooltip(matrixStack, mouseX, mouseY);
     }
@@ -128,12 +110,6 @@ public class CraftingTableRecipeCreatorScreen extends MultiScreenModRecipeCreato
     public void setShaped(boolean isShaped)
     {
         this.craftTypeButton.setOn(isShaped);
-    }
-
-    @Override
-    protected void updateSlots()
-    {
-        this.getMenu().activeSlots(true);
     }
 
     @Override

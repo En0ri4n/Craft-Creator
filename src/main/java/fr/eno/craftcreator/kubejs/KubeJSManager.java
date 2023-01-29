@@ -1,6 +1,6 @@
 package fr.eno.craftcreator.kubejs;
 
-import fr.eno.craftcreator.kubejs.utils.SupportedMods;
+import fr.eno.craftcreator.recipes.utils.SupportedMods;
 import net.minecraft.client.Minecraft;
 
 import java.io.File;

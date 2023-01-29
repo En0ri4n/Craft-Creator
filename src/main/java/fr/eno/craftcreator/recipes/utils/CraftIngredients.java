@@ -1,6 +1,9 @@
-package fr.eno.craftcreator.kubejs.utils;
+package fr.eno.craftcreator.recipes.utils;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import fr.eno.craftcreator.References;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -10,7 +13,9 @@ import vazkii.botania.common.item.ModItems;
 import vazkii.botania.common.item.brew.ItemBrewBase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("unused")
 public class CraftIngredients
@@ -40,7 +45,7 @@ public class CraftIngredients
     {
         this.ingredients.stream().filter(CraftIngredient::hasCount).forEach(ingredient ->
         {
-            ((CountedIngredient) ingredient).setCount(this.ingredients.stream().filter(i -> i.equals(ingredient)).count());
+            ((CountedIngredient) ingredient).addCount((int) (this.ingredients.stream().filter(i -> i.equals(ingredient)).count() - 1));
             if(!contains(ingredientsWithCount, ingredient))
                 this.ingredientsWithCount.add(ingredient);
         });
@@ -181,20 +186,20 @@ public class CraftIngredients
 
     public static class MultiItemIngredient extends CountedIngredient
     {
-        private final List<ResourceLocation> ids;
+        private final Map<ResourceLocation, Boolean> ids;
 
-        public MultiItemIngredient(long count)
+        public MultiItemIngredient(String name, long count)
         {
-            super(CraftIngredientType.MULTI_ITEM, References.getLoc("multi_item"), "Possible Item", count);
-            this.ids = new ArrayList<>();
+            super(CraftIngredientType.MULTI_ITEM, References.getLoc(name), "Possibilities", count);
+            this.ids = new HashMap<>();
         }
 
-        public void addItem(ResourceLocation id)
+        public void add(ResourceLocation id, boolean isTag)
         {
-            this.ids.add(id);
+            this.ids.put(id, isTag);
         }
 
-        public List<ResourceLocation> getIds()
+        public Map<ResourceLocation, Boolean> getIds()
         {
             return ids;
         }
@@ -459,8 +464,51 @@ public class CraftIngredients
         }
     }
 
+    public static class NBTIngredient extends CraftIngredient
+    {
+        private final Gson gson = new GsonBuilder().setLenient().create();
+        private CompoundTag nbt;
+
+        public NBTIngredient(CompoundTag nbt)
+        {
+            this(nbt, "NBT");
+        }
+
+        private NBTIngredient(CompoundTag nbt, String description)
+        {
+            super(CraftIngredientType.NBT, References.getLoc("nbt"), description);
+            this.nbt = nbt;
+        }
+
+        public List<String> getNbtList()
+        {
+            return new ArrayList<>(nbt.getAllKeys());
+        }
+
+        public void setNbt(CompoundTag nbt)
+        {
+            this.nbt = nbt;
+        }
+
+        public CompoundTag getNbt()
+        {
+            return nbt;
+        }
+
+        @Override
+        public boolean equals(Object obj)
+        {
+            if(obj instanceof NBTIngredient)
+            {
+                return super.equals(obj) && ((NBTIngredient) obj).getNbt().equals(this.getNbt());
+            }
+
+            return false;
+        }
+    }
+
     public enum CraftIngredientType
     {
-        ITEM, TAG, BLOCK, FLUID, MULTI_ITEM, DATA
+        ITEM, TAG, BLOCK, FLUID, MULTI_ITEM, DATA, NBT
     }
 }

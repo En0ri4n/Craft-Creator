@@ -6,13 +6,15 @@ import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
 import fr.eno.craftcreator.container.utils.CommonContainer;
 import fr.eno.craftcreator.init.InitPackets;
-import fr.eno.craftcreator.kubejs.managers.RecipeManagerDispatcher;
-import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
-import fr.eno.craftcreator.kubejs.utils.RecipeInfos;
+import fr.eno.craftcreator.recipes.managers.RecipeManagerDispatcher;
+import fr.eno.craftcreator.recipes.utils.RecipeFileUtils;
+import fr.eno.craftcreator.recipes.utils.RecipeInfos;
+import fr.eno.craftcreator.recipes.utils.SupportedMods;
 import fr.eno.craftcreator.packets.RetrieveRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.screen.buttons.ExecuteButton;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;
+import fr.eno.craftcreator.screen.buttons.SimpleCheckBox;
 import fr.eno.craftcreator.screen.utils.ModRecipeCreator;
 import fr.eno.craftcreator.screen.widgets.NumberDataFieldWidget;
 import fr.eno.craftcreator.utils.PairValues;
@@ -42,6 +44,10 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
 {
     int guiTextureSize = 256;
 
+    // Only to check if it's a vanilla machine
+    protected boolean isVanillaScreen;
+    private SimpleCheckBox isKubeJSRecipeButton;
+
     protected ExecuteButton executeButton;
     protected SimpleButton nextButton;
     protected SimpleButton previousButton;
@@ -66,6 +72,13 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         super.init();
         assert this.minecraft != null;
 
+        if(isVanillaScreen)
+        {
+            InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("kubejs_recipe", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.BOOLEAN));
+            this.addRenderableWidget(isKubeJSRecipeButton = new SimpleCheckBox(5, this.height - 20, 15, 15, References.getTranslate("screen.recipe_creator_screen.kube_js_button"), false));
+            if(!SupportedMods.isKubeJSLoaded()) this.isKubeJSRecipeButton.visible = false;
+        }
+
         InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("screen_index", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.INT));
 
         this.addRenderableWidget(executeButton = new ExecuteButton(this.leftPos + this.imageWidth / 2 - 20, this.topPos + 35, 42, (button) -> RecipeManagerDispatcher.createRecipe(this.getMenu().getMod(), getCurrentRecipe(), this.getMenu().slots.stream().filter(slot -> slot instanceof SimpleSlotItemHandler).collect(Collectors.toList()), getRecipeInfos())));
@@ -80,9 +93,9 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         super.setData(dataName, data);
 
         if(dataName.equals("screen_index"))
-        {
             this.setCurrentScreenIndex((Integer) data);
-        }
+        else if(dataName.equals("kubejs_recipe") && isVanillaScreen)
+            this.isKubeJSRecipeButton.setSelected((boolean) data);
     }
 
     public int getArrowXPos(boolean right)
@@ -94,8 +107,10 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     {
         this.recipeInfos.getParameters().clear();
 
-        this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterMap<>("tagged_slots", this.getTagged()));
-        this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterIntList("nbt_slots", this.nbtSlots));
+        this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterMap<>(RecipeInfos.Parameters.TAGGED_SLOTS, this.getTagged()));
+        this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterList<>(RecipeInfos.Parameters.NBT_SLOTS, this.nbtSlots));
+        if(isVanillaScreen)
+            this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterBoolean(RecipeInfos.Parameters.KUBEJS_RECIPE, this.isKubeJSRecipeButton.selected()));
         return this.recipeInfos;
     }
 
@@ -199,6 +214,14 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         {
             if(field.visible) field.render(matrixStack, mouseX, mouseY, partialTicks);
         });
+
+        if(isVanillaScreen)
+        {
+            int yTextureOffset = ExecuteButton.isMouseHover(this.leftPos + imageWidth - 20, topPos, mouseX, mouseY, 20, 20) ? 20 : 0;
+            RenderSystem.setShaderTexture(0, References.getLoc("textures/gui/buttons/item_button.png"));
+            RenderSystem.enableBlend();
+            Screen.blit(matrixStack, this.leftPos + imageWidth - 20, topPos, 20, 20, 0, yTextureOffset, 20, 20, 20, 40);
+        }
     }
 
     @Override
@@ -357,7 +380,23 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
 
     protected void updateSlots()
     {
-        this.getMenu().activeSlots(false);
-        this.getCurrentRecipe().getSlots().forEach(ds -> this.getMenu().slots.stream().filter(s -> s.getSlotIndex() == ds.getIndex() && s instanceof SimpleSlotItemHandler).findFirst().ifPresent(slot -> ((SimpleSlotItemHandler) slot).setActive(true)));
+        if(isVanillaScreen)
+        {
+            this.getMenu().activeSlots(true);
+        }
+        else
+        {
+            this.getMenu().activeSlots(false);
+            this.getCurrentRecipe().getSlots().forEach(ds -> this.getMenu().slots.stream().filter(s -> s.getSlotIndex() == ds.getIndex() && s instanceof SimpleSlotItemHandler).findFirst().ifPresent(slot -> ((SimpleSlotItemHandler) slot).setActive(true)));
+        }
+    }
+
+    @Override
+    public void onClose()
+    {
+        super.onClose();
+
+        if(isVanillaScreen)
+            InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("kubejs_recipe", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.BOOLEAN, this.isKubeJSRecipeButton.selected()));
     }
 }

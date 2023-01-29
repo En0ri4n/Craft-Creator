@@ -3,7 +3,7 @@ package fr.eno.craftcreator.screen.container;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.container.BotaniaRecipeCreatorContainer;
-import fr.eno.craftcreator.kubejs.utils.RecipeInfos;
+import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import fr.eno.craftcreator.screen.utils.ModRecipeCreator;
 import fr.eno.craftcreator.screen.widgets.NumberDataFieldWidget;
 import fr.eno.craftcreator.utils.PairValues;

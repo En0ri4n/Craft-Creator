@@ -2,10 +2,10 @@ package fr.eno.craftcreator.screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.kubejs.serializers.ModRecipesJSSerializer;
-import fr.eno.craftcreator.kubejs.utils.ListEntriesHelper;
-import fr.eno.craftcreator.kubejs.utils.ModRecipeCreatorDispatcher;
-import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
+import fr.eno.craftcreator.recipes.serializers.ModRecipesJSSerializer;
+import fr.eno.craftcreator.recipes.utils.ListEntriesHelper;
+import fr.eno.craftcreator.recipes.utils.ModRecipeCreatorDispatcher;
+import fr.eno.craftcreator.recipes.utils.RecipeFileUtils;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;
 import fr.eno.craftcreator.screen.utils.ListScreen;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;

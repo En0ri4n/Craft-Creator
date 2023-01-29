@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.kubejs.utils;
+package fr.eno.craftcreator.recipes.utils;
 
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import fr.eno.craftcreator.utils.ClientUtils;

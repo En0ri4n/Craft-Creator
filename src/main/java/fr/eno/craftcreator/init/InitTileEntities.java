@@ -1,7 +1,7 @@
 package fr.eno.craftcreator.init;
 
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.kubejs.utils.SupportedMods;
+import fr.eno.craftcreator.recipes.utils.SupportedMods;
 import fr.eno.craftcreator.tileentity.BotaniaRecipeCreatorTile;
 import fr.eno.craftcreator.tileentity.ThermalRecipeCreatorTile;
 import fr.eno.craftcreator.tileentity.vanilla.CraftingTableRecipeCreatorTile;

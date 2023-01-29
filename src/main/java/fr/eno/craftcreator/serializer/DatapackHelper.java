@@ -2,10 +2,10 @@ package fr.eno.craftcreator.serializer;
 
 import com.google.gson.*;
 import fr.eno.craftcreator.CraftCreator;
-import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
+import fr.eno.craftcreator.References;
+import fr.eno.craftcreator.recipes.utils.RecipeFileUtils;
 import fr.eno.craftcreator.utils.ClientUtils;
 import fr.eno.craftcreator.utils.PairValues;
-import fr.eno.craftcreator.utils.Utilities;
 import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
@@ -107,7 +107,7 @@ public class DatapackHelper
             pattern.append(patterns.get(slot.getItem().getItem().getRegistryName()).getSecondValue());
         }
 
-        List<String> patternList = Utilities.splitToListWithSize(pattern.toString(), 3);
+        List<String> patternList = Utils.splitToListWithSize(pattern.toString(), 3);
 
         for(int i = 2; i >= 0; i -= 2)
         {
@@ -172,7 +172,7 @@ public class DatapackHelper
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(getOutputFile(type, output))))
         {
             gson.toJson(recipeJson, writer);
-            ClientUtils.getClientPlayer().sendMessage(Utilities.createComponentFileOpener(Utils.get("serializer.success", getOutputFile(type, output).getName()), getOutputFile(type, output)), ClientUtils.getClientPlayer().getUUID());
+            ClientUtils.getClientPlayer().sendMessage(Utils.createComponentFileOpener(References.getTranslate("serializer.success", getOutputFile(type, output).getName()), getOutputFile(type, output)), ClientUtils.getClientPlayer().getUUID());
         }
         catch(JsonIOException | IOException e)
         {

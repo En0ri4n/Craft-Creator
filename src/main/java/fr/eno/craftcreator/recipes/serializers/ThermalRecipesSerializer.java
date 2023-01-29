@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.kubejs.serializers;
+package fr.eno.craftcreator.recipes.serializers;
 
 import cofh.thermal.core.init.TCoreRecipeTypes;
 import cofh.thermal.core.util.recipes.device.TreeExtractorMapping;
@@ -10,14 +10,16 @@ import cofh.thermal.lib.util.recipes.ThermalRecipe;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import fr.eno.craftcreator.kubejs.utils.CraftIngredients;
-import fr.eno.craftcreator.kubejs.utils.SupportedMods;
+import fr.eno.craftcreator.recipes.managers.ThermalRecipesManager;
+import fr.eno.craftcreator.recipes.utils.CraftIngredients;
+import fr.eno.craftcreator.recipes.utils.SupportedMods;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 
+import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("unused")
@@ -32,34 +34,101 @@ public class ThermalRecipesSerializer extends ModRecipesJSSerializer
 
     public void serializeTreeExtractorRecipe(Block trunk, Block leaves, Fluid fluidResult, int fluidAmount)
     {
-        JsonObject obj = createBaseJson(TCoreRecipeTypes.MAPPING_TREE_EXTRACTOR);
-        obj.addProperty("trunk", trunk.getRegistryName().toString());
-        obj.addProperty("leaves", leaves.getRegistryName().toString());
-        obj.add("result", mapToJsonObject(ImmutableMap.of("fluid", fluidResult.getRegistryName().toString(), "amount", fluidAmount)));
+        JsonObject recipeObj = createBaseJson(TCoreRecipeTypes.MAPPING_TREE_EXTRACTOR);
+        recipeObj.addProperty("trunk", trunk.getRegistryName().toString());
+        recipeObj.addProperty("leaves", leaves.getRegistryName().toString());
+        recipeObj.add("result", mapToJsonObject(ImmutableMap.of("fluid", fluidResult.getRegistryName().toString(), "amount", fluidAmount)));
 
-        addRecipeToFile(gson.toJson(obj), TCoreRecipeTypes.MAPPING_TREE_EXTRACTOR, fluidResult.getRegistryName());
+        addRecipeToKubeJS(gson.toJson(recipeObj), TCoreRecipeTypes.MAPPING_TREE_EXTRACTOR, fluidResult.getRegistryName());
     }
 
-    public void serializecreatePulverizerRecipe(ResourceLocation input, Map<ItemStack, Double> outputs, double exp)
+    public void serializePulverizerRecipe(ResourceLocation input, Map<ItemStack, Double> outputs, double exp)
     {
-        JsonObject obj = createBaseJson(TCoreRecipeTypes.RECIPE_PULVERIZER);
-        obj.addProperty("experience", exp);
-        addIngredients(input, outputs, obj);
+        JsonObject recipeObj = createBaseJson(TCoreRecipeTypes.RECIPE_PULVERIZER);
+        recipeObj.addProperty("experience", exp);
+        addIngredients(input, outputs, recipeObj);
 
-        addRecipeToFile(gson.toJson(obj), TCoreRecipeTypes.RECIPE_PULVERIZER, outputs.keySet().stream().findFirst().orElse(ItemStack.EMPTY).getItem().getRegistryName());
+        addRecipeToKubeJS(gson.toJson(recipeObj), TCoreRecipeTypes.RECIPE_PULVERIZER, outputs.keySet().stream().findFirst().orElse(ItemStack.EMPTY).getItem().getRegistryName());
     }
 
     public void serializeSawmillRecipe(ResourceLocation input, Map<ItemStack, Double> outputs, Integer energy)
     {
-        JsonObject obj = createBaseJson(TCoreRecipeTypes.RECIPE_SAWMILL);
-        obj.addProperty("energy", energy);
-        addIngredients(input, outputs, obj);
+        JsonObject recipeObj = createBaseJson(TCoreRecipeTypes.RECIPE_SAWMILL);
+        recipeObj.addProperty("energy", energy);
+        addIngredients(input, outputs, recipeObj);
 
-        addRecipeToFile(gson.toJson(obj), TCoreRecipeTypes.RECIPE_SAWMILL, outputs.keySet().stream().findFirst().orElse(ItemStack.EMPTY).getItem().getRegistryName());
+        addRecipeToKubeJS(gson.toJson(recipeObj), TCoreRecipeTypes.RECIPE_SAWMILL, outputs.keySet().stream().findFirst().orElse(ItemStack.EMPTY).getItem().getRegistryName());
     }
 
-    public void serializeSmelterRecipe(ItemStack input, ItemStack output, int energy, double experience)
+    public void serializeSmelterRecipe(List<List<ThermalRecipesManager.RecipeInput>> input, Map<ItemStack, Double> output, int energy, double experience)
     {
+        JsonObject recipeObj = createBaseJson(TCoreRecipeTypes.RECIPE_SMELTER);
+        recipeObj.addProperty("energy", energy);
+        recipeObj.addProperty("experience", experience);
+
+        List<ThermalRecipesManager.RecipeInput> flatInput = input.stream().flatMap(List::stream).toList();
+
+        if(flatInput.size() == 1)
+        {
+            JsonObject singleIngredientObj = new JsonObject();
+            singleIngredientObj.addProperty(flatInput.get(0).isTag() ? "tag" : "item", flatInput.get(0).registryName().toString());
+            singleIngredientObj.addProperty("count", flatInput.get(0).count());
+            recipeObj.add("ingredient", singleIngredientObj);
+        }
+        else
+        {
+            JsonArray ingredientsObj = new JsonArray();
+
+            for(List<ThermalRecipesManager.RecipeInput> ingredients : input)
+            {
+                JsonObject ingredientObj = new JsonObject();
+
+                if(ingredients.isEmpty()) continue;
+
+                if(ingredients.size() == 1)
+                {
+                    ingredientObj.addProperty(ingredients.get(0).isTag() ? "tag" : "item", ingredients.get(0).registryName().toString());
+                    ingredientObj.addProperty("count", ingredients.get(0).count());
+                }
+                else
+                {
+                    JsonArray ingredientValues = new JsonArray();
+
+                    for(ThermalRecipesManager.RecipeInput value : ingredients)
+                    {
+                        JsonObject ingredientValueObj = new JsonObject();
+                        ingredientValueObj.addProperty(value.isTag() ? "tag" : "item", value.registryName().toString());
+                        ingredientValues.add(ingredientValueObj);
+                    }
+
+                    ingredientObj.add("value", ingredientValues);
+                    ingredientObj.addProperty("count", ingredients.get(0).count());
+                }
+
+                ingredientsObj.add(ingredientObj);
+            }
+
+            recipeObj.add("ingredients", ingredientsObj);
+        }
+
+        JsonArray resultObj = new JsonArray();
+
+        for(Map.Entry<ItemStack, Double> outputEntry : output.entrySet())
+        {
+            JsonObject resultValueObj = new JsonObject();
+            resultValueObj.addProperty("item", outputEntry.getKey().getItem().getRegistryName().toString());
+            resultValueObj.addProperty("count", outputEntry.getKey().getCount());
+            resultObj.add(resultValueObj);
+        }
+
+        recipeObj.add("result", resultObj);
+
+        addRecipeToKubeJS(gson.toJson(recipeObj), TCoreRecipeTypes.RECIPE_SMELTER, output.keySet().stream().findFirst().orElse(ItemStack.EMPTY).getItem().getRegistryName());
+    }
+
+    public void serializeInsolatorRecipe(ResourceLocation firstValue, Map<ItemStack, Double> secondValue, double energyMod, double waterMod)
+    {
+
     }
 
     private void addIngredients(ResourceLocation input, Map<ItemStack, Double> outputs, JsonObject obj)

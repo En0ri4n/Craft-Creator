@@ -1,7 +1,7 @@
-package fr.eno.craftcreator.kubejs.managers;
+package fr.eno.craftcreator.recipes.managers;
 
-import fr.eno.craftcreator.kubejs.utils.RecipeInfos;
-import fr.eno.craftcreator.kubejs.utils.SupportedMods;
+import fr.eno.craftcreator.recipes.utils.RecipeInfos;
+import fr.eno.craftcreator.recipes.utils.SupportedMods;
 import fr.eno.craftcreator.screen.utils.ModRecipeCreator;
 import net.minecraft.world.inventory.Slot;
 

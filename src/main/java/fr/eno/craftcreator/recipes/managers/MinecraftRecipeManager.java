@@ -1,7 +1,7 @@
-package fr.eno.craftcreator.kubejs.managers;
+package fr.eno.craftcreator.recipes.managers;
 
-import fr.eno.craftcreator.kubejs.serializers.MinecraftRecipeSerializer;
-import fr.eno.craftcreator.kubejs.utils.RecipeInfos;
+import fr.eno.craftcreator.recipes.serializers.MinecraftRecipeSerializer;
+import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import fr.eno.craftcreator.screen.utils.ModRecipeCreator;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
@@ -22,10 +22,10 @@ public class MinecraftRecipeManager extends BaseRecipesManager
     {
         switch(recipe)
         {
-            case CRAFTING_TABLE -> createCraftingTableRecipe(PositionnedSlot.getSlotsFor(SlotHelper.CRAFTING_TABLE_SLOTS, slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getBoolean(RecipeInfos.Parameters.SHAPED), recipeInfos.getBoolean(RecipeInfos.Parameters.IS_KUBEJS_RECIPE));
-            case FURNACE_SMELTING, FURNACE_BLASTING, FURNACE_SMOKING, CAMPFIRE_COOKING -> createFurnaceRecipe(recipe, PositionnedSlot.getSlotsFor(SlotHelper.FURNACE_SLOTS, slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.EXPERIENCE).doubleValue(), recipeInfos.getValue(RecipeInfos.Parameters.COOKING_TIME).intValue(), recipeInfos.getBoolean(RecipeInfos.Parameters.IS_KUBEJS_RECIPE));
-            case SMITHING_TABLE -> createSmithingTableRecipe(PositionnedSlot.getSlotsFor(SlotHelper.SMITHING_TABLE_SLOTS, slots), recipeInfos.getBoolean(RecipeInfos.Parameters.IS_KUBEJS_RECIPE));
-            case STONECUTTER -> createStoneCutterRecipe(PositionnedSlot.getSlotsFor(SlotHelper.STONECUTTER_SLOTS, slots), recipeInfos.getBoolean(RecipeInfos.Parameters.IS_KUBEJS_RECIPE));
+            case CRAFTING_TABLE -> createCraftingTableRecipe(PositionnedSlot.getSlotsFor(SlotHelper.CRAFTING_TABLE_SLOTS, slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getList(RecipeInfos.Parameters.NBT_SLOTS), recipeInfos.getBoolean(RecipeInfos.Parameters.SHAPED), recipeInfos.getBoolean(RecipeInfos.Parameters.KUBEJS_RECIPE));
+            case FURNACE_SMELTING, FURNACE_BLASTING, FURNACE_SMOKING, CAMPFIRE_COOKING -> createFurnaceRecipe(recipe, PositionnedSlot.getSlotsFor(SlotHelper.FURNACE_SLOTS, slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.EXPERIENCE).doubleValue(), recipeInfos.getValue(RecipeInfos.Parameters.COOKING_TIME).intValue(), recipeInfos.getBoolean(RecipeInfos.Parameters.KUBEJS_RECIPE));
+            case SMITHING_TABLE -> createSmithingTableRecipe(PositionnedSlot.getSlotsFor(SlotHelper.SMITHING_TABLE_SLOTS, slots), recipeInfos.getBoolean(RecipeInfos.Parameters.KUBEJS_RECIPE));
+            case STONECUTTER -> createStoneCutterRecipe(PositionnedSlot.getSlotsFor(SlotHelper.STONECUTTER_SLOTS, slots), recipeInfos.getBoolean(RecipeInfos.Parameters.KUBEJS_RECIPE));
         }
     }
 
@@ -57,11 +57,11 @@ public class MinecraftRecipeManager extends BaseRecipesManager
         MinecraftRecipeSerializer.get().serializeStoneCutterRecipe(input.getRegistryName(), output.getItem().getRegistryName(), output.getCount(), isKubeJSRecipe);
     }
 
-    public void createCraftingTableRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, boolean shaped, boolean isKubeJSRecipe)
+    public void createCraftingTableRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, List<Integer> nbtSlots, boolean shaped, boolean isKubeJSRecipe)
     {
         ItemStack output = slots.get(9).getItem();
 
-        MinecraftRecipeSerializer.get().serializeCraftingTableRecipe(output, slots, taggedSlots, shaped, isKubeJSRecipe);
+        MinecraftRecipeSerializer.get().serializeCraftingTableRecipe(output, slots, taggedSlots, nbtSlots, shaped, isKubeJSRecipe);
     }
 
     public static MinecraftRecipeManager get()

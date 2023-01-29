@@ -3,7 +3,6 @@ package fr.eno.craftcreator.screen.buttons;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -41,7 +40,7 @@ public class BooleanButton extends Button
 				yOffset = ExecuteButton.isMouseHover(x, y, mouseX, mouseY, width, height) ? 40 : 20;
 			}
 
-			String str = Utils.getS("button.boolean." + name + "." + (isOn ? "on" : "off"));
+			String str = References.getTranslate("button.boolean." + name + "." + (isOn ? "on" : "off")).getString();
 
 			Screen.blit(pPoseStack, x, y, this.width, this.height, 0, yOffset, 100, 20, 100, 60);
 			drawCenteredString(pPoseStack, mc.font, str, this.x + this.width / 2, this.y + this.height / 3, 0xFFFFFF);

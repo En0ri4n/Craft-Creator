@@ -1,14 +1,11 @@
-package fr.eno.craftcreator.kubejs.serializers;
+package fr.eno.craftcreator.recipes.serializers;
 
 import com.google.common.collect.Multimap;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.kubejs.utils.CraftIngredients;
-import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
-import fr.eno.craftcreator.kubejs.utils.SupportedMods;
+import fr.eno.craftcreator.recipes.utils.CraftIngredients;
+import fr.eno.craftcreator.recipes.utils.RecipeFileUtils;
+import fr.eno.craftcreator.recipes.utils.SupportedMods;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
 import fr.eno.craftcreator.utils.PairValues;
 import fr.eno.craftcreator.utils.Utils;
@@ -67,7 +64,7 @@ public abstract class ModRecipesJSSerializer
         RecipeManager manager = Objects.requireNonNull(Minecraft.getInstance().level).getRecipeManager();
         return manager.getAllRecipesFor(type).stream().filter(Recipe -> Recipe.getResultItem().getItem() == result.asItem()).findFirst().orElse(null);
     }
-    protected void addRecipeToFile(String recipeJson, RecipeType<?> recipeType, ResourceLocation result)
+    protected void addRecipeToKubeJS(String recipeJson, RecipeType<?> recipeType, ResourceLocation result)
     {
         RecipeFileUtils.insertAndWriteLines(this.mod.getModId(), recipeType, "event.custom(" + recipeJson + ")");
         sendSuccessMessage(recipeType, result);
@@ -168,20 +165,36 @@ public abstract class ModRecipesJSSerializer
     {
         for(Ingredient ingredient : ingredients)
         {
-            if(ingredient.toJson().isJsonObject() && ingredient.toJson().getAsJsonObject().has("tag"))
+            int count = 1;
+
+            if(ingredient.getItems().length > 0)
+                ingredient.getItems()[0].getCount();
+
+            if(ingredient.toJson().isJsonObject())
             {
-                inputIngredients.addIngredient(new CraftIngredients.TagIngredient(ResourceLocation.tryParse(ingredient.toJson().getAsJsonObject().get("tag").getAsString()), 1));
+                if(ingredient.toJson().getAsJsonObject().has("tag"))
+                    inputIngredients.addIngredient(new CraftIngredients.TagIngredient(ResourceLocation.tryParse(ingredient.toJson().getAsJsonObject().get("tag").getAsString()), count));
+                else if(ingredient.toJson().getAsJsonObject().has("item"))
+                    inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(ResourceLocation.tryParse(ingredient.toJson().getAsJsonObject().get("item").getAsString()), count));
             }
             else
             {
-                if(ingredient.getItems().length == 0) {}
-                else if(ingredient.getItems().length == 1)
-                    inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(ingredient.getItems()[0].getItem().getRegistryName(), 1));
-                else
+                if(ingredient.toJson().isJsonArray())
                 {
-                    CraftIngredients.MultiItemIngredient multiItemIngredient = new CraftIngredients.MultiItemIngredient(1);
-                    for(ItemStack stack : ingredient.getItems())
-                        if(!stack.isEmpty()) multiItemIngredient.addItem(stack.getItem().getRegistryName());
+                    CraftIngredients.MultiItemIngredient multiItemIngredient = new CraftIngredients.MultiItemIngredient(Utils.generateString(16), count);
+
+                    JsonArray ingredientArray = ingredient.toJson().getAsJsonArray();
+
+                    for(JsonElement value : ingredientArray)
+                    {
+                        if(value.isJsonObject())
+                        {
+                            if(value.getAsJsonObject().has("tag"))
+                                multiItemIngredient.add(ResourceLocation.tryParse(value.getAsJsonObject().get("tag").getAsString()), true);
+                            else if(value.getAsJsonObject().has("item"))
+                                multiItemIngredient.add(ResourceLocation.tryParse(value.getAsJsonObject().get("item").getAsString()), false);
+                        }
+                    }
 
                     inputIngredients.addIngredient(multiItemIngredient);
                 }

@@ -1,10 +1,10 @@
-package fr.eno.craftcreator.kubejs.utils;
+package fr.eno.craftcreator.recipes.utils;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.gson.*;
 import fr.eno.craftcreator.kubejs.KubeJSManager;
-import fr.eno.craftcreator.kubejs.serializers.ModRecipesJSSerializer;
+import fr.eno.craftcreator.recipes.serializers.ModRecipesJSSerializer;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
 import io.netty.buffer.Unpooled;
 import net.minecraft.ChatFormatting;
@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
 @SuppressWarnings({"unchecked", "unused"})
 public class RecipeFileUtils
 {
-    private static final Pattern RECIPE_PATTERN = Pattern.compile("(?<=\\()(.*?)(?=\\))");
+    private static final Pattern RECIPE_PATTERN = Pattern.compile("(?<=\\()(.*?)(?=\\)$)");
 
     public final static String ADD_RECIPE_START = "ADDED-RECIPES-START";
     public final static String MODIFIED_RECIPE_START = "REMOVED-RECIPES-START";

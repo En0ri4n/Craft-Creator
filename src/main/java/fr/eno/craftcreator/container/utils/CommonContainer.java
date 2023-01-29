@@ -1,7 +1,7 @@
 package fr.eno.craftcreator.container.utils;
 
-import fr.eno.craftcreator.kubejs.utils.SupportedMods;
-import fr.eno.craftcreator.tileentity.MultiScreenRecipeCreatorTile;
+import fr.eno.craftcreator.recipes.utils.SupportedMods;
+import fr.eno.craftcreator.tileentity.utils.MultiScreenRecipeCreatorTile;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MenuType;

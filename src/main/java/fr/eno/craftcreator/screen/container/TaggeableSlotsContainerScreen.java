@@ -8,7 +8,7 @@ import fr.eno.craftcreator.packets.RetrieveRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.screen.buttons.SimpleCheckBox;
 import fr.eno.craftcreator.screen.widgets.GuiList;
-import fr.eno.craftcreator.tileentity.vanilla.TaggeableInventoryContainerTileEntity;
+import fr.eno.craftcreator.tileentity.utils.TaggeableInventoryContainerTileEntity;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -160,11 +160,10 @@ public abstract class TaggeableSlotsContainerScreen<T extends AbstractContainerM
 
                 return true;
             }
-            else if(checkInventory && Screen.hasControlDown() && slot.getItem().getTags().findAny().isPresent())
+            else if(checkInventory && Screen.hasControlDown() && slot.hasItem())
             {
-                this.guiTagList.setKeys(null);
-                this.guiTagList.setSelectedKey(null);
-                this.selectedSlot = null;
+                this.selectedSlot = (SlotItemHandler) slot;
+                this.nbtCheckBox.setSelected(this.nbtSlots.contains(slot.getSlotIndex()));
                 return true;
             }
         }

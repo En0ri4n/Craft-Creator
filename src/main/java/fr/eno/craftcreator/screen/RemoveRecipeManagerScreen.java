@@ -3,9 +3,9 @@ package fr.eno.craftcreator.screen;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.kubejs.serializers.ModRecipesJSSerializer;
-import fr.eno.craftcreator.kubejs.utils.ModRecipeCreatorDispatcher;
-import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
+import fr.eno.craftcreator.recipes.serializers.ModRecipesJSSerializer;
+import fr.eno.craftcreator.recipes.utils.ModRecipeCreatorDispatcher;
+import fr.eno.craftcreator.recipes.utils.RecipeFileUtils;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;
 import fr.eno.craftcreator.screen.buttons.SimpleCheckBox;
 import fr.eno.craftcreator.screen.utils.ChildrenScreen;
@@ -13,7 +13,7 @@ import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import fr.eno.craftcreator.screen.widgets.SimpleTextFieldWidget;
 import fr.eno.craftcreator.utils.EntryHelper;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
-import fr.eno.craftcreator.utils.Utilities;
+import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.TextComponent;
@@ -128,7 +128,7 @@ public class RemoveRecipeManagerScreen extends ChildrenScreen
             this.getList(0).setVisible(false);
         });
 
-        this.setEntries(0, Utilities.copyPartialMatches(textFieldWidget.getValue(), entries));
+        this.setEntries(0, Utils.copyPartialMatches(textFieldWidget.getValue(), entries));
     }
 
     @Override

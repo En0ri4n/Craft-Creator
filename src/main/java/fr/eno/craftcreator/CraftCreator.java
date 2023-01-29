@@ -3,14 +3,16 @@ package fr.eno.craftcreator;
 import fr.eno.craftcreator.commands.TestRecipesCommand;
 import fr.eno.craftcreator.init.*;
 import fr.eno.craftcreator.kubejs.KubeJSManager;
-import fr.eno.craftcreator.kubejs.utils.SupportedMods;
+import fr.eno.craftcreator.recipes.utils.SupportedMods;
 import fr.eno.craftcreator.screen.container.*;
+import fr.eno.craftcreator.utils.ClientUtils;
 import fr.eno.craftcreator.utils.EntryHelper;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
@@ -63,6 +65,8 @@ public class CraftCreator
     {
         event.enqueueWork(() ->
         {
+            ClientRegistry.registerKeyBinding(ClientUtils.KEY_OPEN_RECIPES_MENU);
+
             MenuScreens.register(InitContainers.CRAFTING_TABLE_RECIPE_CREATOR.get(), CraftingTableRecipeCreatorScreen::new);
             MenuScreens.register(InitContainers.FURNACE_RECIPE_CREATOR.get(), FurnaceRecipeCreatorScreen::new);
             MenuScreens.register(InitContainers.STONE_CUTTER_RECIPE_CREATOR.get(), StoneCutterRecipeCreatorScreen::new);

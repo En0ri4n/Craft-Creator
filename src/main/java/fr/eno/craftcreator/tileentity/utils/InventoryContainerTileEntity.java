@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.tileentity.vanilla;
+package fr.eno.craftcreator.tileentity.utils;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
