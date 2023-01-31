@@ -1,15 +1,12 @@
 package fr.eno.craftcreator.screen.buttons;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.utils.Utils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.resources.ResourceLocation;
-
+import fr.eno.craftcreator.api.ClientUtils;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.StringTextComponent;
 
 
 public class BooleanButton extends Button
@@ -19,32 +16,30 @@ public class BooleanButton extends Button
 	private boolean isOn;
 	private final String name;
 
-	public BooleanButton(String name, int x, int y, int width, int height, boolean value, OnPress onPress)
+	public BooleanButton(String name, int x, int y, int width, int height, boolean value, IPressable onPress)
 	{
-		super(x, y, width, height, new TextComponent(""), onPress);
+		super(x, y, width, height, new StringTextComponent(""), onPress);
 		this.name = name;
 		this.isOn = value;
 	}
 
 	@Override
-	public void renderButton(PoseStack pPoseStack, int mouseX, int mouseY, float pPartialTick)
+	public void renderWidget(MatrixStack pPoseStack, int mouseX, int mouseY, float pPartialTick)
 	{
-		Minecraft mc = Minecraft.getInstance();
-
 		if(this.visible)
 		{
 			int yOffset = 0;
-			RenderSystem.setShaderTexture(0, TEXTURE);
+			ClientUtils.bindTexture(TEXTURE);
 			
 			if(active)
 			{
 				yOffset = ExecuteButton.isMouseHover(x, y, mouseX, mouseY, width, height) ? 40 : 20;
 			}
 
-			String str = Utils.getS("button.boolean." + name + "." + (isOn ? "on" : "off"));
+			String str = References.getTranslate("button.boolean." + name + "." + (isOn ? "on" : "off")).getString();
 
 			Screen.blit(pPoseStack, x, y, this.width, this.height, 0, yOffset, 100, 20, 100, 60);
-			drawCenteredString(pPoseStack, mc.font, str, this.x + this.width / 2, this.y + this.height / 3, 0xFFFFFF);
+			drawCenteredString(pPoseStack, ClientUtils.getFont(), str, this.x + this.width / 2, this.y + this.height / 3, 0xFFFFFF);
 		}
 	}
 

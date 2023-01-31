@@ -1,41 +1,96 @@
 package fr.eno.craftcreator.blocks;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.phys.BlockHitResult;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.state.DirectionProperty;
+import net.minecraft.state.StateContainer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
+import java.util.HashMap;
+import java.util.Map;
 
 @SuppressWarnings("deprecation")
-public abstract class RecipeCreatorBlock extends BaseEntityBlock
+public abstract class RecipeCreatorBlock extends Block
 {
     public RecipeCreatorBlock()
     {
-        super(BlockBehaviour.Properties.of(Material.METAL).sound(SoundType.STONE).strength(999999F));
+        super(Block.Properties.create(Material.IRON).sound(SoundType.STONE).hardnessAndResistance(999999F));
+        BlockState stateHolder = this.getDefaultState();
+        getStates().forEach(stateHolder::with);
+        this.setDefaultState(stateHolder);
     }
 
-    @Nonnull
-    @Override
-    public abstract InteractionResult use(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit);
-
-    @Nonnull
-    @Override
-    public RenderShape getRenderShape(@NotNull BlockState pState)
+    protected Map<DirectionProperty, Direction> getStates()
     {
-        return RenderShape.MODEL;
+        return new HashMap<>();
     }
-    @org.jetbrains.annotations.Nullable
+
     @Override
-    public abstract BlockEntity newBlockEntity(@NotNull BlockPos pPos, @NotNull BlockState pState);
+    public BlockRenderType getRenderType(BlockState state)
+    {
+        return BlockRenderType.MODEL;
+    }
+
+    @Override
+    public ActionResultType onBlockActivated(BlockState p_225533_1_, World p_225533_2_, BlockPos p_225533_3_, PlayerEntity p_225533_4_, Hand p_225533_5_, BlockRayTraceResult p_225533_6_)
+    {
+        return onBlockUsed(p_225533_1_, p_225533_2_, p_225533_3_, p_225533_4_, p_225533_5_, p_225533_6_);
+    }
+
+    @Override
+    public VoxelShape getShape(BlockState p_220053_1_, IBlockReader p_220053_2_, BlockPos p_220053_3_, ISelectionContext p_220053_4_)
+    {
+        return getShape();
+    }
+
+    protected abstract TileEntity getTileEntity(BlockPos pos, BlockState state);
+
+    protected abstract ActionResultType onBlockUsed(@Nonnull BlockState state, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull PlayerEntity playerIn, @Nonnull Hand handIn, @Nonnull BlockRayTraceResult hit);
+
+    protected VoxelShape getShape()
+    {
+        return VoxelShapes.fullCube();
+    }
+
+    @Override
+    public BlockState getStateForPlacement(BlockItemUseContext context)
+    {
+        BlockState stateHolder = this.getDefaultState();
+        getStates().forEach(stateHolder::with);
+        return stateHolder;
+    }
+
+    @Override
+    public TileEntity createTileEntity(BlockState state, IBlockReader world)
+    {
+        return getTileEntity(null, state);
+    }
+
+    @Override
+    public boolean hasTileEntity(BlockState state)
+    {
+        return true;
+    }
+
+    @Override
+    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> stateBuilder)
+    {
+        getStates().keySet().forEach(stateBuilder::add);
+    }
 }

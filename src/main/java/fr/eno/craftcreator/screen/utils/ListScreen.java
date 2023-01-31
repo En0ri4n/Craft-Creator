@@ -1,10 +1,10 @@
 package fr.eno.craftcreator.screen.utils;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.util.text.ITextComponent;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ public class ListScreen extends Screen
     protected final List<SimpleListWidget> lists;
     protected int doubleClickCounter;
 
-    protected ListScreen(Component titleIn)
+    protected ListScreen(ITextComponent titleIn)
     {
         super(titleIn);
         this.lists = new ArrayList<>();
@@ -56,7 +56,7 @@ public class ListScreen extends Screen
     }
 
     @Override
-    public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         if(this.doubleClickCounter >= 0) this.doubleClickCounter--;
 
@@ -65,7 +65,7 @@ public class ListScreen extends Screen
         this.lists.forEach(list -> list.render(matrixStack, mouseX, mouseY, partialTicks));
         this.lists.forEach(list -> list.renderTooltip(matrixStack, mouseX, mouseY));
 
-        this.renderables.stream().filter(widget -> widget instanceof SimpleButton).forEach(widget -> ((SimpleButton) widget).renderToolTip(matrixStack, mouseX, mouseY));
+        this.buttons.stream().filter(widget -> widget instanceof SimpleButton).forEach(widget -> widget.renderToolTip(matrixStack, mouseX, mouseY));
     }
 
     @Override

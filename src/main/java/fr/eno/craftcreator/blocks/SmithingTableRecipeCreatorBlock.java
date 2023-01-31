@@ -1,47 +1,33 @@
 package fr.eno.craftcreator.blocks;
 
+import fr.eno.craftcreator.api.BlockUtils;
 import fr.eno.craftcreator.tileentity.vanilla.SmithingTableRecipeCreatorTile;
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.network.NetworkHooks;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
 
 public class SmithingTableRecipeCreatorBlock extends RecipeCreatorBlock
 {
-	public SmithingTableRecipeCreatorBlock()
-	{
-	}
+    public SmithingTableRecipeCreatorBlock()
+    {
+    }
 
-	@NotNull
-	@Override
-	public InteractionResult use(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit)
-	{
-		if(!pLevel.isClientSide)
-		{
-			BlockEntity tileentity = pLevel.getBlockEntity(pPos);
-			
-			if(tileentity instanceof SmithingTableRecipeCreatorTile tile)
-			{
+    @Override
+    protected ActionResultType onBlockUsed(@Nonnull BlockState state, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull PlayerEntity playerIn, @Nonnull Hand handIn, @Nonnull BlockRayTraceResult hit)
+    {
+        return BlockUtils.openMenu(worldIn, pos, playerIn, SmithingTableRecipeCreatorTile.class);
+    }
 
-				NetworkHooks.openGui((ServerPlayer) pPlayer, tile, pPos);
-                return InteractionResult.SUCCESS;
-			}
-		}
-		
-		return InteractionResult.CONSUME;
-	}
-
-	@Override
-	public @Nullable BlockEntity newBlockEntity(@NotNull BlockPos pPos, @NotNull BlockState pState)
-	{
-		return new SmithingTableRecipeCreatorTile(pPos, pState);
-	}
+    @Override
+    protected TileEntity getTileEntity(BlockPos pos, BlockState state)
+    {
+        return new SmithingTableRecipeCreatorTile();
+    }
 }

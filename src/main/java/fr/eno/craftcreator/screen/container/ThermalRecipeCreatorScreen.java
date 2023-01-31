@@ -1,37 +1,36 @@
 package fr.eno.craftcreator.screen.container;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.container.ThermalRecipeCreatorContainer;
-import fr.eno.craftcreator.kubejs.utils.RecipeInfos;
-import fr.eno.craftcreator.utils.PairValue;
+import fr.eno.craftcreator.recipes.utils.RecipeInfos;
+import fr.eno.craftcreator.utils.PairValues;
+import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.Items;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.IFormattableTextComponent;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen<ThermalRecipeCreatorContainer>
 {
-    private static final int ENERGY_FIELD = 0;
-    private static final int EXPERIENCE_FIELD = 1;
-    private static final int CHANCES_FIELD = 2;
-    private static final int RESIN_FIELD = 2;
+    private static final int ENERGY_FIELD = 0, EXPERIENCE_FIELD = 1, CHANCES_FIELD = 2, RESIN_FIELD = 2, SPEED_FIELD = 6;
 
-    public ThermalRecipeCreatorScreen(ThermalRecipeCreatorContainer screenContainer, Inventory inv, Component titleIn)
+    public ThermalRecipeCreatorScreen(ThermalRecipeCreatorContainer screenContainer, PlayerInventory inv, ITextComponent titleIn)
     {
-        super(screenContainer, inv, titleIn, screenContainer.getTile().getBlockPos());
+        super(screenContainer, inv, titleIn, screenContainer.getTile().getPos());
         this.guiTextureSize = 384;
-        this.imageWidth = 296;
-        this.imageHeight = 256;
+        this.imageWidth = this.xSize = 296;
+        this.imageHeight = this.ySize = 256;
     }
 
     @Override
@@ -39,7 +38,7 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     {
         super.init();
 
-        addTextField( leftPos + imageWidth - 44, topPos + imageHeight / 2, 35, 10, -1, 6);
+        addNumberField(leftPos + imageWidth - 44, topPos + imageHeight / 2, 35, -1, 7);
 
         updateScreen();
     }
@@ -47,23 +46,29 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     @Override
     public int getArrowXPos(boolean right)
     {
-        return right ? super.getArrowXPos(right) - 60 : super.getArrowXPos(right) + 60;
+        return right ? super.getArrowXPos(true) - 60 : super.getArrowXPos(false) + 60;
     }
 
     @Override
     protected RecipeInfos getRecipeInfos()
     {
-        this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterDouble("experience", getTextField(EXPERIENCE_FIELD).getValue()));
-        this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterDouble("energy", getTextField(ENERGY_FIELD).getValue()));
+        super.getRecipeInfos();
+
+        this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.ENERGY_MOD, getNumberField(SPEED_FIELD).getDoubleValue()));
+        this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.EXPERIENCE, getNumberField(EXPERIENCE_FIELD).getDoubleValue()));
+        this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.ENERGY, getNumberField(ENERGY_FIELD).getIntValue()));
 
         switch(getCurrentRecipe())
         {
-            case TREE_EXTRACTOR -> this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterInteger("resin_amount", getTextField(0).getValue()));
-            case PULVERIZER, SAWMILL ->
-            {
+            case TREE_EXTRACTOR:
+                this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.RESIN_AMOUNT, getNumberField(RESIN_FIELD).getIntValue()));
+            case PULVERIZER:
+            case SAWMILL:
+            case SMELTER:
+            case INSOLATOR:
                 for(int i = 0; i < 4; i++)
-                    this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterDouble("chance_" + i, getTextField(i + 1).getValue()));
-            }
+                    this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber("chance_" + i, getNumberField(i + 1).getDoubleValue()));
+                break;
         }
 
         return this.recipeInfos;
@@ -74,99 +79,100 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     {
         super.updateScreen();
 
-        showTextField(ENERGY_FIELD, EXPERIENCE_FIELD);
-        setTextField(ENERGY_FIELD, this.leftPos + 8, this.topPos + this.imageHeight / 2 + 23, 73, 16, 100);
-        setTextField(EXPERIENCE_FIELD, this.leftPos + this.imageWidth - 73 - 8, this.topPos + this.imageHeight / 2 + 23, 73, 16, 0.1D);
+        showDataField(ENERGY_FIELD, EXPERIENCE_FIELD, SPEED_FIELD);
+        setDataField(ENERGY_FIELD, this.leftPos + 8, this.topPos + this.imageHeight / 2 + 23, 45, 100);
+        setDataField(EXPERIENCE_FIELD, this.leftPos + this.imageWidth - 73 - 8, this.topPos + this.imageHeight / 2 + 23, 73, 0.1D);
+        setDataField(SPEED_FIELD, this.leftPos + 65, this.topPos + this.imageHeight / 2 + 23, 45, 1D);
+
         setExecuteButtonPos(this.leftPos + this.imageWidth / 2 - this.executeButton.getWidth() / 2, this.topPos + this.imageHeight / 2 - this.executeButton.getHeight() / 2 + 22);
 
         switch(getCurrentRecipe())
         {
-            case TREE_EXTRACTOR ->
-            {
-                showTextField(RESIN_FIELD);
-                setTextField(RESIN_FIELD, leftPos + imageWidth / 4 * 3 - 12, topPos + imageHeight / 3 - 13, 55, 16, 25);
-            }
-            case SAWMILL, PULVERIZER, SMELTER ->
-            {
+            case TREE_EXTRACTOR:
+                showDataField(RESIN_FIELD);
+                setDataField(RESIN_FIELD, leftPos + imageWidth / 4 * 3 - 12, topPos + imageHeight / 3 - 13, 55, 25);
+                break;
+            case SAWMILL:
+            case PULVERIZER:
+            case SMELTER:
+            case INSOLATOR:
                 for(int i = 0; i < 4; i++)
                 {
-                    showTextField(i + CHANCES_FIELD);
-                    setTextField(i + CHANCES_FIELD, leftPos + imageWidth / 4 * 3 - 12, topPos + 33 + i * 26, 40, 16, 1D);
+                    showDataField(CHANCES_FIELD + i);
+                    setDataField(CHANCES_FIELD + i, leftPos + imageWidth / 4 * 3 - 12, topPos + 33 + i * 26, 40, 1D);
                 }
-            }
+                break;
         }
     }
 
     @Override
-    public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         super.render(matrixStack, mouseX, mouseY, partialTicks);
 
         switch(getCurrentRecipe())
         {
-            case TREE_EXTRACTOR ->
-            {
-                ItemStack trunkItem = this.getMenu().slots.get(SlotHelper.TREE_EXTRACTOR_SLOTS.get(0).getIndex()).hasItem() ? this.getMenu().slots.get(SlotHelper.TREE_EXTRACTOR_SLOTS.get(0).getIndex()).getItem() : ItemStack.EMPTY;
-                ItemStack leavesItem = this.getMenu().slots.get(SlotHelper.TREE_EXTRACTOR_SLOTS.get(1).getIndex()).hasItem() ? this.getMenu().slots.get(SlotHelper.TREE_EXTRACTOR_SLOTS.get(1).getIndex()).getItem() : ItemStack.EMPTY;
-
-                for(int i = 0; i < 2; i++)
-                    this.minecraft.getItemRenderer().renderAndDecorateFakeItem(trunkItem, this.leftPos + this.imageWidth / 2 - 9, this.topPos + 40 + i * 18);
-
-                for(int line = 0; line < 2; line++)
-                    for(int row = 0; row < 3; row ++)
-                    {
-                        if(line == 1 && row == 1)
-                            continue;
-
-                        this.minecraft.getItemRenderer().renderAndDecorateFakeItem(leavesItem, this.leftPos + this.imageWidth / 2 - 9 - 18 + row * 18, this.topPos + 22 + line * 18);
-                    }
-
-                // Slot slot = this.getMenu().slots.get(SlotHelper.TREE_EXTRACTOR_SLOTS.get(SlotHelper.TREE_EXTRACTOR_SLOTS.size() - 1).getIndex());
-                // Screen.drawString(matrixStack, this.font, "Resin :", this.leftPos + slot.x, this.topPos + slot.y - font.lineHeight - 2, 0xFFFFFFFF);
-
-                renderTextFieldTitle(RESIN_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.resin_amount"), matrixStack);
-            }
-            case PULVERIZER, SAWMILL, SMELTER ->
-            {
-                renderTextFieldTitle(CHANCES_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.chances"), matrixStack);
-            }
+            case TREE_EXTRACTOR:
+                this.renderSlotTitle(0, new StringTextComponent("Trunk"), matrixStack);
+                this.renderSlotTitle(1, new StringTextComponent("Leaves"), matrixStack);
+                renderDataFieldTitle(RESIN_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.resin_amount"), matrixStack);
+                break;
+            case PULVERIZER:
+            case SAWMILL:
+            case SMELTER:
+            case INSOLATOR:
+                renderDataFieldTitle(CHANCES_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.chances"), matrixStack);
+                break;
         }
 
-        renderTextFieldTitle(ENERGY_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.energy"), matrixStack);
-        renderTextFieldTitle(EXPERIENCE_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.experience"), matrixStack);
+        renderDataFieldTitle(ENERGY_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.energy"), matrixStack);
+        renderDataFieldTitle(EXPERIENCE_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.experience"), matrixStack);
+        renderDataFieldTitle(SPEED_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.mod_energy"), matrixStack);
 
-        this.renderTooltip(matrixStack, mouseX, mouseY);
+        this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
     }
 
     @Override
-    protected void renderLabels(PoseStack matrixStack, int pMouseX, int pMouseY)
+    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int pMouseX, int pMouseY)
     {
-        super.renderLabels(matrixStack, pMouseX, pMouseY);
+        super.drawGuiContainerForegroundLayer(matrixStack, pMouseX, pMouseY);
 
         // Render Labels
-        MutableComponent inputLabel = References.getTranslate("screen.recipe_creator.label.input").copy().withStyle(ChatFormatting.UNDERLINE);
-        Component ouputLabel = References.getTranslate("screen.recipe_creator.label.output");
-        Screen.drawString(matrixStack, this.font, inputLabel, this.imageWidth / 4 - font.width(inputLabel) / 2, 8, 0xFFFFFFFF);
-        Screen.drawString(matrixStack, this.font, ouputLabel, this.imageWidth / 4 * 3 - font.width(ouputLabel) / 2, 8, 0xFFFFFFFF);
+        IFormattableTextComponent inputLabel = References.getTranslate("screen.recipe_creator.label.input").copyRaw().mergeStyle(TextFormatting.UNDERLINE);
+        ITextComponent ouputLabel = References.getTranslate("screen.recipe_creator.label.output");
+        Screen.drawString(matrixStack, this.font, inputLabel, this.imageWidth / 4 - font.getStringWidth(inputLabel.getString()) / 2, 8, 0xFFFFFFFF);
+        Screen.drawString(matrixStack, this.font, ouputLabel, this.imageWidth / 4 * 3 - font.getStringWidth(ouputLabel.getString()) / 2, 8, 0xFFFFFFFF);
+    }
 
+    @Override
+    protected List<PositionnedSlot> getTaggeableSlots()
+    {
+        return SlotHelper.THERMAL_SLOTS;
     }
 
     @Override
     protected Item getRecipeIcon()
     {
-        return switch(getCurrentRecipe())
+        switch(getCurrentRecipe())
         {
-            case TREE_EXTRACTOR -> ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:device_tree_extractor"));
-            case PULVERIZER -> ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:machine_pulverizer"));
-            case SAWMILL -> ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:machine_sawmill"));
-            case SMELTER -> ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:machine_smelter"));
-            default -> Items.AIR;
-        };
+            case TREE_EXTRACTOR:
+                return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryCreate("thermal:device_tree_extractor"));
+            case PULVERIZER:
+                return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryCreate("thermal:machine_pulverizer"));
+            case SAWMILL:
+                return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryCreate("thermal:machine_sawmill"));
+            case SMELTER:
+                return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryCreate("thermal:machine_smelter"));
+            case INSOLATOR:
+                return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryCreate("thermal:machine_insolator"));
+            default:
+                return Items.AIR;
+        }
     }
 
     @Override
-    protected PairValue<Integer, Integer> getIconPos()
+    protected PairValues<Integer, Integer> getIconPos()
     {
-        return PairValue.create(this.leftPos + this.imageWidth / 2 - 8, this.topPos + this.imageHeight / 4 + 7);
+        return PairValues.create(this.leftPos + this.imageWidth / 2 - 8, this.topPos + this.imageHeight / 4 + 7);
     }
 }

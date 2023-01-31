@@ -1,24 +1,19 @@
 package fr.eno.craftcreator.container.utils;
 
-import fr.eno.craftcreator.kubejs.utils.SupportedMods;
-import fr.eno.craftcreator.tileentity.MultiScreenRecipeCreatorTile;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
+import fr.eno.craftcreator.recipes.utils.SupportedMods;
+import fr.eno.craftcreator.tileentity.utils.MultiScreenRecipeCreatorTile;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.network.PacketBuffer;
 
 public abstract class CommonContainer extends VanillaCommonContainer
 {
     protected final MultiScreenRecipeCreatorTile tile;
 
-    public CommonContainer(@Nullable MenuType<?> pMenuType, int pContainerId, Inventory inventory, FriendlyByteBuf packet)
+    public CommonContainer(ContainerType<?> pMenuType, int pContainerId, PlayerInventory inventory, PacketBuffer byteBuf)
     {
         super(pMenuType, pContainerId);
-        this.tile = (MultiScreenRecipeCreatorTile) inventory.player.level.getBlockEntity(packet.readBlockPos());
+        this.tile = (MultiScreenRecipeCreatorTile) inventory.player.world.getTileEntity(byteBuf.readBlockPos());
     }
 
     public abstract SupportedMods getMod();

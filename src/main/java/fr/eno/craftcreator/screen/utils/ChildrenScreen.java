@@ -1,21 +1,16 @@
 package fr.eno.craftcreator.screen.utils;
 
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.util.text.ITextComponent;
 
 public class ChildrenScreen extends ListScreen
 {
     private final Screen parent;
 
-    protected ChildrenScreen(Component titleIn, Screen parentIn)
+    protected ChildrenScreen(ITextComponent titleIn, Screen parentIn)
     {
         super(titleIn);
         this.parent = parentIn;
-    }
-
-    public void leaveGUI()
-    {
-        minecraft.setScreen(parent);
     }
 
     @Override
