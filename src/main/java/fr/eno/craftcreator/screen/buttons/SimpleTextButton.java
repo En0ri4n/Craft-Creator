@@ -1,57 +1,52 @@
 package fr.eno.craftcreator.screen.buttons;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import fr.eno.craftcreator.utils.GuiUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import fr.eno.craftcreator.api.ClientUtils;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.util.text.ITextComponent;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 public class SimpleTextButton extends Button
 {
-	private final Minecraft minecraft = Minecraft.getInstance();
-	private final List<Component> tooltips;
+	private final List<ITextComponent> tooltips;
 
-	public SimpleTextButton(Component content, int x, int y, int width, int height, net.minecraft.client.gui.components.Button.OnPress onPress)
+	public SimpleTextButton(ITextComponent content, int x, int y, int width, int height, IPressable onPress)
 	{
 		this(content, Collections.emptyList(), x, y, width, height, onPress);
 	}
 
-	public SimpleTextButton(Component content, List<Component> tooltips, int x, int y, int width, int height, net.minecraft.client.gui.components.Button.OnPress onPress)
+	public SimpleTextButton(ITextComponent content, List<ITextComponent> tooltips, int x, int y, int width, int height, IPressable onPress)
 	{
 		super(x, y, width, height, content, onPress);
 		this.tooltips = tooltips;
 	}
 
 	@Override
-	public void renderButton(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	public void renderWidget(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
-		Minecraft mc = Minecraft.getInstance();
-
 		if(this.visible && this.active)
 		{
-			boolean isHovered = GuiUtils.isMouseHover(this.x, this.y, mouseX, mouseY, this.width, this.height);
+			boolean isHovered = ClientUtils.isMouseHover(this.x, this.y, mouseX, mouseY, this.width, this.height);
 			int color = isHovered ? 0x00FF0050 : 0xFFFFFFFF;
 			Screen.fill(matrixStack, x, y, x + width, y + height, 0x777879FF);
 			Screen.fill(matrixStack, x + 1, y + 1, x + width - 1, y + height - 1, 0x00000000);
-			drawCenteredString(matrixStack, mc.font, this.getMessage().getString(), this.x + this.width / 2, this.y + height / 2 - mc.font.lineHeight / 2 + 1, color);
+			drawCenteredString(matrixStack, ClientUtils.getFont(), this.getMessage().getString(), this.x + this.width / 2, this.y + height / 2 - ClientUtils.getFont().FONT_HEIGHT / 2 + 1, color);
 		}
 	}
 
-	public void setContent(Component content)
+	public void setContent(ITextComponent content)
 	{
 		this.setMessage(content);
 	}
 
 	@Override
-	public void renderToolTip(PoseStack matrixStack, int mouseX, int mouseY)
+	public void renderToolTip(MatrixStack matrixStack, int mouseX, int mouseY)
 	{
-		if(!this.tooltips.isEmpty() && minecraft.screen != null)
-			minecraft.screen.renderTooltip(matrixStack, tooltips, Optional.empty(), mouseX, mouseY);
+		if(!this.tooltips.isEmpty() && ClientUtils.getCurrentScreen() != null)
+			ClientUtils.getCurrentScreen().func_243308_b(matrixStack, tooltips, mouseX, mouseY);
 	}
 }

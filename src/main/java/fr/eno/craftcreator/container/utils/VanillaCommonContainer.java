@@ -1,33 +1,33 @@
 package fr.eno.craftcreator.container.utils;
 
 import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.inventory.container.Slot;
+import net.minecraft.item.ItemStack;
 
-public abstract class VanillaCommonContainer extends AbstractContainerMenu
+//TODO: resolve shift-clicking items not working
+public abstract class VanillaCommonContainer extends Container
 {
-    public VanillaCommonContainer(@Nullable MenuType<?> pMenuType, int pContainerId)
+    public VanillaCommonContainer(ContainerType<?> pMenuType, int pContainerId)
     {
         super(pMenuType, pContainerId);
     }
 
     @Override
-    public boolean stillValid(Player pPlayer)
+    public boolean canInteractWith(PlayerEntity playerIn)
     {
         return true;
     }
 
-    protected void bindPlayerInventory(Inventory playerInventory)
+    protected void bindPlayerInventory(PlayerInventory playerInventory)
     {
         bindPlayerInventory(playerInventory, 0, 0);
     }
 
-    protected void bindPlayerInventory(Inventory playerInventory, int x, int y)
+    protected void bindPlayerInventory(PlayerInventory playerInventory, int x, int y)
     {
         for(int i = 0; i < 3; ++i)
         {
@@ -44,39 +44,43 @@ public abstract class VanillaCommonContainer extends AbstractContainerMenu
     }
 
     /**
-     * Vanilla only
+     * Active slots
+     * @param active if true, the slots will be activated
      */
     public void activeSlots(boolean active)
     {
-        for(Slot slot : slots)
-            if(slot instanceof SimpleSlotItemHandler slotItemHandler)
-                slotItemHandler.setActive(active);
+        for(Slot slot : inventorySlots)
+            if(slot instanceof SimpleSlotItemHandler)
+                ((SimpleSlotItemHandler) slot).setActive(active);
     }
 
+
+
     @Override
-    public ItemStack quickMoveStack(Player player, int index)
+    public ItemStack transferStackInSlot(PlayerEntity player, int index)
     {
-        var retStack = ItemStack.EMPTY;
-        final Slot slot = this.slots.get(index);
-        if(slot.hasItem())
+        int playerInvIndexStart = player.inventory.getSizeInventory();
+        ItemStack retStack = ItemStack.EMPTY;
+        final Slot slot = this.inventorySlots.get(index);
+        if(slot.getHasStack())
         {
-            final ItemStack stack = slot.getItem();
+            final ItemStack stack = slot.getStack();
             retStack = stack.copy();
 
-            final int size = this.slots.size() - player.getInventory().getContainerSize();
+            final int size = this.inventorySlots.size() - playerInvIndexStart;
             if(index < size)
             {
-                if(!moveItemStackTo(stack, 0, this.slots.size(), false)) return ItemStack.EMPTY;
+                if(!mergeItemStack(stack, size, this.inventorySlots.size(), false)) return ItemStack.EMPTY;
             }
-            else if(!moveItemStackTo(stack, 0, size, false)) return ItemStack.EMPTY;
+            else if(!mergeItemStack(stack, 0, size, false)) return ItemStack.EMPTY;
 
             if(stack.isEmpty() || stack.getCount() == 0)
             {
-                slot.set(ItemStack.EMPTY);
+                slot.putStack(ItemStack.EMPTY);
             }
             else
             {
-                slot.setChanged();
+                slot.onSlotChanged();
             }
 
             if(stack.getCount() == retStack.getCount()) return ItemStack.EMPTY;
@@ -84,6 +88,6 @@ public abstract class VanillaCommonContainer extends AbstractContainerMenu
             slot.onTake(player, stack);
         }
 
-        return super.quickMoveStack(player, index);
+        return retStack;
     }
 }

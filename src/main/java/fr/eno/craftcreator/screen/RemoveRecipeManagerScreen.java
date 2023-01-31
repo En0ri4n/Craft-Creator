@@ -1,11 +1,11 @@
 package fr.eno.craftcreator.screen;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.kubejs.jsserializers.ModRecipesJSSerializer;
-import fr.eno.craftcreator.kubejs.utils.ModDispatcher;
-import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
+import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.recipes.serializers.ModRecipesJSSerializer;
+import fr.eno.craftcreator.recipes.utils.ModRecipeCreatorDispatcher;
+import fr.eno.craftcreator.recipes.utils.RecipeFileUtils;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;
 import fr.eno.craftcreator.screen.buttons.SimpleCheckBox;
 import fr.eno.craftcreator.screen.utils.ChildrenScreen;
@@ -13,11 +13,11 @@ import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import fr.eno.craftcreator.screen.widgets.SimpleTextFieldWidget;
 import fr.eno.craftcreator.utils.EntryHelper;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
-import fr.eno.craftcreator.utils.Utilities;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.resources.ResourceLocation;
+import fr.eno.craftcreator.utils.Utils;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.StringTextComponent;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -34,11 +34,11 @@ public class RemoveRecipeManagerScreen extends ChildrenScreen
     private SimpleCheckBox hasTypeBox;
     private SimpleCheckBox hasIdBox;
 
-    private EditBox itemInputButton;
-    private EditBox itemOutputButton;
-    private EditBox modButton;
-    private EditBox typeButton;
-    private EditBox idButton;
+    private TextFieldWidget itemInputButton;
+    private TextFieldWidget itemOutputButton;
+    private TextFieldWidget modButton;
+    private TextFieldWidget typeButton;
+    private TextFieldWidget idButton;
 
     private final Map<ModRecipesJSSerializer.RecipeDescriptors, String> removeMap;
 
@@ -58,36 +58,21 @@ public class RemoveRecipeManagerScreen extends ChildrenScreen
         int space = 20;
         int size = 10;
 
-        this.addRenderableWidget(hasInputItemBox = new SimpleCheckBox(default_x, default_y + i++ * space, size, size, References.getTranslate("screen.remove_manager.button.has_input_item"), true));
-        this.addRenderableWidget(hasOutputItemBox = new SimpleCheckBox(default_x, default_y + i++ * space, size, size, References.getTranslate("screen.remove_manager.button.has_output_item"), false));
-        this.addRenderableWidget(hasModBox = new SimpleCheckBox(default_x, default_y + i++ * space, size, size, References.getTranslate("screen.remove_manager.button.has_mod"), false));
-        this.addRenderableWidget(hasTypeBox = new SimpleCheckBox(default_x, default_y + i++ * space, size, size, References.getTranslate("screen.remove_manager.button.has_type"), false));
-        this.addRenderableWidget(hasIdBox = new SimpleCheckBox(default_x, default_y + i * space, size, size, References.getTranslate("screen.remove_manager.button.has_id"), false));
+        this.addButton(hasInputItemBox = new SimpleCheckBox(default_x, default_y + i++ * space, size, size, References.getTranslate("screen.remove_manager.button.has_input_item"), true));
+        this.addButton(hasOutputItemBox = new SimpleCheckBox(default_x, default_y + i++ * space, size, size, References.getTranslate("screen.remove_manager.button.has_output_item"), false));
+        this.addButton(hasModBox = new SimpleCheckBox(default_x, default_y + i++ * space, size, size, References.getTranslate("screen.remove_manager.button.has_mod"), false));
+        this.addButton(hasTypeBox = new SimpleCheckBox(default_x, default_y + i++ * space, size, size, References.getTranslate("screen.remove_manager.button.has_type"), false));
+        this.addButton(hasIdBox = new SimpleCheckBox(default_x, default_y + i * space, size, size, References.getTranslate("screen.remove_manager.button.has_id"), false));
 
         i = 0;
-        this.addRenderableWidget(itemInputButton = new SimpleTextFieldWidget(new TextComponent(""), this.font, default_x * 5, default_y + i++ * space, this.width / 2, 15, (simpleEditBox) ->
-        {
-            this.updateList(ModRecipesJSSerializer.RecipeDescriptors.INPUT_ITEM, simpleEditBox.x, simpleEditBox.y, simpleEditBox, EntryHelper.getStringEntryListWith(EntryHelper.getItems()));
-        }));
-        this.addRenderableWidget(itemOutputButton = new SimpleTextFieldWidget(new TextComponent(""), this.font, default_x * 5, default_y + i++ * space, this.width / 2, 15, (simpleEditBox) ->
-        {
-            this.updateList(ModRecipesJSSerializer.RecipeDescriptors.OUTPUT_ITEM, simpleEditBox.x, simpleEditBox.y, simpleEditBox, EntryHelper.getStringEntryListWith(EntryHelper.getItems()));
-        }));
-        this.addRenderableWidget(modButton = new SimpleTextFieldWidget(new TextComponent(""), this.font, default_x * 5, default_y + i++ * space, this.width / 2, 15, (simpleEditBox) ->
-        {
-            this.updateList(ModRecipesJSSerializer.RecipeDescriptors.MOD_ID, simpleEditBox.x, simpleEditBox.y, simpleEditBox, EntryHelper.getStringEntryList(EntryHelper.getMods()));
-        }));
-        this.addRenderableWidget(typeButton = new SimpleTextFieldWidget(new TextComponent(""), this.font, default_x * 5, default_y + i++ * space, this.width / 2, 15, (simpleEditBox) ->
-        {
-            this.updateList(ModRecipesJSSerializer.RecipeDescriptors.RECIPE_TYPE, simpleEditBox.x, simpleEditBox.y, simpleEditBox, EntryHelper.getStringEntryListWith(EntryHelper.getRecipeTypes()));
-        }));
-        this.addRenderableWidget(idButton = new SimpleTextFieldWidget(new TextComponent(""), this.font, default_x * 5, default_y + i * space, this.width / 2, 15, (simpleEditBox) ->
-        {
-            this.updateList(ModRecipesJSSerializer.RecipeDescriptors.RECIPE_ID, simpleEditBox.x, simpleEditBox.y, simpleEditBox, EntryHelper.getStringEntryListWith(EntryHelper.getRecipeIds()));
-        }));
+        this.addButton(itemInputButton = new SimpleTextFieldWidget(new StringTextComponent(""), this.font, default_x * 5, default_y + i++ * space, this.width / 2, 15, (simpleEditBox) -> this.updateList(ModRecipesJSSerializer.RecipeDescriptors.INPUT_ITEM, simpleEditBox.x, simpleEditBox.y, simpleEditBox, EntryHelper.getStringEntryListWith(EntryHelper.getItems()))));
+        this.addButton(itemOutputButton = new SimpleTextFieldWidget(new StringTextComponent(""), this.font, default_x * 5, default_y + i++ * space, this.width / 2, 15, (simpleEditBox) -> this.updateList(ModRecipesJSSerializer.RecipeDescriptors.OUTPUT_ITEM, simpleEditBox.x, simpleEditBox.y, simpleEditBox, EntryHelper.getStringEntryListWith(EntryHelper.getItems()))));
+        this.addButton(modButton = new SimpleTextFieldWidget(new StringTextComponent(""), this.font, default_x * 5, default_y + i++ * space, this.width / 2, 15, (simpleEditBox) -> this.updateList(ModRecipesJSSerializer.RecipeDescriptors.MOD_ID, simpleEditBox.x, simpleEditBox.y, simpleEditBox, EntryHelper.getStringEntryList(EntryHelper.getMods()))));
+        this.addButton(typeButton = new SimpleTextFieldWidget(new StringTextComponent(""), this.font, default_x * 5, default_y + i++ * space, this.width / 2, 15, (simpleEditBox) -> this.updateList(ModRecipesJSSerializer.RecipeDescriptors.RECIPE_TYPE, simpleEditBox.x, simpleEditBox.y, simpleEditBox, EntryHelper.getStringEntryListWith(EntryHelper.getRecipeTypes()))));
+        this.addButton(idButton = new SimpleTextFieldWidget(new StringTextComponent(""), this.font, default_x * 5, default_y + i * space, this.width / 2, 15, (simpleEditBox) -> this.updateList(ModRecipesJSSerializer.RecipeDescriptors.RECIPE_ID, simpleEditBox.x, simpleEditBox.y, simpleEditBox, EntryHelper.getStringEntryListWith(EntryHelper.getRecipeIds()))));
 
-        this.addRenderableWidget(new SimpleButton(References.getTranslate("screen.remove_manager.button.remove"), this.width / 2 - 80, this.height - 50, 160, 20, (button) -> sendRemovedRecipe()));
-        this.addRenderableWidget(new SimpleButton(References.getTranslate("screen.remove_manager.button.back"), this.width - 97, this.height - 35, 80, 20, (button) -> this.minecraft.setScreen(new ModSelectionScreen())));
+        this.addButton(new SimpleButton(References.getTranslate("screen.remove_manager.button.remove"), this.width / 2 - 80, this.height - 50, 160, 20, (button) -> sendRemovedRecipe()));
+        this.addButton(new SimpleButton(References.getTranslate("screen.remove_manager.button.back"), this.width - 97, this.height - 35, 80, 20, (button) -> ClientUtils.openScreen(new ModSelectionScreen())));
 
         this.addList(new SimpleListWidget(minecraft, 200, 200, 100, 100, 15,  4, null));
         this.setEntries(0, Arrays.asList(new SimpleListWidget.StringEntry("test"), new SimpleListWidget.StringEntry("test2")));
@@ -98,19 +83,19 @@ public class RemoveRecipeManagerScreen extends ChildrenScreen
 
     private void sendRemovedRecipe()
     {
-        if(!hasInputItemBox.selected())
+        if(!hasInputItemBox.isChecked())
             this.removeMap.remove(ModRecipesJSSerializer.RecipeDescriptors.INPUT_ITEM);
-        if(!hasOutputItemBox.selected())
+        if(!hasOutputItemBox.isChecked())
             this.removeMap.remove(ModRecipesJSSerializer.RecipeDescriptors.OUTPUT_ITEM);
-        if(!hasModBox.selected())
+        if(!hasModBox.isChecked())
             this.removeMap.remove(ModRecipesJSSerializer.RecipeDescriptors.MOD_ID);
-        if(!hasTypeBox.selected())
+        if(!hasTypeBox.isChecked())
             this.removeMap.remove(ModRecipesJSSerializer.RecipeDescriptors.RECIPE_TYPE);
-        if(!hasIdBox.selected())
+        if(!hasIdBox.isChecked())
             this.removeMap.remove(ModRecipesJSSerializer.RecipeDescriptors.RECIPE_ID);
 
         if(!this.removeMap.isEmpty())
-            ModDispatcher.getSeralizer(getModId()).removeRecipe(new ModifiedRecipe(RecipeFileUtils.ModifiedRecipeType.REMOVED, removeMap));
+            ModRecipeCreatorDispatcher.getSeralizer(getModId()).removeRecipe(new ModifiedRecipe(RecipeFileUtils.ModifiedRecipeType.REMOVED, removeMap));
     }
 
     private String getModId()
@@ -119,7 +104,7 @@ public class RemoveRecipeManagerScreen extends ChildrenScreen
         {
             try
             {
-                ResourceLocation location = ResourceLocation.tryParse(entry.getValue());
+                ResourceLocation location = ResourceLocation.tryCreate(entry.getValue());
                 return location.getNamespace();
             }
             catch(Exception ignored)
@@ -139,18 +124,18 @@ public class RemoveRecipeManagerScreen extends ChildrenScreen
         this.getList(0).setOnSelectedChange((entry) ->
         {
             this.removeMap.put(removeTag, entry.toString());
-            textFieldWidget.setValue(entry.toString());
+            textFieldWidget.setText(entry.toString());
             this.getList(0).setVisible(false);
         });
 
-        this.setEntries(0, Utilities.copyPartialMatches(textFieldWidget.getValue(), entries));
+        this.setEntries(0, Utils.copyPartialMatches(textFieldWidget.getText(), entries));
     }
 
     @Override
-    public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         renderBackground(matrixStack);
-        RenderSystem.setShaderTexture(0, GUI_TEXTURE);
+        ClientUtils.bindTexture(GUI_TEXTURE);
 
         Screen.blit(matrixStack, 10, 10, this.width - 20, this.height - 20, 0, 0, 256, 256, 256, 256);
 
@@ -171,20 +156,20 @@ public class RemoveRecipeManagerScreen extends ChildrenScreen
 
     private void checkBoxes()
     {
-        if(this.itemInputButton.visible != this.hasInputItemBox.selected() ||
-                this.itemOutputButton.visible != this.hasOutputItemBox.selected() ||
-                this.modButton.visible != this.hasModBox.selected() ||
-                this.typeButton.visible != this.hasTypeBox.selected() ||
-                this.idButton.visible != this.hasIdBox.selected())
+        if(this.itemInputButton.visible != this.hasInputItemBox.isChecked() ||
+                this.itemOutputButton.visible != this.hasOutputItemBox.isChecked() ||
+                this.modButton.visible != this.hasModBox.isChecked() ||
+                this.typeButton.visible != this.hasTypeBox.isChecked() ||
+                this.idButton.visible != this.hasIdBox.isChecked())
         {
             this.getList(0).setVisible(false);
         }
         
-        this.itemInputButton.visible = this.hasInputItemBox.selected();
-        this.itemOutputButton.visible = this.hasOutputItemBox.selected();
-        this.modButton.visible = this.hasModBox.selected();
-        this.typeButton.visible = this.hasTypeBox.selected();
-        this.idButton.visible = this.hasIdBox.selected();
+        this.itemInputButton.visible = this.hasInputItemBox.isChecked();
+        this.itemOutputButton.visible = this.hasOutputItemBox.isChecked();
+        this.modButton.visible = this.hasModBox.isChecked();
+        this.typeButton.visible = this.hasTypeBox.isChecked();
+        this.idButton.visible = this.hasIdBox.isChecked();
     }
 
     @Override

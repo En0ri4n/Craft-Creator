@@ -1,7 +1,7 @@
 package fr.eno.craftcreator.kubejs;
 
-import fr.eno.craftcreator.kubejs.utils.SupportedMods;
-import net.minecraft.client.Minecraft;
+import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.recipes.utils.SupportedMods;
 
 import java.io.File;
 
@@ -37,7 +37,7 @@ public class KubeJSManager
     private File createKubeJSFolder()
     {
         check();
-        File folder = new File(Minecraft.getInstance().gameDirectory, "kubejs");
+        File folder = new File(ClientUtils.getMinecraft().gameDir, "kubejs");
 
         if(!folder.exists()) folder.mkdirs();
 
@@ -67,13 +67,7 @@ public class KubeJSManager
 
     private static void check()
     {
-        if(!isInitialized()) try
-        {
-            throw new Exception("The mod KubeJS is not installed !");
-        }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
+        if(!isInitialized())
+            throw new RuntimeException("The mod KubeJS is not installed! (if you're seeing this, this is a bug!)");
     }
 }

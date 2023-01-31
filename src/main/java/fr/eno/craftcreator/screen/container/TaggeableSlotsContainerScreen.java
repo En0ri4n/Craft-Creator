@@ -1,74 +1,132 @@
 package fr.eno.craftcreator.screen.container;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
+import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.container.slot.CustomSlotItemHandler;
 import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
 import fr.eno.craftcreator.init.InitPackets;
-import fr.eno.craftcreator.packets.GetTaggeableContainerRecipeCreatorTileInfosServerPacket;
-import fr.eno.craftcreator.packets.UpdateTaggeableContainerRecipeCreatorTilePacket;
-import fr.eno.craftcreator.tileentity.vanilla.TaggeableInventoryContainerTileEntity;
-import fr.eno.craftcreator.utils.GuiList;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.Slot;
+import fr.eno.craftcreator.packets.RetrieveRecipeCreatorTileDataServerPacket;
+import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataServerPacket;
+import fr.eno.craftcreator.screen.buttons.SimpleCheckBox;
+import fr.eno.craftcreator.screen.widgets.GuiList;
+import fr.eno.craftcreator.tileentity.utils.TaggeableInventoryContainerTileEntity;
+import fr.eno.craftcreator.utils.PositionnedSlot;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.Slot;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.items.SlotItemHandler;
-import net.minecraftforge.network.PacketDistributor;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-public abstract class TaggeableSlotsContainerScreen<T extends AbstractContainerMenu> extends AbstractContainerScreen<T>
+public abstract class TaggeableSlotsContainerScreen<T extends Container> extends ModRecipeCreatorDataScreen<T>
 {
-    private Map<SlotItemHandler, ResourceLocation> taggedSlots;
+    private final Map<SlotItemHandler, ResourceLocation> taggedSlots;
+    protected final List<Integer> nbtSlots;
+
     private GuiList<ResourceLocation> guiTagList;
+    private SimpleCheckBox nbtCheckBox;
     private SlotItemHandler selectedSlot;
     private final BlockPos pos;
 
-    public TaggeableSlotsContainerScreen(T screenContainer, Inventory inv, Component titleIn, BlockPos pos)
+    protected int leftPos;
+    protected int topPos;
+    protected int imageWidth;
+    protected int imageHeight;
+
+    public TaggeableSlotsContainerScreen(T screenContainer, PlayerInventory inv, ITextComponent titleIn, BlockPos pos)
     {
         super(screenContainer, inv, titleIn);
         this.taggedSlots = new HashMap<>();
+        this.nbtSlots = new ArrayList<>();
         this.pos = pos;
+        this.imageWidth = xSize;
+        this.imageHeight = ySize;
+    }
+
+    public TaggeableSlotsContainerScreen(T screenContainer, PlayerInventory inv, ITextComponent titleIn)
+    {
+        this(screenContainer, inv, titleIn, null);
     }
 
     @Override
     protected void init()
     {
         super.init();
-        InitPackets.getNetWork().send(PacketDistributor.SERVER.noArg(), new GetTaggeableContainerRecipeCreatorTileInfosServerPacket(this.pos, this.getMenu().containerId));
 
+        this.leftPos = guiLeft;
+        this.topPos = guiTop;
+
+        if(this.pos != null)
+        {
+            InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("tagged_slots", this.pos, InitPackets.PacketDataType.MAP_INT_STRING));
+            InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("nbt_slots", this.pos, InitPackets.PacketDataType.INT_ARRAY));
+        }
+
+        addListener(this.nbtCheckBox = new SimpleCheckBox(this.leftPos + 5, this.topPos + 5, 10, 10, References.getTranslate("screen.crafting.info.nbt"), false, checkBox ->
+        {
+            if(this.selectedSlot != null)
+            {
+                if(this.nbtSlots.contains(this.selectedSlot.getSlotIndex()))
+                    this.nbtSlots.removeIf(slotIndex -> slotIndex == this.selectedSlot.getSlotIndex());
+                else if(!this.nbtSlots.contains(this.selectedSlot.getSlotIndex()))
+                    this.nbtSlots.add(this.selectedSlot.getSlotIndex());
+            }
+        }));
         this.guiTagList = new GuiList<>(this.leftPos, this.topPos + 1, 18);
         this.selectedSlot = null;
     }
 
     @Override
-    public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void setData(String dataName, Object data)
+    {
+        if(dataName.equals("tagged_slots"))
+        {
+            setTaggedSlots((Map<Integer, ResourceLocation>) data);
+        }
+        else if(dataName.equals("nbt_slots"))
+        {
+            setNbtSlots((int[]) data);
+        }
+    }
+
+    @Override
+    public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         this.renderBackground(matrixStack);
 
         super.render(matrixStack, mouseX, mouseY, partialTicks);
 
         if(this.guiTagList.getKeys() != null) this.guiTagList.render(matrixStack, mouseX, mouseY);
+        if(this.selectedSlot != null) this.nbtCheckBox.render(matrixStack, mouseX, mouseY, partialTicks);
+
+        renderHoveredTooltip(matrixStack, mouseX, mouseY);
     }
 
     @Override
-    protected void renderLabels(PoseStack matrixStack, int pMouseX, int pMouseY)
+    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int pMouseX, int pMouseY)
     {
         if(Screen.hasShiftDown() || Screen.hasControlDown())
-            drawString(matrixStack, this.font, References.getTranslate("screen.crafting.info").getString(), 0, this.imageHeight, 0x707370);
+            drawString(matrixStack, this.font, References.getTranslate("screen.crafting.info.msg").getString(), 0, this.ySize, 0x707370);
     }
+
+    protected abstract List<PositionnedSlot> getTaggeableSlots();
 
     private void updateServerTileData()
     {
-        InitPackets.getNetWork().send(PacketDistributor.SERVER.noArg(), new UpdateTaggeableContainerRecipeCreatorTilePacket(this.pos, getTagged(this.taggedSlots)));
+        if(this.pos != null)
+        {
+            InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("tagged_slots", this.pos, InitPackets.PacketDataType.MAP_INT_STRING, getTagged(this.taggedSlots)));
+            InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("nbt_slots", this.pos, InitPackets.PacketDataType.INT_ARRAY, getNbtSlots(this.nbtSlots)));
+        }
     }
 
     private Map<Integer, ResourceLocation> getTagged(Map<SlotItemHandler, ResourceLocation> taggedSlots)
@@ -86,7 +144,7 @@ public abstract class TaggeableSlotsContainerScreen<T extends AbstractContainerM
     {
         Slot slot = this.getSelectedSlot(mouseX, mouseY);
 
-        if(slot instanceof SlotItemHandler && slot.getSlotIndex() != 9)
+        if(slot instanceof CustomSlotItemHandler && PositionnedSlot.contains(this.getTaggeableSlots(), slot.getSlotIndex()))
         {
             boolean checkInventory = ((SlotItemHandler) slot).getItemHandler() instanceof TaggeableInventoryContainerTileEntity;
 
@@ -95,7 +153,7 @@ public abstract class TaggeableSlotsContainerScreen<T extends AbstractContainerM
                 this.guiTagList.setKeys(null);
                 this.selectedSlot = null;
                 this.taggedSlots.remove(slot);
-                updateServerTileData();
+                if(this.nbtSlots.contains(slot.getSlotIndex())) this.nbtSlots.removeIf(slotIndex -> slotIndex == slot.getSlotIndex());
                 return super.mouseClicked(mouseX, mouseY, button);
             }
 
@@ -103,25 +161,28 @@ public abstract class TaggeableSlotsContainerScreen<T extends AbstractContainerM
             this.guiTagList.setSelectedKey(null);
             this.selectedSlot = null;
 
-            if(checkInventory && Screen.hasControlDown() && slot.getItem().getTags().findAny().isPresent())
+            if(checkInventory && Screen.hasControlDown() && slot.getStack().getItem().getTags().stream().findFirst().isPresent())
             {
                 this.selectedSlot = (SlotItemHandler) slot;
-                this.guiTagList.setKeys(slot.getItem().getTags().map(TagKey::location).collect(Collectors.toList()));
+                this.guiTagList.setKeys(new ArrayList<>(slot.getStack().getItem().getTags()));
+                this.nbtCheckBox.setSelected(this.nbtSlots.contains(slot.getSlotIndex()));
 
                 if(this.taggedSlots.containsKey(this.selectedSlot))
                     this.guiTagList.setSelectedKey(this.taggedSlots.get(this.selectedSlot));
 
-                updateServerTileData();
                 return true;
             }
-            else if(checkInventory && Screen.hasControlDown() && slot.getItem().getTags().findAny().isPresent())
+            else if(checkInventory && Screen.hasControlDown() && slot.getHasStack())
             {
-                this.guiTagList.setKeys(null);
-                this.guiTagList.setSelectedKey(null);
-                this.selectedSlot = null;
-                updateServerTileData();
+                this.selectedSlot = (SlotItemHandler) slot;
+                this.nbtCheckBox.setSelected(this.nbtSlots.contains(slot.getSlotIndex()));
                 return true;
             }
+        }
+
+        if(nbtCheckBox.mouseClicked(mouseX, mouseY, button))
+        {
+            return true;
         }
 
         this.guiTagList.mouseClicked((int) mouseX, (int) mouseY, resourceLocation ->
@@ -129,12 +190,10 @@ public abstract class TaggeableSlotsContainerScreen<T extends AbstractContainerM
             if(resourceLocation == null)
             {
                 this.taggedSlots.remove(this.selectedSlot);
-                updateServerTileData();
                 return;
             }
 
             this.taggedSlots.put(this.selectedSlot, resourceLocation);
-            updateServerTileData();
         });
 
         this.guiTagList.setKeys(null);
@@ -145,11 +204,11 @@ public abstract class TaggeableSlotsContainerScreen<T extends AbstractContainerM
 
     private Slot getSelectedSlot(double mouseX, double mouseY)
     {
-        for(int i = 0; i < this.getMenu().slots.size(); ++i)
+        for(int i = 0; i < this.getContainer().inventorySlots.size(); ++i)
         {
-            Slot slot = this.getMenu().slots.get(i);
+            Slot slot = this.getContainer().inventorySlots.get(i);
 
-            if(this.isSlotSelected(slot, mouseX, mouseY) && slot.isActive())
+            if(this.isSlotSelected(slot, mouseX, mouseY) && slot.isEnabled())
             {
                 return slot;
             }
@@ -160,19 +219,27 @@ public abstract class TaggeableSlotsContainerScreen<T extends AbstractContainerM
 
     private boolean isSlotSelected(Slot slotIn, double mouseX, double mouseY)
     {
-        return this.isHovering(slotIn.x, slotIn.y, 16, 16, mouseX, mouseY);
+        int x = this.leftPos;
+        int y = this.topPos;
+
+        return ClientUtils.isMouseHover(x + slotIn.xPos, y + slotIn.yPos, (int) mouseX, (int) mouseY, 16, 16);
     }
 
     public void setTaggedSlots(Map<Integer, ResourceLocation> taggedSlots)
     {
-        Map<SlotItemHandler, ResourceLocation> taggedSlots1 = new HashMap<>();
-
         for(Integer integer : taggedSlots.keySet())
         {
-            taggedSlots1.put((SlotItemHandler) this.getMenu().getSlot(integer), taggedSlots.get(integer));
+            this.taggedSlots.put((SlotItemHandler) this.getContainer().getSlot(integer), taggedSlots.get(integer));
         }
+    }
 
-        this.taggedSlots = taggedSlots1;
+    private void setNbtSlots(int[] data)
+    {
+        this.nbtSlots.clear();
+        for(int i : data)
+        {
+            this.nbtSlots.add(i);
+        }
     }
 
     public Map<SlotItemHandler, ResourceLocation> getTaggedSlots()
@@ -181,25 +248,48 @@ public abstract class TaggeableSlotsContainerScreen<T extends AbstractContainerM
     }
 
     @Override
-    public void renderBackground(PoseStack pPoseStack)
+    protected void renderHoveredTooltip(MatrixStack poseStack, int mouseX, int mouseY)
+    {
+        super.renderHoveredTooltip(poseStack, mouseX, mouseY);
+
+        if(this.selectedSlot != null)
+        {
+            this.nbtCheckBox.renderToolTip(poseStack, mouseX, mouseY);
+        }
+
+        int x = this.leftPos;
+        int y = this.topPos;
+
+        for(Slot slot : this.getContainer().inventorySlots)
+        {
+            if(slot instanceof SimpleSlotItemHandler)
+            {
+                SimpleSlotItemHandler simpleSlotItemHandler = (SimpleSlotItemHandler) slot;
+                if(simpleSlotItemHandler.isEnabled() && this.taggedSlots.containsKey(simpleSlotItemHandler) && this.nbtSlots.contains(simpleSlotItemHandler.getSlotIndex()))
+                {
+                    fill(poseStack, x + slot.xPos, y + slot.yPos, x + slot.xPos + 16, y + slot.yPos + 16, 0x8000FFFF);
+                }
+                else if(simpleSlotItemHandler.isEnabled() && this.taggedSlots.containsKey(simpleSlotItemHandler))
+                    fill(poseStack, x + slot.xPos, y + slot.yPos, x + slot.xPos + 16, y + slot.yPos + 16, 0x8000FF00);
+                else if(simpleSlotItemHandler.isEnabled() && this.nbtSlots.contains(simpleSlotItemHandler.getSlotIndex()))
+                    fill(poseStack, x + slot.xPos, y + slot.yPos, x + slot.xPos + 16, y + slot.yPos + 16, 0x800000FF);
+            }
+        }
+
+        if(this.selectedSlot != null)
+            fill(poseStack, x + selectedSlot.xPos, y + selectedSlot.yPos, x + selectedSlot.xPos + 16, y + selectedSlot.yPos + 16, 0xFFE7f50d);
+
+    }
+
+    @Override
+    public void renderBackground(MatrixStack pPoseStack)
     {
         super.renderBackground(pPoseStack);
     }
 
     @Override
-    protected void renderBg(PoseStack matrixStack, float pPartialTick, int pMouseX, int pMouseY)
+    public void renderBackground(MatrixStack matrixStack, int offset)
     {
-        int x = this.leftPos;
-        int y = this.topPos;
-
-        for(Slot slot : this.taggedSlots.keySet())
-        {
-            if(slot instanceof SimpleSlotItemHandler simpleSlotItemHandler && simpleSlotItemHandler.isActive())
-                fill(matrixStack, x + slot.x, y + slot.y, x + slot.x + 16, y + slot.y + 16, 0x8006e806);
-        }
-
-        if(this.selectedSlot != null)
-            fill(matrixStack, x + selectedSlot.x, y + selectedSlot.y, x + selectedSlot.x + 16, y + selectedSlot.y + 16, 0xFFE7f50d);
     }
 
     @Override
@@ -207,5 +297,15 @@ public abstract class TaggeableSlotsContainerScreen<T extends AbstractContainerM
     {
         updateServerTileData();
         super.onClose();
+    }
+
+    protected int[] getNbtSlots(List<Integer> nbtSlots)
+    {
+        int[] slots = new int[nbtSlots.size()];
+        for(int i = 0; i < nbtSlots.size(); i++)
+        {
+            slots[i] = nbtSlots.get(i);
+        }
+        return slots;
     }
 }

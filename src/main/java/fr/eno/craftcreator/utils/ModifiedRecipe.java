@@ -1,11 +1,14 @@
 package fr.eno.craftcreator.utils;
 
-import fr.eno.craftcreator.kubejs.jsserializers.ModRecipesJSSerializer;
-import fr.eno.craftcreator.kubejs.utils.RecipeFileUtils;
+import fr.eno.craftcreator.recipes.serializers.ModRecipesJSSerializer;
+import fr.eno.craftcreator.recipes.utils.RecipeFileUtils;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.crafting.IRecipe;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public class ModifiedRecipe
 {
     private final RecipeFileUtils.ModifiedRecipeType type;
@@ -38,7 +41,6 @@ public class ModifiedRecipe
         return recipeDescriptors.get(ModRecipesJSSerializer.RecipeDescriptors.MOD_ID);
     }
 
-
     public String getRecipeType()
     {
         return recipeDescriptors.get(ModRecipesJSSerializer.RecipeDescriptors.RECIPE_TYPE);
@@ -47,6 +49,11 @@ public class ModifiedRecipe
     public String getRecipeId()
     {
         return recipeDescriptors.get(ModRecipesJSSerializer.RecipeDescriptors.RECIPE_ID);
+    }
+
+    public <C extends IInventory> IRecipe<C> getRecipeIfExists()
+    {
+        return null;
     }
 
     public void setDescriptor(ModRecipesJSSerializer.RecipeDescriptors descriptor, String value)

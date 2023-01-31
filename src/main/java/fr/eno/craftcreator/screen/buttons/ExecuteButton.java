@@ -1,32 +1,29 @@
 package fr.eno.craftcreator.screen.buttons;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.resources.ResourceLocation;
+import fr.eno.craftcreator.api.ClientUtils;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.StringTextComponent;
 
 public class ExecuteButton extends Button
 {
 	private static final ResourceLocation TEXTURE = References.getLoc("textures/gui/buttons/arrow_button.png");
 
-	public ExecuteButton(int x, int y, int width, OnPress onPress)
+	public ExecuteButton(int x, int y, int width, IPressable onPress)
 	{
-		super(x, y, width, 20, new TextComponent(""), onPress);
+		super(x, y, width, 20, new StringTextComponent(""), onPress);
 	}
 
 	@Override
-	public void renderButton(PoseStack pPoseStack, int mouseX, int mouseY, float partialTick)
+	public void renderWidget(MatrixStack pPoseStack, int mouseX, int mouseY, float partialTick)
 	{
-		Minecraft mc = Minecraft.getInstance();
-
 		if(this.visible)
 		{
 			int yOffset = 0;
-			RenderSystem.setShaderTexture(0, TEXTURE);
+			ClientUtils.bindTexture(TEXTURE);
 			
 			if(active)
 			{

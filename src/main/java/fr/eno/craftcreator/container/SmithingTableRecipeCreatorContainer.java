@@ -1,26 +1,32 @@
 package fr.eno.craftcreator.container;
 
 import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
-import fr.eno.craftcreator.container.utils.VanillaCommonContainer;
+import fr.eno.craftcreator.container.utils.CommonContainer;
 import fr.eno.craftcreator.init.InitContainers;
-import fr.eno.craftcreator.tileentity.vanilla.SmithingTableRecipeCreatorTile;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.entity.player.Inventory;
+import fr.eno.craftcreator.recipes.utils.SupportedMods;
+import fr.eno.craftcreator.utils.SlotHelper;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.network.PacketBuffer;
 
-public class SmithingTableRecipeCreatorContainer extends VanillaCommonContainer
+public class SmithingTableRecipeCreatorContainer extends CommonContainer
 {
-	public SmithingTableRecipeCreatorContainer(int windowId, Inventory playerInventory, FriendlyByteBuf packet)
+	public SmithingTableRecipeCreatorContainer(int windowId, PlayerInventory playerInventory, PacketBuffer packet)
 	{
-		super(InitContainers.SMITHING_TABLE_RECIPE_CREATOR.get(), windowId);
-		SmithingTableRecipeCreatorTile tile = (SmithingTableRecipeCreatorTile) playerInventory.player.level.getBlockEntity(packet.readBlockPos());
-		int index = 0;
+		super(InitContainers.SMITHING_TABLE_RECIPE_CREATOR.get(), windowId, playerInventory, packet);
 
-		this.addSlot(new SimpleSlotItemHandler(tile, index++, 27, 47));
-		this.addSlot(new SimpleSlotItemHandler(tile, index++, 76, 47));
-		this.addSlot(new SimpleSlotItemHandler(tile, index, 134, 47));
-		
+		for(int i = 0; i < SlotHelper.SMITHING_TABLE_SLOTS_SIZE; i++)
+		{
+			this.addSlot(new SimpleSlotItemHandler(this.tile, i, SlotHelper.SMITHING_TABLE_SLOTS.get(i).getxPos(), SlotHelper.SMITHING_TABLE_SLOTS.get(i).getyPos()));
+		}
+
 		this.bindPlayerInventory(playerInventory);
 
 		activeSlots(true);
+	}
+
+	@Override
+	public SupportedMods getMod()
+	{
+		return SupportedMods.MINECRAFT;
 	}
 }

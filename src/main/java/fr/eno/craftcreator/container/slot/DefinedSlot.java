@@ -1,8 +1,7 @@
 package fr.eno.craftcreator.container.slot;
 
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Predicate;
 
@@ -17,7 +16,7 @@ public class DefinedSlot extends SimpleSlotItemHandler
     }
 
     @Override
-    public boolean mayPlace(@NotNull ItemStack stack)
+    protected boolean canPlace(ItemStack stack)
     {
         return isItemValid.test(stack);
     }

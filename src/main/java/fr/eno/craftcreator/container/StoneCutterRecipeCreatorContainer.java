@@ -2,26 +2,31 @@ package fr.eno.craftcreator.container;
 
 import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
 import fr.eno.craftcreator.container.utils.CommonContainer;
-import fr.eno.craftcreator.container.utils.VanillaCommonContainer;
 import fr.eno.craftcreator.init.InitContainers;
-import fr.eno.craftcreator.kubejs.utils.SupportedMods;
-import fr.eno.craftcreator.tileentity.vanilla.StoneCutterRecipeCreatorTile;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.entity.player.Inventory;
+import fr.eno.craftcreator.recipes.utils.SupportedMods;
+import fr.eno.craftcreator.utils.SlotHelper;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.network.PacketBuffer;
 
-public class StoneCutterRecipeCreatorContainer extends VanillaCommonContainer
+public class StoneCutterRecipeCreatorContainer extends CommonContainer
 {
-	public StoneCutterRecipeCreatorContainer(int windowId, Inventory playerInventory, FriendlyByteBuf packet)
+	public StoneCutterRecipeCreatorContainer(int windowId, PlayerInventory playerInventory, PacketBuffer packet)
 	{
-		super(InitContainers.STONE_CUTTER_RECIPE_CREATOR.get(), windowId);
-		StoneCutterRecipeCreatorTile tile = (StoneCutterRecipeCreatorTile) playerInventory.player.level.getBlockEntity(packet.readBlockPos());
-		int index = 0;
+		super(InitContainers.STONE_CUTTER_RECIPE_CREATOR.get(), windowId, playerInventory, packet);
 
-		this.addSlot(new SimpleSlotItemHandler(tile, index++, 39, 33));
-		this.addSlot(new SimpleSlotItemHandler(tile, index, 114, 33));
-		
+		for(int i = 0; i < SlotHelper.STONECUTTER_SLOTS_SIZE; i++)
+		{
+			this.addSlot(new SimpleSlotItemHandler(this.tile, i, SlotHelper.STONECUTTER_SLOTS.get(i).getxPos(), SlotHelper.STONECUTTER_SLOTS.get(i).getyPos()));
+		}
+
 		this.bindPlayerInventory(playerInventory);
 
 		activeSlots(true);
+	}
+
+	@Override
+	public SupportedMods getMod()
+	{
+		return SupportedMods.MINECRAFT;
 	}
 }

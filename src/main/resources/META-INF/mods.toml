@@ -1,28 +1,30 @@
-modLoader="javafml" #mandatory
-loaderVersion="[40,)" #mandatory This is typically bumped every Minecraft version by Forge. See our download page for lists of versions.
-license="All rights reserved"
-issueTrackerURL="http://my.issue.tracker/" #optional
-[[mods]] #mandatory
-modId="craftcreator" #mandatory
-version="1.0.0" #mandatory
-displayName="Craft Creator" #mandatory
-updateJSONURL="http://myurl.me/" #optional
-displayURL="http://example.com/" #optional
-logoFile="logo.png" #optional
-credits="Thanks to MFF" #optional
-authors="En0ri4n" #optional
+modLoader="javafml"
+loaderVersion="[36,)"
+license="CC BY-SA"
+issueTrackerURL="https://github.com/En0ri4n/Craft-Creator/issues"
+
+[[mods]]
+modId="craftcreator"
+version="1.0.0"
+displayName="Craft Creator"
+#updateJSONURL="http://myurl.me/"
+#displayURL="http://example.com/"
+logoFile="logo.png"
+credits="Thanks to MFF, and others supports"
+authors="En0ri4n (Enooow#4595 on Discord!)"
 description='''
-This is a long form description of the mod. You can write whatever you want here
-
-Have some lorem ipsum.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed mollis lacinia magna. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed sagittis luctus odio eu tempus. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque volutpat ligula eget lacus auctor sagittis. In hac habitasse platea dictumst. Nunc gravida elit vitae sem vehicula efficitur. Donec mattis ipsum et arcu lobortis, eleifend sagittis sem rutrum. Cras pharetra quam eget posuere fermentum. Sed id tincidunt justo. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+Craft Creator is a mod that allows you to create your own crafts in Minecraft! (with kubeJS system or just datapacks)
 '''
-# A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
-# Here's another dependency
 [[dependencies.craftcreator]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.18.2]"
+    versionRange="[1.16.5]"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.craftcreator]]
+    modId="forge"
+    mandatory=true
+    versionRange="[36,)"
     ordering="NONE"
     side="BOTH"
