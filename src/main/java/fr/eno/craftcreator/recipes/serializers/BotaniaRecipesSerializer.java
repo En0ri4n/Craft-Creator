@@ -174,7 +174,7 @@ public class BotaniaRecipesSerializer extends ModRecipesJSSerializer
         }
 
         if(outputIngredients.isEmpty())
-            outputIngredients.addIngredient(new CraftIngredients.ItemIngredient(recipe.getRecipeOutput().getItem().getRegistryName(), recipe.getRecipeOutput().getCount()));
+            outputIngredients.addIngredient(new CraftIngredients.ItemIngredient(recipe.getResultItem().getItem().getRegistryName(), recipe.getResultItem().getCount()));
 
         return outputIngredients;
     }

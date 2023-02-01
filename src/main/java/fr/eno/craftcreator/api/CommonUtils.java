@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 
 public class CommonUtils
 {
-    public static final Predicate<RenderType> DEFAULT_ITEMBLOCK_RENDER = (r) -> r == RenderType.getCutout();
+    public static final Predicate<RenderType> DEFAULT_ITEMBLOCK_RENDER = (r) -> r == RenderType.cutout();
 
     public static void setItemBlockRender(Block block, Predicate<RenderType> render)
     {

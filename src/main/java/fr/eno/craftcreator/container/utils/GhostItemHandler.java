@@ -35,7 +35,7 @@ public class GhostItemHandler implements IItemHandler
     @Override
     public ItemStack extractItem(int slot, int amount, boolean simulate)
     {
-        return ItemStackHelper.getAndSplit(this.ghostSlots, slot, amount);
+        return ItemStackHelper.removeItem(this.ghostSlots, slot, amount);
     }
 
     @Override

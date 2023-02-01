@@ -24,7 +24,7 @@ public class BooleanButton extends Button
 	}
 
 	@Override
-	public void renderWidget(MatrixStack pPoseStack, int mouseX, int mouseY, float pPartialTick)
+	public void renderButton(MatrixStack pPoseStack, int mouseX, int mouseY, float pPartialTick)
 	{
 		if(this.visible)
 		{

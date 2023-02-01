@@ -31,6 +31,6 @@ public class SmithingTableRecipeCreatorTile extends MultiScreenRecipeCreatorTile
 	@Override
 	public Container createMenu(int id, @Nonnull PlayerInventory playerInventory, @Nonnull PlayerEntity player)
 	{
-		return new SmithingTableRecipeCreatorContainer(id, playerInventory, new PacketBuffer(Unpooled.buffer()).writeBlockPos(getPos()));
+		return new SmithingTableRecipeCreatorContainer(id, playerInventory, new PacketBuffer(Unpooled.buffer()).writeBlockPos(getBlockPos()));
 	}
 }

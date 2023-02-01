@@ -10,12 +10,9 @@ public class KubeJSManager
     private static boolean initialized = false;
     private static KubeJSManager INSTANCE;
 
-    private final File kubeJSFolder;
-
     private KubeJSManager()
     {
         INSTANCE = this;
-        kubeJSFolder = createKubeJSFolder();
     }
 
     public File getKubeJSRecipesFolder()
@@ -31,13 +28,13 @@ public class KubeJSManager
     public File getKubeJSFolder()
     {
         check();
-        return kubeJSFolder;
+        return createKubeJSFolder();
     }
 
     private File createKubeJSFolder()
     {
         check();
-        File folder = new File(ClientUtils.getMinecraft().gameDir, "kubejs");
+        final File folder = new File(ClientUtils.getMinecraft().gameDirectory, "kubejs");
 
         if(!folder.exists()) folder.mkdirs();
 

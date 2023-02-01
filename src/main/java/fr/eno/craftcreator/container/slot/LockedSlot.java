@@ -24,7 +24,7 @@ public class LockedSlot extends SimpleSlotItemHandler
 
 	@Nonnull
 	@Override
-	public ItemStack getStack()
+	public ItemStack getItem()
 	{
 		return this.lockedStack;
 	}

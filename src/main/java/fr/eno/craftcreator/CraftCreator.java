@@ -74,7 +74,7 @@ public class CraftCreator
     @SubscribeEvent
     public void onServerStart(FMLServerStartedEvent event)
     {
-        event.getServer().getWorlds().forEach(EntryHelper::init);
+        event.getServer().getAllLevels().forEach(EntryHelper::init);
     }
 
     @SubscribeEvent
@@ -86,7 +86,7 @@ public class CraftCreator
     public static final ItemGroup CRAFT_CREATOR_TAB = new ItemGroup(References.MOD_ID)
     {
         @Override
-        public ItemStack createIcon()
+        public ItemStack makeIcon()
         {
             return new ItemStack(InitItems.CRAFTING_TABLE_RECIPE_CREATOR.get());
         }

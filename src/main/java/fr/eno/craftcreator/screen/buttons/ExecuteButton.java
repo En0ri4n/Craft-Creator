@@ -18,7 +18,7 @@ public class ExecuteButton extends Button
 	}
 
 	@Override
-	public void renderWidget(MatrixStack pPoseStack, int mouseX, int mouseY, float partialTick)
+	public void renderButton(MatrixStack pPoseStack, int mouseX, int mouseY, float partialTick)
 	{
 		if(this.visible)
 		{

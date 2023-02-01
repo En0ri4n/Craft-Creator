@@ -42,8 +42,8 @@ public class MinecraftRecipeManager extends BaseRecipesManager
 
     private void createFurnaceRecipe(ModRecipeCreator recipe, List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, double experience, int cookingTime, boolean isKubeJSRecipe)
     {
-        ResourceLocation input = slots.get(0).getStack().getItem().getRegistryName();
-        Item output = slots.get(1).getStack().getItem();
+        ResourceLocation input = slots.get(0).getItem().getItem().getRegistryName();
+        Item output = slots.get(1).getItem().getItem();
 
         if(taggedSlots.size() > 0 && taggedSlots.get(0) != null)
             input = taggedSlots.get(0);
@@ -53,24 +53,24 @@ public class MinecraftRecipeManager extends BaseRecipesManager
 
     public void createSmithingTableRecipe(List<Slot> inventory, boolean isKubeJSRecipe)
     {
-        ResourceLocation base = inventory.get(0).getStack().getItem().getRegistryName();
-        ResourceLocation addition = inventory.get(1).getStack().getItem().getRegistryName();
-        Item output = inventory.get(2).getStack().getItem();
+        ResourceLocation base = inventory.get(0).getItem().getItem().getRegistryName();
+        ResourceLocation addition = inventory.get(1).getItem().getItem().getRegistryName();
+        Item output = inventory.get(2).getItem().getItem();
 
         MinecraftRecipeSerializer.get().serializeSmithingRecipe(base, addition, output.getRegistryName(), isKubeJSRecipe);
     }
 
     public void createStoneCutterRecipe(List<Slot> inventory, boolean isKubeJSRecipe)
     {
-        Item input = inventory.get(0).getStack().getItem();
-        ItemStack output = inventory.get(1).getStack();
+        Item input = inventory.get(0).getItem().getItem();
+        ItemStack output = inventory.get(1).getItem();
 
         MinecraftRecipeSerializer.get().serializeStoneCutterRecipe(input.getRegistryName(), output.getItem().getRegistryName(), output.getCount(), isKubeJSRecipe);
     }
 
     public void createCraftingTableRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, List<Integer> nbtSlots, boolean shaped, boolean isKubeJSRecipe)
     {
-        ItemStack output = slots.get(9).getStack();
+        ItemStack output = slots.get(9).getItem();
 
         MinecraftRecipeSerializer.get().serializeCraftingTableRecipe(output, slots, taggedSlots, nbtSlots, shaped, isKubeJSRecipe);
     }

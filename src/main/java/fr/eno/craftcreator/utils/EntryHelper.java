@@ -52,7 +52,7 @@ public class EntryHelper
         if(recipeIds.isEmpty()) Registry.RECIPE_TYPE.stream().collect(Collectors.toList()).forEach(recipeType ->
         {
             IRecipeType<T> recipeType1 = (IRecipeType<T>) recipeType;
-            world.getRecipeManager().getRecipesForType(recipeType1).forEach(recipe ->
+            world.getRecipeManager().getAllRecipesFor(recipeType1).forEach(recipe ->
             {
                 if(!recipe.getId().toString().contains("kjs")) recipeIds.add(recipe.getId());
             });

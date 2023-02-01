@@ -1,5 +1,6 @@
 package fr.eno.craftcreator.recipes.utils;
 
+import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import net.minecraft.inventory.IInventory;
@@ -21,19 +22,25 @@ public class ListEntriesHelper
     {
         List<T> entries = new ArrayList<>();
 
-        Stream.of(mods).forEach(mod -> entries.add((T) new SimpleListWidget.StringEntry(mod.getModId())));
+        Stream.of(mods).filter(mod -> SupportedMods.isModLoaded(mod.getModId())).forEach(mod -> entries.add((T) new SimpleListWidget.StringEntry(mod.getModId())));
 
         return entries;
     }
 
-    public static <T extends SimpleListWidget.Entry> List<T> getAddedRecipesEntryList(String modId, ResourceLocation recipeTypeLoc)
+    public static <C extends IInventory, R extends IRecipe<C>, T extends SimpleListWidget.Entry> List<T> getAddedRecipesEntryList(String modId, ResourceLocation recipeTypeLoc)
     {
-        IRecipeType<? extends IRecipe<?>> recipeType = RecipeFileUtils.byName(recipeTypeLoc);
+        IRecipeType<R> recipeType = RecipeFileUtils.byName(recipeTypeLoc);
 
         List<T> entries = new ArrayList<>();
 
-        RecipeFileUtils.getAddedRecipesFor(modId, recipeType).forEach(recipe ->
-                entries.add((T) new SimpleListWidget.RecipeEntry(recipe)));
+        if(!SupportedMods.isKubeJSLoaded())
+        {
+            ClientUtils.getClientLevel().getRecipeManager().getAllRecipesFor(recipeType).stream().filter(recipe -> recipe.getId().getNamespace().equals(References.MOD_ID)).forEach(recipe -> entries.add((T) new SimpleListWidget.RecipeEntry(recipe)));
+        }
+        else
+        {
+            RecipeFileUtils.getAddedRecipesFor(modId, recipeType).forEach(recipe -> entries.add((T) new SimpleListWidget.RecipeEntry(recipe)));
+        }
 
         return entries;
     }
@@ -42,8 +49,9 @@ public class ListEntriesHelper
     {
         List<T> entries = new ArrayList<>();
 
-        RecipeFileUtils.getModifiedRecipesFor().forEach(modifiedRecipe ->
-                entries.add((T) new SimpleListWidget.ModifiedRecipeEntry(modifiedRecipe)));
+        if(!SupportedMods.isKubeJSLoaded()) return entries;
+
+        RecipeFileUtils.getModifiedRecipesFor().forEach(modifiedRecipe -> entries.add((T) new SimpleListWidget.ModifiedRecipeEntry(modifiedRecipe)));
 
         return entries;
     }
@@ -52,8 +60,7 @@ public class ListEntriesHelper
     {
         List<T> entries = new ArrayList<>();
 
-        Registry.RECIPE_TYPE.stream().filter(type -> RecipeFileUtils.getName(type).getNamespace().equals(modId))
-                .forEach(type -> entries.add((T) new SimpleListWidget.StringEntry(RecipeFileUtils.getName(type).toString())));
+        Registry.RECIPE_TYPE.stream().filter(type -> RecipeFileUtils.getName(type).getNamespace().equals(modId)).forEach(type -> entries.add((T) new SimpleListWidget.StringEntry(RecipeFileUtils.getName(type).toString())));
 
         return entries;
     }
@@ -64,12 +71,10 @@ public class ListEntriesHelper
 
         List<E> entries = new ArrayList<>();
 
-        ClientUtils.getClientLevel().getRecipeManager().getRecipesForType(recipeType)
-                .forEach(recipe ->
-                {
-                    if(!recipe.getId().toString().contains("kjs"))
-                        entries.add((E) new SimpleListWidget.RecipeEntry(recipe));
-                });
+        ClientUtils.getClientLevel().getRecipeManager().getAllRecipesFor(recipeType).forEach(recipe ->
+        {
+            if(!recipe.getId().toString().contains("kjs")) entries.add((E) new SimpleListWidget.RecipeEntry(recipe));
+        });
 
         return entries.stream().sorted(Comparator.comparing(object -> ((SimpleListWidget.RecipeEntry) object).getRecipe().getId().toString())).collect(Collectors.toList());
     }

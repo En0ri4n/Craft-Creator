@@ -26,7 +26,7 @@ public class CraftingTableRecipeCreatorScreen extends MultiScreenModRecipeCreato
 
     public CraftingTableRecipeCreatorScreen(CraftingTableRecipeCreatorContainer screenContainer, PlayerInventory inv, ITextComponent titleIn)
     {
-        super(screenContainer, inv, titleIn, screenContainer.getTile().getPos());
+        super(screenContainer, inv, titleIn, screenContainer.getTile().getBlockPos());
         isVanillaScreen = true;
     }
 
@@ -34,7 +34,7 @@ public class CraftingTableRecipeCreatorScreen extends MultiScreenModRecipeCreato
     protected void init()
     {
         super.init();
-        InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("shaped", this.getContainer().getTile().getPos(), InitPackets.PacketDataType.BOOLEAN));
+        InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("shaped", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.BOOLEAN));
         this.addButton(craftTypeButton = new BooleanButton("craftType", leftPos + 100, topPos + 60, 68, 20, true, (button) ->
         {
         }));
@@ -77,7 +77,7 @@ public class CraftingTableRecipeCreatorScreen extends MultiScreenModRecipeCreato
     {
         super.render(matrixStack, mouseX, mouseY, partialTicks);
         craftTypeButton.render(matrixStack, mouseX, mouseY, partialTicks);
-        renderHoveredTooltip(matrixStack, mouseX, mouseY);
+        renderTooltip(matrixStack, mouseX, mouseY);
     }
 
     private boolean isShaped()
@@ -112,6 +112,6 @@ public class CraftingTableRecipeCreatorScreen extends MultiScreenModRecipeCreato
     public void onClose()
     {
         super.onClose();
-        InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("shaped", this.getContainer().getTile().getPos(), InitPackets.PacketDataType.BOOLEAN, isShaped()));
+        InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("shaped", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.BOOLEAN, isShaped()));
     }
 }

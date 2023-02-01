@@ -23,7 +23,7 @@ public class BotaniaRecipeCreatorContainer extends CommonContainer
         {
             if(PositionnedSlot.contains(SlotHelper.PURE_DAISY_SLOTS_INPUT, i) || PositionnedSlot.isValidSlot(SlotHelper.MANA_INFUSION_SLOTS_INPUT, 1, i))
             {
-                this.addSlot(new DefinedSlot(tile, i, SlotHelper.BOTANIA_SLOTS.get(i).getxPos(), SlotHelper.BOTANIA_SLOTS.get(i).getyPos(), is -> Block.getBlockFromItem(is.getItem()) != Blocks.AIR));
+                this.addSlot(new DefinedSlot(tile, i, SlotHelper.BOTANIA_SLOTS.get(i).getxPos(), SlotHelper.BOTANIA_SLOTS.get(i).getyPos(), is -> Block.byItem(is.getItem()) != Blocks.AIR));
                 continue;
             }
             else if(PositionnedSlot.contains(SlotHelper.BREWERY_SLOTS_OUTPUT, i))

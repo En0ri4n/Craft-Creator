@@ -44,18 +44,18 @@ public class CraftingTableRecipeCreatorTile extends MultiScreenRecipeCreatorTile
 	}
 
 	@Override
-	public void read(BlockState state, CompoundNBT compound)
+	public void load(BlockState state, CompoundNBT compound)
 	{
-		super.read(state, compound);
+		super.load(state, compound);
 
 		if(compound.contains("isShapedRecipe"))
 			this.shapedRecipe = compound.getBoolean("isShapedRecipe");
 	}
 
 	@Override
-	public CompoundNBT write(CompoundNBT compoundTag)
+	public CompoundNBT save(CompoundNBT compoundTag)
 	{
-		super.write(compoundTag);
+		super.save(compoundTag);
 		compoundTag.putBoolean("isShapedRecipe", this.shapedRecipe);
 		return compoundTag;
 	}
@@ -71,7 +71,7 @@ public class CraftingTableRecipeCreatorTile extends MultiScreenRecipeCreatorTile
 	@Override
 	public Container createMenu(int id, @Nonnull PlayerInventory playerInventory, @Nonnull PlayerEntity player)
 	{
-		return new CraftingTableRecipeCreatorContainer(id, playerInventory, new PacketBuffer(Unpooled.buffer()).writeBlockPos(getPos()));
+		return new CraftingTableRecipeCreatorContainer(id, playerInventory, new PacketBuffer(Unpooled.buffer()).writeBlockPos(getBlockPos()));
 	}
 
 	public boolean isShapedRecipe()
@@ -82,6 +82,6 @@ public class CraftingTableRecipeCreatorTile extends MultiScreenRecipeCreatorTile
 	public void setShapedRecipe(boolean shapedRecipe)
 	{
 		this.shapedRecipe = shapedRecipe;
-		this.markDirty();
+		this.setChanged();
 	}
 }

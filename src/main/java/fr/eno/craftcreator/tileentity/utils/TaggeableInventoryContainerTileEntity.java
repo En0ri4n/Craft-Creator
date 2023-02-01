@@ -70,9 +70,9 @@ public abstract class TaggeableInventoryContainerTileEntity extends InventoryDat
     }
 
     @Override
-    public void read(BlockState state, CompoundNBT compound)
+    public void load(BlockState state, CompoundNBT compound)
     {
-        super.read(state, compound);
+        super.load(state, compound);
 
         if(compound.contains(TAGGED_SLOTS_TAG))
         {
@@ -84,7 +84,7 @@ public abstract class TaggeableInventoryContainerTileEntity extends InventoryDat
                 {
                     CompoundNBT compoundNBT = (CompoundNBT) nbt;
 
-                    this.taggedSlots.put(compoundNBT.getInt("Slot"), ResourceLocation.tryCreate(compoundNBT.getString("Tag")));
+                    this.taggedSlots.put(compoundNBT.getInt("Slot"), ResourceLocation.tryParse(compoundNBT.getString("Tag")));
                 }
             }
         }
@@ -92,7 +92,7 @@ public abstract class TaggeableInventoryContainerTileEntity extends InventoryDat
         {
             IntArrayNBT list = (IntArrayNBT) compound.get(NBT_SLOTS_TAG);
 
-            for(int i : list.getIntArray())
+            for(int i : list.getAsIntArray())
             {
                 this.nbtSlots.add(i);
             }
@@ -100,9 +100,9 @@ public abstract class TaggeableInventoryContainerTileEntity extends InventoryDat
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT compoundTag)
+    public CompoundNBT save(CompoundNBT compoundTag)
     {
-        super.write(compoundTag);
+        super.save(compoundTag);
 
         ListNBT taggedSlotsListNBT = new ListNBT();
         for(Integer integer : this.taggedSlots.keySet())
@@ -128,6 +128,6 @@ public abstract class TaggeableInventoryContainerTileEntity extends InventoryDat
     public void setTaggedSlots(Map<Integer, ResourceLocation> taggedSlots)
     {
         this.taggedSlots = taggedSlots;
-        this.markDirty();
+        this.setChanged();
     }
 }

@@ -37,7 +37,7 @@ public class GuiList<T>
             int finalWidth = (width + 10);
             int x = this.guiListRight - finalWidth + 3;
             int y = this.y + 3 + i * keyHeight + i;
-            int buttonTitle = y + keyHeight / 2 - ClientUtils.getFont().FONT_HEIGHT / 2;
+            int buttonTitle = y + keyHeight / 2 - ClientUtils.getFont().lineHeight / 2;
 
             if(ExecuteButton.isMouseHover(x, y, mouseX, mouseY, finalWidth, keyHeight))
                 Screen.blit(matrixStack, x, y, finalWidth - 6, keyHeight, 0, 20, 100, 20, 100, 60);
@@ -63,10 +63,10 @@ public class GuiList<T>
     {
         if(this.keys == null) return 0;
 
-        int max = ClientUtils.getFont().getStringWidth(References.getTranslate("screen.guiList.reset").getString());
+        int max = ClientUtils.getFont().width(References.getTranslate("screen.guiList.reset").getString());
         for(T key : this.keys)
         {
-            int width = ClientUtils.getFont().getStringWidth(key.toString());
+            int width = ClientUtils.getFont().width(key.toString());
 
             if(width > max)
                 max = width;

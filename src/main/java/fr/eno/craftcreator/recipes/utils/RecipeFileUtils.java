@@ -3,6 +3,8 @@ package fr.eno.craftcreator.recipes.utils;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.gson.*;
+import fr.eno.craftcreator.References;
+import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.kubejs.KubeJSManager;
 import fr.eno.craftcreator.recipes.serializers.ModRecipesJSSerializer;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
@@ -75,7 +77,7 @@ public class RecipeFileUtils
         return recipe;
     }
 
-    public static <T extends IRecipe<?>> List<T> getAddedRecipesFor(String modId, IRecipeType<T> recipeType)
+    public static <C extends IInventory, T extends IRecipe<C>> List<T> getAddedRecipesFor(String modId, IRecipeType<T> recipeType)
     {
         List<T> recipes = new ArrayList<>();
 
@@ -124,8 +126,8 @@ public class RecipeFileUtils
         assert craftingTableSerializer != null;
         try
         {
-            T tempRecipe = craftingTableSerializer.read(new ResourceLocation(modId, "recipe"), jsonObject);
-            T recipe = craftingTableSerializer.read(new ResourceLocation(modId, ModRecipeCreatorDispatcher.getOutput(tempRecipe).getIngredientsWithCount().stream().findAny().orElse(CraftIngredients.CraftIngredient.EMPTY).getId().getPath()), jsonObject);
+            T tempRecipe = craftingTableSerializer.fromJson(new ResourceLocation(modId, "recipe"), jsonObject);
+            T recipe = craftingTableSerializer.fromJson(new ResourceLocation(modId, ModRecipeCreatorDispatcher.getOutput(tempRecipe).getIngredientsWithCount().stream().findAny().orElse(CraftIngredients.CraftIngredient.EMPTY).getId().getPath()), jsonObject);
             recipes.add(recipe);
         }
         catch(JsonSyntaxException e)
@@ -187,13 +189,13 @@ public class RecipeFileUtils
     {
         T tempRecipe;
         T recipe;
-        tempRecipe = serializer.read(new ResourceLocation(modId, "recipe"), jsonObject);
-        recipe = serializer.read(new ResourceLocation(modId, ModRecipeCreatorDispatcher.getOutput(tempRecipe).getIngredientsWithCount().stream().findAny().orElse(null).getId().getPath()), jsonObject);
+        tempRecipe = serializer.fromJson(new ResourceLocation(modId, "recipe"), jsonObject);
+        recipe = serializer.fromJson(new ResourceLocation(modId, ModRecipeCreatorDispatcher.getOutput(tempRecipe).getIngredientsWithCount().stream().findAny().orElse(null).getId().getPath()), jsonObject);
 
         PacketBuffer existingRecipeBuffer = new PacketBuffer(Unpooled.buffer());
         PacketBuffer jsonRecipeBuffer = new PacketBuffer(Unpooled.buffer());
-        serializer.write(existingRecipeBuffer, addedRecipe);
-        serializer.write(jsonRecipeBuffer, recipe);
+        serializer.toNetwork(existingRecipeBuffer, addedRecipe);
+        serializer.toNetwork(jsonRecipeBuffer, recipe);
 
         if(existingRecipeBuffer.compareTo(jsonRecipeBuffer) == 0)
         {
@@ -397,7 +399,7 @@ public class RecipeFileUtils
 
         ingredients.forEach(ingredient ->
         {
-            JsonElement json = ingredient.serialize();
+            JsonElement json = ingredient.toJson();
             if(json instanceof JsonArray) json.getAsJsonArray().forEach(je -> getAndSave(je, locations));
             else getAndSave(json, locations);
         });
@@ -408,8 +410,8 @@ public class RecipeFileUtils
     private static void getAndSave(JsonElement element, Multimap<String, ResourceLocation> map)
     {
         if(element.getAsJsonObject().has("item"))
-            map.put("Item", ResourceLocation.tryCreate(element.getAsJsonObject().get("item").getAsString()));
-        else map.put("Tag", ResourceLocation.tryCreate(element.getAsJsonObject().get("tag").getAsString()));
+            map.put("Item", ResourceLocation.tryParse(element.getAsJsonObject().get("item").getAsString()));
+        else map.put("Tag", ResourceLocation.tryParse(element.getAsJsonObject().get("tag").getAsString()));
     }
 
     public static void removeModifiedRecipe(ModifiedRecipe recipe)
@@ -496,9 +498,9 @@ public class RecipeFileUtils
 
     public enum ModifiedRecipeType
     {
-        REMOVED("event.remove", new StringTextComponent("Removed").mergeStyle(TextFormatting.RED)),
-        REPLACED_INPUT("event.replaceInput", new StringTextComponent("Input Replaced").mergeStyle(TextFormatting.GOLD)),
-        REPLACED_OUTPUT("event.replaceOutput", new StringTextComponent("Output Replaced").mergeStyle(TextFormatting.YELLOW));
+        REMOVED("event.remove", new StringTextComponent("Removed").withStyle(TextFormatting.RED)),
+        REPLACED_INPUT("event.replaceInput", new StringTextComponent("Input Replaced").withStyle(TextFormatting.GOLD)),
+        REPLACED_OUTPUT("event.replaceOutput", new StringTextComponent("Output Replaced").withStyle(TextFormatting.YELLOW));
 
         private final String descriptor;
         private final IFormattableTextComponent title;

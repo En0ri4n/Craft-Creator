@@ -21,8 +21,8 @@ public abstract class BaseRecipesManager
     {
         for(int i = outputCount; i < slots.size(); i++)
         {
-            if(slots.get(i).getHasStack())
-                return slots.get(i).getStack();
+            if(slots.get(i).hasItem())
+                return slots.get(i).getItem();
         }
 
         return ItemStack.EMPTY;
@@ -36,7 +36,7 @@ public abstract class BaseRecipesManager
         {
             if(i > slots.size() - 1) break;
 
-            if(slots.get(i).getHasStack()) list.add(slots.get(i).getStack().getItem());
+            if(slots.get(i).hasItem()) list.add(slots.get(i).getItem().getItem());
         }
 
         return list;
@@ -48,7 +48,7 @@ public abstract class BaseRecipesManager
 
         for(int i = 0; i < slots.size() - 1; i++)
         {
-            if(slots.get(i).getHasStack()) list.add(slots.get(i).getStack().getItem());
+            if(slots.get(i).hasItem()) list.add(slots.get(i).getItem().getItem());
         }
 
         return list;
@@ -61,7 +61,7 @@ public abstract class BaseRecipesManager
 
         for(int i = 0; i < slots.size() - 1; i++)
         {
-            if(slots.get(i).getHasStack()) list.add(slots.get(i));
+            if(slots.get(i).hasItem()) list.add(slots.get(i));
         }
 
         return list;
@@ -74,7 +74,7 @@ public abstract class BaseRecipesManager
 
         for(int i = 0; i < inputSlotsCount; i++)
         {
-            if(slots.get(i).getHasStack())
+            if(slots.get(i).hasItem())
             {
                 hasNoInput = false;
                 break;
@@ -83,7 +83,7 @@ public abstract class BaseRecipesManager
 
         for(int i = slots.size() - outputSlotsCount; i < slots.size(); i++)
         {
-            if(slots.get(i).getHasStack())
+            if(slots.get(i).hasItem())
             {
                 hasNoOutput = false;
                 break;
@@ -110,7 +110,7 @@ public abstract class BaseRecipesManager
                 continue;
             }
 
-            if(isValid(slots.get(i).getStack())) map.put(slots.get(i).getStack().getItem().getRegistryName(), false);
+            if(isValid(slots.get(i).getItem())) map.put(slots.get(i).getItem().getItem().getRegistryName(), false);
         }
 
         return map;

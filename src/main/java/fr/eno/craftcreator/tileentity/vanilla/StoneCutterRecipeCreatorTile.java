@@ -31,6 +31,6 @@ public class StoneCutterRecipeCreatorTile extends MultiScreenRecipeCreatorTile
 	@Override
 	public Container createMenu(int id, @Nonnull PlayerInventory playerInventory, @Nonnull PlayerEntity player)
 	{
-		return new StoneCutterRecipeCreatorContainer(id, playerInventory, new PacketBuffer(Unpooled.buffer()).writeBlockPos(getPos()));
+		return new StoneCutterRecipeCreatorContainer(id, playerInventory, new PacketBuffer(Unpooled.buffer()).writeBlockPos(getBlockPos()));
 	}
 }

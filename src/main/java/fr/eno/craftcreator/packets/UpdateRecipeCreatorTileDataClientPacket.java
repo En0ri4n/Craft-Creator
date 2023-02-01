@@ -29,7 +29,7 @@ public class UpdateRecipeCreatorTileDataClientPacket
 
     public static void encode(UpdateRecipeCreatorTileDataClientPacket msg, PacketBuffer packetBuffer)
     {
-        packetBuffer.writeString(msg.dataName);
+        packetBuffer.writeUtf(msg.dataName);
         packetBuffer.writeInt(msg.dataType.ordinal());
         packetBuffer.writeBlockPos(msg.pos);
 
@@ -42,7 +42,7 @@ public class UpdateRecipeCreatorTileDataClientPacket
                 packetBuffer.writeVarIntArray((int[]) msg.data);
                 break;
             case STRING:
-                packetBuffer.writeString((String) msg.data);
+                packetBuffer.writeUtf((String) msg.data);
                 break;
             case BOOLEAN:
                 packetBuffer.writeBoolean((boolean) msg.data);
@@ -61,7 +61,7 @@ public class UpdateRecipeCreatorTileDataClientPacket
 
     public static UpdateRecipeCreatorTileDataClientPacket decode(PacketBuffer packetBuffer)
     {
-        String dataName = packetBuffer.readString();
+        String dataName = packetBuffer.readUtf();
         InitPackets.PacketDataType dataType = InitPackets.PacketDataType.values()[packetBuffer.readInt()];
         BlockPos pos = packetBuffer.readBlockPos();
 
@@ -72,12 +72,13 @@ public class UpdateRecipeCreatorTileDataClientPacket
             case INT_ARRAY:
                 return new UpdateRecipeCreatorTileDataClientPacket(dataName, pos, dataType, packetBuffer.readVarIntArray());
             case STRING:
-                return new UpdateRecipeCreatorTileDataClientPacket(dataName, pos, dataType, packetBuffer.readString());
+                return new UpdateRecipeCreatorTileDataClientPacket(dataName, pos, dataType, packetBuffer.readUtf());
             case BOOLEAN:
                 return new UpdateRecipeCreatorTileDataClientPacket(dataName, pos, dataType, packetBuffer.readBoolean());
             case MAP_INT_STRING:
                 Map<Integer, ResourceLocation> map = new HashMap<>();
-                for(int i = 0; i < packetBuffer.readInt(); i++)
+                int size = packetBuffer.readInt();
+                for(int i = 0; i < size; i++)
                     map.put(packetBuffer.readInt(), packetBuffer.readResourceLocation());
                 return new UpdateRecipeCreatorTileDataClientPacket(dataName, pos, dataType, map);
             default:

@@ -19,7 +19,7 @@ public class NumberDataFieldWidget extends TextFieldWidget
     {
         super(font, x, y, width, height, new StringTextComponent(""));
         this.tooltip = new StringTextComponent("");
-        this.setText(String.valueOf(defaultValue));
+        this.setValue(String.valueOf(defaultValue));
     }
 
     @Override
@@ -37,24 +37,24 @@ public class NumberDataFieldWidget extends TextFieldWidget
             return;
 
         List<ITextComponent> tooltips = new ArrayList<>();
-        tooltips.add(new StringTextComponent("Value :").mergeStyle(TextFormatting.GRAY));
-        tooltips.add(this.tooltip.copyRaw().mergeStyle(TextFormatting.DARK_GRAY));
-        ClientUtils.getCurrentScreen().func_243308_b(poseStack, tooltips, mouseX, mouseY);
+        tooltips.add(new StringTextComponent("Value :").withStyle(TextFormatting.GRAY));
+        tooltips.add(this.tooltip.copy().withStyle(TextFormatting.DARK_GRAY));
+        ClientUtils.getCurrentScreen().renderComponentTooltip(poseStack, tooltips, mouseX, mouseY);
     }
 
     public void setNumberValue(Number number)
     {
-        this.setText(String.valueOf(number));
+        this.setValue(String.valueOf(number));
     }
 
     public double getDoubleValue()
     {
-        return Double.parseDouble(this.getText());
+        return Double.parseDouble(this.getValue());
     }
 
     public int getIntValue()
     {
-        return Integer.parseInt(this.getText());
+        return Integer.parseInt(this.getValue());
     }
 
     public void setTooltip(ITextComponent tooltip)

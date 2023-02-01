@@ -220,7 +220,7 @@ public class ThermalRecipesSerializer extends ModRecipesJSSerializer
         }
 
         if(outputsIngredient.isEmpty())
-            outputsIngredient.addIngredient(new CraftIngredients.ItemIngredient(recipe.getRecipeOutput().getItem().getRegistryName(), recipe.getRecipeOutput().getCount()));
+            outputsIngredient.addIngredient(new CraftIngredients.ItemIngredient(recipe.getResultItem().getItem().getRegistryName(), recipe.getResultItem().getCount()));
 
         return outputsIngredient;
     }

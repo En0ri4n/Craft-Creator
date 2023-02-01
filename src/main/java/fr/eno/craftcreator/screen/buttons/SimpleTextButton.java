@@ -26,7 +26,7 @@ public class SimpleTextButton extends Button
 	}
 
 	@Override
-	public void renderWidget(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+	public void renderButton(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
 	{
 		if(this.visible && this.active)
 		{
@@ -34,7 +34,7 @@ public class SimpleTextButton extends Button
 			int color = isHovered ? 0x00FF0050 : 0xFFFFFFFF;
 			Screen.fill(matrixStack, x, y, x + width, y + height, 0x777879FF);
 			Screen.fill(matrixStack, x + 1, y + 1, x + width - 1, y + height - 1, 0x00000000);
-			drawCenteredString(matrixStack, ClientUtils.getFont(), this.getMessage().getString(), this.x + this.width / 2, this.y + height / 2 - ClientUtils.getFont().FONT_HEIGHT / 2 + 1, color);
+			drawCenteredString(matrixStack, ClientUtils.getFont(), this.getMessage().getString(), this.x + this.width / 2, this.y + height / 2 - ClientUtils.getFont().lineHeight / 2 + 1, color);
 		}
 	}
 
@@ -47,6 +47,6 @@ public class SimpleTextButton extends Button
 	public void renderToolTip(MatrixStack matrixStack, int mouseX, int mouseY)
 	{
 		if(!this.tooltips.isEmpty() && ClientUtils.getCurrentScreen() != null)
-			ClientUtils.getCurrentScreen().func_243308_b(matrixStack, tooltips, mouseX, mouseY);
+			ClientUtils.getCurrentScreen().renderComponentTooltip(matrixStack, tooltips, mouseX, mouseY);
 	}
 }

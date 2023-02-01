@@ -41,7 +41,7 @@ public class SimpleCheckBox extends CheckboxButton
     }
 
     @Override
-    public void renderWidget(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void renderButton(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         if(visible)
         {
@@ -53,7 +53,7 @@ public class SimpleCheckBox extends CheckboxButton
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-            Screen.blit(matrixStack, this.x, this.y, this.width, this.height, !isFocused() ? 0 : 20, !isChecked() ? 0 : 20, 20, 20, 64, 64);
+            Screen.blit(matrixStack, this.x, this.y, this.width, this.height, !isFocused() ? 0 : 20, !selected() ? 0 : 20, 20, 20, 64, 64);
             this.renderBg(matrixStack, minecraft, mouseX, mouseY);
 
             drawString(matrixStack, ClientUtils.getFont(), this.getMessage(), this.x + this.width + 4, this.y + (this.height - 8) / 2, 14737632 | MathHelper.ceil(this.alpha * 255.0F) << 24);
@@ -78,7 +78,7 @@ public class SimpleCheckBox extends CheckboxButton
     }
 
     @Override
-    public boolean isChecked()
+    public boolean selected()
     {
         return this.selected;
     }

@@ -83,15 +83,15 @@ public class RemoveRecipeManagerScreen extends ChildrenScreen
 
     private void sendRemovedRecipe()
     {
-        if(!hasInputItemBox.isChecked())
+        if(!hasInputItemBox.selected())
             this.removeMap.remove(ModRecipesJSSerializer.RecipeDescriptors.INPUT_ITEM);
-        if(!hasOutputItemBox.isChecked())
+        if(!hasOutputItemBox.selected())
             this.removeMap.remove(ModRecipesJSSerializer.RecipeDescriptors.OUTPUT_ITEM);
-        if(!hasModBox.isChecked())
+        if(!hasModBox.selected())
             this.removeMap.remove(ModRecipesJSSerializer.RecipeDescriptors.MOD_ID);
-        if(!hasTypeBox.isChecked())
+        if(!hasTypeBox.selected())
             this.removeMap.remove(ModRecipesJSSerializer.RecipeDescriptors.RECIPE_TYPE);
-        if(!hasIdBox.isChecked())
+        if(!hasIdBox.selected())
             this.removeMap.remove(ModRecipesJSSerializer.RecipeDescriptors.RECIPE_ID);
 
         if(!this.removeMap.isEmpty())
@@ -104,7 +104,7 @@ public class RemoveRecipeManagerScreen extends ChildrenScreen
         {
             try
             {
-                ResourceLocation location = ResourceLocation.tryCreate(entry.getValue());
+                ResourceLocation location = ResourceLocation.tryParse(entry.getValue());
                 return location.getNamespace();
             }
             catch(Exception ignored)
@@ -124,11 +124,11 @@ public class RemoveRecipeManagerScreen extends ChildrenScreen
         this.getList(0).setOnSelectedChange((entry) ->
         {
             this.removeMap.put(removeTag, entry.toString());
-            textFieldWidget.setText(entry.toString());
+            textFieldWidget.setValue(entry.toString());
             this.getList(0).setVisible(false);
         });
 
-        this.setEntries(0, Utils.copyPartialMatches(textFieldWidget.getText(), entries));
+        this.setEntries(0, Utils.copyPartialMatches(textFieldWidget.getValue(), entries));
     }
 
     @Override
@@ -156,20 +156,20 @@ public class RemoveRecipeManagerScreen extends ChildrenScreen
 
     private void checkBoxes()
     {
-        if(this.itemInputButton.visible != this.hasInputItemBox.isChecked() ||
-                this.itemOutputButton.visible != this.hasOutputItemBox.isChecked() ||
-                this.modButton.visible != this.hasModBox.isChecked() ||
-                this.typeButton.visible != this.hasTypeBox.isChecked() ||
-                this.idButton.visible != this.hasIdBox.isChecked())
+        if(this.itemInputButton.visible != this.hasInputItemBox.selected() ||
+                this.itemOutputButton.visible != this.hasOutputItemBox.selected() ||
+                this.modButton.visible != this.hasModBox.selected() ||
+                this.typeButton.visible != this.hasTypeBox.selected() ||
+                this.idButton.visible != this.hasIdBox.selected())
         {
             this.getList(0).setVisible(false);
         }
         
-        this.itemInputButton.visible = this.hasInputItemBox.isChecked();
-        this.itemOutputButton.visible = this.hasOutputItemBox.isChecked();
-        this.modButton.visible = this.hasModBox.isChecked();
-        this.typeButton.visible = this.hasTypeBox.isChecked();
-        this.idButton.visible = this.hasIdBox.isChecked();
+        this.itemInputButton.visible = this.hasInputItemBox.selected();
+        this.itemOutputButton.visible = this.hasOutputItemBox.selected();
+        this.modButton.visible = this.hasModBox.selected();
+        this.typeButton.visible = this.hasTypeBox.selected();
+        this.idButton.visible = this.hasIdBox.selected();
     }
 
     @Override

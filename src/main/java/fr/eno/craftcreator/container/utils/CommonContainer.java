@@ -13,7 +13,7 @@ public abstract class CommonContainer extends VanillaCommonContainer
     public CommonContainer(ContainerType<?> pMenuType, int pContainerId, PlayerInventory inventory, PacketBuffer byteBuf)
     {
         super(pMenuType, pContainerId);
-        this.tile = (MultiScreenRecipeCreatorTile) inventory.player.world.getTileEntity(byteBuf.readBlockPos());
+        this.tile = (MultiScreenRecipeCreatorTile) inventory.player.level.getBlockEntity(byteBuf.readBlockPos());
     }
 
     public abstract SupportedMods getMod();

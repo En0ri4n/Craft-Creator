@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class ThermalRecipeCreatorBlock extends RecipeCreatorBlock
 {
-    public static final DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
+    public static final DirectionProperty FACING = HorizontalBlock.FACING;
 
     public ThermalRecipeCreatorBlock()
     {

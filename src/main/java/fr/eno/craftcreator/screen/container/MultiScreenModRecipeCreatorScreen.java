@@ -73,14 +73,14 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
 
         if(isVanillaScreen)
         {
-            InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("kubejs_recipe", this.getContainer().getTile().getPos(), InitPackets.PacketDataType.BOOLEAN));
+            InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("kubejs_recipe", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.BOOLEAN));
             this.addButton(isKubeJSRecipeButton = new SimpleCheckBox(5, this.height - 20, 15, 15, References.getTranslate("screen.recipe_creator_screen.kube_js_button"), false));
             if(!SupportedMods.isKubeJSLoaded()) this.isKubeJSRecipeButton.visible = false;
         }
 
-        InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("screen_index", this.getContainer().getTile().getPos(), InitPackets.PacketDataType.INT));
+        InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("screen_index", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.INT));
 
-        this.addButton(executeButton = new ExecuteButton(this.leftPos + this.imageWidth / 2 - 20, this.topPos + 35, 42, (button) -> RecipeManagerDispatcher.createRecipe(this.getContainer().getMod(), getCurrentRecipe(), this.getContainer().inventorySlots.stream().filter(slot -> slot instanceof SimpleSlotItemHandler).collect(Collectors.toList()), getRecipeInfos())));
+        this.addButton(executeButton = new ExecuteButton(this.leftPos + this.imageWidth / 2 - 20, this.topPos + 35, 42, (button) -> RecipeManagerDispatcher.createRecipe(this.getMenu().getMod(), getCurrentRecipe(), this.getMenu().slots.stream().filter(slot -> slot instanceof SimpleSlotItemHandler).collect(Collectors.toList()), getRecipeInfos())));
 
         this.addButton(nextButton = new SimpleButton(References.getTranslate("screen.recipe_creator.button.next"), getArrowXPos(true), this.topPos + this.imageHeight - 66, 10, 20, (button) -> nextPage()));
         this.addButton(previousButton = new SimpleButton(References.getTranslate("screen.recipe_creator.button.previous"), getArrowXPos(false), this.topPos + this.imageHeight - 66, 10, 20, (button) -> previousPage()));
@@ -108,7 +108,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterMap<>(RecipeInfos.Parameters.TAGGED_SLOTS, this.getTagged()));
         this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterList<>(RecipeInfos.Parameters.NBT_SLOTS, this.nbtSlots));
         if(isVanillaScreen)
-            this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterBoolean(RecipeInfos.Parameters.KUBEJS_RECIPE, this.isKubeJSRecipeButton.isChecked()));
+            this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterBoolean(RecipeInfos.Parameters.KUBEJS_RECIPE, this.isKubeJSRecipeButton.selected() && SupportedMods.isKubeJSLoaded()));
         return this.recipeInfos;
     }
 
@@ -182,7 +182,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     protected void setDataField(int index, int x, int y, int width, Object value)
     {
         setDataFieldPosAndSize(index, x, y, width);
-        dataFields.get(index).setText(String.valueOf(value));
+        dataFields.get(index).setValue(String.valueOf(value));
     }
 
     protected void setExecuteButtonPos(int x, int y)
@@ -198,7 +198,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
 
     protected List<ModRecipeCreator> getAvailableRecipesCreator()
     {
-        return ModRecipeCreator.getRecipeCreatorScreens(this.getContainer().getMod());
+        return ModRecipeCreator.getRecipeCreatorScreens(this.getMenu().getMod());
     }
 
     @Override
@@ -225,7 +225,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     @Override
     protected void renderComponentHoverEffect(MatrixStack pPoseStack, Style pStyle, int pMouseX, int pMouseY)
     {
-        this.renderHoveredTooltip(pPoseStack, pMouseX, pMouseY);
+        this.renderTooltip(pPoseStack, pMouseX, pMouseY);
         super.renderComponentHoverEffect(pPoseStack, pStyle, pMouseX, pMouseY);
     }
 
@@ -237,11 +237,11 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
 
     protected void renderDataFieldTitle(int index, ITextComponent fieldTitle, MatrixStack matrixStack)
     {
-        matrixStack.push();
+        matrixStack.pushPose();
         float scale = 1F;
         matrixStack.scale(scale, scale, scale);
-        Screen.drawString(matrixStack, font, fieldTitle.copyRaw().mergeStyle(TextFormatting.ITALIC), (int) (dataFields.get(index).x / scale), (int) ((dataFields.get(index).y - font.FONT_HEIGHT * scale - 1) / scale), 0xFF88AEC1);
-        matrixStack.pop();
+        Screen.drawString(matrixStack, font, fieldTitle.copy().withStyle(TextFormatting.ITALIC), (int) (dataFields.get(index).x / scale), (int) ((dataFields.get(index).y - font.lineHeight * scale - 1) / scale), 0xFF88AEC1);
+        matrixStack.popPose();
     }
 
     protected NumberDataFieldWidget getNumberField(int index)
@@ -273,8 +273,9 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int x, int y)
+    protected void renderBg(MatrixStack matrixStack, float partialTicks, int x, int y)
     {
+        renderBackground(matrixStack);
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         ClientUtils.bindTexture(getCurrentRecipe().getGuiTexture());
         blit(matrixStack, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, this.guiTextureSize, this.guiTextureSize);
@@ -288,19 +289,19 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     }
 
     @Override
-    protected void renderHoveredTooltip(MatrixStack poseStack, int mouseX, int mouseY)
+    protected void renderTooltip(MatrixStack poseStack, int mouseX, int mouseY)
     {
         if(getRecipeIcon() != Items.AIR)
-            ClientUtils.getItemRenderer().renderItemAndEffectIntoGUI(new ItemStack(getRecipeIcon()), getIconPos().getFirstValue(), getIconPos().getSecondValue());
-        super.renderHoveredTooltip(poseStack, mouseX, mouseY);
+            ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(getRecipeIcon()), getIconPos().getFirstValue(), getIconPos().getSecondValue());
+        super.renderTooltip(poseStack, mouseX, mouseY);
         this.dataFields.forEach(field -> field.renderToolTip(poseStack, mouseX, mouseY));
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int pMouseX, int pMouseY)
+    protected void renderLabels(MatrixStack matrixStack, int pMouseX, int pMouseY)
     {
-        drawCenteredString(matrixStack, ClientUtils.getFont(), References.getTranslate("screen." + this.getContainer().getMod().getModId() + "_recipe_creator." + RecipeFileUtils.getName(getCurrentRecipe().getRecipeType()).getPath() + ".title"), this.imageWidth / 2, -15, 0xFFFFFF);
-        super.drawGuiContainerForegroundLayer(matrixStack, pMouseX, pMouseY);
+        drawCenteredString(matrixStack, ClientUtils.getFont(), References.getTranslate("screen." + this.getMenu().getMod().getModId() + "_recipe_creator." + RecipeFileUtils.getName(getCurrentRecipe().getRecipeType()).getPath() + ".title"), this.imageWidth / 2, -15, 0xFFFFFF);
+        super.renderLabels(matrixStack, pMouseX, pMouseY);
     }
 
     /**
@@ -311,7 +312,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     protected void renderSlotTitle(int index, ITextComponent name, MatrixStack matrixStack)
     {
         SimpleSlotItemHandler slot = getCurrentSlot(index);
-        Screen.drawCenteredString(matrixStack, font, name.copyRaw().mergeStyle(TextFormatting.DARK_PURPLE), this.leftPos + slot.xPos + 8, this.topPos + slot.yPos - font.FONT_HEIGHT - 1, 0xFFFFFFFF);
+        Screen.drawCenteredString(matrixStack, font, name.copy().withStyle(TextFormatting.DARK_PURPLE), this.leftPos + slot.x + 8, this.topPos + slot.y - font.lineHeight - 1, 0xFFFFFFFF);
     }
 
     /**
@@ -320,7 +321,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
      */
     protected SimpleSlotItemHandler getCurrentSlot(int index)
     {
-        return (SimpleSlotItemHandler) PositionnedSlot.getSlotsFor(getCurrentRecipe().getSlots(), this.getContainer().inventorySlots).get(index);
+        return (SimpleSlotItemHandler) PositionnedSlot.getSlotsFor(getCurrentRecipe().getSlots(), this.getMenu().slots).get(index);
     }
 
     private boolean hasNext()
@@ -356,26 +357,26 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         for(int i = 0; i < count; i++)
         {
             NumberDataFieldWidget numberDataFieldWidget = new NumberDataFieldWidget(this.font, x, y, width, 10, defaultValue);
-            numberDataFieldWidget.setText(String.valueOf(defaultValue));
+            numberDataFieldWidget.setValue(String.valueOf(defaultValue));
             this.dataFields.add(numberDataFieldWidget);
         }
     }
 
     private void updateServerIndex()
     {
-        InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("screen_index", this.getContainer().getTile().getPos(), InitPackets.PacketDataType.INT, this.currentScreenIndex));
+        InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("screen_index", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.INT, this.currentScreenIndex));
     }
 
     protected void updateSlots()
     {
         if(isVanillaScreen)
         {
-            this.getContainer().activeSlots(true);
+            this.getMenu().activeSlots(true);
         }
         else
         {
-            this.getContainer().activeSlots(false);
-            this.getCurrentRecipe().getSlots().forEach(ds -> this.getContainer().inventorySlots.stream().filter(s -> s.getSlotIndex() == ds.getIndex() && s instanceof SimpleSlotItemHandler).findFirst().ifPresent(slot -> ((SimpleSlotItemHandler) slot).setActive(true)));
+            this.getMenu().activeSlots(false);
+            this.getCurrentRecipe().getSlots().forEach(ds -> this.getMenu().slots.stream().filter(s -> s.getSlotIndex() == ds.getIndex() && s instanceof SimpleSlotItemHandler).findFirst().ifPresent(slot -> ((SimpleSlotItemHandler) slot).setActive(true)));
         }
     }
 
@@ -385,6 +386,6 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         super.onClose();
 
         if(isVanillaScreen)
-            InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("kubejs_recipe", this.getContainer().getTile().getPos(), InitPackets.PacketDataType.BOOLEAN, this.isKubeJSRecipeButton.isChecked()));
+            InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("kubejs_recipe", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.BOOLEAN, this.isKubeJSRecipeButton.selected()));
     }
 }

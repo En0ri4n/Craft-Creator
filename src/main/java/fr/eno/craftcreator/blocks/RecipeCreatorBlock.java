@@ -30,10 +30,10 @@ public abstract class RecipeCreatorBlock extends Block
 {
     public RecipeCreatorBlock()
     {
-        super(Block.Properties.create(Material.IRON).sound(SoundType.STONE).hardnessAndResistance(999999F));
-        BlockState stateHolder = this.getDefaultState();
-        getStates().forEach(stateHolder::with);
-        this.setDefaultState(stateHolder);
+        super(Block.Properties.of(Material.METAL).sound(SoundType.STONE).strength(999999F));
+        BlockState stateHolder = this.defaultBlockState();
+        getStates().forEach(stateHolder::setValue);
+        this.registerDefaultState(stateHolder);
     }
 
     protected Map<DirectionProperty, Direction> getStates()
@@ -42,13 +42,13 @@ public abstract class RecipeCreatorBlock extends Block
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState state)
+    public BlockRenderType getRenderShape(BlockState p_149645_1_)
     {
         return BlockRenderType.MODEL;
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState p_225533_1_, World p_225533_2_, BlockPos p_225533_3_, PlayerEntity p_225533_4_, Hand p_225533_5_, BlockRayTraceResult p_225533_6_)
+    public ActionResultType use(BlockState p_225533_1_, World p_225533_2_, BlockPos p_225533_3_, PlayerEntity p_225533_4_, Hand p_225533_5_, BlockRayTraceResult p_225533_6_)
     {
         return onBlockUsed(p_225533_1_, p_225533_2_, p_225533_3_, p_225533_4_, p_225533_5_, p_225533_6_);
     }
@@ -65,14 +65,14 @@ public abstract class RecipeCreatorBlock extends Block
 
     protected VoxelShape getShape()
     {
-        return VoxelShapes.fullCube();
+        return VoxelShapes.block();
     }
 
     @Override
     public BlockState getStateForPlacement(BlockItemUseContext context)
     {
-        BlockState stateHolder = this.getDefaultState();
-        getStates().forEach(stateHolder::with);
+        BlockState stateHolder = this.defaultBlockState();
+        getStates().forEach(stateHolder::setValue);
         return stateHolder;
     }
 
@@ -89,7 +89,7 @@ public abstract class RecipeCreatorBlock extends Block
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> stateBuilder)
+    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> stateBuilder)
     {
         getStates().keySet().forEach(stateBuilder::add);
     }

@@ -81,7 +81,7 @@ public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
         if(nbtSlots.contains(9))
         {
             resultObj.addProperty("type", "forge:nbt");
-            resultObj.addProperty("nbt", slots.get(9).getStack().getTag().toString());
+            resultObj.addProperty("nbt", slots.get(9).getItem().getTag().toString());
         }
         obj.add("result", resultObj);
 
@@ -99,17 +99,17 @@ public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
             SmithingRecipe smithingRecipe = (SmithingRecipe) recipe;
             PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
             SmithingRecipe.Serializer serializer = (SmithingRecipe.Serializer) smithingRecipe.getSerializer();
-            serializer.write(buffer, smithingRecipe);
-            Ingredient base = Ingredient.read(buffer);
-            Ingredient addition = Ingredient.read(buffer);
-            inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(base.getMatchingStacks()[0].getItem().getRegistryName(), 1, "Base"));
-            inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(addition.getMatchingStacks()[0].getItem().getRegistryName(), 1, "Addition"));
+            serializer.toNetwork(buffer, smithingRecipe);
+            Ingredient base = Ingredient.fromNetwork(buffer);
+            Ingredient addition = Ingredient.fromNetwork(buffer);
+            inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(base.getItems()[0].getItem().getRegistryName(), 1, "Base"));
+            inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(addition.getItems()[0].getItem().getRegistryName(), 1, "Addition"));
         }
         else if(recipe instanceof AbstractCookingRecipe)
         {
             AbstractCookingRecipe abstractCookingRecipe = (AbstractCookingRecipe) recipe;
             putIfNotEmpty(inputIngredients, abstractCookingRecipe.getIngredients());
-            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Cooking Time", CraftIngredients.DataIngredient.DataUnit.TICK, abstractCookingRecipe.getCookTime(), false));
+            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Cooking Time", CraftIngredients.DataIngredient.DataUnit.TICK, abstractCookingRecipe.getCookingTime(), false));
             inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Experience", CraftIngredients.DataIngredient.DataUnit.EXPERIENCE, abstractCookingRecipe.getExperience(), false));
         }
 
@@ -126,13 +126,13 @@ public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
         if(recipe instanceof ICraftingRecipe)
         {
             ICraftingRecipe craftingRecipe = (ICraftingRecipe) recipe;
-            ingredients.addIngredient(new CraftIngredients.ItemIngredient(recipe.getRecipeOutput().getItem().getRegistryName(), recipe.getRecipeOutput().getCount()));
-            if(craftingRecipe.getRecipeOutput().hasTag())
-                ingredients.addIngredient(new CraftIngredients.NBTIngredient(craftingRecipe.getRecipeOutput().getTag()));
+            ingredients.addIngredient(new CraftIngredients.ItemIngredient(recipe.getResultItem().getItem().getRegistryName(), recipe.getResultItem().getCount()));
+            if(craftingRecipe.getResultItem().hasTag())
+                ingredients.addIngredient(new CraftIngredients.NBTIngredient(craftingRecipe.getResultItem().getTag()));
         }
 
         if(ingredients.isEmpty())
-            ingredients.addIngredient(new CraftIngredients.ItemIngredient(recipe.getRecipeOutput().getItem().getRegistryName(), recipe.getRecipeOutput().getCount()));
+            ingredients.addIngredient(new CraftIngredients.ItemIngredient(recipe.getResultItem().getItem().getRegistryName(), recipe.getResultItem().getCount()));
 
         return ingredients;
     }

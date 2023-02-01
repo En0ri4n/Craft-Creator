@@ -24,7 +24,7 @@ public class FurnaceRecipeCreatorTile extends MultiScreenRecipeCreatorTile
 	@Override
 	public Container createMenu(int id, @Nonnull PlayerInventory playerInventory, @Nonnull PlayerEntity player)
 	{
-		return new FurnaceRecipeCreatorContainer(id, playerInventory, new PacketBuffer(Unpooled.buffer()).writeBlockPos(getPos()));
+		return new FurnaceRecipeCreatorContainer(id, playerInventory, new PacketBuffer(Unpooled.buffer()).writeBlockPos(getBlockPos()));
 	}
 
 	@Nonnull

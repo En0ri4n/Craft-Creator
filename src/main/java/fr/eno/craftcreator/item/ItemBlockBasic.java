@@ -9,6 +9,6 @@ public class ItemBlockBasic extends BlockItem
 {
 	public ItemBlockBasic(Block blockIn)
 	{
-		super(blockIn, new Item.Properties().maxStackSize(64).group(CraftCreator.CRAFT_CREATOR_TAB));
+		super(blockIn, new Item.Properties().stacksTo(64).tab(CraftCreator.CRAFT_CREATOR_TAB));
 	}
 }

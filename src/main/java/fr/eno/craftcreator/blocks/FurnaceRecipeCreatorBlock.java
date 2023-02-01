@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 
 public class FurnaceRecipeCreatorBlock extends RecipeCreatorBlock
 {
-	public static final DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
+	public static final DirectionProperty FACING = HorizontalBlock.FACING;
 	private static final VoxelShape SHAPE = Stream.of(
 			BlockUtils.box(1, 0, 1, 15, 15, 15),
 			BlockUtils.box(13, 0, 0, 16, 14, 1),

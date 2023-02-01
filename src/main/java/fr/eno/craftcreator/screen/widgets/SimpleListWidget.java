@@ -110,14 +110,14 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         if(hasTitleBox)
         {
             Screen.fill(pPoseStack, this.x0, this.y0 - titleBoxHeight, this.x0 + this.width, this.y0, 0xf2c3a942);
-            Screen.drawCenteredString(pPoseStack, minecraft.fontRenderer, this.title, this.x0 + this.width / 2, this.y0 - this.titleBoxHeight / 2 - minecraft.fontRenderer.FONT_HEIGHT / 2, 0xFFFFFF);
+            Screen.drawCenteredString(pPoseStack, minecraft.font, this.title, this.x0 + this.width / 2, this.y0 - this.titleBoxHeight / 2 - minecraft.font.lineHeight / 2, 0xFFFFFF);
             //this.renderBackground(pPoseStack);
         }
 
         this.hoveredEntry = this.isMouseOver(pMouseX, pMouseY) ? this.getEntryAtPosition(pMouseX, pMouseY) : null;
         this.isListHovered = ClientUtils.isMouseHover(x0, y0, pMouseX, pMouseY, width, height - itemHeight);
         Tessellator tesselator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tesselator.getBuffer();
+        BufferBuilder bufferbuilder = tesselator.getBuilder();
 
         // Render background
         Entry hovered = this.isMouseOver(pMouseX, pMouseY) ? this.getEntryAtPosition(pMouseX, pMouseY) : null;
@@ -125,11 +125,11 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         int alpha = 100;
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-        bufferbuilder.pos(this.x0, this.y1, 0.0D).tex((float) this.x0 / 32.0F, (float) (this.y1 + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, alpha).endVertex();
-        bufferbuilder.pos(this.x1, this.y1, 0.0D).tex((float) this.x1 / 32.0F, (float) (this.y1 + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, alpha).endVertex();
-        bufferbuilder.pos(this.x1, this.y0, 0.0D).tex((float) this.x1 / 32.0F, (float) (this.y0 + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, alpha).endVertex();
-        bufferbuilder.pos(this.x0, this.y0, 0.0D).tex((float) this.x0 / 32.0F, (float) (this.y0 + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, alpha).endVertex();
-        tesselator.draw();
+        bufferbuilder.vertex(this.x0, this.y1, 0.0D).uv((float) this.x0 / 32.0F, (float) (this.y1 + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, alpha).endVertex();
+        bufferbuilder.vertex(this.x1, this.y1, 0.0D).uv((float) this.x1 / 32.0F, (float) (this.y1 + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, alpha).endVertex();
+        bufferbuilder.vertex(this.x1, this.y0, 0.0D).uv((float) this.x1 / 32.0F, (float) (this.y0 + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, alpha).endVertex();
+        bufferbuilder.vertex(this.x0, this.y0, 0.0D).uv((float) this.x0 / 32.0F, (float) (this.y0 + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, alpha).endVertex();
+        tesselator.end();
 
         int rowLeft = this.getRowLeft();
         int k = this.y0 + 4 - (int) this.getScrollAmount();
@@ -151,19 +151,19 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
             }
 
             bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-            bufferbuilder.pos(scrollbarPosition, this.y1, 0.0D).tex(0.0F, 1.0F).color(0, 0, 0, 255).endVertex();
-            bufferbuilder.pos(j, this.y1, 0.0D).tex(0.0F, 1.0F).color(0, 0, 0, 255).endVertex();
-            bufferbuilder.pos(j, this.y0, 0.0D).tex(1.0F, 0.0F).color(0, 0, 0, 255).endVertex();
-            bufferbuilder.pos(scrollbarPosition, this.y0, 0.0D).tex(0.0F, 0.0F).color(0, 0, 0, 255).endVertex();
-            bufferbuilder.pos(scrollbarPosition, (i2 + l1), 0.0D).tex(0.0F, 1.0F).color(128, 128, 128, 255).endVertex();
-            bufferbuilder.pos(j, (i2 + l1), 0.0D).tex(1.0F, 1.0F).color(128, 128, 128, 255).endVertex();
-            bufferbuilder.pos(j, i2, 0.0D).tex(1.0F, 0.0F).color(128, 128, 128, 255).endVertex();
-            bufferbuilder.pos(scrollbarPosition, i2, 0.0D).tex(0.0F, 0.0F).color(128, 128, 128, 255).endVertex();
-            bufferbuilder.pos(scrollbarPosition, (i2 + l1 - 1), 0.0D).tex(0.0F, 1.0F).color(192, 192, 192, 255).endVertex();
-            bufferbuilder.pos((j - 1), (i2 + l1 - 1), 0.0D).tex(1.0F, 1.0F).color(192, 192, 192, 255).endVertex();
-            bufferbuilder.pos((j - 1), i2, 0.0D).tex(1.0F, 0.0F).color(192, 192, 192, 255).endVertex();
-            bufferbuilder.pos(scrollbarPosition, i2, 0.0D).tex(0.0F, 0.0F).color(192, 192, 192, 255).endVertex();
-            tesselator.draw();
+            bufferbuilder.vertex(scrollbarPosition, this.y1, 0.0D).uv(0.0F, 1.0F).color(0, 0, 0, 255).endVertex();
+            bufferbuilder.vertex(j, this.y1, 0.0D).uv(0.0F, 1.0F).color(0, 0, 0, 255).endVertex();
+            bufferbuilder.vertex(j, this.y0, 0.0D).uv(1.0F, 0.0F).color(0, 0, 0, 255).endVertex();
+            bufferbuilder.vertex(scrollbarPosition, this.y0, 0.0D).uv(0.0F, 0.0F).color(0, 0, 0, 255).endVertex();
+            bufferbuilder.vertex(scrollbarPosition, (i2 + l1), 0.0D).uv(0.0F, 1.0F).color(128, 128, 128, 255).endVertex();
+            bufferbuilder.vertex(j, (i2 + l1), 0.0D).uv(1.0F, 1.0F).color(128, 128, 128, 255).endVertex();
+            bufferbuilder.vertex(j, i2, 0.0D).uv(1.0F, 0.0F).color(128, 128, 128, 255).endVertex();
+            bufferbuilder.vertex(scrollbarPosition, i2, 0.0D).uv(0.0F, 0.0F).color(128, 128, 128, 255).endVertex();
+            bufferbuilder.vertex(scrollbarPosition, (i2 + l1 - 1), 0.0D).uv(0.0F, 1.0F).color(192, 192, 192, 255).endVertex();
+            bufferbuilder.vertex((j - 1), (i2 + l1 - 1), 0.0D).uv(1.0F, 1.0F).color(192, 192, 192, 255).endVertex();
+            bufferbuilder.vertex((j - 1), i2, 0.0D).uv(1.0F, 0.0F).color(192, 192, 192, 255).endVertex();
+            bufferbuilder.vertex(scrollbarPosition, i2, 0.0D).uv(0.0F, 0.0F).color(192, 192, 192, 255).endVertex();
+            tesselator.end();
         }
 
         this.renderDecorations(pPoseStack, pMouseX, pMouseY);
@@ -175,7 +175,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
     {
         int itemCount = this.getItemCount();
         Tessellator tesselator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tesselator.getBuffer();
+        BufferBuilder bufferbuilder = tesselator.getBuilder();
 
         for(int itemIndex = 0; itemIndex < itemCount; ++itemIndex)
         {
@@ -195,18 +195,18 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
                     float f = this.isFocused() ? 1.0F : 0.5F;
                     RenderSystem.color4f(f, f, f, 1.0F);
                     bufferbuilder.begin(7, DefaultVertexFormats.POSITION);
-                    bufferbuilder.pos(l1, (i1 + j1 + 2), 0.0D).endVertex();
-                    bufferbuilder.pos(i2, (i1 + j1 + 2), 0.0D).endVertex();
-                    bufferbuilder.pos(i2, (i1 - 2), 0.0D).endVertex();
-                    bufferbuilder.pos(l1, (i1 - 2), 0.0D).endVertex();
-                    tesselator.draw();
+                    bufferbuilder.vertex(l1, (i1 + j1 + 2), 0.0D).endVertex();
+                    bufferbuilder.vertex(i2, (i1 + j1 + 2), 0.0D).endVertex();
+                    bufferbuilder.vertex(i2, (i1 - 2), 0.0D).endVertex();
+                    bufferbuilder.vertex(l1, (i1 - 2), 0.0D).endVertex();
+                    tesselator.end();
                     RenderSystem.color4f(0.0F, 0.0F, 0.0F, 1.0F);
                     bufferbuilder.begin(7, DefaultVertexFormats.POSITION);
-                    bufferbuilder.pos((l1 + 1), (i1 + j1 + 1), 0.0D).endVertex();
-                    bufferbuilder.pos((i2 - 1), (i1 + j1 + 1), 0.0D).endVertex();
-                    bufferbuilder.pos((i2 - 1), (i1 - 1), 0.0D).endVertex();
-                    bufferbuilder.pos((l1 + 1), (i1 - 1), 0.0D).endVertex();
-                    tesselator.draw();
+                    bufferbuilder.vertex((l1 + 1), (i1 + j1 + 1), 0.0D).endVertex();
+                    bufferbuilder.vertex((i2 - 1), (i1 + j1 + 1), 0.0D).endVertex();
+                    bufferbuilder.vertex((i2 - 1), (i1 - 1), 0.0D).endVertex();
+                    bufferbuilder.vertex((l1 + 1), (i1 - 1), 0.0D).endVertex();
+                    tesselator.end();
                     RenderSystem.enableTexture();
                 }
 
@@ -348,12 +348,12 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
 
             int color = isMouseOver ? 0xF1f115 : 0xFFFFFF;
 
-            Screen.drawString(matrixStack, minecraft.fontRenderer, stringToDisplay, hasItemDisplay ? leftPos + 16 + 5 : leftPos + width / 2 - minecraft.fontRenderer.getStringWidth(stringToDisplay) / 2, (topPos + height / 2 - minecraft.fontRenderer.FONT_HEIGHT / 2), color);
+            Screen.drawString(matrixStack, minecraft.font, stringToDisplay, hasItemDisplay ? leftPos + 16 + 5 : leftPos + width / 2 - minecraft.font.width(stringToDisplay) / 2, (topPos + height / 2 - minecraft.font.lineHeight / 2), color);
         }
 
         protected String getString(int width, String displayStr)
         {
-            int stringWidth = minecraft.fontRenderer.getStringWidth(displayStr);
+            int stringWidth = minecraft.font.width(displayStr);
 
             if(stringWidth > width - (16 + 5))
             {
@@ -389,11 +389,11 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
 
             ItemStack item = ModRecipeCreatorDispatcher.getOutput(recipe).getIcon();
 
-            matrixStack.push();
+            matrixStack.pushPose();
             float scale = 1F;
             int yPos = height / 2 - 16 / 2;
-            minecraft.getItemRenderer().renderItemAndEffectIntoGUI(item, (int) ((left + 1) / scale), (int) ((top + yPos) / scale));
-            matrixStack.pop();
+            minecraft.getItemRenderer().renderAndDecorateFakeItem(item, (int) ((left + 1) / scale), (int) ((top + yPos) / scale));
+            matrixStack.popPose();
         }
 
         @Override
@@ -408,17 +408,17 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
             CraftIngredients input = ModRecipeCreatorDispatcher.getInputs(recipe);
             CraftIngredients output = ModRecipeCreatorDispatcher.getOutput(recipe);
 
-            tooltips.add(new StringTextComponent(this.recipe.getId().toString()).mergeStyle(TextFormatting.GREEN, TextFormatting.UNDERLINE));
+            tooltips.add(new StringTextComponent(this.recipe.getId().toString()).withStyle(TextFormatting.GREEN, TextFormatting.UNDERLINE));
             tooltips.add(new StringTextComponent(""));
             tooltips.add(References.getTranslate("screen.widget.simple_list.tooltip.input"));
             addToTooltip(input);
 
-            tooltips.add(new StringTextComponent("").mergeStyle(TextFormatting.DARK_AQUA));
+            tooltips.add(new StringTextComponent("").withStyle(TextFormatting.DARK_AQUA));
             tooltips.add(References.getTranslate("screen.widget.simple_list.tooltip.output"));
             addToTooltip(output);
 
-            assert minecraft.currentScreen != null;
-            minecraft.currentScreen.func_243308_b(matrixStack, tooltips, mouseX, mouseY);
+            assert minecraft.screen != null;
+            minecraft.screen.renderComponentTooltip(matrixStack, tooltips, mouseX, mouseY);
         }
 
         private void addToTooltip(CraftIngredients input)
@@ -427,49 +427,49 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
             {
                 IFormattableTextComponent ingredientTooltipLine = new StringTextComponent(craftIngredient.getDescription());
                 TextFormatting baseColor = TextFormatting.AQUA;
-                ingredientTooltipLine.mergeStyle(baseColor);
+                ingredientTooltipLine.withStyle(baseColor);
 
                 IFormattableTextComponent separator = new StringTextComponent(" : ");
-                separator.mergeStyle(TextFormatting.WHITE);
-                ingredientTooltipLine.appendSibling(separator);
+                separator.withStyle(TextFormatting.WHITE);
+                ingredientTooltipLine.append(separator);
 
                 IFormattableTextComponent ingredientValue = new StringTextComponent("");
 
                 if(craftIngredient instanceof CraftIngredients.BlockIngredient)
                 {
                     CraftIngredients.BlockIngredient blockIngredient = (CraftIngredients.BlockIngredient) craftIngredient;
-                    ingredientValue.appendSibling(new StringTextComponent(blockIngredient.getId().toString()));
-                    ingredientValue.mergeStyle(TextFormatting.DARK_AQUA);
+                    ingredientValue.append(new StringTextComponent(blockIngredient.getId().toString()));
+                    ingredientValue.withStyle(TextFormatting.DARK_AQUA);
                 }
                 else if(craftIngredient instanceof CraftIngredients.ItemLuckIngredient)
                 {
                     CraftIngredients.ItemLuckIngredient itemLuckIngredient = (CraftIngredients.ItemLuckIngredient) craftIngredient;
 
-                    ingredientValue.appendSibling(new StringTextComponent(itemLuckIngredient.getId().toString())).mergeStyle(TextFormatting.DARK_AQUA);
+                    ingredientValue.append(new StringTextComponent(itemLuckIngredient.getId().toString())).withStyle(TextFormatting.DARK_AQUA);
 
-                    IFormattableTextComponent countComponent = new StringTextComponent(" (x").appendString(String.valueOf(itemLuckIngredient.getCount())).appendString(")").mergeStyle(TextFormatting.GRAY);
-                    ingredientValue.appendSibling(countComponent);
+                    IFormattableTextComponent countComponent = new StringTextComponent(" (x").append(String.valueOf(itemLuckIngredient.getCount())).append(")").withStyle(TextFormatting.GRAY);
+                    ingredientValue.append(countComponent);
 
                     if(itemLuckIngredient.getLuck() != 1D && itemLuckIngredient.getLuck() > 0D)
                     {
-                        IFormattableTextComponent luckComponent = new StringTextComponent(" ").appendString(String.valueOf(itemLuckIngredient.getLuck() * 100)).appendString("%").mergeStyle(TextFormatting.DARK_GRAY);
-                        ingredientValue.appendSibling(luckComponent);
+                        IFormattableTextComponent luckComponent = new StringTextComponent(" ").append(String.valueOf(itemLuckIngredient.getLuck() * 100)).append("%").withStyle(TextFormatting.DARK_GRAY);
+                        ingredientValue.append(luckComponent);
                     }
                 }
                 else if(craftIngredient instanceof CraftIngredients.MultiItemIngredient)
                 {
                     CraftIngredients.MultiItemIngredient multiItemIngredient = (CraftIngredients.MultiItemIngredient) craftIngredient;
 
-                    IFormattableTextComponent countComponent = new StringTextComponent(" (x").appendString(String.valueOf(multiItemIngredient.getCount())).appendString(")").mergeStyle(TextFormatting.GRAY);
-                    ingredientTooltipLine.appendSibling(countComponent);
+                    IFormattableTextComponent countComponent = new StringTextComponent(" (x").append(String.valueOf(multiItemIngredient.getCount())).append(")").withStyle(TextFormatting.GRAY);
+                    ingredientTooltipLine.append(countComponent);
                     tooltips.add(ingredientTooltipLine);
 
                     multiItemIngredient.getIds().forEach((resourceLocation, isTag) ->
                     {
-                        IFormattableTextComponent itemEntryComponent = new StringTextComponent("    ").appendSibling(new StringTextComponent("- ").mergeStyle(TextFormatting.WHITE));
-                        itemEntryComponent.appendSibling(new StringTextComponent(isTag ? "Tag" : "Item").mergeStyle(TextFormatting.YELLOW));
-                        itemEntryComponent.appendSibling(new StringTextComponent(" : ").mergeStyle(TextFormatting.WHITE));
-                        itemEntryComponent.appendSibling(new StringTextComponent(resourceLocation.toString()).mergeStyle(TextFormatting.RED));
+                        IFormattableTextComponent itemEntryComponent = new StringTextComponent("    ").append(new StringTextComponent("- ").withStyle(TextFormatting.WHITE));
+                        itemEntryComponent.append(new StringTextComponent(isTag ? "Tag" : "Item").withStyle(TextFormatting.YELLOW));
+                        itemEntryComponent.append(new StringTextComponent(" : ").withStyle(TextFormatting.WHITE));
+                        itemEntryComponent.append(new StringTextComponent(resourceLocation.toString()).withStyle(TextFormatting.RED));
                         tooltips.add(itemEntryComponent);
                     });
                     continue;
@@ -477,37 +477,37 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
                 else if(craftIngredient instanceof CraftIngredients.TagIngredient)
                 {
                     CraftIngredients.TagIngredient tagIngredient = (CraftIngredients.TagIngredient) craftIngredient;
-                    ingredientValue.appendSibling(new StringTextComponent(tagIngredient.getId().toString())).mergeStyle(TextFormatting.DARK_AQUA);
+                    ingredientValue.append(new StringTextComponent(tagIngredient.getId().toString())).withStyle(TextFormatting.DARK_AQUA);
 
-                    IFormattableTextComponent countComponent = new StringTextComponent(" (x").appendString(String.valueOf(tagIngredient.getCount())).appendString(")").mergeStyle(TextFormatting.GRAY);
-                    ingredientValue.appendSibling(countComponent);
+                    IFormattableTextComponent countComponent = new StringTextComponent(" (x").append(String.valueOf(tagIngredient.getCount())).append(")").withStyle(TextFormatting.GRAY);
+                    ingredientValue.append(countComponent);
                 }
                 else if(craftIngredient instanceof CraftIngredients.ItemIngredient)
                 {
                     CraftIngredients.ItemIngredient itemIngredient = (CraftIngredients.ItemIngredient) craftIngredient;
-                    ingredientValue.appendSibling(new StringTextComponent(itemIngredient.getId().toString())).mergeStyle(TextFormatting.DARK_AQUA);
+                    ingredientValue.append(new StringTextComponent(itemIngredient.getId().toString())).withStyle(TextFormatting.DARK_AQUA);
 
-                    IFormattableTextComponent countComponent = new StringTextComponent(" (x").appendString(String.valueOf(itemIngredient.getCount())).appendString(")").mergeStyle(TextFormatting.GRAY);
-                    ingredientValue.appendSibling(countComponent);
+                    IFormattableTextComponent countComponent = new StringTextComponent(" (x").append(String.valueOf(itemIngredient.getCount())).append(")").withStyle(TextFormatting.GRAY);
+                    ingredientValue.append(countComponent);
                 }
                 else if(craftIngredient instanceof CraftIngredients.FluidIngredient)
                 {
                     CraftIngredients.FluidIngredient fluidIngredient = (CraftIngredients.FluidIngredient) craftIngredient;
 
-                    ingredientValue.appendSibling(new StringTextComponent(fluidIngredient.getId().toString()));
-                    ingredientValue.mergeStyle(TextFormatting.BLUE);
+                    ingredientValue.append(new StringTextComponent(fluidIngredient.getId().toString()));
+                    ingredientValue.withStyle(TextFormatting.BLUE);
 
                     IFormattableTextComponent component = new StringTextComponent(" (");
-                    component.appendString(String.valueOf(fluidIngredient.getAmount()));
-                    component.appendSibling(new StringTextComponent("mb)"));
-                    component.mergeStyle(TextFormatting.GRAY);
-                    ingredientValue.appendSibling(component);
+                    component.append(String.valueOf(fluidIngredient.getAmount()));
+                    component.append(new StringTextComponent("mb)"));
+                    component.withStyle(TextFormatting.GRAY);
+                    ingredientValue.append(component);
                 }
                 else if(craftIngredient instanceof CraftIngredients.DataIngredient)
                 {
                     CraftIngredients.DataIngredient dataIngredient = (CraftIngredients.DataIngredient) craftIngredient;
-                    ingredientValue.appendSibling(new StringTextComponent("" + (dataIngredient.isDouble() ? dataIngredient.getData().doubleValue() : dataIngredient.getData().intValue())).mergeStyle(TextFormatting.LIGHT_PURPLE));
-                    ingredientValue.appendSibling(new StringTextComponent(" ").appendString(dataIngredient.getUnit().getDisplayUnit()).mergeStyle(TextFormatting.DARK_GRAY));
+                    ingredientValue.append(new StringTextComponent("" + (dataIngredient.isDouble() ? dataIngredient.getData().doubleValue() : dataIngredient.getData().intValue())).withStyle(TextFormatting.LIGHT_PURPLE));
+                    ingredientValue.append(new StringTextComponent(" ").append(dataIngredient.getUnit().getDisplayUnit()).withStyle(TextFormatting.DARK_GRAY));
                 }
                 else if(craftIngredient instanceof CraftIngredients.NBTIngredient)
                 {
@@ -515,11 +515,11 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
 
                     tooltips.add(ingredientTooltipLine);
 
-                    getNbtComponent(tooltips, gson.fromJson(nbtIngredient.getNbt().getString(), JsonObject.class), 1);
+                    getNbtComponent(tooltips, gson.fromJson(nbtIngredient.getNbt().getAsString(), JsonObject.class), 1);
                     continue;
                 }
 
-                ingredientTooltipLine.appendSibling(ingredientValue);
+                ingredientTooltipLine.append(ingredientValue);
 
                 tooltips.add(ingredientTooltipLine);
             }
@@ -529,7 +529,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         {
             for(String nbtKey : compoundTag.entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList()))
             {
-                IFormattableTextComponent itemEntryKey = new StringTextComponent(String.join("", Collections.nCopies(step, "    "))).appendSibling(new StringTextComponent(nbtKey).mergeStyle(TextFormatting.RED)).appendSibling(new StringTextComponent(" : ").mergeStyle(TextFormatting.WHITE));
+                IFormattableTextComponent itemEntryKey = new StringTextComponent(String.join("", Collections.nCopies(step, "    "))).append(new StringTextComponent(nbtKey).withStyle(TextFormatting.RED)).append(new StringTextComponent(" : ").withStyle(TextFormatting.WHITE));
 
                 parent.add(itemEntryKey);
 
@@ -551,11 +551,11 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
                                 StringTextComponent value = new StringTextComponent("");
 
                                 if(matcher.find())
-                                    value.appendString(matcher.group());
+                                    value.append(matcher.group());
                                 else
-                                    value.appendString(je.getAsJsonPrimitive().getAsString());
+                                    value.append(je.getAsJsonPrimitive().getAsString());
 
-                                itemEntryKey.appendSibling(value.mergeStyle(TextFormatting.GOLD));
+                                itemEntryKey.append(value.withStyle(TextFormatting.GOLD));
                             }
                         }
                     });
@@ -567,11 +567,11 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
                     StringTextComponent value = new StringTextComponent("");
 
                     if(matcher.find())
-                        value.appendString(matcher.group());
+                        value.append(matcher.group());
                     else
-                        value.appendString(compoundTag.get(nbtKey).getAsJsonPrimitive().getAsString());
+                        value.append(compoundTag.get(nbtKey).getAsJsonPrimitive().getAsString());
 
-                    itemEntryKey.appendSibling(value.mergeStyle(TextFormatting.GOLD));
+                    itemEntryKey.append(value.withStyle(TextFormatting.GOLD));
                 }
             }
         }
@@ -605,7 +605,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
             {
                 try
                 {
-                    item = ForgeRegistries.ITEMS.getValue(ResourceLocation.tryCreate(recipe.getOutputItem()));
+                    item = ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(recipe.getOutputItem()));
                 }
                 catch(Exception ignored)
                 {
@@ -615,7 +615,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
             {
                 try
                 {
-                    item = ForgeRegistries.ITEMS.getValue(ResourceLocation.tryCreate(recipe.getInputItem()));
+                    item = ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(recipe.getInputItem()));
                 }
                 catch(Exception ignored)
                 {
@@ -623,7 +623,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
             }
 
             int yPos = height / 2 - 16 / 2;
-            minecraft.getItemRenderer().renderItemAndEffectIntoGUI(new ItemStack(item), left + yPos, top + yPos);
+            minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(item), left + yPos, top + yPos);
         }
 
         @Override
@@ -636,11 +636,11 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         {
             tooltips.clear();
             Map<ModRecipesJSSerializer.RecipeDescriptors, String> recipeDescriptors = recipe.getRecipeMap();
-            tooltips.add(new StringTextComponent(recipeDescriptors.values().stream().findFirst().orElse(References.getLoc("empty").toString())).mergeStyle(TextFormatting.GREEN, TextFormatting.UNDERLINE));
+            tooltips.add(new StringTextComponent(recipeDescriptors.values().stream().findFirst().orElse(References.getLoc("empty").toString())).withStyle(TextFormatting.GREEN, TextFormatting.UNDERLINE));
             tooltips.add(new StringTextComponent(""));
-            recipeDescriptors.forEach((tag, value) -> tooltips.add(new StringTextComponent(tag.toString()).mergeStyle(TextFormatting.DARK_PURPLE).appendSibling(new StringTextComponent(" : ")).appendSibling(new StringTextComponent(value).mergeStyle(TextFormatting.DARK_AQUA))));
+            recipeDescriptors.forEach((tag, value) -> tooltips.add(new StringTextComponent(tag.toString()).withStyle(TextFormatting.DARK_PURPLE).append(new StringTextComponent(" : ")).append(new StringTextComponent(value).withStyle(TextFormatting.DARK_AQUA))));
 
-            ClientUtils.getCurrentScreen().func_243308_b(matrixStack, tooltips, mouseX, mouseY);
+            ClientUtils.getCurrentScreen().renderComponentTooltip(matrixStack, tooltips, mouseX, mouseY);
         }
 
         public ModifiedRecipe getRecipe()
@@ -680,10 +680,10 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         @Override
         public void renderTooltip(MatrixStack matrixStack, int mouseX, int mouseY)
         {
-            if(!tooltips.isEmpty() && minecraft.currentScreen != null)
+            if(!tooltips.isEmpty() && minecraft.screen != null)
             {
                 tooltips.clear();
-                minecraft.currentScreen.func_243308_b(matrixStack, tooltips, mouseX, mouseY);
+                minecraft.screen.renderComponentTooltip(matrixStack, tooltips, mouseX, mouseY);
             }
         }
 
@@ -716,16 +716,16 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
             String displayStr = getString(width, resourceLocation.toString());
 
             int color = isMouseOver ? 0xF1f115 : 0xFFFFFF;
-            matrixStack.push();
+            matrixStack.pushPose();
             float scale = 1.1F;
             matrixStack.scale(scale, scale, scale);
-            Screen.drawCenteredString(matrixStack, minecraft.fontRenderer, displayStr, (int) ((left + width / 2) / scale), (int) ((top + height / 2 - (minecraft.fontRenderer.FONT_HEIGHT * scale) / 2) / scale), color);
-            matrixStack.pop();
+            Screen.drawCenteredString(matrixStack, minecraft.font, displayStr, (int) ((left + width / 2) / scale), (int) ((top + height / 2 - (minecraft.font.lineHeight * scale) / 2) / scale), color);
+            matrixStack.popPose();
 
             Item item = ForgeRegistries.ITEMS.getValue(getResourceLocation());
 
             int yPos = height / 2 - 16 / 2;
-            minecraft.getItemRenderer().renderItemAndEffectIntoGUI(new ItemStack(item == null ? Items.BARRIER : item), left + yPos, top + yPos);
+            minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(item == null ? Items.BARRIER : item), left + yPos, top + yPos);
         }
 
         @Override
@@ -737,10 +737,10 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         @Override
         public void renderTooltip(MatrixStack matrixStack, int mouseX, int mouseY)
         {
-            if(!tooltips.isEmpty() && minecraft.currentScreen != null)
+            if(!tooltips.isEmpty() && minecraft.screen != null)
             {
                 tooltips.clear();
-                minecraft.currentScreen.func_243308_b(matrixStack, tooltips, mouseX, mouseY);
+                minecraft.screen.renderComponentTooltip(matrixStack, tooltips, mouseX, mouseY);
             }
         }
     }
