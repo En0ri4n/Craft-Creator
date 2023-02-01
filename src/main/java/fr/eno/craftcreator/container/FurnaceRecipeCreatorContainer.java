@@ -23,7 +23,7 @@ public class FurnaceRecipeCreatorContainer extends CommonContainer
 			if(i == SlotHelper.FURNACE_SLOTS_SIZE - 1)
 			{
 				ItemStack fuel = new ItemStack(Items.COAL_BLOCK, 1);
-				fuel.addEnchantment(Enchantments.PROTECTION, 10);
+				fuel.enchant(Enchantments.ALL_DAMAGE_PROTECTION, 10);
 				this.addSlot(new LockedSlot(tile, i, 56, 53, fuel));
 			}
 			this.addSlot(new SimpleSlotItemHandler(tile, i, SlotHelper.FURNACE_SLOTS.get(i).getxPos(), SlotHelper.FURNACE_SLOTS.get(i).getyPos()));

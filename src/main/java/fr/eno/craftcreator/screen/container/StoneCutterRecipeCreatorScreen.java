@@ -19,7 +19,7 @@ public class StoneCutterRecipeCreatorScreen extends MultiScreenModRecipeCreatorS
 {
     public StoneCutterRecipeCreatorScreen(StoneCutterRecipeCreatorContainer screenContainer, PlayerInventory inv, ITextComponent titleIn)
     {
-        super(screenContainer, inv, titleIn, screenContainer.getTile().getPos());
+        super(screenContainer, inv, titleIn, screenContainer.getTile().getBlockPos());
         isVanillaScreen = true;
     }
 
@@ -35,7 +35,7 @@ public class StoneCutterRecipeCreatorScreen extends MultiScreenModRecipeCreatorS
     public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         super.render(matrixStack, mouseX, mouseY, partialTicks);
-        renderHoveredTooltip(matrixStack, mouseX, mouseY);
+        renderTooltip(matrixStack, mouseX, mouseY);
     }
 
     @Override

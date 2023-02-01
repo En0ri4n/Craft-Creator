@@ -25,7 +25,7 @@ public class FurnaceRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
 
     public FurnaceRecipeCreatorScreen(FurnaceRecipeCreatorContainer screenContainer, PlayerInventory inv, ITextComponent titleIn)
     {
-        super(screenContainer, inv, titleIn, screenContainer.getTile().getPos());
+        super(screenContainer, inv, titleIn, screenContainer.getTile().getBlockPos());
         isVanillaScreen = true;
     }
 
@@ -71,13 +71,13 @@ public class FurnaceRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
         renderDataFieldAndTitle(0, References.getTranslate("screen.furnace_recipe_creator_screen.experience"), matrixStack, mouseX, mouseY, partialTicks);
         renderDataFieldAndTitle(1, References.getTranslate("screen.furnace_recipe_creator_screen.cooking_time"), matrixStack, mouseX, mouseY, partialTicks);
 
-        this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
+        this.renderTooltip(matrixStack, mouseX, mouseY);
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int x, int y)
+    protected void renderBg(MatrixStack matrixStack, float partialTicks, int x, int y)
     {
-        super.drawGuiContainerBackgroundLayer(matrixStack, partialTicks, x, y);
+        super.renderBg(matrixStack, partialTicks, x, y);
 
         // Only for >> FLAMES <<
         ClientUtils.bindTexture(References.getLoc("textures/gui/container/minecraft/furnace_recipe_creator.png"));

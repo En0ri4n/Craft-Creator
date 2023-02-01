@@ -30,7 +30,7 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
 
     public BotaniaRecipeCreatorScreen(BotaniaRecipeCreatorContainer screenContainer, PlayerInventory inv, ITextComponent titleIn)
     {
-        super(screenContainer, inv, titleIn, screenContainer.getTile().getPos());
+        super(screenContainer, inv, titleIn, screenContainer.getTile().getBlockPos());
     }
 
     @Override
@@ -50,7 +50,7 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
         {
             if(textField.visible)
             {
-                if(textField.getText().isEmpty()) textField.setNumberValue(100);
+                if(textField.getValue().isEmpty()) textField.setNumberValue(100);
 
                 if(this.getCurrentRecipe().equals(ModRecipeCreator.PURE_DAISY))
                 {
@@ -122,15 +122,15 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
                     {
                         if(i == 4)
                         {
-                            ClientUtils.getItemRenderer().renderItemAndEffectIntoGUI(new ItemStack(ModSubtiles.pureDaisy), this.leftPos + 8 + 18 * x, this.topPos + 18 + y * 18);
-                            ClientUtils.getItemRenderer().renderItemAndEffectIntoGUI(new ItemStack(ModSubtiles.pureDaisy), this.leftPos + 116 + 18 * x, this.topPos + 18 + y * 18);
+                            ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(ModSubtiles.pureDaisy), this.leftPos + 8 + 18 * x, this.topPos + 18 + y * 18);
+                            ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(ModSubtiles.pureDaisy), this.leftPos + 116 + 18 * x, this.topPos + 18 + y * 18);
                         }
                         else if(i != 5)
                         {
-                            Slot inputSlot = PositionnedSlot.getSlotsFor(SlotHelper.PURE_DAISY_SLOTS, this.getContainer().inventorySlots).get(0);
-                            Slot outputSlot = PositionnedSlot.getSlotsFor(SlotHelper.PURE_DAISY_SLOTS, this.getContainer().inventorySlots).get(1);
-                            ClientUtils.getItemRenderer().renderItemAndEffectIntoGUI(inputSlot.getHasStack() ? inputSlot.getStack() : ItemStack.EMPTY, this.leftPos + 8 + 18 * x, this.topPos + 18 + y * 18);
-                            ClientUtils.getItemRenderer().renderItemAndEffectIntoGUI(outputSlot.getHasStack() ? outputSlot.getStack() : ItemStack.EMPTY, this.leftPos + 116 + 18 * x, this.topPos + 18 + y * 18);
+                            Slot inputSlot = PositionnedSlot.getSlotsFor(SlotHelper.PURE_DAISY_SLOTS, this.getMenu().slots).get(0);
+                            Slot outputSlot = PositionnedSlot.getSlotsFor(SlotHelper.PURE_DAISY_SLOTS, this.getMenu().slots).get(1);
+                            ClientUtils.getItemRenderer().renderAndDecorateFakeItem(inputSlot.hasItem() ? inputSlot.getItem() : ItemStack.EMPTY, this.leftPos + 8 + 18 * x, this.topPos + 18 + y * 18);
+                            ClientUtils.getItemRenderer().renderAndDecorateFakeItem(outputSlot.hasItem() ? outputSlot.getItem() : ItemStack.EMPTY, this.leftPos + 116 + 18 * x, this.topPos + 18 + y * 18);
                         }
 
                         i++;
@@ -140,7 +140,7 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
                 break;
         }
 
-        this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
+        this.renderTooltip(matrixStack, mouseX, mouseY);
     }
 
     @Override

@@ -38,10 +38,10 @@ public class DatapackHelper
 
         for(Slot slot : slots)
         {
-            if(!slot.getHasStack()) continue;
+            if(!slot.hasItem()) continue;
 
             JsonObject obj = new JsonObject();
-            obj.addProperty("item", slot.getStack().getItem().getRegistryName().getPath());
+            obj.addProperty("item", slot.getItem().getItem().getRegistryName().getPath());
             ingredients.add(obj);
         }
 
@@ -80,7 +80,7 @@ public class DatapackHelper
         {
             Slot slot = slots.get(index);
 
-            if(!slot.getHasStack())
+            if(!slot.hasItem())
             {
                 pattern.append(' ');
                 continue;
@@ -99,12 +99,12 @@ public class DatapackHelper
                 continue;
             }
 
-            if(!patterns.containsKey(slot.getStack().getItem().getRegistryName()))
+            if(!patterns.containsKey(slot.getItem().getItem().getRegistryName()))
             {
-                patterns.put(slot.getStack().getItem().getRegistryName(), PairValues.create(false, key));
+                patterns.put(slot.getItem().getItem().getRegistryName(), PairValues.create(false, key));
             }
 
-            pattern.append(patterns.get(slot.getStack().getItem().getRegistryName()).getSecondValue());
+            pattern.append(patterns.get(slot.getItem().getItem().getRegistryName()).getSecondValue());
         }
 
         List<String> patternList = Utils.splitToListWithSize(pattern.toString(), 3);
@@ -188,7 +188,7 @@ public class DatapackHelper
      */
     private static File getOutputFile(IRecipeType<?> type, ResourceLocation output)
     {
-        File directory = new File(Minecraft.getInstance().gameDir, "Craft-Creator");
+        File directory = new File(Minecraft.getInstance().gameDirectory, "Craft-Creator");
         if(!directory.exists()) directory.mkdirs();
 
         return new File(directory, output.getPath() + "_from_" + RecipeFileUtils.getName(type).getPath() + ".json");

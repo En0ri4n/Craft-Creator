@@ -61,18 +61,18 @@ public abstract class MultiScreenRecipeCreatorTile extends TaggeableInventoryCon
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT compoundTag)
+    public CompoundNBT save(CompoundNBT compoundTag)
     {
-        super.write(compoundTag);
+        super.save(compoundTag);
         compoundTag.putInt("ScreenIndex", this.screenIndex);
         compoundTag.putBoolean("KubeJSRecipe", this.isKubeJSRecipe);
         return compoundTag;
     }
 
     @Override
-    public void read(BlockState state, CompoundNBT compound)
+    public void load(BlockState state, CompoundNBT compound)
     {
-        super.read(state, compound);
+        super.load(state, compound);
         this.screenIndex = compound.getInt("ScreenIndex");
         this.isKubeJSRecipe = compound.getBoolean("KubeJSRecipe");
     }

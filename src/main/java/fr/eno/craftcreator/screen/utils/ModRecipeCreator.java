@@ -7,6 +7,7 @@ import fr.eno.craftcreator.utils.SlotHelper;
 import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
 import vazkii.botania.common.crafting.ModRecipeTypes;
 
 import java.util.List;
@@ -25,20 +26,20 @@ public enum ModRecipeCreator
     STONECUTTER(SupportedMods.MINECRAFT, IRecipeType.STONECUTTING, Utils.getGuiContainerTexture(SupportedMods.MINECRAFT.getModId(), "stonecutter_recipe_creator.png"), SlotHelper.STONECUTTER_SLOTS),
 
     // Botania
-    MANA_INFUSION(SupportedMods.BOTANIA, ModRecipeTypes.MANA_INFUSION_TYPE, Utils.getGuiContainerTexture(SupportedMods.BOTANIA.getModId(), "mana_infusion_recipe_creator.png"), SlotHelper.MANA_INFUSION_SLOTS),
-    ELVEN_TRADE(SupportedMods.BOTANIA, ModRecipeTypes.ELVEN_TRADE_TYPE, Utils.getGuiContainerTexture(SupportedMods.BOTANIA.getModId(), "elven_trade_recipe_creator.png"), SlotHelper.ELVEN_TRADE_SLOTS),
-    PURE_DAISY(SupportedMods.BOTANIA, ModRecipeTypes.PURE_DAISY_TYPE, Utils.getGuiContainerTexture(SupportedMods.BOTANIA.getModId(), "pure_daisy_recipe_creator.png"), SlotHelper.PURE_DAISY_SLOTS),
-    BREWERY(SupportedMods.BOTANIA, ModRecipeTypes.BREW_TYPE, Utils.getGuiContainerTexture(SupportedMods.BOTANIA.getModId(), "brewery_recipe_creator.png"), SlotHelper.BREWERY_SLOTS),
-    PETAL_APOTHECARY(SupportedMods.BOTANIA, ModRecipeTypes.PETAL_TYPE, Utils.getGuiContainerTexture(SupportedMods.BOTANIA.getModId(), "petal_apothecary_recipe_creator.png"), SlotHelper.PETAL_APOTHECARY_SLOTS),
-    RUNIC_ALTAR(SupportedMods.BOTANIA, ModRecipeTypes.RUNE_TYPE, Utils.getGuiContainerTexture(SupportedMods.BOTANIA.getModId(), "runic_altar_recipe_creator.png"), SlotHelper.RUNIC_ALTAR_SLOTS),
-    TERRA_PLATE(SupportedMods.BOTANIA, ModRecipeTypes.TERRA_PLATE_TYPE, Utils.getGuiContainerTexture(SupportedMods.BOTANIA.getModId(), "terra_plate_recipe_creator.png"), SlotHelper.TERRA_PLATE_SLOTS),
+    MANA_INFUSION(SupportedMods.BOTANIA, byName("botania:mana_infusion"), Utils.getGuiContainerTexture(SupportedMods.BOTANIA.getModId(), "mana_infusion_recipe_creator.png"), SlotHelper.MANA_INFUSION_SLOTS),
+    ELVEN_TRADE(SupportedMods.BOTANIA, byName("botania:elven_trade"), Utils.getGuiContainerTexture(SupportedMods.BOTANIA.getModId(), "elven_trade_recipe_creator.png"), SlotHelper.ELVEN_TRADE_SLOTS),
+    PURE_DAISY(SupportedMods.BOTANIA, byName("botania:pure_daisy"), Utils.getGuiContainerTexture(SupportedMods.BOTANIA.getModId(), "pure_daisy_recipe_creator.png"), SlotHelper.PURE_DAISY_SLOTS),
+    BREWERY(SupportedMods.BOTANIA, byName("botania:brew"), Utils.getGuiContainerTexture(SupportedMods.BOTANIA.getModId(), "brewery_recipe_creator.png"), SlotHelper.BREWERY_SLOTS),
+    PETAL_APOTHECARY(SupportedMods.BOTANIA, byName("botania:petal_apothecary"), Utils.getGuiContainerTexture(SupportedMods.BOTANIA.getModId(), "petal_apothecary_recipe_creator.png"), SlotHelper.PETAL_APOTHECARY_SLOTS),
+    RUNIC_ALTAR(SupportedMods.BOTANIA, byName("botania:runic_altar"), Utils.getGuiContainerTexture(SupportedMods.BOTANIA.getModId(), "runic_altar_recipe_creator.png"), SlotHelper.RUNIC_ALTAR_SLOTS),
+    TERRA_PLATE(SupportedMods.BOTANIA, byName("botania:terra_plate"), Utils.getGuiContainerTexture(SupportedMods.BOTANIA.getModId(), "terra_plate_recipe_creator.png"), SlotHelper.TERRA_PLATE_SLOTS),
 
     // Thermal
-    TREE_EXTRACTOR(SupportedMods.THERMAL, TCoreRecipeTypes.MAPPING_TREE_EXTRACTOR, Utils.getGuiContainerTexture(SupportedMods.THERMAL.getModId(), "tree_extractor_recipe_creator.png"), SlotHelper.TREE_EXTRACTOR_SLOTS),
-    PULVERIZER(SupportedMods.THERMAL, TCoreRecipeTypes.RECIPE_PULVERIZER, Utils.getGuiContainerTexture(SupportedMods.THERMAL.getModId(), "pulverizer_recipe_creator.png"), SlotHelper.PULVERIZER_SLOTS),
-    SAWMILL(SupportedMods.THERMAL, TCoreRecipeTypes.RECIPE_SAWMILL, Utils.getGuiContainerTexture(SupportedMods.THERMAL.getModId(), "sawmill_recipe_creator.png"), SlotHelper.SAWMILL_SLOTS),
-    SMELTER(SupportedMods.THERMAL, TCoreRecipeTypes.RECIPE_SMELTER, Utils.getGuiContainerTexture(SupportedMods.THERMAL.getModId(), "smelter_recipe_creator.png"), SlotHelper.SMELTER_SLOTS),
-    INSOLATOR(SupportedMods.THERMAL, TCoreRecipeTypes.RECIPE_INSOLATOR, Utils.getGuiContainerTexture(SupportedMods.THERMAL.getModId(), "insolator_recipe_creator.png"), SlotHelper.INSOLATOR_SLOTS);
+    TREE_EXTRACTOR(SupportedMods.THERMAL, byName("thermal:tree_extractor"), Utils.getGuiContainerTexture(SupportedMods.THERMAL.getModId(), "tree_extractor_recipe_creator.png"), SlotHelper.TREE_EXTRACTOR_SLOTS),
+    PULVERIZER(SupportedMods.THERMAL, byName("thermal:pulverizer"), Utils.getGuiContainerTexture(SupportedMods.THERMAL.getModId(), "pulverizer_recipe_creator.png"), SlotHelper.PULVERIZER_SLOTS),
+    SAWMILL(SupportedMods.THERMAL, byName("thermal:sawmill"), Utils.getGuiContainerTexture(SupportedMods.THERMAL.getModId(), "sawmill_recipe_creator.png"), SlotHelper.SAWMILL_SLOTS),
+    SMELTER(SupportedMods.THERMAL, byName("thermal:smelter"), Utils.getGuiContainerTexture(SupportedMods.THERMAL.getModId(), "smelter_recipe_creator.png"), SlotHelper.SMELTER_SLOTS),
+    INSOLATOR(SupportedMods.THERMAL, byName("thermal:insolator"), Utils.getGuiContainerTexture(SupportedMods.THERMAL.getModId(), "insolator_recipe_creator.png"), SlotHelper.INSOLATOR_SLOTS);
 
     private final SupportedMods mod;
     private final IRecipeType<?> recipeType;
@@ -76,5 +77,10 @@ public enum ModRecipeCreator
     public static List<ModRecipeCreator> getRecipeCreatorScreens(SupportedMods mod)
     {
         return Stream.of(values()).filter(recipe -> recipe.getMod().equals(mod)).collect(Collectors.toList());
+    }
+
+    private static IRecipeType<?> byName(String resourceLocation)
+    {
+        return Registry.RECIPE_TYPE.getOptional(ResourceLocation.tryParse(resourceLocation)).orElse(null);
     }
 }

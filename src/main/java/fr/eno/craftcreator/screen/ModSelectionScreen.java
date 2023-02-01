@@ -39,18 +39,18 @@ public class ModSelectionScreen extends ListScreen
     {
         this.renderBackground(matrixStack);
 
-        matrixStack.push();
+        matrixStack.pushPose();
         float scale = 3F;
         matrixStack.scale(scale, scale, scale);
-        Screen.drawCenteredString(matrixStack, minecraft.fontRenderer, References.getTranslate("screen.mod_selection.infos.modId"), Math.floorDiv((this.width / 4 + 10) + (width - (this.width / 4 + 10)) / 2, (int) scale), (int) (10 / scale), 0xFFFFFF);
-        matrixStack.pop();
+        Screen.drawCenteredString(matrixStack, minecraft.font, References.getTranslate("screen.mod_selection.infos.modId"), Math.floorDiv((this.width / 4 + 10) + (width - (this.width / 4 + 10)) / 2, (int) scale), (int) (10 / scale), 0xFFFFFF);
+        matrixStack.popPose();
         if(this.getList(0).getSelected() != null)
         {
-            matrixStack.push();
+            matrixStack.pushPose();
             scale = scale / 2F;
             matrixStack.scale(scale, scale, scale);
-            Screen.drawCenteredString(matrixStack, minecraft.fontRenderer, References.getTranslate("screen.mod_selection.infos.recipeType"), (int) (((this.width / 4 + 10) + (width - (this.width / 4 + 10)) / 2) / scale), (int) ((this.height / 2D - font.FONT_HEIGHT * scale - 3) / scale), 0xFFFFFF);
-            matrixStack.pop();
+            Screen.drawCenteredString(matrixStack, minecraft.font, References.getTranslate("screen.mod_selection.infos.recipeType"), (int) (((this.width / 4 + 10) + (width - (this.width / 4 + 10)) / 2) / scale), (int) ((this.height / 2D - font.lineHeight * scale - 3) / scale), 0xFFFFFF);
+            matrixStack.popPose();
         }
 
         super.render(matrixStack, mouseX, mouseY, partialTicks);
@@ -77,6 +77,6 @@ public class ModSelectionScreen extends ListScreen
 
     private ResourceLocation getRecipeType()
     {
-        return ResourceLocation.tryCreate(((SimpleListWidget.StringEntry) this.getList(1).getSelected()).getResource());
+        return ResourceLocation.tryParse(((SimpleListWidget.StringEntry) this.getList(1).getSelected()).getResource());
     }
 }

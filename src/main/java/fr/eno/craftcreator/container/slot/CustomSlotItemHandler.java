@@ -22,19 +22,19 @@ public abstract class CustomSlotItemHandler extends SlotItemHandler
     protected abstract boolean canPlace(ItemStack stack);
 
     @Override
-    public boolean canTakeStack(PlayerEntity playerIn)
+    public boolean mayPickup(PlayerEntity playerIn)
     {
         return canPickup(playerIn);
     }
 
     @Override
-    public boolean isItemValid(@Nonnull ItemStack stack)
+    public boolean mayPlace(@Nonnull ItemStack stack)
     {
         return canPlace(stack);
     }
 
     @Override
-    public boolean isEnabled()
+    public boolean isActive()
     {
         return isActive;
     }

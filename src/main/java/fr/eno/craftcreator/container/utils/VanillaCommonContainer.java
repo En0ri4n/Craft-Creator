@@ -15,9 +15,9 @@ public abstract class VanillaCommonContainer extends Container
     {
         super(pMenuType, pContainerId);
     }
-
+    
     @Override
-    public boolean canInteractWith(PlayerEntity playerIn)
+    public boolean stillValid(PlayerEntity playerIn)
     {
         return true;
     }
@@ -49,38 +49,36 @@ public abstract class VanillaCommonContainer extends Container
      */
     public void activeSlots(boolean active)
     {
-        for(Slot slot : inventorySlots)
+        for(Slot slot : slots)
             if(slot instanceof SimpleSlotItemHandler)
                 ((SimpleSlotItemHandler) slot).setActive(active);
     }
 
-
-
     @Override
-    public ItemStack transferStackInSlot(PlayerEntity player, int index)
+    public ItemStack quickMoveStack(PlayerEntity player, int index)
     {
-        int playerInvIndexStart = player.inventory.getSizeInventory();
+        int playerInvIndexStart = player.inventory.getContainerSize();
         ItemStack retStack = ItemStack.EMPTY;
-        final Slot slot = this.inventorySlots.get(index);
-        if(slot.getHasStack())
+        final Slot slot = this.slots.get(index);
+        if(slot.hasItem())
         {
-            final ItemStack stack = slot.getStack();
+            final ItemStack stack = slot.getItem();
             retStack = stack.copy();
 
-            final int size = this.inventorySlots.size() - playerInvIndexStart;
+            final int size = this.slots.size() - playerInvIndexStart;
             if(index < size)
             {
-                if(!mergeItemStack(stack, size, this.inventorySlots.size(), false)) return ItemStack.EMPTY;
+                if(!moveItemStackTo(stack, size, this.slots.size(), false)) return ItemStack.EMPTY;
             }
-            else if(!mergeItemStack(stack, 0, size, false)) return ItemStack.EMPTY;
+            else if(!moveItemStackTo(stack, 0, size, false)) return ItemStack.EMPTY;
 
             if(stack.isEmpty() || stack.getCount() == 0)
             {
-                slot.putStack(ItemStack.EMPTY);
+                slot.set(ItemStack.EMPTY);
             }
             else
             {
-                slot.onSlotChanged();
+                slot.setChanged();
             }
 
             if(stack.getCount() == retStack.getCount()) return ItemStack.EMPTY;

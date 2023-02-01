@@ -40,7 +40,7 @@ public class MultipleItemChoiceButton<K extends Item, V> extends Button
 			int yOffset = ExecuteButton.isMouseHover(x, y, mouseX, mouseY, width, height) ? 20 : 0;
 			Screen.blit(matrixStack, x, y, this.width, this.height, 0, yOffset, 20, 20, 20, 40);
 			
-			ClientUtils.getItemRenderer().renderItemIntoGUI(new ItemStack(currentKey), this.x + this.width / 2 - 8, this.y + this.height / 2 - 8);
+			ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(currentKey), this.x + this.width / 2 - 8, this.y + this.height / 2 - 8);
 		}
 	}
 

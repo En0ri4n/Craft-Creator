@@ -23,8 +23,6 @@ import org.lwjgl.glfw.GLFW;
 // TODO replace all calls to minecraft by this class (except in screens classes)
 public class ClientUtils
 {
-    private static final Minecraft mc = Minecraft.getInstance();
-
     public static final KeyBinding KEY_OPEN_RECIPES_MENU = new KeyBinding("key.craftcreator.open_recipes_menu", GLFW.GLFW_KEY_K, "key.categories.craft_creator");
 
     /**
@@ -33,25 +31,25 @@ public class ClientUtils
      */
     public static Minecraft getMinecraft()
     {
-        return mc;
+        return Minecraft.getInstance();
     }
 
     /**
      * @return the client level instance
-     * @see Minecraft#world
+     * @see Minecraft#level
      */
     public static World getClientLevel()
     {
-        return getMinecraft().world;
+        return getMinecraft().level;
     }
 
     /**
      * @return the minecraft font
-     * @see Minecraft#fontRenderer
+     * @see Minecraft#font
      */
     public static FontRenderer getFont()
     {
-        return getMinecraft().fontRenderer;
+        return getMinecraft().font;
     }
 
 	/**
@@ -74,20 +72,20 @@ public class ClientUtils
 
 	/**
 	 * @param screen the screen to open
-	 * @see Minecraft#displayGuiScreen(Screen)
-	 */
+	 * @see Minecraft#setScreen(Screen)
+     */
     public static void openScreen(Screen screen)
     {
-        getMinecraft().displayGuiScreen(screen);
+        getMinecraft().setScreen(screen);
     }
 
 	/**
 	 * @return the current displayed screen (can be null)
-	 * @see Minecraft#currentScreen
+	 * @see Minecraft#screen
 	 */
     public static Screen getCurrentScreen()
     {
-        return getMinecraft().currentScreen;
+        return getMinecraft().screen;
     }
 
 	/**
@@ -102,11 +100,11 @@ public class ClientUtils
 
     /**
      * Register the given container with the given screen
-     * @see net.minecraft.client.gui.ScreenManager#registerFactory(ContainerType, ScreenManager.IScreenFactory)
+     * @see net.minecraft.client.gui.ScreenManager#register(ContainerType, ScreenManager.IScreenFactory)
      */
     public static <M extends Container, U extends Screen & IHasContainer<M>> void registerScreen(ContainerType<? extends M> container, ScreenManager.IScreenFactory<M, U> screenConstructor)
     {
-        ScreenManager.registerFactory(container, screenConstructor);
+        ScreenManager.register(container, screenConstructor);
     }
 
     /**
@@ -115,16 +113,16 @@ public class ClientUtils
      */
     public static void sendClientPlayerMessage(ITextComponent message)
     {
-        getClientPlayer().sendMessage(message, getClientPlayer().getUniqueID());
+        getClientPlayer().sendMessage(message, getClientPlayer().getUUID());
     }
 
     public static void sendMessage(PlayerEntity player, ITextComponent message)
     {
-        player.sendMessage(message, player.getUniqueID());
+        player.sendMessage(message, player.getUUID());
     }
 
     public static void bindTexture(ResourceLocation texture)
     {
-        getMinecraft().getTextureManager().bindTexture(texture);
+        getMinecraft().getTextureManager().bind(texture);
     }
 }

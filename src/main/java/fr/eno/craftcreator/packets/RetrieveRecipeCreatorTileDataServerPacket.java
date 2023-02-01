@@ -25,14 +25,14 @@ public class RetrieveRecipeCreatorTileDataServerPacket
 
     public static void encode(RetrieveRecipeCreatorTileDataServerPacket msg, PacketBuffer packetBuffer)
     {
-        packetBuffer.writeString(msg.dataName);
+        packetBuffer.writeUtf(msg.dataName);
         packetBuffer.writeInt(msg.dataType.ordinal());
         packetBuffer.writeBlockPos(msg.pos);
     }
 
     public static RetrieveRecipeCreatorTileDataServerPacket decode(PacketBuffer packetBuffer)
     {
-        String dataName = packetBuffer.readString();
+        String dataName = packetBuffer.readUtf();
         InitPackets.PacketDataType dataType = InitPackets.PacketDataType.values()[packetBuffer.readInt()];
         BlockPos pos = packetBuffer.readBlockPos();
         return new RetrieveRecipeCreatorTileDataServerPacket(dataName, pos, dataType);

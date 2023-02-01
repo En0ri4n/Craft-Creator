@@ -63,8 +63,8 @@ public class RecipeModifierManagerScreen extends TaggeableSlotsContainerScreen<R
 
         this.lists.get(0).render(matrixStack, mouseX, mouseY, partialTicks);
         String msg = "NOT IMPLEMENTED YET";
-        Screen.drawString(matrixStack, this.font, msg, this.width / 2 - this.font.getStringWidth(msg) / 2, this.height / 2 - this.font.FONT_HEIGHT / 2, 0xFFFF0000);
-        ClientUtils.getItemRenderer().renderItemAndEffectIntoGUI(new ItemStack(Items.ACACIA_BOAT), 100, 100);
+        Screen.drawString(matrixStack, this.font, msg, this.width / 2 - this.font.width(msg) / 2, this.height / 2 - this.font.lineHeight / 2, 0xFFFF0000);
+        ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(Items.ACACIA_BOAT), 100, 100);
     }
 
     @Override
@@ -92,7 +92,7 @@ public class RecipeModifierManagerScreen extends TaggeableSlotsContainerScreen<R
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int pX, int pY)
+    protected void renderBg(MatrixStack matrixStack, float partialTicks, int pX, int pY)
     {
         ClientUtils.bindTexture(GUI_TEXTURE);
         int size = 256;

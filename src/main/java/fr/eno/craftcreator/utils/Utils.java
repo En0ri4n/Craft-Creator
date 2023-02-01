@@ -39,15 +39,15 @@ public class Utils
     }
 
     /**
-     * calls {@link net.minecraft.client.gui.FontRenderer#getStringWidth(String)}
+     * calls {@link net.minecraft.client.gui.FontRenderer#width(String)}
      *
      * @param str The string
      * @return width of the given string
-     * @see net.minecraft.client.gui.FontRenderer#getStringWidth(String)
+     * @see net.minecraft.client.gui.FontRenderer#width(String)
      */
     public static int width(String str)
     {
-        return ClientUtils.getFont().getStringWidth(str);
+        return ClientUtils.getFont().width(str);
     }
 
     /**
@@ -116,7 +116,7 @@ public class Utils
      */
     public static IFormattableTextComponent createComponentFileOpener(ITextComponent component, File toOpen)
     {
-        return component.copyRaw().modifyStyle((msg) -> msg.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, toOpen.getAbsolutePath())));
+        return component.copy().withStyle((msg) -> msg.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, toOpen.getAbsolutePath())));
     }
 
     /**
@@ -128,7 +128,7 @@ public class Utils
      */
     public static IFormattableTextComponent createComponentUrlOpener(ITextComponent component, String urlToOpen)
     {
-        return component.copyRaw().modifyStyle((msg) -> msg.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, urlToOpen)));
+        return component.copy().withStyle((msg) -> msg.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, urlToOpen)));
     }
 
     public static String generateString(int size)

@@ -75,12 +75,12 @@ public class ThermalRecipesManager extends BaseRecipesManager
             {
                 Slot slot = slots.get(i);
                 i++;
-                if(!slot.getHasStack()) continue;
+                if(!slot.hasItem()) continue;
 
                 if(taggedSlots.containsKey(slot.getSlotIndex()))
-                    tempList.add(new RecipeInput(true, taggedSlots.get(slot.getSlotIndex()), slot.getStack().getCount()));
+                    tempList.add(new RecipeInput(true, taggedSlots.get(slot.getSlotIndex()), slot.getItem().getCount()));
                 else
-                    tempList.add(new RecipeInput(false, slot.getStack().getItem().getRegistryName(), slot.getStack().getCount()));
+                    tempList.add(new RecipeInput(false, slot.getItem().getItem().getRegistryName(), slot.getItem().getCount()));
             }
             input.add(tempList);
         }
@@ -91,9 +91,9 @@ public class ThermalRecipesManager extends BaseRecipesManager
             int realIndex = k + SlotHelper.SMELTER_SLOTS_INPUT.size();
 
             Slot slot = slots.get(realIndex);
-            if(!slot.getHasStack()) continue;
+            if(!slot.hasItem()) continue;
 
-            output.put(slot.getStack(), recipeInfos.getValue("chance_" + k).doubleValue());
+            output.put(slot.getItem(), recipeInfos.getValue("chance_" + k).doubleValue());
         }
 
         ThermalRecipesSerializer.get().serializeSmelterRecipe(input, output, energy, experience);
@@ -104,13 +104,13 @@ public class ThermalRecipesManager extends BaseRecipesManager
         if(isSlotsEmpty(slots, SlotHelper.TREE_EXTRACTOR_SLOTS_INPUT.size(), SlotHelper.TREE_EXTRACTOR_SLOTS_OUTPUT.size()))
             return;
 
-        ItemStack trunk = slots.get(0).getStack();
-        ItemStack leaves = slots.get(1).getStack();
+        ItemStack trunk = slots.get(0).getItem();
+        ItemStack leaves = slots.get(1).getItem();
         Fluid fluid = ((BucketItem) getValidOutput(slots, SlotHelper.TREE_EXTRACTOR_SLOTS_OUTPUT.size()).getItem()).getFluid();
 
         if(trunk.isEmpty() || leaves.isEmpty() || fluid == Fluids.EMPTY || resin_amount <= 0) return;
 
-        ThermalRecipesSerializer.get().serializeTreeExtractorRecipe(Block.getBlockFromItem(trunk.getItem()), Block.getBlockFromItem(leaves.getItem()), fluid, resin_amount);
+        ThermalRecipesSerializer.get().serializeTreeExtractorRecipe(Block.byItem(trunk.getItem()), Block.byItem(leaves.getItem()), fluid, resin_amount);
     }
 
     private void createPulverizerRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, double experience, RecipeInfos recipeInfos)
@@ -134,13 +134,13 @@ public class ThermalRecipesManager extends BaseRecipesManager
 
     private PairValues<ResourceLocation, Map<ItemStack, Double>> processRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, RecipeInfos recipeInfos)
     {
-        ResourceLocation input = slots.get(0).getStack().getItem().getRegistryName();
+        ResourceLocation input = slots.get(0).getItem().getItem().getRegistryName();
         Map<ItemStack, Double> outputs = new HashMap<>();
 
         for(int i = 0; i < slots.size() - 1; i++)
         {
-            if(slots.get(i + 1).getHasStack() && recipeInfos.contains("chance_" + i))
-                outputs.put(slots.get(i + 1).getStack(), recipeInfos.getValue("chance_" + i).doubleValue());
+            if(slots.get(i + 1).hasItem() && recipeInfos.contains("chance_" + i))
+                outputs.put(slots.get(i + 1).getItem(), recipeInfos.getValue("chance_" + i).doubleValue());
         }
 
         if(!taggedSlots.isEmpty())

@@ -27,10 +27,10 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
 
     public ThermalRecipeCreatorScreen(ThermalRecipeCreatorContainer screenContainer, PlayerInventory inv, ITextComponent titleIn)
     {
-        super(screenContainer, inv, titleIn, screenContainer.getTile().getPos());
+        super(screenContainer, inv, titleIn, screenContainer.getTile().getBlockPos());
         this.guiTextureSize = 384;
-        this.imageWidth = this.xSize = 296;
-        this.imageHeight = this.ySize = 256;
+        this.imageWidth = 296;
+        this.imageHeight = 256;
     }
 
     @Override
@@ -129,19 +129,19 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
         renderDataFieldTitle(EXPERIENCE_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.experience"), matrixStack);
         renderDataFieldTitle(SPEED_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.mod_energy"), matrixStack);
 
-        this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
+        this.renderTooltip(matrixStack, mouseX, mouseY);
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int pMouseX, int pMouseY)
+    protected void renderLabels(MatrixStack matrixStack, int pMouseX, int pMouseY)
     {
-        super.drawGuiContainerForegroundLayer(matrixStack, pMouseX, pMouseY);
+        super.renderLabels(matrixStack, pMouseX, pMouseY);
 
         // Render Labels
-        IFormattableTextComponent inputLabel = References.getTranslate("screen.recipe_creator.label.input").copyRaw().mergeStyle(TextFormatting.UNDERLINE);
+        IFormattableTextComponent inputLabel = References.getTranslate("screen.recipe_creator.label.input").copy().withStyle(TextFormatting.UNDERLINE);
         ITextComponent ouputLabel = References.getTranslate("screen.recipe_creator.label.output");
-        Screen.drawString(matrixStack, this.font, inputLabel, this.imageWidth / 4 - font.getStringWidth(inputLabel.getString()) / 2, 8, 0xFFFFFFFF);
-        Screen.drawString(matrixStack, this.font, ouputLabel, this.imageWidth / 4 * 3 - font.getStringWidth(ouputLabel.getString()) / 2, 8, 0xFFFFFFFF);
+        Screen.drawString(matrixStack, this.font, inputLabel, this.imageWidth / 4 - font.width(inputLabel.getString()) / 2, 8, 0xFFFFFFFF);
+        Screen.drawString(matrixStack, this.font, ouputLabel, this.imageWidth / 4 * 3 - font.width(ouputLabel.getString()) / 2, 8, 0xFFFFFFFF);
     }
 
     @Override
@@ -156,15 +156,15 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
         switch(getCurrentRecipe())
         {
             case TREE_EXTRACTOR:
-                return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryCreate("thermal:device_tree_extractor"));
+                return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:device_tree_extractor"));
             case PULVERIZER:
-                return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryCreate("thermal:machine_pulverizer"));
+                return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:machine_pulverizer"));
             case SAWMILL:
-                return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryCreate("thermal:machine_sawmill"));
+                return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:machine_sawmill"));
             case SMELTER:
-                return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryCreate("thermal:machine_smelter"));
+                return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:machine_smelter"));
             case INSOLATOR:
-                return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryCreate("thermal:machine_insolator"));
+                return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:machine_insolator"));
             default:
                 return Items.AIR;
         }

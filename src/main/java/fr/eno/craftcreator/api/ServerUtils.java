@@ -34,11 +34,11 @@ public class ServerUtils
      * @param ctx The context
      * @return The server level
      *
-     * @see ServerPlayerEntity#getServerWorld()
+     * @see ServerPlayerEntity#getLevel()
      */
     public static ServerWorld getServerLevel(Supplier<NetworkEvent.Context> ctx)
     {
-        return getServerPlayer(ctx).getServerWorld();
+        return getServerPlayer(ctx).getLevel();
     }
 
     /**
@@ -46,15 +46,15 @@ public class ServerUtils
      * @param ctx The context
      * @param pos The position
      * @return The block entity
-     * @see ServerWorld#getTileEntity(BlockPos)
+     * @see ServerWorld#getBlockEntity(BlockPos)
      */
     public static TileEntity getBlockEntity(Supplier<NetworkEvent.Context> ctx, BlockPos pos)
     {
-        return getServerLevel(ctx).getTileEntity(pos);
+        return getServerLevel(ctx).getBlockEntity(pos);
     }
 
     public static void doCommand(CommandContext<CommandSource> ctx, String command)
     {
-        ctx.getSource().getServer().getCommandManager().handleCommand(ctx.getSource(), command);
+        ctx.getSource().getServer().getCommands().performCommand(ctx.getSource(), command);
     }
 }

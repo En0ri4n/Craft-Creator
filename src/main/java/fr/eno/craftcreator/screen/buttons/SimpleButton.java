@@ -30,7 +30,7 @@ public class SimpleButton extends Button
 	}
 
 	@Override
-	public void renderWidget(MatrixStack pPoseStack, int mouseX, int mouseY, float pPartialTick)
+	public void renderButton(MatrixStack pPoseStack, int mouseX, int mouseY, float pPartialTick)
 	{
 		if(this.visible && this.active)
 		{
@@ -51,6 +51,6 @@ public class SimpleButton extends Button
 	public void renderToolTip(MatrixStack pPoseStack, int mouseX, int mouseY)
 	{
 		if(!this.tooltips.isEmpty())
-			ClientUtils.getCurrentScreen().func_243308_b(pPoseStack, tooltips, mouseX, mouseY);
+			ClientUtils.getCurrentScreen().renderComponentTooltip(pPoseStack, tooltips, mouseX, mouseY);
 	}
 }

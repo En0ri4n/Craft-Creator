@@ -22,14 +22,14 @@ public class TestRecipesCommand
 {
 	public static void register(CommandDispatcher<CommandSource> dispatcher)
 	{
-		dispatcher.register(Commands.literal("testrecipes").requires((source) -> source.hasPermissionLevel(4))
+		dispatcher.register(Commands.literal("testrecipes").requires((source) -> source.hasPermission(4))
 				.executes(TestRecipesCommand::execute));
 	}
 
 	public static int execute(CommandContext<CommandSource> ctx)
 	{
 		File recipeFolder = createDatapack(ctx);
-		File generatorFolder = new File(ctx.getSource().getServer().getDataDirectory(), "Craft-Creator");
+		File generatorFolder = new File(ctx.getSource().getServer().getServerDirectory(), "Craft-Creator");
 
 		File[] datapackRecipeFolder = recipeFolder.listFiles();
 
@@ -48,15 +48,15 @@ public class TestRecipesCommand
 			}
 
 		ServerUtils.doCommand(ctx, "/reload");
-		ctx.getSource().sendFeedback(new StringTextComponent(TextFormatting.GREEN + "Recipes has been loaded successfully !"), false);
-		register(ctx.getSource().getServer().getCommandManager().getDispatcher());
+		ctx.getSource().sendSuccess(new StringTextComponent(TextFormatting.GREEN + "Recipes has been loaded successfully !"), false);
+		register(ctx.getSource().getServer().getCommands().getDispatcher());
 
 		return 0;
 	}
 
 	private static File createDatapack(CommandContext<CommandSource> ctx)
 	{
-		File datapackFolder = ctx.getSource().getServer().func_240776_a_(FolderName.DATAPACKS).toFile();
+		File datapackFolder = ctx.getSource().getServer().getWorldPath(FolderName.DATAPACK_DIR).toFile();
 		File packFolder = new File(datapackFolder, "Craft-Creator");
 		packFolder.mkdirs();
 

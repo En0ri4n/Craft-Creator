@@ -24,17 +24,17 @@ public abstract class InventoryContainerTileEntity extends TileEntity implements
     }
 
     @Override
-    public void read(BlockState state, CompoundNBT compound)
+    public void load(BlockState state, CompoundNBT compound)
     {
-        super.read(state, compound);
+        super.load(state, compound);
         this.inventory = NonNullList.withSize(inventory.size(), ItemStack.EMPTY);
         ItemStackHelper.loadAllItems(compound, this.inventory);
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT compoundTag)
+    public CompoundNBT save(CompoundNBT compoundTag)
     {
-        super.write(compoundTag);
+        super.save(compoundTag);
         ItemStackHelper.saveAllItems(compoundTag, this.inventory, false);
         return compoundTag;
     }
@@ -93,7 +93,7 @@ public abstract class InventoryContainerTileEntity extends TileEntity implements
                 existing.grow(reachedLimit ? limit : stack.getCount());
             }
 
-            this.markDirty();
+            this.setChanged();
         }
 
         return reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, stack.getCount()- limit) : ItemStack.EMPTY;
@@ -125,7 +125,7 @@ public abstract class InventoryContainerTileEntity extends TileEntity implements
             if (!simulate)
             {
                 this.inventory.set(slot, ItemStack.EMPTY);
-                this.markDirty();
+                this.setChanged();
                 return existing;
             }
             else
@@ -138,7 +138,7 @@ public abstract class InventoryContainerTileEntity extends TileEntity implements
             if (!simulate)
             {
                 this.inventory.set(slot, ItemHandlerHelper.copyStackWithSize(existing, existing.getCount() - toExtract));
-                this.markDirty();
+                this.setChanged();
             }
 
             return ItemHandlerHelper.copyStackWithSize(existing, toExtract);
@@ -156,7 +156,7 @@ public abstract class InventoryContainerTileEntity extends TileEntity implements
     {
         this.validateSlotIndex(slot);
         this.inventory.set(slot, stack);
-        this.markDirty();
+        this.setChanged();
     }
 
     @Override

@@ -29,6 +29,6 @@ public class ThermalRecipeCreatorTile extends MultiScreenRecipeCreatorTile
     @Override
     public Container createMenu(int containerId, PlayerInventory inventory, PlayerEntity player)
     {
-        return new ThermalRecipeCreatorContainer(containerId, inventory, new PacketBuffer(Unpooled.buffer()).writeBlockPos(getPos()));
+        return new ThermalRecipeCreatorContainer(containerId, inventory, new PacketBuffer(Unpooled.buffer()).writeBlockPos(getBlockPos()));
     }
 }

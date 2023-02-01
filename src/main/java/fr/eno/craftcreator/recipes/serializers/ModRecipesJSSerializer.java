@@ -61,8 +61,8 @@ public abstract class ModRecipesJSSerializer
 
     private <C extends IInventory, T extends IRecipe<C>> IRecipe<C> getRecipe(IRecipeType<T> type, IItemProvider result)
     {
-        RecipeManager manager = ClientUtils.getMinecraft().world.getRecipeManager();
-        return manager.getRecipesForType(type).stream().filter(recipe -> recipe.getRecipeOutput().getItem() == result.asItem()).findFirst().orElse(null);
+        RecipeManager manager = ClientUtils.getClientLevel().getRecipeManager();
+        return manager.getAllRecipesFor(type).stream().filter(recipe -> recipe.getResultItem().getItem() == result.asItem()).findFirst().orElse(null);
     }
     protected void addRecipeToKubeJS(String recipeJson, IRecipeType<?> recipeType, ResourceLocation result)
     {
@@ -167,32 +167,32 @@ public abstract class ModRecipesJSSerializer
         {
             int count = 1;
 
-            if(ingredient.getMatchingStacks().length > 0)
-                count = ingredient.getMatchingStacks()[0].getCount();
+            if(ingredient.getItems().length > 0)
+                count = ingredient.getItems()[0].getCount();
 
-            if(ingredient.serialize().isJsonObject())
+            if(ingredient.toJson().isJsonObject())
             {
-                if(ingredient.serialize().getAsJsonObject().has("tag"))
-                    inputIngredients.addIngredient(new CraftIngredients.TagIngredient(ResourceLocation.tryCreate(ingredient.serialize().getAsJsonObject().get("tag").getAsString()), count));
-                else if(ingredient.serialize().getAsJsonObject().has("item"))
-                    inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(ResourceLocation.tryCreate(ingredient.serialize().getAsJsonObject().get("item").getAsString()), count));
+                if(ingredient.toJson().getAsJsonObject().has("tag"))
+                    inputIngredients.addIngredient(new CraftIngredients.TagIngredient(ResourceLocation.tryParse(ingredient.toJson().getAsJsonObject().get("tag").getAsString()), count));
+                else if(ingredient.toJson().getAsJsonObject().has("item"))
+                    inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(ResourceLocation.tryParse(ingredient.toJson().getAsJsonObject().get("item").getAsString()), count));
             }
             else
             {
-                if(ingredient.serialize().isJsonArray())
+                if(ingredient.toJson().isJsonArray())
                 {
                     CraftIngredients.MultiItemIngredient multiItemIngredient = new CraftIngredients.MultiItemIngredient(Utils.generateString(16), count);
 
-                    JsonArray ingredientArray = ingredient.serialize().getAsJsonArray();
+                    JsonArray ingredientArray = ingredient.toJson().getAsJsonArray();
 
                     for(JsonElement value : ingredientArray)
                     {
                         if(value.isJsonObject())
                         {
                             if(value.getAsJsonObject().has("tag"))
-                                multiItemIngredient.add(ResourceLocation.tryCreate(value.getAsJsonObject().get("tag").getAsString()), true);
+                                multiItemIngredient.add(ResourceLocation.tryParse(value.getAsJsonObject().get("tag").getAsString()), true);
                             else if(value.getAsJsonObject().has("item"))
-                                multiItemIngredient.add(ResourceLocation.tryCreate(value.getAsJsonObject().get("item").getAsString()), false);
+                                multiItemIngredient.add(ResourceLocation.tryParse(value.getAsJsonObject().get("item").getAsString()), false);
                         }
                     }
 

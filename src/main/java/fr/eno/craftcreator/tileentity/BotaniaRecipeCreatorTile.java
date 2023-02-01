@@ -32,6 +32,6 @@ public class BotaniaRecipeCreatorTile extends MultiScreenRecipeCreatorTile
     @Override
     public Container createMenu(int pContainerId, PlayerInventory pInventory, PlayerEntity pPlayer)
     {
-        return new BotaniaRecipeCreatorContainer(pContainerId, pInventory, new PacketBuffer(Unpooled.buffer()).writeBlockPos(getPos()));
+        return new BotaniaRecipeCreatorContainer(pContainerId, pInventory, new PacketBuffer(Unpooled.buffer()).writeBlockPos(getBlockPos()));
     }
 }

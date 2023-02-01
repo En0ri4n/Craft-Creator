@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class StoneCutterRecipeCreatorBlock extends RecipeCreatorBlock
 {
-    public static final DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
+    public static final DirectionProperty FACING = HorizontalBlock.FACING;
     protected static final VoxelShape SHAPE = BlockUtils.box(0.0D, 0.0D, 0.0D, 16.0D, 9.0D, 16.0D);
 
     public StoneCutterRecipeCreatorBlock()

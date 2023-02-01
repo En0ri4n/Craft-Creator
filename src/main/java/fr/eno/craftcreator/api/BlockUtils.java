@@ -16,19 +16,19 @@ public class BlockUtils
 {
     public static VoxelShape box(double x1, double y1, double z1, double x2, double y2, double z2)
     {
-        return VoxelShapes.create(x1 / 16.0D, y1 / 16.0D, z1 / 16.0D, x2 / 16.0D, y2 / 16.0D, z2 / 16.0D);
+        return VoxelShapes.box(x1 / 16.0D, y1 / 16.0D, z1 / 16.0D, x2 / 16.0D, y2 / 16.0D, z2 / 16.0D);
     }
 
     public static VoxelShape join(VoxelShape shape1, VoxelShape shape2, IBooleanFunction op)
     {
-        return VoxelShapes.combineAndSimplify(shape1, shape2, op);
+        return VoxelShapes.join(shape1, shape2, op);
     }
 
     public static ActionResultType openMenu(World level, BlockPos pos, PlayerEntity player, Class<? extends TileEntity> tileEntityClass)
     {
-        if(!level.isRemote)
+        if(!level.isClientSide)
         {
-            TileEntity tileentity = level.getTileEntity(pos);
+            TileEntity tileentity = level.getBlockEntity(pos);
 
             if(tileentity != null && tileentity.getClass().equals(tileEntityClass))
             {

@@ -16,7 +16,7 @@ public class EventHandler
     @SubscribeEvent
     public static void onKey(InputEvent.KeyInputEvent e)
     {
-        if(ClientUtils.KEY_OPEN_RECIPES_MENU.isKeyDown() && ClientUtils.getCurrentScreen() == null)
+        if(ClientUtils.KEY_OPEN_RECIPES_MENU.isDown() && ClientUtils.getCurrentScreen() == null)
             ClientUtils.openScreen(new ModSelectionScreen());
     }
 
@@ -25,7 +25,7 @@ public class EventHandler
     {
         ITextComponent issueMsg = Utils.createComponentUrlOpener(References.getTranslate("message.join_issue"), "https://github.com/En0ri4n/Craft-Creator/issues");
 
-        ClientUtils.sendMessage(event.getPlayer(), References.getTranslate("message.join", new TranslationTextComponent(ClientUtils.KEY_OPEN_RECIPES_MENU.getKey().getTranslationKey()).getString()));
+        ClientUtils.sendMessage(event.getPlayer(), References.getTranslate("message.join", new TranslationTextComponent(ClientUtils.KEY_OPEN_RECIPES_MENU.getKey().getDisplayName().getString()).getString()));
         ClientUtils.sendMessage(event.getPlayer(), issueMsg);
     }
 }

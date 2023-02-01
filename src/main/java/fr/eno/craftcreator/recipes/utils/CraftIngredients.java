@@ -47,6 +47,7 @@ public class CraftIngredients
         {
             ((CountedIngredient) ingredient).addCount((int) (this.ingredients.stream().filter(i -> i.equals(ingredient)).mapToInt(o -> (int) ((CountedIngredient) o).getCount()).sum() - ((CountedIngredient) ingredient).getCount()));
             if(!contains(ingredientsWithCount, ingredient))
+            {
                 if(ingredient instanceof MultiItemIngredient)
                 {
                     if(((MultiItemIngredient) ingredient).getIds().size() > 0)
@@ -56,8 +57,7 @@ public class CraftIngredients
                 {
                     this.ingredientsWithCount.add(ingredient);
                 }
-
-
+            }
         });
 
         for(CraftIngredient ingredient : this.ingredients)
@@ -113,7 +113,7 @@ public class CraftIngredients
                 if(containsDescription("Brew"))
                 {
                     ItemStack stack = ModItems.brewFlask.getDefaultInstance();
-                    ItemBrewBase.setBrew(stack, BotaniaAPI.instance().getBrewRegistry().getOrDefault(getByDescription("Brew").getId()));
+                    ItemBrewBase.setBrew(stack, BotaniaAPI.instance().getBrewRegistry().get(getByDescription("Brew").getId()));
                     return stack;
                 }
 
@@ -121,7 +121,7 @@ public class CraftIngredients
             }
             else if(ingredient instanceof FluidIngredient)
             {
-                return new ItemStack(ForgeRegistries.FLUIDS.getValue(ingredient.getId()).getFilledBucket());
+                return new ItemStack(ForgeRegistries.FLUIDS.getValue(ingredient.getId()).getBucket());
             }
             else if(ingredient instanceof BlockIngredient)
             {
@@ -180,6 +180,11 @@ public class CraftIngredients
         {
             return false;
         }
+
+        public boolean equals(CraftIngredient ingredient)
+        {
+            return this.type.equals(ingredient.getType()) && this.id.equals(ingredient.getId()) && this.description.equals(ingredient.getDescription());
+        }
     }
 
     public static class MultiItemIngredient extends CountedIngredient
@@ -200,6 +205,18 @@ public class CraftIngredients
         public Map<ResourceLocation, Boolean> getIds()
         {
             return ids;
+        }
+
+        @Override
+        public boolean equals(CraftIngredient ingredient)
+        {
+            if(ingredient instanceof MultiItemIngredient)
+            {
+                MultiItemIngredient multiItemIngredient = (MultiItemIngredient) ingredient;
+                return this.ids.equals(multiItemIngredient.getIds()) && this.getCount() == multiItemIngredient.getCount();
+            }
+
+            return false;
         }
     }
 
@@ -233,6 +250,18 @@ public class CraftIngredients
         {
             return true;
         }
+
+        @Override
+        public boolean equals(CraftIngredient ingredient)
+        {
+            if(ingredient instanceof CountedIngredient)
+            {
+                CountedIngredient countedIngredient = (CountedIngredient) ingredient;
+                return this.count == countedIngredient.getCount();
+            }
+
+            return false;
+        }
     }
 
     public static class FluidIngredient extends CraftIngredient
@@ -261,6 +290,18 @@ public class CraftIngredients
         {
             return amount;
         }
+
+        @Override
+        public boolean equals(CraftIngredient ingredient)
+        {
+            if(ingredient instanceof FluidIngredient)
+            {
+                FluidIngredient fluidIngredient = (FluidIngredient) ingredient;
+                return this.amount == fluidIngredient.getAmount();
+            }
+
+            return false;
+        }
     }
 
     public static class ItemIngredient extends CountedIngredient
@@ -274,6 +315,18 @@ public class CraftIngredients
         {
             this(id, count, "Item");
         }
+
+        @Override
+        public boolean equals(CraftIngredient ingredient)
+        {
+            if(ingredient instanceof ItemIngredient)
+            {
+                ItemIngredient itemIngredient = (ItemIngredient) ingredient;
+                return this.getCount() == itemIngredient.getCount();
+            }
+
+            return false;
+        }
     }
 
     public static class TagIngredient extends CountedIngredient
@@ -286,6 +339,18 @@ public class CraftIngredients
         public TagIngredient(ResourceLocation id, long count)
         {
             this(id, count, "Tag");
+        }
+
+        @Override
+        public boolean equals(CraftIngredient ingredient)
+        {
+            if(ingredient instanceof TagIngredient)
+            {
+                TagIngredient tagIngredient = (TagIngredient) ingredient;
+                return this.getCount() == tagIngredient.getCount();
+            }
+
+            return false;
         }
     }
 
@@ -314,6 +379,18 @@ public class CraftIngredients
         {
             return luck;
         }
+
+        @Override
+        public boolean equals(CraftIngredient ingredient)
+        {
+            if(ingredient instanceof ItemLuckIngredient)
+            {
+                ItemLuckIngredient itemLuckIngredient = (ItemLuckIngredient) ingredient;
+                return this.getCount() == itemLuckIngredient.getCount() && this.getLuck() == itemLuckIngredient.getLuck();
+            }
+
+            return false;
+        }
     }
 
     public static class BlockIngredient extends CountedIngredient
@@ -333,6 +410,18 @@ public class CraftIngredients
         public BlockIngredient(ResourceLocation id, long count, String description)
         {
             super(CraftIngredientType.BLOCK, id, description, count);
+        }
+
+        @Override
+        public boolean equals(CraftIngredient ingredient)
+        {
+            if(ingredient instanceof BlockIngredient)
+            {
+                BlockIngredient blockIngredient = (BlockIngredient) ingredient;
+                return this.getCount() == blockIngredient.getCount();
+            }
+
+            return false;
         }
     }
 
@@ -371,6 +460,18 @@ public class CraftIngredients
             return unit;
         }
 
+        @Override
+        public boolean equals(CraftIngredient ingredient)
+        {
+            if(ingredient instanceof DataIngredient)
+            {
+                DataIngredient dataIngredient = (DataIngredient) ingredient;
+                return this.getData().equals(dataIngredient.getData()) && this.getUnit().equals(dataIngredient.getUnit());
+            }
+
+            return false;
+        }
+
         public enum DataUnit
         {
             TICK("tick"), EMPTY(""), EXPERIENCE("xp"), ENERGY("RF");
@@ -407,7 +508,7 @@ public class CraftIngredients
 
         public List<String> getNbtList()
         {
-            return new ArrayList<>(nbt.keySet());
+            return new ArrayList<>(nbt.getAllKeys());
         }
 
         public void setNbt(CompoundNBT nbt)
@@ -418,6 +519,18 @@ public class CraftIngredients
         public CompoundNBT getNbt()
         {
             return nbt;
+        }
+
+        @Override
+        public boolean equals(CraftIngredient ingredient)
+        {
+            if(ingredient instanceof NBTIngredient)
+            {
+                NBTIngredient nbtIngredient = (NBTIngredient) ingredient;
+                return this.getNbt().equals(nbtIngredient.getNbt());
+            }
+
+            return false;
         }
     }
 

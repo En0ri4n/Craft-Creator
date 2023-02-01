@@ -57,8 +57,8 @@ public class BotaniaRecipesManager extends BaseRecipesManager
         if(isSlotsEmpty(slots, SlotHelper.MANA_INFUSION_SLOTS_INPUT.size(), SlotHelper.MANA_INFUSION_SLOTS_OUTPUT.size()))
             return;
 
-        Item input = slots.get(0).getStack().getItem();
-        Item catalystItem = slots.get(1).getStack().getItem();
+        Item input = slots.get(0).getItem().getItem();
+        Item catalystItem = slots.get(1).getItem().getItem();
         ItemStack output = getValidOutput(slots, SlotHelper.MANA_INFUSION_SLOTS_OUTPUT.size());
 
         if(catalystItem instanceof BlockItem)
@@ -82,7 +82,7 @@ public class BotaniaRecipesManager extends BaseRecipesManager
         if(isSlotsEmpty(slots, SlotHelper.PURE_DAISY_SLOTS_INPUT.size(), SlotHelper.PURE_DAISY_SLOTS_OUTPUT.size()))
             return;
 
-        Item input = slots.get(0).getStack().getItem();
+        Item input = slots.get(0).getItem().getItem();
         Item output = getValidOutput(slots, SlotHelper.PURE_DAISY_SLOTS_OUTPUT.size()).getItem();
 
         if(input instanceof BlockItem && output instanceof BlockItem)
