@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "unused"})
 public class ListEntriesHelper
 {
     public static <T extends SimpleListWidget.Entry> List<T> getStringEntryList(SupportedMods[] mods)
@@ -45,7 +45,7 @@ public class ListEntriesHelper
         return entries;
     }
 
-    public static <T extends SimpleListWidget.Entry> List<T> getModifiedRecipesEntryList()
+    public static <T extends SimpleListWidget.ModifiedRecipeEntry> List<T> getModifiedRecipesEntryList()
     {
         List<T> entries = new ArrayList<>();
 
