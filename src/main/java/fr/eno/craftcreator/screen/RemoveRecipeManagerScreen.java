@@ -49,6 +49,7 @@ public class RemoveRecipeManagerScreen extends ChildrenScreen
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     protected void init()
     {
         this.lists.clear();
@@ -72,9 +73,9 @@ public class RemoveRecipeManagerScreen extends ChildrenScreen
         this.addButton(idButton = new SimpleTextFieldWidget(new StringTextComponent(""), this.font, default_x * 5, default_y + i * space, this.width / 2, 15, (simpleEditBox) -> this.updateList(ModRecipesJSSerializer.RecipeDescriptors.RECIPE_ID, simpleEditBox.x, simpleEditBox.y, simpleEditBox, EntryHelper.getStringEntryListWith(EntryHelper.getRecipeIds()))));
 
         this.addButton(new SimpleButton(References.getTranslate("screen.remove_manager.button.remove"), this.width / 2 - 80, this.height - 50, 160, 20, (button) -> sendRemovedRecipe()));
-        this.addButton(new SimpleButton(References.getTranslate("screen.remove_manager.button.back"), this.width - 97, this.height - 35, 80, 20, (button) -> ClientUtils.openScreen(new ModSelectionScreen())));
+        this.addButton(new SimpleButton(References.getTranslate("screen.remove_manager.button.back"), this.width - 97, this.height - 35, 80, 20, (button) -> ClientUtils.openScreen(null)));
 
-        this.addList(new SimpleListWidget(minecraft, 200, 200, 100, 100, 15,  4, null));
+        this.addList(new SimpleListWidget(minecraft, 200, 200, 100, 100, 15,  4, 6, new StringTextComponent(""), null));
         this.setEntries(0, Arrays.asList(new SimpleListWidget.StringEntry("test"), new SimpleListWidget.StringEntry("test2")));
         this.getList(0).setVisible(false);
 
@@ -105,7 +106,7 @@ public class RemoveRecipeManagerScreen extends ChildrenScreen
             try
             {
                 ResourceLocation location = ResourceLocation.tryParse(entry.getValue());
-                return location.getNamespace();
+                return Utils.notNull(location).getNamespace();
             }
             catch(Exception ignored)
             {

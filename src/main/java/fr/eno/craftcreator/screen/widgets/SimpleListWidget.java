@@ -38,7 +38,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "deprecation"})
 public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
 {
     private static final ResourceLocation BACKGROUND_TILE = References.getLoc("textures/gui/background_tile.png");
@@ -52,6 +52,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
     private Callable<Entry> onDelete;
     private Entry hoveredEntry;
     private boolean isListHovered;
+    private boolean canDisplayTooltips;
 
     public SimpleListWidget(Minecraft mcIn, int leftIn, int topIn, int widthIn, int heightIn, int slotHeightIn, int titleBoxHeight, int scrollBarWidth, ITextComponent titleIn, @Nullable Callable<Entry> onDelete)
     {
@@ -67,22 +68,12 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         this.hasTitleBox = true;
         this.isVisible = true;
         this.onDelete = onDelete;
+        this.canDisplayTooltips = true;
     }
 
-    public SimpleListWidget(Minecraft mcIn, int x, int y, int widthIn, int heightIn, int slotHeightIn, int scrollBarWidth, @Nullable Callable<Entry> onDelete)
+    public void setCanDisplayTooltips(boolean bool)
     {
-        super(mcIn, widthIn - scrollBarWidth, heightIn, 0, 0, slotHeightIn);
-        this.x0 = x;
-        this.x1 = x + widthIn - scrollBarWidth;
-        this.y0 = y;
-        this.y1 = y + heightIn;
-        this.title = new StringTextComponent("");
-        this.titleBoxHeight = 0;
-        this.scrollBarWidth = scrollBarWidth;
-        this.canHaveSelected = true;
-        this.hasTitleBox = false;
-        this.isVisible = true;
-        this.onDelete = onDelete;
+        this.canDisplayTooltips = bool;
     }
 
     public void setCanHaveSelected(boolean bool)
@@ -211,7 +202,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
                 }
 
                 int rowLeft = this.getRowLeft();
-                entry.render(matrixStack, itemIndex, rowTop, rowLeft, rowWidth, j1, mouseX, mouseY, Objects.equals(this.hoveredEntry, entry), partialTicks);
+                entry.render(matrixStack, itemIndex, rowTop, rowLeft, rowWidth, j1, mouseX, mouseY, Objects.equals(this.hoveredEntry, entry) && canDisplayTooltips, partialTicks);
             }
         }
     }
@@ -263,11 +254,11 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         return true;
     }
 
-    public void setEntries(List<Entry> entries)
+    public void setEntries(List<? extends Entry> entries)
     {
         this.clearEntries();
         entries.forEach(this::addEntry);
-        this.setScrollAmount(0D);
+        // this.setScrollAmount(0D);
     }
 
     @Override
@@ -278,6 +269,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
             this.onSelected.run(entry);
             this.onSelected = null;
         }
+
         super.setSelected(entry);
     }
 
@@ -304,7 +296,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
     {
         Entry entry = getEntryAtPosition(mouseX, mouseY);
 
-        if(entry != null && isListHovered)
+        if(entry != null && isListHovered && canDisplayTooltips)
         {
             entry.renderTooltip(matrixStack, mouseX, mouseY);
         }
@@ -601,29 +593,22 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
 
             Item item = Items.BARRIER;
 
-            if(recipe.getOutputItem() != null)
+            if(recipe.getRecipeId() != null)
             {
-                try
+                ResourceLocation recipeId = ResourceLocation.tryParse(recipe.getRecipeId());
+                IRecipe<?> recipe = ClientUtils.getClientLevel().getRecipeManager().getRecipes().stream().filter(r -> r.getId().equals(recipeId)).findFirst().orElse(null);
+
+                if(recipe != null)
                 {
-                    item = ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(recipe.getOutputItem()));
-                }
-                catch(Exception ignored)
-                {
-                }
-            }
-            else if(recipe.getInputItem() != null)
-            {
-                try
-                {
-                    item = ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(recipe.getInputItem()));
-                }
-                catch(Exception ignored)
-                {
+                    item = ModRecipeCreatorDispatcher.getOutput(recipe).getIcon().getItem();
                 }
             }
 
             int yPos = height / 2 - 16 / 2;
             minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(item), left + yPos, top + yPos);
+
+            RenderSystem.color4f(1F, 1.0F, 1.0F, 1F);
+            minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(Items.BARRIER), left + yPos, top + yPos);
         }
 
         @Override
