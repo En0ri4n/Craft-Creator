@@ -8,6 +8,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -16,6 +17,7 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
+import java.util.Map;
 import java.util.stream.Stream;
 
 public class FurnaceRecipeCreatorBlock extends RecipeCreatorBlock
@@ -50,6 +52,14 @@ public class FurnaceRecipeCreatorBlock extends RecipeCreatorBlock
 
 	public FurnaceRecipeCreatorBlock()
 	{
+	}
+
+	@Override
+	protected Map<DirectionProperty, Direction> getStates()
+	{
+		Map<DirectionProperty, Direction> states = super.getStates();
+		states.put(FACING, Direction.NORTH);
+		return states;
 	}
 
 	@Override
