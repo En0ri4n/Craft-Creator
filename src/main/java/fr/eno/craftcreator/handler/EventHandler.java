@@ -2,7 +2,7 @@ package fr.eno.craftcreator.handler;
 
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.screen.ModSelectionScreen;
+import fr.eno.craftcreator.screen.RecipeManagerScreen;
 import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -17,7 +17,7 @@ public class EventHandler
     public static void onKey(InputEvent.KeyInputEvent e)
     {
         if(ClientUtils.KEY_OPEN_RECIPES_MENU.isDown() && ClientUtils.getCurrentScreen() == null)
-            ClientUtils.openScreen(new ModSelectionScreen());
+            ClientUtils.openScreen(new RecipeManagerScreen());
     }
 
     @SubscribeEvent

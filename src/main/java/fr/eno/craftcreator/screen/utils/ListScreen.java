@@ -21,7 +21,7 @@ public class ListScreen extends Screen
         this.lists = new ArrayList<>();
     }
 
-    protected List<SimpleListWidget> getLists()
+    public List<SimpleListWidget> getLists()
     {
         return this.lists;
     }
@@ -36,7 +36,7 @@ public class ListScreen extends Screen
         return this.lists.get(index);
     }
 
-    protected void setEntries(int index, List<SimpleListWidget.Entry> entries)
+    protected void setEntries(int index, List<? extends SimpleListWidget.Entry> entries)
     {
         this.getList(index).setEntries(entries);
     }
