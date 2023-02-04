@@ -1,33 +1,32 @@
 package fr.eno.craftcreator.init;
 
+import com.mojang.datafixers.types.Type;
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.recipes.utils.SupportedMods;
 import fr.eno.craftcreator.tileentity.BotaniaRecipeCreatorTile;
+import fr.eno.craftcreator.tileentity.MinecraftRecipeCreatorTile;
 import fr.eno.craftcreator.tileentity.ThermalRecipeCreatorTile;
-import fr.eno.craftcreator.tileentity.vanilla.CraftingTableRecipeCreatorTile;
-import fr.eno.craftcreator.tileentity.vanilla.FurnaceRecipeCreatorTile;
-import fr.eno.craftcreator.tileentity.vanilla.SmithingTableRecipeCreatorTile;
-import fr.eno.craftcreator.tileentity.vanilla.StoneCutterRecipeCreatorTile;
+import net.minecraft.block.Block;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.Util;
+import net.minecraft.util.datafix.TypeReferences;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.function.Supplier;
+
 public class InitTileEntities
 {
-	public static final DeferredRegister<TileEntityType<?>> TILE_ENTITY = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, References.MOD_ID);
+	public static final DeferredRegister<TileEntityType<?>> TILE_ENTITIES = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, References.MOD_ID);
 
-	public static final RegistryObject<TileEntityType<?>> CRAFTING_TABLE_RECIPE_CREATOR = TILE_ENTITY.register("crafting_table_recipe_creator", () -> TileEntityType.Builder.of(CraftingTableRecipeCreatorTile::new, InitBlocks.CRAFTING_TABLE_RECIPE_CREATOR.get()).build(null));
-	public static final RegistryObject<TileEntityType<?>> FURNACE_RECIPE_CREATOR = TILE_ENTITY.register("furnace_recipe_creator", () -> TileEntityType.Builder.of(FurnaceRecipeCreatorTile::new, InitBlocks.FURNACE_RECIPE_CREATOR.get()).build(null));
-	public static final RegistryObject<TileEntityType<?>> STONE_CUTTER_RECIPE_CREATOR = TILE_ENTITY.register("stone_cutter_recipe_creator", () -> TileEntityType.Builder.of(StoneCutterRecipeCreatorTile::new, InitBlocks.STONE_CUTTER_RECIPE_CREATOR.get()).build(null));
-	public static final RegistryObject<TileEntityType<?>> SMITHING_TABLE_RECIPE_CREATOR = TILE_ENTITY.register("smithing_table_recipe_creator", () -> TileEntityType.Builder.of(SmithingTableRecipeCreatorTile::new, InitBlocks.SMITHING_TABLE_RECIPE_CREATOR.get()).build(null));
+	public static final RegistryObject<TileEntityType<?>> MINECRAFT_RECIPE_CREATOR = register("minecraft_recipe_creator", MinecraftRecipeCreatorTile::new, InitBlocks.MINECRAFT_RECIPE_CREATOR);
+	public static final RegistryObject<TileEntityType<?>> BOTANIA_RECIPE_CREATOR = register("botania_recipe_creator", BotaniaRecipeCreatorTile::new, InitBlocks.BOTANIA_RECIPE_CREATOR);
+	public static final RegistryObject<TileEntityType<?>> THERMAL_RECIPE_CREATOR = register("thermal_recipe_creator", ThermalRecipeCreatorTile::new, InitBlocks.THERMAL_RECIPE_CREATOR);
 
-	public static final RegistryObject<TileEntityType<?>> BOTANIA_RECIPE_CREATOR;
-	public static final RegistryObject<TileEntityType<?>> THERMAL_RECIPE_CREATOR;
-
-	static
+	private static <T extends TileEntity> RegistryObject<TileEntityType<?>> register(String registryName, Supplier<T> tileEntity, Supplier<Block> block)
 	{
-		BOTANIA_RECIPE_CREATOR = SupportedMods.BOTANIA.isLoaded() ? TILE_ENTITY.register("botania_recipe_creator", () -> TileEntityType.Builder.of(BotaniaRecipeCreatorTile::new, InitBlocks.BOTANIA_RECIPE_CREATOR.get()).build(null)) : null;
-		THERMAL_RECIPE_CREATOR = SupportedMods.THERMAL.isLoaded() ? TILE_ENTITY.register("thermal_recipe_creator", () -> TileEntityType.Builder.of(ThermalRecipeCreatorTile::new, InitBlocks.THERMAL_RECIPE_CREATOR.get()).build(null)) : null;
+		Type<?> type = Util.fetchChoiceType(TypeReferences.BLOCK_ENTITY, registryName);
+		return TILE_ENTITIES.register(registryName, () -> TileEntityType.Builder.of(tileEntity, block.get()).build(type));
 	}
 }

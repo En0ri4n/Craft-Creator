@@ -9,6 +9,7 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 
 //TODO: resolve shift-clicking items not working
+@SuppressWarnings("NullableProblems")
 public abstract class VanillaCommonContainer extends Container
 {
     public VanillaCommonContainer(ContainerType<?> pMenuType, int pContainerId)
@@ -60,7 +61,7 @@ public abstract class VanillaCommonContainer extends Container
         int playerInvIndexStart = player.inventory.getContainerSize();
         ItemStack retStack = ItemStack.EMPTY;
         final Slot slot = this.slots.get(index);
-        if(slot.hasItem())
+        if(slot.hasItem() && slot.isActive())
         {
             final ItemStack stack = slot.getItem();
             retStack = stack.copy();

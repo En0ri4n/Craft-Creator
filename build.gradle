@@ -17,9 +17,9 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 
 
-version = '1.0.0'
+version = "${craftcreator_version}"
 group = 'fr.eno.craftcreator' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'craftcreator'
+archivesBaseName = "${craftcreator_name}"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"

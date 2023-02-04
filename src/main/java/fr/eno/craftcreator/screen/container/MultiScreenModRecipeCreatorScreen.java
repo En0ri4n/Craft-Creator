@@ -17,14 +17,14 @@ import fr.eno.craftcreator.screen.buttons.ExecuteButton;
 import fr.eno.craftcreator.screen.buttons.SimpleButton;
 import fr.eno.craftcreator.screen.buttons.SimpleCheckBox;
 import fr.eno.craftcreator.screen.utils.ModRecipeCreator;
+import fr.eno.craftcreator.screen.widgets.ButtonGrid;
+import fr.eno.craftcreator.screen.widgets.IconButton;
 import fr.eno.craftcreator.screen.widgets.NumberDataFieldWidget;
-import fr.eno.craftcreator.utils.PairValues;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -51,6 +51,9 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     protected SimpleButton nextButton;
     protected SimpleButton previousButton;
 
+    protected ButtonGrid<IconButton> buttonGrid;
+    protected IconButton recipeTypeButton;
+
     protected final List<NumberDataFieldWidget> dataFields;
 
     protected final RecipeInfos recipeInfos;
@@ -70,6 +73,18 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     {
         super.init();
         assert this.minecraft != null;
+
+        this.buttonGrid = new ButtonGrid<>(this.leftPos + this.imageWidth, this.topPos, 20, 2, 4, IconButton.getButtons(getAvailableRecipesCreator().stream().map(this::getRecipeIcon).collect(Collectors.toList())), (button) ->
+        {
+            this.currentScreenIndex = this.buttonGrid.getButtons().indexOf(button);
+            updateServerIndex();
+            updateScreen();
+
+            this.buttonGrid.setVisible(false);
+            this.recipeTypeButton.setItem(button.getItem());
+        });
+
+        addButton(this.recipeTypeButton = new IconButton(this.leftPos + imageWidth - 20, this.topPos, ItemStack.EMPTY, button -> this.buttonGrid.setVisible(!this.buttonGrid.isVisible())));
 
         if(isVanillaScreen)
         {
@@ -132,6 +147,8 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
 
         nextButton.visible = hasNext();
         previousButton.visible = hasPrevious();
+
+        this.recipeTypeButton.setItem(getRecipeIcon(getCurrentRecipe()));
     }
 
     protected void hideDataFields()
@@ -213,13 +230,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
             if(field.visible) field.render(matrixStack, mouseX, mouseY, partialTicks);
         });
 
-        if(isVanillaScreen)
-        {
-            int yTextureOffset = ExecuteButton.isMouseHover(this.leftPos + imageWidth - 20, topPos, mouseX, mouseY, 20, 20) ? 20 : 0;
-            ClientUtils.bindTexture(References.getLoc("textures/gui/buttons/item_button.png"));
-            RenderSystem.enableBlend();
-            Screen.blit(matrixStack, this.leftPos + imageWidth - 20, topPos, 20, 20, 0, yTextureOffset, 20, 20, 20, 40);
-        }
+        this.buttonGrid.render(matrixStack, mouseX, mouseY, partialTicks);
     }
 
     @Override
@@ -268,33 +279,30 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     public boolean mouseClicked(double mouseX, double mouseY, int button)
     {
         this.dataFields.forEach(field -> field.mouseClicked(mouseX, mouseY, button));
-        boolean flag = super.mouseClicked(mouseX, mouseY, button);
-        return flag;
+        if(!this.buttonGrid.isMouseOver(mouseX, mouseY)) this.buttonGrid.setVisible(false);
+        else this.buttonGrid.onMouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
     protected void renderBg(MatrixStack matrixStack, float partialTicks, int x, int y)
     {
-        renderBackground(matrixStack);
+        this.fillGradient(matrixStack, 0, 0, this.width, this.height, -1072689136, -804253680);
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         ClientUtils.bindTexture(getCurrentRecipe().getGuiTexture());
         blit(matrixStack, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, this.guiTextureSize, this.guiTextureSize);
+        renderBackground(matrixStack);
     }
 
-    protected abstract Item getRecipeIcon();
-
-    protected PairValues<Integer, Integer> getIconPos()
-    {
-        return PairValues.create(0, 0);
-    }
+    protected abstract Item getRecipeIcon(ModRecipeCreator modRecipeCreator);
 
     @Override
     protected void renderTooltip(MatrixStack poseStack, int mouseX, int mouseY)
     {
-        if(getRecipeIcon() != Items.AIR)
-            ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(getRecipeIcon()), getIconPos().getFirstValue(), getIconPos().getSecondValue());
         super.renderTooltip(poseStack, mouseX, mouseY);
         this.dataFields.forEach(field -> field.renderToolTip(poseStack, mouseX, mouseY));
+        if(this.buttonGrid.isVisible())
+            this.buttonGrid.getButtons().forEach(button -> button.renderToolTip(poseStack, mouseX, mouseY));
     }
 
     @Override
@@ -369,15 +377,8 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
 
     protected void updateSlots()
     {
-        if(isVanillaScreen)
-        {
-            this.getMenu().activeSlots(true);
-        }
-        else
-        {
-            this.getMenu().activeSlots(false);
-            this.getCurrentRecipe().getSlots().forEach(ds -> this.getMenu().slots.stream().filter(s -> s.getSlotIndex() == ds.getIndex() && s instanceof SimpleSlotItemHandler).findFirst().ifPresent(slot -> ((SimpleSlotItemHandler) slot).setActive(true)));
-        }
+        this.getMenu().activeSlots(false);
+        this.getCurrentRecipe().getSlots().forEach(ds -> this.getMenu().slots.stream().filter(s -> s.getSlotIndex() == ds.getIndex() && s instanceof SimpleSlotItemHandler).findFirst().ifPresent(slot -> ((SimpleSlotItemHandler) slot).setActive(true)));
     }
 
     @Override

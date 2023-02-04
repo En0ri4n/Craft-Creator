@@ -4,7 +4,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.container.ThermalRecipeCreatorContainer;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
-import fr.eno.craftcreator.utils.PairValues;
+import fr.eno.craftcreator.screen.utils.ModRecipeCreator;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.client.gui.screen.Screen;
@@ -38,7 +38,7 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     {
         super.init();
 
-        addNumberField(leftPos + imageWidth - 44, topPos + imageHeight / 2, 35, -1, 7);
+        addNumberField(leftPos + imageWidth - 44, topPos + imageHeight / 2, 35, -1, 8);
 
         updateScreen();
     }
@@ -67,7 +67,9 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
             case SMELTER:
             case INSOLATOR:
                 for(int i = 0; i < 4; i++)
-                    this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber("chance_" + i, getNumberField(i + 1).getDoubleValue()));
+                    this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber("chance_" + i, getNumberField(CHANCES_FIELD + i).getDoubleValue()));
+                if(getCurrentRecipe() == ModRecipeCreator.INSOLATOR)
+                    this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.WATER_MOD, getNumberField(7).getDoubleValue()));
                 break;
         }
 
@@ -101,6 +103,12 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
                     showDataField(CHANCES_FIELD + i);
                     setDataField(CHANCES_FIELD + i, leftPos + imageWidth / 4 * 3 - 12, topPos + 33 + i * 26, 40, 1D);
                 }
+
+                if(getCurrentRecipe() == ModRecipeCreator.INSOLATOR)
+                {
+                    showDataField(7);
+                    setDataField(7, this.leftPos + 48, this.topPos + this.imageHeight / 3 - 15, 45, 1D);
+                }
                 break;
         }
     }
@@ -122,6 +130,8 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
             case SMELTER:
             case INSOLATOR:
                 renderDataFieldTitle(CHANCES_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.chances"), matrixStack);
+                if(getCurrentRecipe() == ModRecipeCreator.INSOLATOR)
+                    renderDataFieldTitle(7, References.getTranslate("screen.thermal_recipe_creator.field.mod_water"), matrixStack);
                 break;
         }
 
@@ -151,9 +161,9 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     }
 
     @Override
-    protected Item getRecipeIcon()
+    protected Item getRecipeIcon(ModRecipeCreator modRecipeCreator)
     {
-        switch(getCurrentRecipe())
+        switch(modRecipeCreator)
         {
             case TREE_EXTRACTOR:
                 return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:device_tree_extractor"));
@@ -165,14 +175,10 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
                 return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:machine_smelter"));
             case INSOLATOR:
                 return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:machine_insolator"));
+            case PRESS:
+                return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:machine_press"));
             default:
                 return Items.AIR;
         }
-    }
-
-    @Override
-    protected PairValues<Integer, Integer> getIconPos()
-    {
-        return PairValues.create(this.leftPos + this.imageWidth / 2 - 8, this.topPos + this.imageHeight / 4 + 7);
     }
 }

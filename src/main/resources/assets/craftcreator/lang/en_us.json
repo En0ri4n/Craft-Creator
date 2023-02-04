@@ -20,13 +20,11 @@
 	"craftcreator.screen.crafting.info.nbt": "§oUse NBT tags for this item",
 	"craftcreator.screen.guiList.reset": "§cReset Tag",
 
-	"block.craftcreator.furnace_recipe_creator": "§lFurnace Recipe Creator",
-	"block.craftcreator.crafting_table_recipe_creator": "§lCrafting Table Recipe Creator",
-	"block.craftcreator.stone_cutter_recipe_creator": "§lStone Cutter Recipe Creator",
-	"block.craftcreator.smithing_table_recipe_creator": "§lSmithing Table Recipe Creator",
-
+	"block.craftcreator.minecraft_recipe_creator": "§lMinecraft Table Recipe Creator",
 	"block.craftcreator.botania_recipe_creator": "§lBotania Recipe Creator",
 	"block.craftcreator.thermal_recipe_creator": "§lThermal Recipe Creator",
+
+	"craftcreator.container.minecraft.furnace.fuel": "§cFire Egg §r§7§o(don't ask why)",
 
 	"craftcreator.screen.furnace_recipe_creator_screen.experience": "Exp. :",
 	"craftcreator.screen.furnace_recipe_creator_screen.cooking_time": "Time :",
@@ -102,5 +100,6 @@
 	"craftcreator.screen.thermal_recipe_creator.field.experience": "Exp. Gained :",
 	"craftcreator.screen.thermal_recipe_creator.field.chances": "Luck :",
 	"craftcreator.screen.thermal_recipe_creator.field.resin_amount": "Resin (mb) :",
-	"craftcreator.screen.thermal_recipe_creator.field.mod_energy": "Speed :"
+	"craftcreator.screen.thermal_recipe_creator.field.mod_energy": "Speed :",
+	"craftcreator.screen.thermal_recipe_creator.field.mod_water": "Water :"
 }

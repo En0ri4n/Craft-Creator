@@ -7,13 +7,11 @@ import java.util.stream.Stream;
 public class SlotHelper
 {
     // Minecraft
-    public static final int CRAFTING_TABLE_SLOTS_SIZE;
+    public static final int MINECRAFT_SLOTS_SIZE;
+    public static final List<PositionnedSlot> MINECRAFT_SLOTS;
     public static final List<PositionnedSlot> CRAFTING_TABLE_SLOTS;
-    public static final int FURNACE_SLOTS_SIZE;
     public static final List<PositionnedSlot> FURNACE_SLOTS;
-    public static final int SMITHING_TABLE_SLOTS_SIZE;
     public static final List<PositionnedSlot> SMITHING_TABLE_SLOTS;
-    public static final int STONECUTTER_SLOTS_SIZE;
     public static final List<PositionnedSlot> STONECUTTER_SLOTS;
 
     // Botania
@@ -61,38 +59,26 @@ public class SlotHelper
     public static final List<PositionnedSlot> INSOLATOR_SLOTS;
     public static final List<PositionnedSlot> INSOLATOR_SLOTS_INPUT;
     public static final List<PositionnedSlot> INSOLATOR_SLOTS_OUTPUT;
+    public static final List<PositionnedSlot> PRESS_SLOTS;
+    public static final List<PositionnedSlot> PRESS_SLOTS_INPUT;
+    public static final List<PositionnedSlot> PRESS_SLOTS_OUTPUT;
 
     static
     {
-        int craftingTableSlots = 0;
+        // Vanilla, homemade
+        int minecraftSlots = 0;
         CRAFTING_TABLE_SLOTS = new ArrayList<>();
         for(int x = 0; x < 3; ++x)
             for(int y = 0; y < 3; ++y)
-                CRAFTING_TABLE_SLOTS.add(new PositionnedSlot(craftingTableSlots++, 30 + y * 18, 17 + x * 18));
-        CRAFTING_TABLE_SLOTS.add(new PositionnedSlot(craftingTableSlots++, 124, 35));
-        CRAFTING_TABLE_SLOTS_SIZE = craftingTableSlots;
+                CRAFTING_TABLE_SLOTS.add(new PositionnedSlot(minecraftSlots++, 30 + y * 18, 17 + x * 18));
+        CRAFTING_TABLE_SLOTS.add(new PositionnedSlot(minecraftSlots++, 124, 35));
 
-        int furnaceSlots = 0;
-        FURNACE_SLOTS = new ArrayList<>();
-        FURNACE_SLOTS.add(new PositionnedSlot(furnaceSlots++, 56, 17));
-        FURNACE_SLOTS.add(new PositionnedSlot(furnaceSlots++, 116, 35));
-        FURNACE_SLOTS.add(new PositionnedSlot(furnaceSlots++, 56, 53));
-        FURNACE_SLOTS_SIZE = furnaceSlots;
+        FURNACE_SLOTS = Arrays.asList(new PositionnedSlot(minecraftSlots++, 56, 17), new PositionnedSlot(minecraftSlots++, 116, 35), new PositionnedSlot(minecraftSlots++, 56, 53));
+        SMITHING_TABLE_SLOTS = Arrays.asList(new PositionnedSlot(minecraftSlots++, 27, 47), new PositionnedSlot(minecraftSlots++, 76, 47), new PositionnedSlot(minecraftSlots++, 134, 47));
+        STONECUTTER_SLOTS = Arrays.asList(new PositionnedSlot(minecraftSlots++, 39, 33), new PositionnedSlot(minecraftSlots++, 114, 33));
 
-        int smithingTableSlots = 0;
-        SMITHING_TABLE_SLOTS = Arrays.asList(
-                new PositionnedSlot(smithingTableSlots++, 27, 47),
-                new PositionnedSlot(smithingTableSlots++, 76, 47),
-                new PositionnedSlot(smithingTableSlots++, 134, 47)
-        );
-        SMITHING_TABLE_SLOTS_SIZE = smithingTableSlots;
-
-        int stonecutterSlots = 0;
-        STONECUTTER_SLOTS = Arrays.asList(
-                new PositionnedSlot(stonecutterSlots++, 39, 33),
-                new PositionnedSlot(stonecutterSlots++, 114, 33)
-        );
-        STONECUTTER_SLOTS_SIZE = stonecutterSlots;
+        MINECRAFT_SLOTS = Stream.of(CRAFTING_TABLE_SLOTS, FURNACE_SLOTS, SMITHING_TABLE_SLOTS, STONECUTTER_SLOTS).flatMap(Collection::stream).collect(Collectors.toList());
+        MINECRAFT_SLOTS_SIZE = minecraftSlots;
 
 
         int botaniaSlots = 0;
@@ -139,9 +125,13 @@ public class SlotHelper
         INSOLATOR_SLOTS_INPUT = Collections.singletonList(new PositionnedSlot(thermalSlots++, 63, 98));
         INSOLATOR_SLOTS_OUTPUT = Arrays.asList(new PositionnedSlot(thermalSlots++, 189, 33), new PositionnedSlot(thermalSlots++, 189, 59), new PositionnedSlot(thermalSlots++, 189, 85), new PositionnedSlot(thermalSlots++, 189, 111));
         INSOLATOR_SLOTS = Stream.of(INSOLATOR_SLOTS_INPUT, INSOLATOR_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
+        PRESS_SLOTS_INPUT = Arrays.asList(new PositionnedSlot(thermalSlots++, 22, 98), new PositionnedSlot(thermalSlots++, 83, 98));
+        PRESS_SLOTS_OUTPUT = Arrays.asList(new PositionnedSlot(thermalSlots++, 189, 41), new PositionnedSlot(thermalSlots++, 189, 103));
+        PRESS_SLOTS = Stream.of(PRESS_SLOTS_INPUT, PRESS_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
 
-        THERMAL_SLOTS_OUTPUT = Stream.of(TREE_EXTRACTOR_SLOTS_OUTPUT, PULVERIZER_SLOTS_OUTPUT, SAWMILL_SLOTS_OUTPUT, SMELTER_SLOTS_OUTPUT, INSOLATOR_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
-        THERMAL_SLOTS = Stream.of(TREE_EXTRACTOR_SLOTS, PULVERIZER_SLOTS, SAWMILL_SLOTS, SMELTER_SLOTS, INSOLATOR_SLOTS).flatMap(Collection::stream).collect(Collectors.toList());
+
+        THERMAL_SLOTS_OUTPUT = Stream.of(TREE_EXTRACTOR_SLOTS_OUTPUT, PULVERIZER_SLOTS_OUTPUT, SAWMILL_SLOTS_OUTPUT, SMELTER_SLOTS_OUTPUT, INSOLATOR_SLOTS_OUTPUT, PRESS_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
+        THERMAL_SLOTS = Stream.of(TREE_EXTRACTOR_SLOTS, PULVERIZER_SLOTS, SAWMILL_SLOTS, SMELTER_SLOTS, INSOLATOR_SLOTS, PRESS_SLOTS).flatMap(Collection::stream).collect(Collectors.toList());
         THERMAL_SLOTS_SIZE = thermalSlots;
     }
 }

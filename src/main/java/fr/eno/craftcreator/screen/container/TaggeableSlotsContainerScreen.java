@@ -247,6 +247,12 @@ public abstract class TaggeableSlotsContainerScreen<T extends Container> extends
             this.nbtCheckBox.renderToolTip(poseStack, mouseX, mouseY);
         }
 
+    }
+
+    @Override
+    public void renderBackground(MatrixStack pPoseStack)
+    {
+
         int x = this.leftPos;
         int y = this.topPos;
 
@@ -257,24 +263,17 @@ public abstract class TaggeableSlotsContainerScreen<T extends Container> extends
                 SimpleSlotItemHandler simpleSlotItemHandler = (SimpleSlotItemHandler) slot;
                 if(simpleSlotItemHandler.isActive() && this.taggedSlots.containsKey(simpleSlotItemHandler) && this.nbtSlots.contains(simpleSlotItemHandler.getSlotIndex()))
                 {
-                    fill(poseStack, x + slot.x, y + slot.y, x + slot.x + 16, y + slot.y + 16, 0x8000FFFF);
+                    fill(pPoseStack, x + slot.x, y + slot.y, x + slot.x + 16, y + slot.y + 16, 0x8000FFFF);
                 }
                 else if(simpleSlotItemHandler.isActive() && this.taggedSlots.containsKey(simpleSlotItemHandler))
-                    fill(poseStack, x + slot.x, y + slot.y, x + slot.x + 16, y + slot.y + 16, 0x8000FF00);
+                    fill(pPoseStack, x + slot.x, y + slot.y, x + slot.x + 16, y + slot.y + 16, 0x8000FF00);
                 else if(simpleSlotItemHandler.isActive() && this.nbtSlots.contains(simpleSlotItemHandler.getSlotIndex()))
-                    fill(poseStack, x + slot.x, y + slot.y, x + slot.x + 16, y + slot.y + 16, 0x800000FF);
+                    fill(pPoseStack, x + slot.x, y + slot.y, x + slot.x + 16, y + slot.y + 16, 0x800000FF);
             }
         }
 
         if(this.selectedSlot != null)
-            fill(poseStack, x + selectedSlot.x, y + selectedSlot.y, x + selectedSlot.x + 16, y + selectedSlot.y + 16, 0xFFE7f50d);
-
-    }
-
-    @Override
-    public void renderBackground(MatrixStack pPoseStack)
-    {
-        super.renderBackground(pPoseStack);
+            fill(pPoseStack, x + selectedSlot.x, y + selectedSlot.y, x + selectedSlot.x + 16, y + selectedSlot.y + 16, 0xFFE7f50d);
     }
 
     @Override

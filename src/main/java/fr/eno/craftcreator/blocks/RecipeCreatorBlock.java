@@ -1,9 +1,6 @@
 package fr.eno.craftcreator.blocks;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
@@ -22,23 +19,24 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
-import java.util.HashMap;
-import java.util.Map;
 
-@SuppressWarnings("deprecation")
+@SuppressWarnings({"deprecation", "NullableProblems"})
 public abstract class RecipeCreatorBlock extends Block
 {
+    private static final DirectionProperty FACING = HorizontalBlock.FACING;
+
     public RecipeCreatorBlock()
     {
         super(Block.Properties.of(Material.METAL).sound(SoundType.STONE).strength(999999F));
         BlockState stateHolder = this.defaultBlockState();
-        getStates().forEach(stateHolder::setValue);
+        if(hasFacing())
+            stateHolder = stateHolder.setValue(FACING, Direction.NORTH);
         this.registerDefaultState(stateHolder);
     }
 
-    protected Map<DirectionProperty, Direction> getStates()
+    protected boolean hasFacing()
     {
-        return new HashMap<>();
+        return false;
     }
 
     @Override
@@ -72,7 +70,8 @@ public abstract class RecipeCreatorBlock extends Block
     public BlockState getStateForPlacement(BlockItemUseContext context)
     {
         BlockState stateHolder = this.defaultBlockState();
-        getStates().forEach(stateHolder::setValue);
+        if(hasFacing())
+            stateHolder = stateHolder.setValue(FACING, context.getHorizontalDirection().getOpposite());
         return stateHolder;
     }
 
@@ -91,6 +90,7 @@ public abstract class RecipeCreatorBlock extends Block
     @Override
     protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> stateBuilder)
     {
-        getStates().keySet().forEach(stateBuilder::add);
+        if(hasFacing())
+            stateBuilder.add(FACING);
     }
 }
