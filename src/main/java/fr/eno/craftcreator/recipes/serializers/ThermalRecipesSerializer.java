@@ -2,10 +2,7 @@ package fr.eno.craftcreator.recipes.serializers;
 
 import cofh.thermal.core.init.TCoreRecipeTypes;
 import cofh.thermal.core.util.recipes.device.TreeExtractorMapping;
-import cofh.thermal.core.util.recipes.machine.InsolatorRecipe;
-import cofh.thermal.core.util.recipes.machine.PulverizerRecipe;
-import cofh.thermal.core.util.recipes.machine.SawmillRecipe;
-import cofh.thermal.core.util.recipes.machine.SmelterRecipe;
+import cofh.thermal.core.util.recipes.machine.*;
 import cofh.thermal.lib.util.recipes.ThermalRecipe;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
@@ -129,7 +126,26 @@ public class ThermalRecipesSerializer extends ModRecipesJSSerializer
 
     public void serializeInsolatorRecipe(ResourceLocation firstValue, Map<ItemStack, Double> secondValue, double energyMod, double waterMod)
     {
+        JsonObject recipeObj = createBaseJson(TCoreRecipeTypes.RECIPE_INSOLATOR);
+        recipeObj.addProperty("energy_mod", energyMod);
+        recipeObj.addProperty("water_mod", waterMod);
 
+        addIngredients(firstValue, secondValue, recipeObj);
+
+        addRecipeToKubeJS(gson.toJson(recipeObj), TCoreRecipeTypes.RECIPE_INSOLATOR, secondValue.keySet().stream().findFirst().orElse(ItemStack.EMPTY).getItem().getRegistryName());
+    }
+
+    public void serializePressRecipe(ResourceLocation input, int count, ResourceLocation inputDie, ItemStack output, int energy)
+    {
+        JsonObject recipeObj = createBaseJson(TCoreRecipeTypes.RECIPE_PRESS);
+        recipeObj.addProperty("energy", energy);
+        JsonArray ingredientsArray = new JsonArray();
+        ingredientsArray.add(mapToJsonObject(ImmutableMap.of(isItem(input) ? "item" : "tag", input.toString(), "count", count)));
+        ingredientsArray.add(singletonItemJsonObject("item", inputDie));
+        recipeObj.add("ingredients", ingredientsArray);
+        recipeObj.add("result", mapToJsonObject(ImmutableMap.of("item", output.getItem().getRegistryName().toString(), "count", output.getCount())));
+
+        addRecipeToKubeJS(gson.toJson(recipeObj), TCoreRecipeTypes.RECIPE_PRESS, output.getItem().getRegistryName());
     }
 
     private void addIngredients(ResourceLocation input, Map<ItemStack, Double> outputs, JsonObject obj)
@@ -181,6 +197,12 @@ public class ThermalRecipesSerializer extends ModRecipesJSSerializer
             putIfNotEmpty(inputIngredients, insolatorRecipe.getInputItems());
             inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", CraftIngredients.DataIngredient.DataUnit.ENERGY, insolatorRecipe.getEnergy(), false));
         }
+        else if(recipe instanceof PressRecipe)
+        {
+            PressRecipe pressRecipe = (PressRecipe) recipe;
+            putIfNotEmpty(inputIngredients, pressRecipe.getInputItems());
+            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", CraftIngredients.DataIngredient.DataUnit.ENERGY, pressRecipe.getEnergy(), false));
+        }
 
         if(inputIngredients.isEmpty() && recipe instanceof ThermalRecipe)
         {
@@ -217,6 +239,12 @@ public class ThermalRecipesSerializer extends ModRecipesJSSerializer
             SmelterRecipe smelterRecipe = (SmelterRecipe) recipe;
             putIfNotEmptyLuckedItems(outputsIngredient, smelterRecipe.getOutputItems(), smelterRecipe.getOutputItemChances(), "Item");
             outputsIngredient.addIngredient(new CraftIngredients.DataIngredient("Experience", CraftIngredients.DataIngredient.DataUnit.EXPERIENCE, smelterRecipe.getXp(), true));
+        }
+        else if(recipe instanceof PressRecipe)
+        {
+            PressRecipe pressRecipe = (PressRecipe) recipe;
+            for(ItemStack is : pressRecipe.getOutputItems())
+                outputsIngredient.addIngredient(new CraftIngredients.ItemIngredient(is.getItem().getRegistryName(), is.getCount(), "Item"));
         }
 
         if(outputsIngredient.isEmpty())

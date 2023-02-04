@@ -2,6 +2,7 @@ package fr.eno.craftcreator.utils;
 
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.recipes.utils.SupportedMods;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.IFormattableTextComponent;
@@ -77,13 +78,13 @@ public class Utils
     /**
      * Get the container's texture with the specified name
      *
-     * @param modid The mod id of the container
+     * @param mod The mod of the container
      * @param path  The path of the texture
      * @return the texture's resource location
      */
-    public static ResourceLocation getGuiContainerTexture(String modid, String path)
+    public static ResourceLocation getGuiContainerTexture(SupportedMods mod, String path)
     {
-        return References.getLoc("textures/gui/container/" + modid + "/" + path);
+        return References.getLoc("textures/gui/container/" + mod.getModId() + "/" + path);
     }
 
     /**

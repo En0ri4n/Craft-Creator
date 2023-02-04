@@ -1,6 +1,7 @@
 package fr.eno.craftcreator.blocks;
 
 import fr.eno.craftcreator.api.BlockUtils;
+import fr.eno.craftcreator.recipes.utils.SupportedMods;
 import fr.eno.craftcreator.tileentity.BotaniaRecipeCreatorTile;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -26,7 +27,7 @@ public class BotaniaRecipeCreatorBlock extends RecipeCreatorBlock
     @Override
     protected ActionResultType onBlockUsed(@Nonnull BlockState state, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull PlayerEntity playerIn, @Nonnull Hand handIn, @Nonnull BlockRayTraceResult hit)
     {
-        return BlockUtils.openMenu(worldIn, pos, playerIn, BotaniaRecipeCreatorTile.class);
+        return BlockUtils.openMenu(SupportedMods.BOTANIA, worldIn, pos, playerIn, BotaniaRecipeCreatorTile.class);
     }
 
     @Override

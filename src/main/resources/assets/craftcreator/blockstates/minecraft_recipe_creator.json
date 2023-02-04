@@ -1,0 +1,5 @@
+{
+    "variants": {
+        "": { "model": "craftcreator:block/minecraft_recipe_creator" }
+    }
+}

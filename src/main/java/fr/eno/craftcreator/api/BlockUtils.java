@@ -1,5 +1,6 @@
 package fr.eno.craftcreator.api;
 
+import fr.eno.craftcreator.recipes.utils.SupportedMods;
 import fr.eno.craftcreator.tileentity.utils.MultiScreenRecipeCreatorTile;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -24,9 +25,9 @@ public class BlockUtils
         return VoxelShapes.join(shape1, shape2, op);
     }
 
-    public static ActionResultType openMenu(World level, BlockPos pos, PlayerEntity player, Class<? extends TileEntity> tileEntityClass)
+    public static ActionResultType openMenu(SupportedMods mod, World level, BlockPos pos, PlayerEntity player, Class<? extends TileEntity> tileEntityClass)
     {
-        if(!level.isClientSide)
+        if(!level.isClientSide && mod.isLoaded())
         {
             TileEntity tileentity = level.getBlockEntity(pos);
 

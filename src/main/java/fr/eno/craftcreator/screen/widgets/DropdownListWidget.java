@@ -71,6 +71,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
 
         if(this.isFocused())
         {
+            Screen.fill(matrixStack, x0, y0 + height, x1, y1, 0x88C0C0C0);
             if(getMaxScrollAmount() > 0)
             {
                 int scrollBarX0 = x + width - 4;
@@ -86,9 +87,9 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
                     currentY = y0;
                 }
 
-                Screen.fill(matrixStack, scrollBarX0, y0, scrollBarX1, this.y1, 0xFF000000);
+                Screen.fill(matrixStack, scrollBarX0, y0, scrollBarX1, this.y1, 0xFF101010);
                 Screen.fill(matrixStack, scrollBarX0, currentY, scrollBarX1, currentY + currentHeight, 0xFFA0A0A0);
-                Screen.fill(matrixStack, scrollBarX0, currentY, scrollBarX1 - 1, currentY + currentHeight - 1, 0xFF000000);
+                Screen.fill(matrixStack, scrollBarX0, currentY, scrollBarX1 - 1, currentY + currentHeight - 1, 0xFF303030);
             }
 
             for(int i = 0; i < entries.size(); ++i)

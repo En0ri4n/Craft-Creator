@@ -112,7 +112,6 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
             case RUNIC_ALTAR:
             case TERRA_PLATE:
             case BREWERY:
-            case PETAL_APOTHECARY:
                 renderDataFieldAndTitle(MANA_FIELD, References.getTranslate("screen.botania_recipe_creator.field.mana"), matrixStack, mouseX, mouseY, partialTicks);
                 break;
             case PURE_DAISY:
@@ -140,6 +139,8 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
                 break;
         }
 
+        ClientUtils.getItemRenderer().renderAndDecorateFakeItem(getRecipeIcon(getCurrentRecipe()).getDefaultInstance(), getIconPos().getFirstValue(), getIconPos().getSecondValue());
+
         this.renderTooltip(matrixStack, mouseX, mouseY);
     }
 
@@ -150,9 +151,9 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     }
 
     @Override
-    protected Item getRecipeIcon()
+    protected Item getRecipeIcon(ModRecipeCreator modRecipeCreator)
     {
-        switch(getCurrentRecipe())
+        switch(modRecipeCreator)
         {
             case MANA_INFUSION:
                 return ModBlocks.creativePool.asItem();
@@ -166,12 +167,13 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
                 return ModBlocks.runeAltar.asItem();
             case TERRA_PLATE:
                 return ModItems.spark.asItem();
+            case PURE_DAISY:
+                return ModSubtiles.pureDaisy.asItem();
             default:
                 return Items.AIR;
         }
     }
 
-    @Override
     protected PairValues<Integer, Integer> getIconPos()
     {
         switch(getCurrentRecipe())
@@ -188,7 +190,7 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
             case TERRA_PLATE:
                 return PairValues.create(this.leftPos + 34, this.topPos + 34);
             default:
-                return super.getIconPos();
+                return PairValues.create(0, 0);
         }
     }
 }

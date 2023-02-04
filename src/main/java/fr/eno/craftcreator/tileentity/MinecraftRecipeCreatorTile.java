@@ -1,6 +1,6 @@
-package fr.eno.craftcreator.tileentity.vanilla;
+package fr.eno.craftcreator.tileentity;
 
-import fr.eno.craftcreator.container.CraftingTableRecipeCreatorContainer;
+import fr.eno.craftcreator.container.MinecraftRecipeCreatorContainer;
 import fr.eno.craftcreator.init.InitTileEntities;
 import fr.eno.craftcreator.tileentity.utils.MultiScreenRecipeCreatorTile;
 import fr.eno.craftcreator.utils.SlotHelper;
@@ -17,13 +17,13 @@ import net.minecraft.util.text.StringTextComponent;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class CraftingTableRecipeCreatorTile extends MultiScreenRecipeCreatorTile
+public class MinecraftRecipeCreatorTile extends MultiScreenRecipeCreatorTile
 {
 	private boolean shapedRecipe;
 
-	public CraftingTableRecipeCreatorTile()
+	public MinecraftRecipeCreatorTile()
 	{
-		super(InitTileEntities.CRAFTING_TABLE_RECIPE_CREATOR.get(), SlotHelper.CRAFTING_TABLE_SLOTS_SIZE);
+		super(InitTileEntities.MINECRAFT_RECIPE_CREATOR.get(), SlotHelper.MINECRAFT_SLOTS_SIZE);
 	}
 
 	@Override
@@ -64,14 +64,14 @@ public class CraftingTableRecipeCreatorTile extends MultiScreenRecipeCreatorTile
 	@Override
 	public ITextComponent getDisplayName()
 	{
-		return new StringTextComponent("container.crafting_table_recipe_creator.title");
+		return new StringTextComponent("container.minecraft_recipe_creator.title");
 	}
 
 	@Nullable
 	@Override
 	public Container createMenu(int id, @Nonnull PlayerInventory playerInventory, @Nonnull PlayerEntity player)
 	{
-		return new CraftingTableRecipeCreatorContainer(id, playerInventory, new PacketBuffer(Unpooled.buffer()).writeBlockPos(getBlockPos()));
+		return new MinecraftRecipeCreatorContainer(id, playerInventory, new PacketBuffer(Unpooled.buffer()).writeBlockPos(getBlockPos()));
 	}
 
 	public boolean isShapedRecipe()

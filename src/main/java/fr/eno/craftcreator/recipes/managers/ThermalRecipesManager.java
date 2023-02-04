@@ -29,7 +29,6 @@ public class ThermalRecipesManager extends BaseRecipesManager
         switch(recipe)
         {
             case TREE_EXTRACTOR:
-
                 createTreeExtractorRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getValue(RecipeInfos.Parameters.RESIN_AMOUNT).intValue());
                 break;
             case PULVERIZER:
@@ -44,7 +43,24 @@ public class ThermalRecipesManager extends BaseRecipesManager
             case INSOLATOR:
                 createInsolatorRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.ENERGY_MOD).doubleValue(), recipeInfos.getValue(RecipeInfos.Parameters.WATER_MOD).doubleValue(), recipeInfos);
                 break;
+            case PRESS:
+                createPressRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.ENERGY).intValue());
+                break;
         }
+    }
+
+    private void createPressRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, int energy)
+    {
+        ResourceLocation input = slots.get(0).getItem().getItem().getRegistryName();
+        int count = slots.get(0).getItem().getCount();
+        ResourceLocation inputDie = slots.get(1).getItem().getItem().getRegistryName();
+
+        if(taggedSlots.containsKey(slots.get(0).getSlotIndex()))
+            input = taggedSlots.get(slots.get(0).getSlotIndex());
+
+        ItemStack output = slots.get(2).getItem();
+
+        ThermalRecipesSerializer.get().serializePressRecipe(input, count, inputDie, output, energy);
     }
 
     private void createInsolatorRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, double energyMod, double waterMod, RecipeInfos recipeInfos)
@@ -163,7 +179,7 @@ public class ThermalRecipesManager extends BaseRecipesManager
         return INSTANCE;
     }
 
-    public class RecipeInput
+    public static class RecipeInput
     {
         private final boolean isTag;
         private final ResourceLocation registryName;
