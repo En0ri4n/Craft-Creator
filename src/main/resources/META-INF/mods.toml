@@ -5,12 +5,10 @@ issueTrackerURL="https://github.com/En0ri4n/Craft-Creator/issues"
 
 [[mods]]
 modId="craftcreator"
-version="1.0.0"
+version="Minecraft 1.16.5"
 displayName="Craft Creator"
-#updateJSONURL="http://myurl.me/"
-#displayURL="http://example.com/"
 logoFile="logo.png"
-credits="Thanks to MFF, and others supports"
+credits="Traptonian (Arts)"
 authors="En0ri4n (Enooow#4595 on Discord!)"
 description='''
 Craft Creator is a mod that allows you to create your own crafts in Minecraft! (with kubeJS system or just datapacks)
