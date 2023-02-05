@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+// TODO: move in another package, not screen
 public enum ModRecipeCreator
 {
     // Minecraft
