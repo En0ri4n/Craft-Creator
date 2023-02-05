@@ -24,6 +24,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.*;
 
+// TODO: improve code
 @SuppressWarnings("ALL")
 public abstract class ModRecipesJSSerializer
 {
