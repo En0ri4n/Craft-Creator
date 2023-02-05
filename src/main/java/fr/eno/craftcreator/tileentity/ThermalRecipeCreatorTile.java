@@ -3,6 +3,7 @@ package fr.eno.craftcreator.tileentity;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.container.ThermalRecipeCreatorContainer;
 import fr.eno.craftcreator.init.InitTileEntities;
+import fr.eno.craftcreator.recipes.utils.SupportedMods;
 import fr.eno.craftcreator.tileentity.utils.MultiScreenRecipeCreatorTile;
 import fr.eno.craftcreator.utils.SlotHelper;
 import io.netty.buffer.Unpooled;
@@ -17,7 +18,7 @@ public class ThermalRecipeCreatorTile extends MultiScreenRecipeCreatorTile
 {
     public ThermalRecipeCreatorTile()
     {
-        super(InitTileEntities.THERMAL_RECIPE_CREATOR.get(), SlotHelper.THERMAL_SLOTS_SIZE);
+        super(SupportedMods.THERMAL, InitTileEntities.THERMAL_RECIPE_CREATOR.get(), SlotHelper.THERMAL_SLOTS_SIZE);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package fr.eno.craftcreator.screen.utils;
 
+import fr.eno.craftcreator.recipes.utils.RecipeFileUtils;
 import fr.eno.craftcreator.recipes.utils.SupportedMods;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
@@ -76,6 +77,11 @@ public enum ModRecipeCreator
     public static List<ModRecipeCreator> getRecipeCreatorScreens(SupportedMods mod)
     {
         return Stream.of(values()).filter(recipe -> recipe.getMod().equals(mod)).collect(Collectors.toList());
+    }
+
+    public static ModRecipeCreator byName(ResourceLocation recipeTypeName)
+    {
+        return Stream.of(values()).filter(recipe -> recipeTypeName.toString().equals(RecipeFileUtils.getName(recipe.getRecipeType()).toString())).findFirst().orElse(null);
     }
 
     private static IRecipeType<?> byName(String resourceLocation)

@@ -3,6 +3,7 @@ package fr.eno.craftcreator.tileentity;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.container.BotaniaRecipeCreatorContainer;
 import fr.eno.craftcreator.init.InitTileEntities;
+import fr.eno.craftcreator.recipes.utils.SupportedMods;
 import fr.eno.craftcreator.tileentity.utils.MultiScreenRecipeCreatorTile;
 import fr.eno.craftcreator.utils.SlotHelper;
 import io.netty.buffer.Unpooled;
@@ -19,7 +20,7 @@ public class BotaniaRecipeCreatorTile extends MultiScreenRecipeCreatorTile
 {
     public BotaniaRecipeCreatorTile()
     {
-        super(InitTileEntities.BOTANIA_RECIPE_CREATOR.get(), SlotHelper.BOTANIA_SLOTS_SIZE);
+        super(SupportedMods.BOTANIA, InitTileEntities.BOTANIA_RECIPE_CREATOR.get(), SlotHelper.BOTANIA_SLOTS_SIZE);
     }
 
     @Nonnull

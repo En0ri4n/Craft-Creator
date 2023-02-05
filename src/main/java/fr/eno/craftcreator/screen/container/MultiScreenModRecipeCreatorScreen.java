@@ -301,6 +301,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     {
         super.renderTooltip(poseStack, mouseX, mouseY);
         this.dataFields.forEach(field -> field.renderToolTip(poseStack, mouseX, mouseY));
+        this.recipeTypeButton.renderToolTip(poseStack, mouseX, mouseY);
         if(this.buttonGrid.isVisible())
             this.buttonGrid.getButtons().forEach(button -> button.renderToolTip(poseStack, mouseX, mouseY));
     }
@@ -374,6 +375,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     private void updateServerIndex()
     {
         InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("screen_index", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.INT, this.currentScreenIndex));
+        InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("recipe_type", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.STRING, RecipeFileUtils.getName(getCurrentRecipe().getRecipeType()).toString()));
     }
 
     protected void updateSlots()
