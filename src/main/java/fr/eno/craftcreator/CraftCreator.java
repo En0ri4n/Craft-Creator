@@ -80,6 +80,7 @@ public class CraftCreator
         TestRecipesCommand.register(e.getDispatcher());
     }
 
+    @SuppressWarnings("NullableProblems")
     public static final ItemGroup CRAFT_CREATOR_TAB = new ItemGroup(References.MOD_ID)
     {
         @Override

@@ -13,6 +13,7 @@ import fr.eno.craftcreator.recipes.utils.SupportedMods;
 import net.minecraft.block.Block;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
 
@@ -141,7 +142,8 @@ public class ThermalRecipesSerializer extends ModRecipesJSSerializer
         recipeObj.addProperty("energy", energy);
         JsonArray ingredientsArray = new JsonArray();
         ingredientsArray.add(mapToJsonObject(ImmutableMap.of(isItem(input) ? "item" : "tag", input.toString(), "count", count)));
-        ingredientsArray.add(singletonItemJsonObject("item", inputDie));
+        if(!inputDie.equals(Items.AIR.getRegistryName()))
+            ingredientsArray.add(singletonItemJsonObject("item", inputDie));
         recipeObj.add("ingredients", ingredientsArray);
         recipeObj.add("result", mapToJsonObject(ImmutableMap.of("item", output.getItem().getRegistryName().toString(), "count", output.getCount())));
 
