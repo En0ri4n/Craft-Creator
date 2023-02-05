@@ -51,9 +51,12 @@ public class CraftCreator
 
     private void setup(final FMLCommonSetupEvent event)
     {
-        CommonUtils.setDefaultItemblockRender(InitBlocks.MINECRAFT_RECIPE_CREATOR.get());
-        CommonUtils.setDefaultItemblockRender(InitBlocks.BOTANIA_RECIPE_CREATOR.get());
-        CommonUtils.setDefaultItemblockRender(InitBlocks.THERMAL_RECIPE_CREATOR.get());
+        event.enqueueWork(() ->
+        {
+            CommonUtils.setDefaultBlockRender(InitBlocks.BOTANIA_RECIPE_CREATOR.get());
+            CommonUtils.setDefaultBlockRender(InitBlocks.MINECRAFT_RECIPE_CREATOR.get());
+            CommonUtils.setDefaultBlockRender(InitBlocks.THERMAL_RECIPE_CREATOR.get());
+        });
     }
 
     public void clientSetup(FMLClientSetupEvent event)

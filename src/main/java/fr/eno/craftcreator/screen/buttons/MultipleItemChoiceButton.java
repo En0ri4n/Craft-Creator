@@ -4,7 +4,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.screen.buttons.pressable.NullPressable;
-import net.minecraft.client.gui.screen.Screen;
+import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -17,7 +17,6 @@ import java.util.Map;
 
 public class MultipleItemChoiceButton<K extends Item, V> extends Button
 {
-	private static final ResourceLocation TEXTURE = References.getLoc("textures/gui/buttons/item_button.png");
 	private final Map<K, V> map;
 	private int currentIndex;
 	private V currentValue;
@@ -36,9 +35,7 @@ public class MultipleItemChoiceButton<K extends Item, V> extends Button
 	{
 		if(this.visible)
 		{
-			ClientUtils.bindTexture(TEXTURE);
-			int yOffset = ExecuteButton.isMouseHover(x, y, mouseX, mouseY, width, height) ? 20 : 0;
-			Screen.blit(matrixStack, x, y, this.width, this.height, 0, yOffset, 20, 20, 20, 40);
+			Utils.renderSizedButton(matrixStack, x, y, this.width, this.height, active, Utils.isMouseHover(x, y, mouseX, mouseY, width, height));
 			
 			ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(currentKey), this.x + this.width / 2 - 8, this.y + this.height / 2 - 8);
 		}

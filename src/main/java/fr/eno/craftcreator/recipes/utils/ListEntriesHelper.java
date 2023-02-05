@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @SuppressWarnings({"unchecked", "unused"})
 public class ListEntriesHelper
@@ -22,7 +21,7 @@ public class ListEntriesHelper
     {
         List<T> entries = new ArrayList<>();
 
-        Stream.of(mods).filter(mod -> SupportedMods.isModLoaded(mod.getModId())).forEach(mod -> entries.add((T) new SimpleListWidget.StringEntry(mod.getModId())));
+        SupportedMods.getSupportedLoadedMods().forEach(mod -> entries.add((T) new SimpleListWidget.StringEntry(mod.getModId())));
 
         return entries;
     }

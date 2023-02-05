@@ -3,14 +3,17 @@ package fr.eno.craftcreator.screen.widgets;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.screen.buttons.ExecuteButton;
 import fr.eno.craftcreator.utils.Callable;
+import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.util.ResourceLocation;
 
 import java.util.List;
 
 public class GuiList<T>
 {
+    private static final ResourceLocation BACKGROUND_TEXTURE = References.getLoc("textures/gui/container/gui_background.png");
+
     private final int guiListRight;
     private final int y;
     private final int keyHeight;
@@ -26,36 +29,31 @@ public class GuiList<T>
 
     public void render(MatrixStack matrixStack, int mouseX, int mouseY)
     {
-        int width = getMaxWidth();
-        ClientUtils.bindTexture(References.getLoc("textures/gui/container/gui_background.png"));
-        Screen.blit(matrixStack, this.guiListRight - (width + 10), y, width + 10, (this.keys.size() + 1) * keyHeight + (this.keys.size() + 1) + 6, 0, 0, 256, 256, 256, 256);
+        int width = (getMaxWidth() + 12);
+        ClientUtils.bindTexture(BACKGROUND_TEXTURE);
+        Utils.renderSizedTexture(matrixStack, 4, this.guiListRight - width - 6, y, width + 6, (this.keys.size() + 1) * keyHeight + (this.keys.size() + 1) + 6, 0, 0, 16, 16, 16);
 
         for(int i = 0; i < this.keys.size() + 1; i++)
         {
-            ClientUtils.bindTexture(References.getLoc("textures/gui/buttons/basic_button.png"));
-
-            int finalWidth = (width + 10);
-            int x = this.guiListRight - finalWidth + 3;
+            int x = this.guiListRight - width - 3;
             int y = this.y + 3 + i * keyHeight + i;
             int buttonTitle = y + keyHeight / 2 - ClientUtils.getFont().lineHeight / 2;
 
-            if(ExecuteButton.isMouseHover(x, y, mouseX, mouseY, finalWidth, keyHeight))
-                Screen.blit(matrixStack, x, y, finalWidth - 6, keyHeight, 0, 20, 100, 20, 100, 60);
-            else
-                Screen.blit(matrixStack, x, y, finalWidth - 6, keyHeight, 0, 40, 100, 20, 100, 60);
+            Utils.renderSizedButton(matrixStack, x, y, width, keyHeight, true, Utils.isMouseHover(x, y, mouseX, mouseY, width, keyHeight));
+            //Screen.blit(matrixStack, x, y, finalWidth - 6, keyHeight, xTexture, yTexture, widthToGet, heightToGet, textureWidth, textureHeight);
 
             if(i >= this.keys.size())
             {
-                Screen.drawCenteredString(matrixStack, ClientUtils.getFont(), References.getTranslate("screen.guiList.reset").getString(), x + finalWidth / 2 - 3, buttonTitle, 0xFFFFFF);
+                Screen.drawCenteredString(matrixStack, ClientUtils.getFont(), References.getTranslate("screen.guiList.reset").getString(), x + width / 2 - 3, buttonTitle, 0xFFFFFF);
                 continue;
             }
 
             boolean isSelected = this.selectedKey != null && this.selectedKey.toString().equals(this.keys.get(i).toString());
 
             if(isSelected)
-                Screen.drawCenteredString(matrixStack, ClientUtils.getFont(), this.keys.get(i).toString(), x + finalWidth / 2 - 3, buttonTitle, 0x0dc70d);
+                Screen.drawCenteredString(matrixStack, ClientUtils.getFont(), this.keys.get(i).toString(), x + width / 2 - 3, buttonTitle, 0x0dc70d);
             else
-                Screen.drawCenteredString(matrixStack, ClientUtils.getFont(), this.keys.get(i).toString(), x + finalWidth / 2 - 3, buttonTitle, 0xFFFFFF);
+                Screen.drawCenteredString(matrixStack, ClientUtils.getFont(), this.keys.get(i).toString(), x + width / 2 - 3, buttonTitle, 0xFFFFFF);
         }
     }
 
@@ -87,7 +85,7 @@ public class GuiList<T>
             int x = this.guiListRight - finalWidth + 3;
             int y = this.y + 3 + i * keyHeight + i;
 
-            if(ExecuteButton.isMouseHover(x, y, mouseX, mouseY, width - 6, keyHeight))
+            if(Utils.isMouseHover(x, y, mouseX, mouseY, width - 6, keyHeight))
             {
                 if(i >= this.keys.size())
                 {

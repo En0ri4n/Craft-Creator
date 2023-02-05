@@ -70,23 +70,25 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     {
         super.updateScreen();
 
+        int dataFieldY = topPos + imageHeight / 2 - 15;
+
         switch(getCurrentRecipe())
         {
             case MANA_INFUSION:
                 showDataField(0);
-                setDataFieldPos(MANA_FIELD, leftPos + imageWidth - 44, dataFields.get(MANA_FIELD).y);
+                setDataFieldPos(MANA_FIELD, leftPos + imageWidth - 44, dataFieldY);
                 setExecuteButtonPos(this.leftPos + this.imageWidth / 2 - 20, this.topPos + 35);
                 break;
             case ELVEN_TRADE:
             case PURE_DAISY:
                 showDataField(0);
-                setDataFieldPos(MANA_FIELD, leftPos + imageWidth / 2 - 35 / 2, dataFields.get(MANA_FIELD).y);
+                setDataFieldPos(MANA_FIELD, leftPos + imageWidth / 2 - 35 / 2, dataFieldY);
                 setExecuteButtonPos(this.leftPos + this.imageWidth / 2 - 20, this.topPos + 35);
                 break;
             case BREWERY:
             case TERRA_PLATE:
                 showDataField(0);
-                setDataFieldPos(MANA_FIELD, leftPos + imageWidth / 2, dataFields.get(MANA_FIELD).y);
+                setDataFieldPos(MANA_FIELD, leftPos + imageWidth / 2, dataFieldY);
                 setExecuteButtonPos(this.leftPos + this.imageWidth / 2 - 5, this.topPos + 31);
                 break;
             case PETAL_APOTHECARY:
@@ -94,7 +96,7 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
                 break;
             case RUNIC_ALTAR:
                 showDataField(0);
-                setDataFieldPos(MANA_FIELD, leftPos + imageWidth / 2, dataFields.get(MANA_FIELD).y);
+                setDataFieldPos(MANA_FIELD, leftPos + imageWidth / 2, dataFieldY);
                 setExecuteButtonPos(this.leftPos + this.imageWidth / 2 - 2, this.topPos + 31);
                 break;
         }
@@ -138,8 +140,6 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
                 renderDataFieldAndTitle(MANA_FIELD, References.getTranslate("screen.botania_recipe_creator.field.time"), matrixStack, mouseX, mouseY, partialTicks);
                 break;
         }
-
-        ClientUtils.getItemRenderer().renderAndDecorateFakeItem(getRecipeIcon(getCurrentRecipe()).getDefaultInstance(), getIconPos().getFirstValue(), getIconPos().getSecondValue());
 
         this.renderTooltip(matrixStack, mouseX, mouseY);
     }

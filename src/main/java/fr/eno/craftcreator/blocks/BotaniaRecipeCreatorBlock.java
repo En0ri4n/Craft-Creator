@@ -18,7 +18,8 @@ import javax.annotation.Nonnull;
 
 public class BotaniaRecipeCreatorBlock extends RecipeCreatorBlock
 {
-    private static final VoxelShape SHAPE = BlockUtils.join(BlockUtils.box(0.0D, 0.0D, 0.0D, 16.0D, 8.0D, 16.0D), BlockUtils.box(1.0D, 1.0D, 1.0D, 15.0D, 8.0D, 15.0D), IBooleanFunction.ONLY_FIRST);
+    private static final VoxelShape SHAPE = BlockUtils.join(BlockUtils.box(0.0D, 0.0D, 0.0D, 16.0D, 7.0D, 16.0D),
+            BlockUtils.box(1.0D, 1.0D, 1.0D, 15.0D, 8.0D, 15.0D), IBooleanFunction.ONLY_FIRST);
 
     public BotaniaRecipeCreatorBlock()
     {

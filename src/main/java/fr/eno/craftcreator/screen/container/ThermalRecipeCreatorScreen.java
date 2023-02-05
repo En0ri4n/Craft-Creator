@@ -133,6 +133,9 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
                 if(getCurrentRecipe() == ModRecipeCreator.INSOLATOR)
                     renderDataFieldTitle(7, References.getTranslate("screen.thermal_recipe_creator.field.mod_water"), matrixStack);
                 break;
+            case PRESS:
+                this.renderSlotTitle(1, new StringTextComponent("Die"), matrixStack);
+                break;
         }
 
         renderDataFieldTitle(ENERGY_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.energy"), matrixStack);
