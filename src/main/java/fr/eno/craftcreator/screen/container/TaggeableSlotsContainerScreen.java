@@ -104,9 +104,7 @@ public abstract class TaggeableSlotsContainerScreen<T extends Container> extends
     @Override
     protected void renderLabels(MatrixStack matrixStack, int pMouseX, int pMouseY)
     {
-        if(Screen.hasShiftDown() || Screen.hasControlDown())
-            drawString(matrixStack, this.font, References.getTranslate("screen.crafting.info.msg").getString(), 0, this.imageHeight, 0x707370);
-    }
+        }
 
     protected abstract List<PositionnedSlot> getTaggeableSlots();
 

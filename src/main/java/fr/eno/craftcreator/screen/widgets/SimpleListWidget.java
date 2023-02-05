@@ -12,6 +12,7 @@ import fr.eno.craftcreator.recipes.utils.CraftIngredients;
 import fr.eno.craftcreator.recipes.utils.ModRecipeCreatorDispatcher;
 import fr.eno.craftcreator.utils.Callable;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
+import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.list.AbstractList;
@@ -319,7 +320,6 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
 
     public abstract static class Entry extends AbstractList.AbstractListEntry<SimpleListWidget.Entry>
     {
-        protected Minecraft minecraft = Minecraft.getInstance();
         protected final List<ITextComponent> tooltips;
 
         protected Entry()
@@ -340,12 +340,12 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
 
             int color = isMouseOver ? 0xF1f115 : 0xFFFFFF;
 
-            Screen.drawString(matrixStack, minecraft.font, stringToDisplay, hasItemDisplay ? leftPos + 16 + 5 : leftPos + width / 2 - minecraft.font.width(stringToDisplay) / 2, (topPos + height / 2 - minecraft.font.lineHeight / 2), color);
+            Screen.drawString(matrixStack, ClientUtils.getFont(), stringToDisplay, hasItemDisplay ? leftPos + 16 + 5 : leftPos + width / 2 - Utils.width(stringToDisplay) / 2, (topPos + height / 2 - ClientUtils.getFont().lineHeight / 2), color);
         }
 
         protected String getString(int width, String displayStr)
         {
-            int stringWidth = minecraft.font.width(displayStr);
+            int stringWidth = Utils.width(displayStr);
 
             if(stringWidth > width - (16 + 5))
             {
@@ -384,7 +384,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
             matrixStack.pushPose();
             float scale = 1F;
             int yPos = height / 2 - 16 / 2;
-            minecraft.getItemRenderer().renderAndDecorateFakeItem(item, (int) ((left + 1) / scale), (int) ((top + yPos) / scale));
+            ClientUtils.getItemRenderer().renderAndDecorateFakeItem(item, (int) ((left + 1) / scale), (int) ((top + yPos) / scale));
             matrixStack.popPose();
         }
 
@@ -409,8 +409,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
             tooltips.add(References.getTranslate("screen.widget.simple_list.tooltip.output"));
             addToTooltip(output);
 
-            assert minecraft.screen != null;
-            minecraft.screen.renderComponentTooltip(matrixStack, tooltips, mouseX, mouseY);
+            ClientUtils.getCurrentScreen().renderComponentTooltip(matrixStack, tooltips, mouseX, mouseY);
         }
 
         private void addToTooltip(CraftIngredients input)
@@ -605,10 +604,10 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
             }
 
             int yPos = height / 2 - 16 / 2;
-            minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(item), left + yPos, top + yPos);
+            ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(item), left + yPos, top + yPos);
 
             RenderSystem.color4f(1F, 1.0F, 1.0F, 1F);
-            minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(Items.BARRIER), left + yPos, top + yPos);
+            ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(Items.BARRIER), left + yPos, top + yPos);
         }
 
         @Override
@@ -665,10 +664,10 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         @Override
         public void renderTooltip(MatrixStack matrixStack, int mouseX, int mouseY)
         {
-            if(!tooltips.isEmpty() && minecraft.screen != null)
+            if(!tooltips.isEmpty() && ClientUtils.getCurrentScreen() != null)
             {
                 tooltips.clear();
-                minecraft.screen.renderComponentTooltip(matrixStack, tooltips, mouseX, mouseY);
+                ClientUtils.getCurrentScreen().renderComponentTooltip(matrixStack, tooltips, mouseX, mouseY);
             }
         }
 
@@ -704,13 +703,13 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
             matrixStack.pushPose();
             float scale = 1.1F;
             matrixStack.scale(scale, scale, scale);
-            Screen.drawCenteredString(matrixStack, minecraft.font, displayStr, (int) ((left + width / 2) / scale), (int) ((top + height / 2 - (minecraft.font.lineHeight * scale) / 2) / scale), color);
+            Screen.drawCenteredString(matrixStack, ClientUtils.getFont(), displayStr, (int) ((left + width / 2) / scale), (int) ((top + height / 2 - (ClientUtils.getFont().lineHeight * scale) / 2) / scale), color);
             matrixStack.popPose();
 
             Item item = ForgeRegistries.ITEMS.getValue(getResourceLocation());
 
             int yPos = height / 2 - 16 / 2;
-            minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(item == null ? Items.BARRIER : item), left + yPos, top + yPos);
+            ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(item == null ? Items.BARRIER : item), left + yPos, top + yPos);
         }
 
         @Override
@@ -722,10 +721,10 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         @Override
         public void renderTooltip(MatrixStack matrixStack, int mouseX, int mouseY)
         {
-            if(!tooltips.isEmpty() && minecraft.screen != null)
+            if(!tooltips.isEmpty() && ClientUtils.getCurrentScreen() != null)
             {
                 tooltips.clear();
-                minecraft.screen.renderComponentTooltip(matrixStack, tooltips, mouseX, mouseY);
+                ClientUtils.getCurrentScreen().renderComponentTooltip(matrixStack, tooltips, mouseX, mouseY);
             }
         }
     }

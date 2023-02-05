@@ -7,7 +7,6 @@ import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.recipes.utils.RecipeFileUtils;
 import fr.eno.craftcreator.utils.PairValues;
 import fr.eno.craftcreator.utils.Utils;
-import net.minecraft.client.Minecraft;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.util.ResourceLocation;
@@ -188,7 +187,7 @@ public class DatapackHelper
      */
     private static File getOutputFile(IRecipeType<?> type, ResourceLocation output)
     {
-        File directory = new File(Minecraft.getInstance().gameDirectory, "Craft-Creator");
+        File directory = new File(ClientUtils.getMinecraft().gameDirectory, "Craft-Creator");
         if(!directory.exists()) directory.mkdirs();
 
         return new File(directory, output.getPath() + "_from_" + RecipeFileUtils.getName(type).getPath() + ".json");

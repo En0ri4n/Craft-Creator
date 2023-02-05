@@ -1,9 +1,11 @@
 package fr.eno.craftcreator.utils;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.recipes.utils.SupportedMods;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
@@ -22,7 +24,7 @@ import java.util.Random;
 public class Utils
 {
     private static final Random RANDOM = new Random();
-
+    private static final ResourceLocation BUTTON_TEXTURE = References.getLoc("textures/gui/buttons/basic_button.png");
     private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz";
 
     /**
@@ -132,6 +134,12 @@ public class Utils
         return component.copy().withStyle((msg) -> msg.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, urlToOpen)));
     }
 
+    /**
+     * Generate a string with a given size
+     *
+     * @param size the size of the string
+     * @return the string
+     */
     public static String generateString(int size)
     {
         String output = "";
@@ -142,5 +150,45 @@ public class Utils
         }
 
         return output;
+    }
+
+    public static void renderSizedButton(MatrixStack matrixStack, int x, int y, int width, int height, boolean isActive, boolean isHovered)
+    {
+        ClientUtils.bindTexture(BUTTON_TEXTURE);
+
+        int buttonTextureHeight = 20;
+        int textureWidth = 100;
+        int textureHeight = 60;
+        int xTexture = 0;
+        int yTexture = !isActive ? 0 : isHovered ? 20 : 40;
+
+        renderSizedTexture(matrixStack, 4, x, y, width, height, xTexture, yTexture, textureWidth, textureHeight, buttonTextureHeight);
+    }
+
+    public static void renderSizedTexture(MatrixStack matrixStack, int cutSize, int x, int y, int width, int height, int xTexture, int yTexture, int textureWidth, int textureHeight, int buttonTextureHeight)
+    {
+        // Top left corner
+        Screen.blit(matrixStack, x, y, cutSize, cutSize, xTexture, yTexture, cutSize, cutSize, textureWidth, textureHeight);
+        // Left side
+        Screen.blit(matrixStack, x, y + cutSize, cutSize, height - cutSize * 2, xTexture, yTexture + cutSize, cutSize, cutSize, textureWidth, textureHeight);
+        // Bottom left corner
+        Screen.blit(matrixStack, x, y + height - cutSize, cutSize, cutSize, xTexture, yTexture + buttonTextureHeight - cutSize, cutSize, cutSize, textureWidth, textureHeight);
+        // Top side
+        Screen.blit(matrixStack, x + cutSize, y, width - cutSize * 2, cutSize, cutSize, yTexture, textureWidth - cutSize * 2, cutSize, textureWidth, textureHeight);
+        // Top right corner
+        Screen.blit(matrixStack, x + width - cutSize, y, cutSize, cutSize, textureWidth - cutSize, yTexture, cutSize, cutSize, textureWidth, textureHeight);
+        // Right side
+        Screen.blit(matrixStack, x + width - cutSize, y + cutSize, cutSize, height - cutSize * 2, textureWidth - cutSize, yTexture + cutSize, cutSize, cutSize, textureWidth, textureHeight);
+        // Bottom right corner
+        Screen.blit(matrixStack, x + width - cutSize, y + height - cutSize, cutSize, cutSize, textureWidth - cutSize, yTexture + buttonTextureHeight - cutSize, cutSize, cutSize, textureWidth, textureHeight);
+        // Bottom side
+        Screen.blit(matrixStack, x + cutSize, y + height - cutSize, width - cutSize * 2, cutSize, cutSize, yTexture + buttonTextureHeight - cutSize, textureWidth - cutSize * 2, cutSize, textureWidth, textureHeight);
+        // Middle
+        Screen.blit(matrixStack, x + cutSize, y + cutSize, width - cutSize * 2, height - cutSize * 2, cutSize, yTexture + cutSize, textureWidth - cutSize * 2, buttonTextureHeight - cutSize * 2, textureWidth, textureHeight);
+    }
+
+    public static boolean isMouseHover(int x, int y, int mouseX, int mouseY, int width, int height)
+    {
+        return mouseX > x && mouseX < (x + width) && mouseY > y && mouseY < (y + height);
     }
 }

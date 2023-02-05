@@ -89,7 +89,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         if(isVanillaScreen)
         {
             InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("kubejs_recipe", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.BOOLEAN));
-            this.addButton(isKubeJSRecipeButton = new SimpleCheckBox(5, this.height - 20, 15, 15, References.getTranslate("screen.recipe_creator_screen.kube_js_button"), false));
+            this.addButton(isKubeJSRecipeButton = new SimpleCheckBox(leftPos, topPos + imageHeight + 2, 10, 10, References.getTranslate("screen.recipe_creator_screen.kube_js_button"), false));
             if(!SupportedMods.isKubeJSLoaded()) this.isKubeJSRecipeButton.visible = false;
         }
 
@@ -309,7 +309,8 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     protected void renderLabels(MatrixStack matrixStack, int pMouseX, int pMouseY)
     {
         drawCenteredString(matrixStack, ClientUtils.getFont(), References.getTranslate("screen." + this.getMenu().getMod().getModId() + "_recipe_creator." + RecipeFileUtils.getName(getCurrentRecipe().getRecipeType()).getPath() + ".title"), this.imageWidth / 2, -15, 0xFFFFFF);
-        super.renderLabels(matrixStack, pMouseX, pMouseY);
+        if(Screen.hasShiftDown() || Screen.hasControlDown())
+            drawString(matrixStack, this.font, References.getTranslate("screen.crafting.info.msg").getString(), 0, this.imageHeight + (isVanillaScreen ? 15 : 0), 0x707370);
     }
 
     /**

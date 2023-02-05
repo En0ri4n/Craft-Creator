@@ -2,6 +2,10 @@ package fr.eno.craftcreator.recipes.utils;
 
 import net.minecraftforge.fml.ModList;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public enum SupportedMods
 {
     MINECRAFT("minecraft"),
@@ -41,6 +45,11 @@ public enum SupportedMods
         }
 
         return SupportedMods.MINECRAFT;
+    }
+
+    public static List<SupportedMods> getSupportedLoadedMods()
+    {
+        return Arrays.stream(SupportedMods.values()).filter(SupportedMods::isLoaded).collect(Collectors.toList());
     }
 
     public static boolean isKubeJSLoaded()

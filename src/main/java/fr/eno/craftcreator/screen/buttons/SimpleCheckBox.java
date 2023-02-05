@@ -5,7 +5,6 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.utils.Callable;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.CheckboxButton;
 import net.minecraft.util.ResourceLocation;
@@ -46,7 +45,6 @@ public class SimpleCheckBox extends CheckboxButton
         if(visible)
         {
             this.isHovered = ClientUtils.isMouseHover(x, y, mouseX, mouseY, width, height);
-            Minecraft minecraft = Minecraft.getInstance();
             ClientUtils.bindTexture(TEXTURE);
             RenderSystem.enableDepthTest();
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.alpha);
@@ -54,7 +52,7 @@ public class SimpleCheckBox extends CheckboxButton
             RenderSystem.defaultBlendFunc();
             RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
             Screen.blit(matrixStack, this.x, this.y, this.width, this.height, !isFocused() ? 0 : 20, !selected() ? 0 : 20, 20, 20, 64, 64);
-            this.renderBg(matrixStack, minecraft, mouseX, mouseY);
+            this.renderBg(matrixStack, ClientUtils.getMinecraft(), mouseX, mouseY);
 
             drawString(matrixStack, ClientUtils.getFont(), this.getMessage(), this.x + this.width + 4, this.y + (this.height - 8) / 2, 14737632 | MathHelper.ceil(this.alpha * 255.0F) << 24);
         }

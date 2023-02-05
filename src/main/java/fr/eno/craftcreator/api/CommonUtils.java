@@ -8,15 +8,15 @@ import java.util.function.Predicate;
 
 public class CommonUtils
 {
-    public static final Predicate<RenderType> DEFAULT_ITEMBLOCK_RENDER = (r) -> r == RenderType.cutout();
+    public static final Predicate<RenderType> DEFAULT_BLOCK_RENDER = (r) -> r == RenderType.cutoutMipped();
 
-    public static void setItemBlockRender(Block block, Predicate<RenderType> render)
+    public static void setBlockRender(Block block, Predicate<RenderType> render)
     {
         RenderTypeLookup.setRenderLayer(block, render);
     }
 
-    public static void setDefaultItemblockRender(Block block)
+    public static void setDefaultBlockRender(Block block)
     {
-        setItemBlockRender(block, DEFAULT_ITEMBLOCK_RENDER);
+        setBlockRender(block, DEFAULT_BLOCK_RENDER);
     }
 }

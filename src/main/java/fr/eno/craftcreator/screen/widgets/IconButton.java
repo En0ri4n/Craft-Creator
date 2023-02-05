@@ -3,10 +3,8 @@ package fr.eno.craftcreator.screen.widgets;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.screen.buttons.ExecuteButton;
-import net.minecraft.client.gui.screen.Screen;
+import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -35,11 +33,9 @@ public class IconButton extends Button
     @Override
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        int yTextureOffset = ExecuteButton.isMouseHover(x, y, mouseX, mouseY, width, height) ? 20 : 0;
-        ClientUtils.bindTexture(References.getLoc("textures/gui/buttons/item_button.png"));
         RenderSystem.enableBlend();
-        Screen.blit(matrixStack, x, y, width, height, 0, yTextureOffset, width, height, 20, 40);
-        ClientUtils.getItemRenderer().renderAndDecorateFakeItem(this.icon, x + 2, y + 2);
+        Utils.renderSizedButton(matrixStack, x, y, width, height, active, Utils.isMouseHover(x, y, mouseX, mouseY, width, height));
+        ClientUtils.getItemRenderer().renderAndDecorateFakeItem(this.icon, x + 2, y + 1);
     }
 
     @Override

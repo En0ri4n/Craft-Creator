@@ -16,7 +16,6 @@ import net.minecraft.util.text.StringTextComponent;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -282,7 +281,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
 
         public static List<StringEntry> getModIds()
         {
-            return Arrays.stream(SupportedMods.values()).map(mod -> new StringEntry(mod.getModId(), new StringTextComponent(mod.getModId()))).collect(Collectors.toList());
+            return SupportedMods.getSupportedLoadedMods().stream().map(mod -> new StringEntry(mod.getModId(), new StringTextComponent(mod.getModId()))).collect(Collectors.toList());
         }
     }
 

@@ -27,7 +27,13 @@ public class MinecraftRecipeCreatorBlock extends RecipeCreatorBlock
 	@Override
 	public VoxelShape getShape()
 	{
-		return SHAPE;
+		VoxelShape shape = VoxelShapes.empty();
+		shape = VoxelShapes.or(shape, VoxelShapes.box(1D / 16D, 0D, 0D, 15D / 16D, 14D / 16D, 1D / 16D));
+		shape = VoxelShapes.or(shape, VoxelShapes.box(0D, 0D, 1D / 16D, 1D, 14D / 16D, 15D / 16D));
+		shape = VoxelShapes.or(shape, VoxelShapes.box(1D / 16D, 0D, 15D / 16D, 15D / 16D, 14D / 16D, 1D));
+		shape = VoxelShapes.or(shape, VoxelShapes.box(15D / 16D, 0D, 1D / 16D, 1D, 14D / 16D, 15D / 16D));
+		shape = VoxelShapes.or(shape, VoxelShapes.box(1D / 16D, 13D / 16D, 1D / 16D, 15D / 16D, 15D / 16D, 15D / 16D));
+		return shape;
 	}
 
 	@Override
