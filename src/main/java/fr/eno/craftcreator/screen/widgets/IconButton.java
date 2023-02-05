@@ -35,7 +35,11 @@ public class IconButton extends Button
     {
         RenderSystem.enableBlend();
         Utils.renderSizedButton(matrixStack, x, y, width, height, active, Utils.isMouseHover(x, y, mouseX, mouseY, width, height));
-        ClientUtils.getItemRenderer().renderAndDecorateFakeItem(this.icon, x + 2, y + 1);
+        RenderSystem.pushMatrix();
+        float scale = 0.85F;
+        RenderSystem.scalef(scale, scale, scale);
+        ClientUtils.getItemRenderer().renderAndDecorateFakeItem(this.icon, (int) ((x + width / 2 - 6) /scale), (int) ((y + height / 2 - 6)/scale));
+        RenderSystem.popMatrix();
     }
 
     @Override

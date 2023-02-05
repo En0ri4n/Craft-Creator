@@ -2,6 +2,7 @@ package fr.eno.craftcreator.tileentity;
 
 import fr.eno.craftcreator.container.MinecraftRecipeCreatorContainer;
 import fr.eno.craftcreator.init.InitTileEntities;
+import fr.eno.craftcreator.recipes.utils.SupportedMods;
 import fr.eno.craftcreator.tileentity.utils.MultiScreenRecipeCreatorTile;
 import fr.eno.craftcreator.utils.SlotHelper;
 import io.netty.buffer.Unpooled;
@@ -23,7 +24,7 @@ public class MinecraftRecipeCreatorTile extends MultiScreenRecipeCreatorTile
 
 	public MinecraftRecipeCreatorTile()
 	{
-		super(InitTileEntities.MINECRAFT_RECIPE_CREATOR.get(), SlotHelper.MINECRAFT_SLOTS_SIZE);
+		super(SupportedMods.MINECRAFT, InitTileEntities.MINECRAFT_RECIPE_CREATOR.get(), SlotHelper.MINECRAFT_SLOTS_SIZE);
 	}
 
 	@Override

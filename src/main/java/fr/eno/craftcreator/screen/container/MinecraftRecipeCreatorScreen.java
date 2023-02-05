@@ -89,6 +89,8 @@ public class MinecraftRecipeCreatorScreen extends MultiScreenModRecipeCreatorScr
                 setExecuteButtonPos(this.leftPos + this.imageWidth / 2 - 14, this.topPos + 33);
                 executeButton.setWidth(35);
                 showDataField(0, 1);
+                setDataFieldPos(0, leftPos + 8, topPos + 30);
+                setDataFieldPos(1, leftPos + 8, topPos + 60);
                 break;
         }
     }
