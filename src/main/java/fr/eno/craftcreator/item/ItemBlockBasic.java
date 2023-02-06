@@ -1,7 +1,7 @@
 package fr.eno.craftcreator.item;
 
 import fr.eno.craftcreator.CraftCreator;
-import fr.eno.craftcreator.recipes.utils.SupportedMods;
+import fr.eno.craftcreator.base.SupportedMods;
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;

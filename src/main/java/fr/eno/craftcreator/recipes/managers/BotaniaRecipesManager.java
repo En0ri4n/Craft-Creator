@@ -3,7 +3,7 @@ package fr.eno.craftcreator.recipes.managers;
 import com.google.common.collect.Multimap;
 import fr.eno.craftcreator.recipes.serializers.BotaniaRecipesSerializer;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
-import fr.eno.craftcreator.screen.utils.ModRecipeCreator;
+import fr.eno.craftcreator.base.ModRecipeCreator;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.block.Block;

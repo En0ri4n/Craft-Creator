@@ -2,7 +2,7 @@ package fr.eno.craftcreator.recipes.managers;
 
 import fr.eno.craftcreator.recipes.serializers.ThermalRecipesSerializer;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
-import fr.eno.craftcreator.screen.utils.ModRecipeCreator;
+import fr.eno.craftcreator.base.ModRecipeCreator;
 import fr.eno.craftcreator.utils.PairValues;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;

@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.container.utils;
+package fr.eno.craftcreator.container.base;
 
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;

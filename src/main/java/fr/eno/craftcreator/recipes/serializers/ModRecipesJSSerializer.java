@@ -6,7 +6,7 @@ import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.recipes.utils.CraftIngredients;
 import fr.eno.craftcreator.recipes.utils.RecipeFileUtils;
-import fr.eno.craftcreator.recipes.utils.SupportedMods;
+import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
 import fr.eno.craftcreator.utils.PairValues;
 import fr.eno.craftcreator.utils.Utils;

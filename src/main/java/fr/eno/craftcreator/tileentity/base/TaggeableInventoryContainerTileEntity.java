@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.tileentity.utils;
+package fr.eno.craftcreator.tileentity.base;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;

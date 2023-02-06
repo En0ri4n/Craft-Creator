@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.screen.widgets;
+package fr.eno.craftcreator.screen.widgets.buttons;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;

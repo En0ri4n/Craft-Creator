@@ -2,6 +2,7 @@ package fr.eno.craftcreator.recipes.utils;
 
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.crafting.IRecipe;

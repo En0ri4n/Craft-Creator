@@ -4,7 +4,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.container.ThermalRecipeCreatorContainer;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
-import fr.eno.craftcreator.screen.utils.ModRecipeCreator;
+import fr.eno.craftcreator.base.ModRecipeCreator;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.client.gui.screen.Screen;

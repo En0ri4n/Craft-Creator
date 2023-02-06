@@ -33,8 +33,6 @@ public class CraftCreator
     {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        KubeJSManager.initialize();
-
         bus.addListener(this::setup);
         bus.addListener(this::clientSetup);
 
@@ -46,7 +44,7 @@ public class CraftCreator
         InitTileEntities.TILE_ENTITIES.register(bus);
 
         InitPackets.initNetwork();
-        InitPackets.registerMessages();
+        KubeJSManager.initialize();
     }
 
     private void setup(final FMLCommonSetupEvent event)
@@ -83,7 +81,6 @@ public class CraftCreator
         TestRecipesCommand.register(e.getDispatcher());
     }
 
-    @SuppressWarnings("NullableProblems")
     public static final ItemGroup CRAFT_CREATOR_TAB = new ItemGroup(References.MOD_ID)
     {
         @Override

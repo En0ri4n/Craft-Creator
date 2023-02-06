@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import com.google.gson.JsonObject;
 import fr.eno.craftcreator.recipes.utils.CraftIngredients;
-import fr.eno.craftcreator.recipes.utils.SupportedMods;
+import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;

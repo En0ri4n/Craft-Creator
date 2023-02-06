@@ -3,7 +3,7 @@ package fr.eno.craftcreator.utils;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.recipes.utils.SupportedMods;
+import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.ResourceLocation;

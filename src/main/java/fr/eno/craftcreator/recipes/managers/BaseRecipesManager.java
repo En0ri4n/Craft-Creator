@@ -3,7 +3,7 @@ package fr.eno.craftcreator.recipes.managers;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
-import fr.eno.craftcreator.screen.utils.ModRecipeCreator;
+import fr.eno.craftcreator.base.ModRecipeCreator;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;

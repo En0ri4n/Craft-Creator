@@ -5,10 +5,9 @@ import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.recipes.serializers.ModRecipesJSSerializer;
 import fr.eno.craftcreator.recipes.utils.ListEntriesHelper;
-import fr.eno.craftcreator.recipes.utils.ModRecipeCreatorDispatcher;
+import fr.eno.craftcreator.base.ModRecipeCreatorDispatcher;
 import fr.eno.craftcreator.recipes.utils.RecipeFileUtils;
-import fr.eno.craftcreator.screen.buttons.SimpleButton;
-import fr.eno.craftcreator.screen.utils.ListScreen;
+import fr.eno.craftcreator.screen.widgets.buttons.SimpleButton;
 import fr.eno.craftcreator.screen.widgets.DropdownListWidget;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
@@ -101,9 +100,7 @@ public class RecipeManagerScreen extends ListScreen
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button)
     {
-        this.getLists().forEach(list -> list.setCanDisplayTooltips(
-                !modDropdown.mouseClicked(mouseX, mouseY, button) &&
-                        !recipeTypeDropdown.mouseClicked(mouseX, mouseY, button)));
+        this.getLists().forEach(list -> list.setCanDisplayTooltips(!modDropdown.mouseClicked(mouseX, mouseY, button) && !recipeTypeDropdown.mouseClicked(mouseX, mouseY, button)));
 
         return super.mouseClicked(mouseX, mouseY, button);
     }

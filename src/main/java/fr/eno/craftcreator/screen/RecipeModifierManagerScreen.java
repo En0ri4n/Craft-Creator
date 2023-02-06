@@ -5,7 +5,7 @@ import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.container.RecipeModifierContainer;
 import fr.eno.craftcreator.recipes.utils.ListEntriesHelper;
-import fr.eno.craftcreator.screen.buttons.SimpleButton;
+import fr.eno.craftcreator.screen.widgets.buttons.SimpleButton;
 import fr.eno.craftcreator.screen.container.TaggeableSlotsContainerScreen;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import fr.eno.craftcreator.utils.PositionnedSlot;

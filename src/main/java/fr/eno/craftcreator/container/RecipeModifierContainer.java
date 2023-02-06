@@ -1,7 +1,7 @@
 package fr.eno.craftcreator.container;
 
 import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.container.utils.VanillaCommonContainer;
+import fr.eno.craftcreator.container.base.VanillaCommonContainer;
 import fr.eno.craftcreator.init.InitContainers;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;

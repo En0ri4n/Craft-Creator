@@ -23,7 +23,7 @@ import javax.annotation.Nonnull;
 @SuppressWarnings({"deprecation", "NullableProblems"})
 public abstract class RecipeCreatorBlock extends Block
 {
-    private static final DirectionProperty FACING = HorizontalBlock.FACING;
+    public static final DirectionProperty FACING = HorizontalBlock.FACING;
 
     public RecipeCreatorBlock()
     {

@@ -2,7 +2,7 @@ package fr.eno.craftcreator.init;
 
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.item.ItemBlockBasic;
-import fr.eno.craftcreator.recipes.utils.SupportedMods;
+import fr.eno.craftcreator.base.SupportedMods;
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
