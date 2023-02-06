@@ -1,7 +1,6 @@
-package fr.eno.craftcreator.screen.utils;
+package fr.eno.craftcreator.base;
 
 import fr.eno.craftcreator.recipes.utils.RecipeFileUtils;
-import fr.eno.craftcreator.recipes.utils.SupportedMods;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
 import fr.eno.craftcreator.utils.Utils;

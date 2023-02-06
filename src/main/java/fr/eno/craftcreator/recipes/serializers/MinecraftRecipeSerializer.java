@@ -2,8 +2,8 @@ package fr.eno.craftcreator.recipes.serializers;
 
 import com.google.gson.JsonObject;
 import fr.eno.craftcreator.recipes.utils.CraftIngredients;
-import fr.eno.craftcreator.recipes.utils.SupportedMods;
-import fr.eno.craftcreator.screen.utils.ModRecipeCreator;
+import fr.eno.craftcreator.base.SupportedMods;
+import fr.eno.craftcreator.base.ModRecipeCreator;
 import fr.eno.craftcreator.serializer.DatapackHelper;
 import io.netty.buffer.Unpooled;
 import net.minecraft.inventory.container.Slot;

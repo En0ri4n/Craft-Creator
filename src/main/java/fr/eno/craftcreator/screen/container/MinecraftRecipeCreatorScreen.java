@@ -8,9 +8,10 @@ import fr.eno.craftcreator.init.InitPackets;
 import fr.eno.craftcreator.packets.RetrieveRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
-import fr.eno.craftcreator.recipes.utils.SupportedMods;
-import fr.eno.craftcreator.screen.buttons.BooleanButton;
-import fr.eno.craftcreator.screen.utils.ModRecipeCreator;
+import fr.eno.craftcreator.base.SupportedMods;
+import fr.eno.craftcreator.screen.widgets.buttons.BooleanButton;
+import fr.eno.craftcreator.base.ModRecipeCreator;
+import fr.eno.craftcreator.screen.widgets.buttons.pressable.NullPressable;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.entity.player.PlayerInventory;
@@ -19,7 +20,6 @@ import net.minecraft.item.Items;
 import net.minecraft.util.text.ITextComponent;
 
 import javax.annotation.Nonnull;
-import java.util.Collections;
 import java.util.List;
 
 public class MinecraftRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen<MinecraftRecipeCreatorContainer>
@@ -37,9 +37,7 @@ public class MinecraftRecipeCreatorScreen extends MultiScreenModRecipeCreatorScr
     {
         super.init();
         InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("shaped", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.BOOLEAN));
-        this.addButton(craftTypeButton = new BooleanButton("craftType", leftPos + 100, topPos + 60, 68, 20, true, (button) ->
-        {
-        }));
+        this.addButton(craftTypeButton = new BooleanButton("craftType", leftPos + 100, topPos + 60, 68, 20, true, NullPressable.get()));
 
         addNumberField(leftPos + 8, topPos + 30, 40, 0.1D, 1);
         addNumberField(leftPos + 8, topPos + 60, 40, 200, 1);

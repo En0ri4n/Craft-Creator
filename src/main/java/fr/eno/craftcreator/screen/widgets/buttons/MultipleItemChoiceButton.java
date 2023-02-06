@@ -1,14 +1,12 @@
-package fr.eno.craftcreator.screen.buttons;
+package fr.eno.craftcreator.screen.widgets.buttons;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.screen.buttons.pressable.NullPressable;
+import fr.eno.craftcreator.screen.widgets.buttons.pressable.NullPressable;
 import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
 
 import javax.annotation.Nonnull;

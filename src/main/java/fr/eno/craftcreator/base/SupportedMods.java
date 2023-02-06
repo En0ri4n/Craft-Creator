@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.recipes.utils;
+package fr.eno.craftcreator.base;
 
 import net.minecraftforge.fml.ModList;
 

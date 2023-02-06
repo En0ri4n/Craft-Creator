@@ -1,7 +1,7 @@
 package fr.eno.craftcreator.blocks;
 
 import fr.eno.craftcreator.api.BlockUtils;
-import fr.eno.craftcreator.recipes.utils.SupportedMods;
+import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.tileentity.ThermalRecipeCreatorTile;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;

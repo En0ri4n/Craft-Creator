@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.container.utils;
+package fr.eno.craftcreator.container.base;
 
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;

@@ -37,6 +37,9 @@ public class InitPackets
                 .networkProtocolVersion(() -> PROTOCOL_VERSION)
                 .simpleChannel();
         packetId = 0;
+
+        // Register packets
+        registerPackets();
     }
 
     private static SimpleChannel getNetWork()
@@ -49,7 +52,7 @@ public class InitPackets
         return network;
     }
 
-    public static void registerMessages()
+    public static void registerPackets()
     {
         registerServerMessage(RetrieveRecipeCreatorTileDataServerPacket.class, RetrieveRecipeCreatorTileDataServerPacket::encode, RetrieveRecipeCreatorTileDataServerPacket::decode, RetrieveRecipeCreatorTileDataServerPacket.ServerHandler::handle);
 

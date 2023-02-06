@@ -1,8 +1,8 @@
-package fr.eno.craftcreator.container.utils;
+package fr.eno.craftcreator.container.base;
 
 import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
-import fr.eno.craftcreator.recipes.utils.SupportedMods;
-import fr.eno.craftcreator.tileentity.utils.MultiScreenRecipeCreatorTile;
+import fr.eno.craftcreator.base.SupportedMods;
+import fr.eno.craftcreator.tileentity.base.MultiScreenRecipeCreatorTile;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.ContainerType;
