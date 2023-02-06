@@ -26,8 +26,8 @@
 
 	"craftcreator.container.minecraft.furnace.fuel": "§cFire Egg §r§7§o(don't ask why)",
 
-	"craftcreator.screen.furnace_recipe_creator_screen.experience": "Exp. :",
-	"craftcreator.screen.furnace_recipe_creator_screen.cooking_time": "Time :",
+	"craftcreator.screen.minecraft_recipe_creator_screen.field.experience": "Exp. :",
+	"craftcreator.screen.minecraft_recipe_creator_screen.field.cooking_time": "Time :",
 
 	"craftcreator.screen.minecraft_recipe_creator.crafting.title": "Crafting Table Recipe Creator",
 	"craftcreator.screen.minecraft_recipe_creator.stonecutting.title": "Stone Cutter Recipe Creator",
@@ -45,11 +45,6 @@
 	"craftcreator.screen.recipe_manager.button.back": "Back",
 	"craftcreator.screen.recipe_manager.button.modifier_manager": "Modifier Manager",
 
-	"craftcreator.screen.mod_selection.list.mod": "Mod",
-	"craftcreator.screen.mod_selection.infos.modId": "Choose the Mod...",
-	"craftcreator.screen.mod_selection.infos.recipeType": "...and the Recipe Type",
-	"craftcreator.screen.mod_selection.list.recipe_type": "Recipe Type",
-
 	"craftcreator.screen.recipe_manager.list.added_recipes": "Added Recipes",
 	"craftcreator.screen.recipe_manager.list.modified_recipes": "Modified Recipes",
 	"craftcreator.screen.recipe_manager.list.recipes": "Recipes",
@@ -66,6 +61,9 @@
 	"craftcreator.screen.remove_manager.button.remove": "Remove Recipe",
 	"craftcreator.screen.remove_manager.button.back": "Back",
 
+
+    "craftcreator.screen.recipe_creator.label.input": "§6Input",
+    "craftcreator.screen.recipe_creator.label.output": "§2Output",
 	"craftcreator.screen.recipe_creator_screen.kube_js_button": "Is KubeJS Recipe",
 
 	"craftcreator.screen.botania_recipe_creator.mana_infusion.title": "Mana Infusion Recipe Creator",
@@ -75,6 +73,10 @@
 	"craftcreator.screen.botania_recipe_creator.petal_apothecary.title": "Petal Recipe Creator",
 	"craftcreator.screen.botania_recipe_creator.runic_altar.title": "Rune Recipe Creator",
 	"craftcreator.screen.botania_recipe_creator.terra_plate.title": "Terra Plate Recipe Creator",
+
+    "craftcreator.screen.botania_recipe_creator.field.mana": "Mana :",
+    "craftcreator.screen.botania_recipe_creator.field.time": "Time :",
+
 
 	"craftcreator.screen.thermal_recipe_creator.tree_extractor.title": "Tree Extractor Recipe Creator",
 	"craftcreator.screen.thermal_recipe_creator.pulverizer.title": "Pulverizer Recipe Creator",
@@ -89,17 +91,16 @@
 	"craftcreator.screen.thermal_recipe_creator.fermenter.title": "Fermenter Recipe Creator",
 	"craftcreator.screen.thermal_recipe_creator.carpenter.title": "Carpenter Recipe Creator",
 	"craftcreator.screen.thermal_recipe_creator.sawmill.title": "Sawmill Recipe Creator",
-
-	"craftcreator.screen.recipe_creator.label.input": "§6Input",
-	"craftcreator.screen.recipe_creator.label.output": "§2Output",
-
-	"craftcreator.screen.botania_recipe_creator.field.mana": "Mana :",
-	"craftcreator.screen.botania_recipe_creator.field.time": "Time :",
+	"craftcreator.screen.thermal_recipe_creator.furnace.title": "Furnace Recipe Creator",
 
 	"craftcreator.screen.thermal_recipe_creator.field.energy": "Energy :",
 	"craftcreator.screen.thermal_recipe_creator.field.experience": "Exp. Gained :",
 	"craftcreator.screen.thermal_recipe_creator.field.chances": "Luck :",
 	"craftcreator.screen.thermal_recipe_creator.field.resin_amount": "Resin (mb) :",
 	"craftcreator.screen.thermal_recipe_creator.field.mod_energy": "Speed :",
-	"craftcreator.screen.thermal_recipe_creator.field.mod_water": "Water :"
+	"craftcreator.screen.thermal_recipe_creator.field.mod_water": "Water :",
+
+	"craftcreator.screen.thermal_recipe_creator.slot.trunk": "Trunk",
+	"craftcreator.screen.thermal_recipe_creator.slot.leaves": "Leaves",
+    "craftcreator.screen.thermal_recipe_creator.slot.die": "Die"
 }

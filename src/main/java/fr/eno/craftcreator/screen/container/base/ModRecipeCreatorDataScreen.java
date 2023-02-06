@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.screen.container;
+package fr.eno.craftcreator.screen.container.base;
 
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.entity.player.PlayerInventory;

@@ -62,6 +62,9 @@ public class SlotHelper
     public static final List<PositionnedSlot> PRESS_SLOTS;
     public static final List<PositionnedSlot> PRESS_SLOTS_INPUT;
     public static final List<PositionnedSlot> PRESS_SLOTS_OUTPUT;
+    public static final List<PositionnedSlot> FURNACE_THERMAL_SLOTS;
+    public static final List<PositionnedSlot> FURNACE_THERMAL_SLOTS_INPUT;
+    public static final List<PositionnedSlot> FURNACE_THERMAL_SLOTS_OUTPUT;
 
     static
     {
@@ -128,10 +131,12 @@ public class SlotHelper
         PRESS_SLOTS_INPUT = Arrays.asList(new PositionnedSlot(thermalSlots++, 22, 98), new PositionnedSlot(thermalSlots++, 83, 98));
         PRESS_SLOTS_OUTPUT = Arrays.asList(new PositionnedSlot(thermalSlots++, 189, 41), new PositionnedSlot(thermalSlots++, 189, 103));
         PRESS_SLOTS = Stream.of(PRESS_SLOTS_INPUT, PRESS_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
+        FURNACE_THERMAL_SLOTS_INPUT = Collections.singletonList(new PositionnedSlot(thermalSlots++, 63, 98));
+        FURNACE_THERMAL_SLOTS_OUTPUT = Collections.singletonList(new PositionnedSlot(thermalSlots++, 189, 72));
+        FURNACE_THERMAL_SLOTS = Stream.of(FURNACE_THERMAL_SLOTS_INPUT, FURNACE_THERMAL_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
 
-
-        THERMAL_SLOTS_OUTPUT = Stream.of(TREE_EXTRACTOR_SLOTS_OUTPUT, PULVERIZER_SLOTS_OUTPUT, SAWMILL_SLOTS_OUTPUT, SMELTER_SLOTS_OUTPUT, INSOLATOR_SLOTS_OUTPUT, PRESS_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
-        THERMAL_SLOTS = Stream.of(TREE_EXTRACTOR_SLOTS, PULVERIZER_SLOTS, SAWMILL_SLOTS, SMELTER_SLOTS, INSOLATOR_SLOTS, PRESS_SLOTS).flatMap(Collection::stream).collect(Collectors.toList());
+        THERMAL_SLOTS_OUTPUT = Stream.of(TREE_EXTRACTOR_SLOTS_OUTPUT, PULVERIZER_SLOTS_OUTPUT, SAWMILL_SLOTS_OUTPUT, SMELTER_SLOTS_OUTPUT, INSOLATOR_SLOTS_OUTPUT, PRESS_SLOTS_OUTPUT, FURNACE_THERMAL_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
+        THERMAL_SLOTS = Stream.of(TREE_EXTRACTOR_SLOTS, PULVERIZER_SLOTS, SAWMILL_SLOTS, SMELTER_SLOTS, INSOLATOR_SLOTS, PRESS_SLOTS, FURNACE_THERMAL_SLOTS).flatMap(Collection::stream).collect(Collectors.toList());
         THERMAL_SLOTS_SIZE = thermalSlots;
     }
 }

@@ -29,7 +29,7 @@ public class ListEntriesHelper
 
     public static <C extends IInventory, R extends IRecipe<C>, T extends SimpleListWidget.Entry> List<T> getAddedRecipesEntryList(String modId, ResourceLocation recipeTypeLoc)
     {
-        IRecipeType<R> recipeType = RecipeFileUtils.byName(recipeTypeLoc);
+        IRecipeType<R> recipeType = RecipeFileUtils.getRecipeType(recipeTypeLoc);
 
         List<T> entries = new ArrayList<>();
 
@@ -60,14 +60,14 @@ public class ListEntriesHelper
     {
         List<T> entries = new ArrayList<>();
 
-        Registry.RECIPE_TYPE.stream().filter(type -> RecipeFileUtils.getName(type).getNamespace().equals(modId)).forEach(type -> entries.add((T) new SimpleListWidget.StringEntry(RecipeFileUtils.getName(type).toString())));
+        Registry.RECIPE_TYPE.stream().filter(type -> RecipeFileUtils.getRecipeTypeName(type).getNamespace().equals(modId)).forEach(type -> entries.add((T) new SimpleListWidget.StringEntry(RecipeFileUtils.getRecipeTypeName(type).toString())));
 
         return entries;
     }
 
     public static <C extends IInventory, T extends IRecipe<C>, E extends SimpleListWidget.Entry> List<E> getRecipes(ResourceLocation recipeTypeLoc)
     {
-        IRecipeType<T> recipeType = RecipeFileUtils.byName(recipeTypeLoc);
+        IRecipeType<T> recipeType = RecipeFileUtils.getRecipeType(recipeTypeLoc);
 
         List<E> entries = new ArrayList<>();
 

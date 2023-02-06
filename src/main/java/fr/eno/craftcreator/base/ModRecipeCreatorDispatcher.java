@@ -25,7 +25,7 @@ public class ModRecipeCreatorDispatcher
 
     public static CraftIngredients getOutput(IRecipe<?> recipe)
     {
-        String modId = RecipeFileUtils.getName(recipe.getType()).getNamespace();
+        String modId = RecipeFileUtils.getRecipeTypeName(recipe.getType()).getNamespace();
 
         if(SupportedMods.isModLoaded(modId))
         {
@@ -37,7 +37,7 @@ public class ModRecipeCreatorDispatcher
 
     public static CraftIngredients getInputs(IRecipe<?> recipe)
     {
-        String modId = RecipeFileUtils.getName(recipe.getType()).getNamespace();
+        String modId = RecipeFileUtils.getRecipeTypeName(recipe.getType()).getNamespace();
 
         if(SupportedMods.isModLoaded(modId))
         {

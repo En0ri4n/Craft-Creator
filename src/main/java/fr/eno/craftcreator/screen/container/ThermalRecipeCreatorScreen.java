@@ -5,6 +5,7 @@ import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.container.ThermalRecipeCreatorContainer;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import fr.eno.craftcreator.base.ModRecipeCreator;
+import fr.eno.craftcreator.screen.container.base.MultiScreenModRecipeCreatorScreen;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.client.gui.screen.Screen;
@@ -14,7 +15,6 @@ import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -121,8 +121,8 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
         switch(getCurrentRecipe())
         {
             case TREE_EXTRACTOR:
-                this.renderSlotTitle(0, new StringTextComponent("Trunk"), matrixStack);
-                this.renderSlotTitle(1, new StringTextComponent("Leaves"), matrixStack);
+                this.renderSlotTitle(0, References.getTranslate("screen.thermal_recipe_creator.slot.trunk"), matrixStack);
+                this.renderSlotTitle(1, References.getTranslate("screen.thermal_recipe_creator.slot.leaves"), matrixStack);
                 renderDataFieldTitle(RESIN_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.resin_amount"), matrixStack);
                 break;
             case PULVERIZER:
@@ -134,7 +134,7 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
                     renderDataFieldTitle(7, References.getTranslate("screen.thermal_recipe_creator.field.mod_water"), matrixStack);
                 break;
             case PRESS:
-                this.renderSlotTitle(1, new StringTextComponent("Die"), matrixStack);
+                this.renderSlotTitle(1, References.getTranslate("screen.thermal_recipe_creator.slot.die"), matrixStack);
                 break;
         }
 
@@ -180,8 +180,10 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
                 return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:machine_insolator"));
             case PRESS:
                 return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:machine_press"));
+            case FURNACE_THERMAL:
+                return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:machine_furnace"));
             default:
-                return Items.AIR;
+                return Items.COMMAND_BLOCK;
         }
     }
 }

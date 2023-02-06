@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.screen.container;
+package fr.eno.craftcreator.screen.container.base;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
@@ -76,6 +76,7 @@ public abstract class TaggeableSlotsContainerScreen<T extends Container> extends
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void setData(String dataName, Object data)
     {
         if(dataName.equals("tagged_slots"))

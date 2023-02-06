@@ -9,6 +9,7 @@ import fr.eno.craftcreator.packets.RetrieveRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import fr.eno.craftcreator.base.SupportedMods;
+import fr.eno.craftcreator.screen.container.base.MultiScreenModRecipeCreatorScreen;
 import fr.eno.craftcreator.screen.widgets.buttons.BooleanButton;
 import fr.eno.craftcreator.base.ModRecipeCreator;
 import fr.eno.craftcreator.screen.widgets.buttons.pressable.NullPressable;
@@ -127,8 +128,8 @@ public class MinecraftRecipeCreatorScreen extends MultiScreenModRecipeCreatorScr
             case FURNACE_SMELTING:
             case FURNACE_SMOKING:
             case CAMPFIRE_COOKING:
-                renderDataFieldAndTitle(0, References.getTranslate("screen.furnace_recipe_creator_screen.experience"), matrixStack, mouseX, mouseY, partialTicks);
-                renderDataFieldAndTitle(1, References.getTranslate("screen.furnace_recipe_creator_screen.cooking_time"), matrixStack, mouseX, mouseY, partialTicks);
+                renderDataFieldAndTitle(0, References.getTranslate("screen.minecraft_recipe_creator_screen.field.experience"), matrixStack, mouseX, mouseY, partialTicks);
+                renderDataFieldAndTitle(1, References.getTranslate("screen.minecraft_recipe_creator_screen.field.cooking_time"), matrixStack, mouseX, mouseY, partialTicks);
                 // Only for >> FLAMES <<
                 ClientUtils.bindTexture(getCurrentRecipe().getGuiTexture());
                 blit(matrixStack, this.leftPos + 57, this.topPos + 37, 176, 0, 14, 14, 256, 256);

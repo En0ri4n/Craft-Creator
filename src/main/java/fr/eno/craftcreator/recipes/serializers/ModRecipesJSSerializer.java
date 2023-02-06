@@ -73,7 +73,7 @@ public abstract class ModRecipesJSSerializer
 
     private void sendSuccessMessage(IRecipeType<?> type, ResourceLocation result)
     {
-        IFormattableTextComponent message = References.getTranslate("message.recipe.added", result.getPath(), RecipeFileUtils.getName(type).getPath());
+        IFormattableTextComponent message = References.getTranslate("message.recipe.added", result.getPath(), RecipeFileUtils.getRecipeTypeName(type).getPath());
         ClientUtils.sendClientPlayerMessage(message);
     }
 
