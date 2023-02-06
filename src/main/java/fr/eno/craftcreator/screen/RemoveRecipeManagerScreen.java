@@ -3,14 +3,13 @@ package fr.eno.craftcreator.screen;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.recipes.serializers.ModRecipesJSSerializer;
 import fr.eno.craftcreator.base.ModRecipeCreatorDispatcher;
+import fr.eno.craftcreator.recipes.serializers.ModRecipesJSSerializer;
 import fr.eno.craftcreator.recipes.utils.RecipeFileUtils;
-import fr.eno.craftcreator.screen.widgets.buttons.SimpleButton;
-import fr.eno.craftcreator.screen.widgets.buttons.SimpleCheckBox;
-import fr.eno.craftcreator.screen.utils.ChildrenScreen;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import fr.eno.craftcreator.screen.widgets.SimpleTextFieldWidget;
+import fr.eno.craftcreator.screen.widgets.buttons.SimpleButton;
+import fr.eno.craftcreator.screen.widgets.buttons.SimpleCheckBox;
 import fr.eno.craftcreator.utils.EntryHelper;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
 import fr.eno.craftcreator.utils.Utils;
@@ -25,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RemoveRecipeManagerScreen extends ChildrenScreen
+public class RemoveRecipeManagerScreen extends ListScreen
 {
     private static final ResourceLocation GUI_TEXTURE = References.getLoc("textures/gui/container/gui_background.png");
     private SimpleCheckBox hasInputItemBox;
@@ -42,9 +41,9 @@ public class RemoveRecipeManagerScreen extends ChildrenScreen
 
     private final Map<ModRecipesJSSerializer.RecipeDescriptors, String> removeMap;
 
-    public RemoveRecipeManagerScreen(Screen parentIn)
+    public RemoveRecipeManagerScreen()
     {
-        super(References.getTranslate("screen.remove_manager.title"), parentIn);
+        super(References.getTranslate("screen.remove_manager.title"));
         this.removeMap = new HashMap<>();
     }
 

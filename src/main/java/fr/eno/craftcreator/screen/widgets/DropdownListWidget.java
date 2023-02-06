@@ -276,7 +276,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
     {
         public static List<StringEntry> getRecipeTypes(String modid)
         {
-            return Registry.RECIPE_TYPE.stream().filter(type -> RecipeFileUtils.getName(type).getNamespace().equals(modid)).map(type -> new DropdownListWidget.StringEntry(RecipeFileUtils.getName(type).toString(), new StringTextComponent(RecipeFileUtils.getName(type).toString()))).collect(Collectors.toList());
+            return Registry.RECIPE_TYPE.stream().filter(type -> RecipeFileUtils.getRecipeTypeName(type).getNamespace().equals(modid)).map(type -> new DropdownListWidget.StringEntry(RecipeFileUtils.getRecipeTypeName(type).toString(), new StringTextComponent(RecipeFileUtils.getRecipeTypeName(type).toString()))).collect(Collectors.toList());
         }
 
         public static List<StringEntry> getModIds()

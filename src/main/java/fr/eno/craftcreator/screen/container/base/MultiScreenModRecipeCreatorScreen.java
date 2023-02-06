@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.screen.container;
+package fr.eno.craftcreator.screen.container.base;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContainer> extends TaggeableSlotsContainerScreen<T>
 {
-    int guiTextureSize = 256;
+    protected int guiTextureSize = 256;
 
     // Only to check if it's a vanilla machine
     protected boolean isVanillaScreen;
@@ -285,6 +285,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     protected void renderBg(MatrixStack matrixStack, float partialTicks, int x, int y)
     {
         this.fillGradient(matrixStack, 0, 0, this.width, this.height, -1072689136, -804253680);
@@ -309,7 +310,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     @Override
     protected void renderLabels(MatrixStack matrixStack, int pMouseX, int pMouseY)
     {
-        drawCenteredString(matrixStack, ClientUtils.getFont(), References.getTranslate("screen." + this.getMenu().getMod().getModId() + "_recipe_creator." + RecipeFileUtils.getName(getCurrentRecipe().getRecipeType()).getPath() + ".title"), this.imageWidth / 2, -15, 0xFFFFFF);
+        drawCenteredString(matrixStack, ClientUtils.getFont(), References.getTranslate("screen." + this.getMenu().getMod().getModId() + "_recipe_creator." + RecipeFileUtils.getRecipeTypeName(getCurrentRecipe().getRecipeType()).getPath() + ".title"), this.imageWidth / 2, -15, 0xFFFFFF);
         if(Screen.hasShiftDown() || Screen.hasControlDown())
             drawString(matrixStack, this.font, References.getTranslate("screen.crafting.info.msg").getString(), 0, this.imageHeight + (isVanillaScreen ? 15 : 0), 0x707370);
     }
@@ -375,7 +376,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     private void updateServerIndex()
     {
         InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("screen_index", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.INT, this.currentScreenIndex));
-        InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("recipe_type", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.STRING, RecipeFileUtils.getName(getCurrentRecipe().getRecipeType()).toString()));
+        InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("recipe_type", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.STRING, RecipeFileUtils.getRecipeTypeName(getCurrentRecipe().getRecipeType()).toString()));
     }
 
     protected void updateSlots()

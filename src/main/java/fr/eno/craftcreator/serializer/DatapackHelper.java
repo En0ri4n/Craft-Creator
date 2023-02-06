@@ -40,7 +40,7 @@ public class DatapackHelper
             if(!slot.hasItem()) continue;
 
             JsonObject obj = new JsonObject();
-            obj.addProperty("item", slot.getItem().getItem().getRegistryName().getPath());
+            obj.addProperty("item", Utils.notNull(slot.getItem().getItem().getRegistryName()).getPath());
             ingredients.add(obj);
         }
 
@@ -190,6 +190,6 @@ public class DatapackHelper
         File directory = new File(ClientUtils.getMinecraft().gameDirectory, "Craft-Creator");
         if(!directory.exists()) directory.mkdirs();
 
-        return new File(directory, output.getPath() + "_from_" + RecipeFileUtils.getName(type).getPath() + ".json");
+        return new File(directory, output.getPath() + "_from_" + RecipeFileUtils.getRecipeTypeName(type).getPath() + ".json");
     }
 }

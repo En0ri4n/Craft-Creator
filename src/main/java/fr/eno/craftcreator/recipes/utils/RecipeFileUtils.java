@@ -96,12 +96,12 @@ public class RecipeFileUtils
             JsonObject jsonObject = GSON.fromJson(new StringReader(recipeJson), JsonObject.class);
             IRecipeSerializer<T> currentSerializer;
 
-            if(recipeType == IRecipeType.CRAFTING && jsonObject.get("type").getAsString().contains(getName(recipeType).toString()))
+            if(recipeType == IRecipeType.CRAFTING && jsonObject.get("type").getAsString().contains(getRecipeTypeName(recipeType).toString()))
                 currentSerializer = jsonObject.get("type").getAsString().contains("shaped") ? (IRecipeSerializer<T>) IRecipeSerializer.SHAPED_RECIPE : (IRecipeSerializer<T>) IRecipeSerializer.SHAPELESS_RECIPE;
             else
                 currentSerializer = (IRecipeSerializer<T>) ForgeRegistries.RECIPE_SERIALIZERS.getValue(ResourceLocation.tryParse(jsonObject.get("type").getAsString()));
 
-            if(jsonObject.get("type").getAsString().contains(getName(recipeType).toString()))
+            if(jsonObject.get("type").getAsString().contains(getRecipeTypeName(recipeType).toString()))
                 addRecipeTo(modId, recipes, jsonObject, Utils.notNull(currentSerializer));
         }
 
@@ -303,20 +303,20 @@ public class RecipeFileUtils
 
     private static String getStartRecipeTypeGroup(IRecipeType<?> type)
     {
-        return getName(type).getPath() + "-recipes";
+        return getRecipeTypeName(type).getPath() + "-recipes";
     }
 
     public static void setRecipeType(JsonObject obj, IRecipeType<?> type)
     {
-        obj.addProperty("type", getName(type).toString());
+        obj.addProperty("type", getRecipeTypeName(type).toString());
     }
 
-    public static ResourceLocation getName(IRecipeType<?> recipeType)
+    public static ResourceLocation getRecipeTypeName(IRecipeType<?> recipeType)
     {
         return Registry.RECIPE_TYPE.getKey(recipeType);
     }
 
-    public static <T extends IRecipe<C>, C extends IInventory> IRecipeType<T> byName(ResourceLocation location)
+    public static <T extends IRecipe<C>, C extends IInventory> IRecipeType<T> getRecipeType(ResourceLocation location)
     {
         return (IRecipeType<T>) Registry.RECIPE_TYPE.getOptional(location).orElse(null);
     }
@@ -335,7 +335,7 @@ public class RecipeFileUtils
         while(jsonMatcher.find())
         {
             JsonObject jsonObject = GSON.fromJson(new StringReader(jsonMatcher.group(1)), JsonObject.class);
-            if(jsonObject.get("type").getAsString().equals(getName(recipeType).toString()))
+            if(jsonObject.get("type").getAsString().equals(getRecipeTypeName(recipeType).toString()))
                 jsonRecipes.add(jsonObject);
         }
 

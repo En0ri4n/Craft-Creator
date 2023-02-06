@@ -17,7 +17,7 @@ public abstract class MultiScreenRecipeCreatorTile extends TaggeableInventoryCon
     public MultiScreenRecipeCreatorTile(SupportedMods mod, TileEntityType<?> blockEntityType, int slotsSize)
     {
         super(blockEntityType, slotsSize);
-        this.currentRecipeType = RecipeFileUtils.getName(ModRecipeCreator.getRecipeCreatorScreens(mod).get(0).getRecipeType());
+        this.currentRecipeType = RecipeFileUtils.getRecipeTypeName(ModRecipeCreator.getRecipeCreatorScreens(mod).get(0).getRecipeType());
         this.screenIndex = 0;
         this.isKubeJSRecipe = true;
     }
@@ -103,6 +103,6 @@ public abstract class MultiScreenRecipeCreatorTile extends TaggeableInventoryCon
         super.load(state, compound);
         this.screenIndex = compound.getInt("ScreenIndex");
         this.isKubeJSRecipe = compound.getBoolean("KubeJSRecipe");
-        this.currentRecipeType = ResourceLocation.tryParse("RecipeType");
+        this.currentRecipeType = ResourceLocation.tryParse(compound.getString("RecipeType"));
     }
 }

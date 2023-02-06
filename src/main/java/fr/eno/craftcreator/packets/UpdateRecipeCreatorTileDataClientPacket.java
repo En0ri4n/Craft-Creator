@@ -2,7 +2,7 @@ package fr.eno.craftcreator.packets;
 
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.init.InitPackets;
-import fr.eno.craftcreator.screen.container.ModRecipeCreatorDataScreen;
+import fr.eno.craftcreator.screen.container.base.ModRecipeCreatorDataScreen;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -27,6 +27,7 @@ public class UpdateRecipeCreatorTileDataClientPacket
         this.data = data;
     }
 
+    @SuppressWarnings("unchecked")
     public static void encode(UpdateRecipeCreatorTileDataClientPacket msg, PacketBuffer packetBuffer)
     {
         packetBuffer.writeUtf(msg.dataName);

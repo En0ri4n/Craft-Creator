@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-// TODO: move in another package, not screen
 public enum ModRecipeCreator
 {
     // Minecraft
@@ -39,7 +38,8 @@ public enum ModRecipeCreator
     SAWMILL(SupportedMods.THERMAL, byName("thermal:sawmill"), Utils.getGuiContainerTexture(SupportedMods.THERMAL, "sawmill_recipe_creator.png"), SlotHelper.SAWMILL_SLOTS),
     SMELTER(SupportedMods.THERMAL, byName("thermal:smelter"), Utils.getGuiContainerTexture(SupportedMods.THERMAL, "smelter_recipe_creator.png"), SlotHelper.SMELTER_SLOTS),
     INSOLATOR(SupportedMods.THERMAL, byName("thermal:insolator"), Utils.getGuiContainerTexture(SupportedMods.THERMAL, "insolator_recipe_creator.png"), SlotHelper.INSOLATOR_SLOTS),
-    PRESS(SupportedMods.THERMAL, byName("thermal:press"), Utils.getGuiContainerTexture(SupportedMods.THERMAL, "press_recipe_creator.png"), SlotHelper.PRESS_SLOTS);
+    PRESS(SupportedMods.THERMAL, byName("thermal:press"), Utils.getGuiContainerTexture(SupportedMods.THERMAL, "press_recipe_creator.png"), SlotHelper.PRESS_SLOTS),
+    FURNACE_THERMAL(SupportedMods.THERMAL, byName("thermal:furnace"), Utils.getGuiContainerTexture(SupportedMods.THERMAL, "furnace_recipe_creator.png"), SlotHelper.FURNACE_THERMAL_SLOTS);
 
     private final SupportedMods mod;
     private final IRecipeType<?> recipeType;
@@ -79,9 +79,10 @@ public enum ModRecipeCreator
         return Stream.of(values()).filter(recipe -> recipe.getMod().equals(mod)).collect(Collectors.toList());
     }
 
+
     public static ModRecipeCreator byName(ResourceLocation recipeTypeName)
     {
-        return Stream.of(values()).filter(recipe -> recipeTypeName.toString().equals(RecipeFileUtils.getName(recipe.getRecipeType()).toString())).findFirst().orElse(null);
+        return Stream.of(values()).filter(recipe -> recipeTypeName.toString().equals(RecipeFileUtils.getRecipeTypeName(recipe.getRecipeType()).toString())).findFirst().orElse(null);
     }
 
     private static IRecipeType<?> byName(String resourceLocation)
