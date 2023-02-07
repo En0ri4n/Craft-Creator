@@ -2,6 +2,7 @@ package fr.eno.craftcreator.screen.widgets;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.api.ScreenUtils;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.util.text.ITextComponent;
@@ -33,7 +34,7 @@ public class NumberDataFieldWidget extends TextFieldWidget
     @Override
     public void renderToolTip(MatrixStack poseStack, int mouseX, int mouseY)
     {
-        if(!ClientUtils.isMouseHover(x, y, mouseX, mouseY, width, height) || !this.visible || !this.active || this.tooltip.getString().isEmpty())
+        if(!ScreenUtils.isMouseHover(x, y, mouseX, mouseY, width, height) || !this.visible || !this.active || this.tooltip.getString().isEmpty())
             return;
 
         List<ITextComponent> tooltips = new ArrayList<>();

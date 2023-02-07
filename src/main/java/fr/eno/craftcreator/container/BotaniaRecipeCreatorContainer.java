@@ -1,10 +1,10 @@
 package fr.eno.craftcreator.container;
 
+import fr.eno.craftcreator.base.SupportedMods;
+import fr.eno.craftcreator.container.base.CommonContainer;
 import fr.eno.craftcreator.container.slot.DefinedSlot;
 import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
-import fr.eno.craftcreator.container.base.CommonContainer;
 import fr.eno.craftcreator.init.InitContainers;
-import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.block.Block;
@@ -21,18 +21,21 @@ public class BotaniaRecipeCreatorContainer extends CommonContainer
 
         for(int i = 0; i < SlotHelper.BOTANIA_SLOTS_SIZE; i++)
         {
+            int x = SlotHelper.BOTANIA_SLOTS.get(i).getxPos();
+            int y = SlotHelper.BOTANIA_SLOTS.get(i).getyPos();
+
             if(PositionnedSlot.contains(SlotHelper.PURE_DAISY_SLOTS_INPUT, i) || PositionnedSlot.isValidSlot(SlotHelper.MANA_INFUSION_SLOTS_INPUT, 1, i))
             {
-                this.addSlot(new DefinedSlot(tile, i, SlotHelper.BOTANIA_SLOTS.get(i).getxPos(), SlotHelper.BOTANIA_SLOTS.get(i).getyPos(), is -> Block.byItem(is.getItem()) != Blocks.AIR));
-                continue;
+                this.addSlot(new DefinedSlot(tile, i, x, y, is -> Block.byItem(is.getItem()) != Blocks.AIR));
             }
             else if(PositionnedSlot.contains(SlotHelper.BREWERY_SLOTS_OUTPUT, i))
             {
-                this.addSlot(new DefinedSlot(tile, i, SlotHelper.BOTANIA_SLOTS.get(i).getxPos(), SlotHelper.BOTANIA_SLOTS.get(i).getyPos(), is -> is.getItem() instanceof IBrewItem));
-                continue;
+                this.addSlot(new DefinedSlot(tile, i, x, y, is -> is.getItem() instanceof IBrewItem));
             }
-
-            this.addSlot(new SimpleSlotItemHandler(tile, i, SlotHelper.BOTANIA_SLOTS.get(i).getxPos(), SlotHelper.BOTANIA_SLOTS.get(i).getyPos()));
+            else
+            {
+                this.addSlot(new SimpleSlotItemHandler(tile, i, x, y));
+            }
         }
 
         this.bindPlayerInventory(inventory);

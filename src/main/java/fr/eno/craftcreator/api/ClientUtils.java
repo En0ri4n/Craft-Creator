@@ -1,5 +1,8 @@
 package fr.eno.craftcreator.api;
 
+import fr.eno.craftcreator.References;
+import fr.eno.craftcreator.base.SupportedMods;
+import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.IHasContainer;
@@ -15,15 +18,20 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
+
 /**
  * @author En0ri4n <br>
  * <p>
- * This class contains some useful methods for the client side.
+ * This class contains some useful methods for the client.
  */
-// TODO replace all calls to minecraft by this class (except in screens classes)
 public class ClientUtils
 {
     public static final KeyBinding KEY_OPEN_RECIPES_MENU = new KeyBinding("key.craftcreator.open_recipes_menu", GLFW.GLFW_KEY_K, "key.categories.craft_creator");
+
+    private static final Supplier<Minecraft> minecraftSupplier = Minecraft::getInstance;
 
     /**
      * @return the minecraft instance
@@ -31,7 +39,7 @@ public class ClientUtils
      */
     public static Minecraft getMinecraft()
     {
-        return Minecraft.getInstance();
+        return minecraftSupplier.get();
     }
 
     /**
@@ -40,16 +48,16 @@ public class ClientUtils
      */
     public static World getClientLevel()
     {
-        return getMinecraft().level;
+        return minecraftSupplier.get().level;
     }
 
     /**
      * @return the minecraft font
      * @see Minecraft#font
      */
-    public static FontRenderer getFont()
+    public static FontRenderer getFontRenderer()
     {
-        return getMinecraft().font;
+        return minecraftSupplier.get().font;
     }
 
 	/**
@@ -58,7 +66,7 @@ public class ClientUtils
      */
     public static ItemRenderer getItemRenderer()
     {
-        return getMinecraft().getItemRenderer();
+        return minecraftSupplier.get().getItemRenderer();
     }
 
 	/**
@@ -67,7 +75,7 @@ public class ClientUtils
 	 */
     public static PlayerEntity getClientPlayer()
     {
-        return getMinecraft().player;
+        return minecraftSupplier.get().player;
     }
 
 	/**
@@ -76,7 +84,7 @@ public class ClientUtils
      */
     public static void openScreen(Screen screen)
     {
-        getMinecraft().setScreen(screen);
+        minecraftSupplier.get().setScreen(screen);
     }
 
 	/**
@@ -85,20 +93,10 @@ public class ClientUtils
 	 */
     public static Screen getCurrentScreen()
     {
-        return getMinecraft().screen;
+        return minecraftSupplier.get().screen;
     }
 
 	/**
-	 * Check if the mouse is in the specified area
-	 *
-	 * @return True if the mouse is in the specified area
-	 */
-    public static boolean isMouseHover(int x, int y, int mouseX, int mouseY, int width, int height)
-    {
-        return mouseX > x && mouseX < (x + width) && mouseY > y && mouseY < (y + height);
-    }
-
-    /**
      * Register the given container with the given screen
      * @see net.minecraft.client.gui.ScreenManager#register(ContainerType, ScreenManager.IScreenFactory)
      */
@@ -123,6 +121,88 @@ public class ClientUtils
 
     public static void bindTexture(ResourceLocation texture)
     {
-        getMinecraft().getTextureManager().bind(texture);
+        minecraftSupplier.get().getTextureManager().bind(texture);
+    }
+
+
+    /**
+     * calls {@link net.minecraft.client.gui.FontRenderer#width(String)}
+     *
+     * @param str The string
+     * @return width of the given string
+     * @see net.minecraft.client.gui.FontRenderer#width(String)
+     */
+    public static int width(String str)
+    {
+        return getFontRenderer().width(str);
+    }
+
+    /**
+     * Sort a list of entry with the specified token
+     *
+     * @param token  the string to found
+     * @param inputs a list of entries
+     * @return a non-null list with entries which match the token
+     */
+    public static List<SimpleListWidget.Entry> copyPartialMatches(String token, List<SimpleListWidget.Entry> inputs)
+    {
+        List<SimpleListWidget.Entry> list = new ArrayList<>();
+        if(!token.isEmpty())
+        {
+            for(SimpleListWidget.Entry s : inputs)
+            {
+                if(s.toString().contains(token))
+                {
+                    list.add(s);
+                }
+            }
+        }
+
+        return list;
+    }
+
+    /**
+     * Parse a string to a resource location
+     * @param location the string to parse
+     * @return the resource location
+     *
+     * @see ResourceLocation#tryParse(String)
+     */
+    public static ResourceLocation parse(String location)
+    {
+        return ResourceLocation.tryParse(location);
+    }
+
+    /**
+     * Get the container's texture with the specified name
+     *
+     * @param mod The mod of the container
+     * @param path  The path of the texture
+     * @return the texture's resource location
+     */
+    public static ResourceLocation getGuiContainerTexture(SupportedMods mod, String path)
+    {
+        return References.getLoc("textures/gui/container/" + mod.getModId() + "/" + path);
+    }
+
+    /**
+     * Split a string with the specified size
+     *
+     * @param text the string to split
+     * @param size the size to split
+     * @return a non-null list with the split string
+     */
+    public static List<String> splitToListWithSize(String text, int size)
+    {
+        List<String> parts = new ArrayList<>();
+
+        int length = text.length();
+
+        for(int i = 0; i < length; i += size)
+        {
+            parts.add(text.substring(i, Math.min(length, i + size)));
+        }
+
+        return parts;
     }
 }

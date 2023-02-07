@@ -3,9 +3,9 @@ package fr.eno.craftcreator.screen.container;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.base.ModRecipeCreator;
 import fr.eno.craftcreator.container.BotaniaRecipeCreatorContainer;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
-import fr.eno.craftcreator.base.ModRecipeCreator;
 import fr.eno.craftcreator.screen.container.base.MultiScreenModRecipeCreatorScreen;
 import fr.eno.craftcreator.screen.widgets.NumberDataFieldWidget;
 import fr.eno.craftcreator.utils.PairValues;
@@ -24,7 +24,6 @@ import vazkii.botania.common.item.ModItems;
 import javax.annotation.Nonnull;
 import java.util.List;
 
-@SuppressWarnings("unused")
 public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen<BotaniaRecipeCreatorContainer>
 {
     private static final int MANA_FIELD = 0;
