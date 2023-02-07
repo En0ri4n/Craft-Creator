@@ -3,15 +3,17 @@ package fr.eno.craftcreator.screen;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.recipes.serializers.ModRecipesJSSerializer;
-import fr.eno.craftcreator.recipes.utils.ListEntriesHelper;
+import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.base.ModRecipeCreatorDispatcher;
-import fr.eno.craftcreator.recipes.utils.RecipeFileUtils;
-import fr.eno.craftcreator.screen.widgets.buttons.SimpleButton;
+import fr.eno.craftcreator.base.SupportedMods;
+import fr.eno.craftcreator.recipes.serializers.ModRecipeSerializer;
+import fr.eno.craftcreator.recipes.utils.ListEntriesHelper;
 import fr.eno.craftcreator.screen.widgets.DropdownListWidget;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
+import fr.eno.craftcreator.screen.widgets.buttons.SimpleButton;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
 
@@ -30,7 +32,7 @@ public class RecipeManagerScreen extends ListScreen
     {
         super(new StringTextComponent(""));
         this.modId = DropdownListWidget.Entries.getModIds().get(0).getValue();
-        this.recipeType = ResourceLocation.tryParse(DropdownListWidget.Entries.getRecipeTypes(modId).get(0).getValue());
+        this.recipeType = ClientUtils.parse(DropdownListWidget.Entries.getRecipeTypes(modId).get(0).getValue());
     }
 
     @Override
@@ -44,33 +46,33 @@ public class RecipeManagerScreen extends ListScreen
         {
             this.modId = entry.getValue();
             this.recipeTypeDropdown.setEntries(DropdownListWidget.Entries.getRecipeTypes(entry.getValue()));
-            this.recipeType = ResourceLocation.tryParse(this.recipeTypeDropdown.getEntries().get(0).getValue());
+            this.recipeType = ClientUtils.parse(this.recipeTypeDropdown.getEntries().get(0).getValue());
             updateLists();
         }));
 
         addWidget(recipeTypeDropdown = new DropdownListWidget<>(width / 2, 0, 200, 20, 20, DropdownListWidget.Entries.getRecipeTypes(this.modId), (entry) ->
         {
-            this.recipeType = ResourceLocation.tryParse(entry.getValue());
+            this.recipeType = ClientUtils.parse(entry.getValue());
             updateLists();
         }));
 
 
-        this.addList(new SimpleListWidget(minecraft, 10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.recipes"), (entry) ->
+        this.addList(new SimpleListWidget(ClientUtils.getMinecraft(), 10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.recipes"), (entry) ->
         {
             IRecipe<?> recipeToRemove = ((SimpleListWidget.RecipeEntry) entry).getRecipe();
-            ModRecipeCreatorDispatcher.getSeralizer(this.modId).removeRecipe(new ModifiedRecipe(RecipeFileUtils.ModifiedRecipeType.REMOVED, Collections.singletonMap(ModRecipesJSSerializer.RecipeDescriptors.RECIPE_ID, recipeToRemove.getId().toString())));
+            ModRecipeCreatorDispatcher.getSeralizer(this.modId).removeRecipe(getCurrentRecipeType(), new ModifiedRecipe(ModifiedRecipe.ModifiedRecipeType.REMOVED, Collections.singletonMap(ModRecipeSerializer.RecipeDescriptors.RECIPE_ID, recipeToRemove.getId().toString())));
             updateLists();
         }));
 
-        this.addList(new SimpleListWidget(minecraft, this.width / 3 + 10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.added_recipes"), (entry) ->
+        this.addList(new SimpleListWidget(ClientUtils.getMinecraft(), this.width / 3 + 10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.added_recipes"), (entry) ->
         {
-            ModRecipesJSSerializer.removeAddedRecipe(((SimpleListWidget.RecipeEntry) entry).getRecipe());
+            ModRecipeSerializer.removeAddedRecipe(((SimpleListWidget.RecipeEntry) entry).getRecipe());
             updateLists();
         }));
 
-        this.addList(new SimpleListWidget(minecraft, this.width / 3 * 2 + 10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.modified_recipes"), (entry) ->
+        this.addList(new SimpleListWidget(ClientUtils.getMinecraft(), this.width / 3 * 2 + 10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.modified_recipes"), (entry) ->
         {
-            ModRecipesJSSerializer.removeModifiedRecipe(((SimpleListWidget.ModifiedRecipeEntry) entry).getRecipe());
+            ModRecipeSerializer.removeModifiedRecipe(getCurrentMod(), ((SimpleListWidget.ModifiedRecipeEntry) entry).getRecipe());
             updateLists();
         }));
 
@@ -84,8 +86,18 @@ public class RecipeManagerScreen extends ListScreen
     private void updateLists()
     {
         this.setEntries(0, ListEntriesHelper.getRecipes(this.recipeType));
-        this.setEntries(1, ListEntriesHelper.getAddedRecipesEntryList(this.modId, this.recipeType));
-        this.setEntries(2, ListEntriesHelper.getModifiedRecipesEntryList());
+        this.setEntries(1, ListEntriesHelper.getAddedRecipesEntryList(getCurrentMod(), this.recipeType));
+        this.setEntries(2, ListEntriesHelper.getModifiedRecipesEntryList(getCurrentMod()));
+    }
+
+    private SupportedMods getCurrentMod()
+    {
+        return SupportedMods.getMod(this.modId);
+    }
+
+    private IRecipeType<?> getCurrentRecipeType()
+    {
+        return CommonUtils.getRecipeTypeByName(this.recipeType);
     }
 
     @Override

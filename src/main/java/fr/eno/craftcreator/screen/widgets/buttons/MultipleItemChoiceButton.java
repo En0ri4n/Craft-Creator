@@ -2,8 +2,8 @@ package fr.eno.craftcreator.screen.widgets.buttons;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.api.ScreenUtils;
 import fr.eno.craftcreator.screen.widgets.buttons.pressable.NullPressable;
-import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -33,7 +33,7 @@ public class MultipleItemChoiceButton<K extends Item, V> extends Button
 	{
 		if(this.visible)
 		{
-			Utils.renderSizedButton(matrixStack, x, y, this.width, this.height, active, Utils.isMouseHover(x, y, mouseX, mouseY, width, height));
+			ScreenUtils.renderSizedButton(matrixStack, x, y, this.width, this.height, active, ScreenUtils.isMouseHover(x, y, mouseX, mouseY, width, height));
 			
 			ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(currentKey), this.x + this.width / 2 - 8, this.y + this.height / 2 - 8);
 		}

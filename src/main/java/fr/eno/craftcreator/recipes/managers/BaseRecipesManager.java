@@ -1,15 +1,15 @@
 package fr.eno.craftcreator.recipes.managers;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import fr.eno.craftcreator.base.ModRecipeCreator;
+import fr.eno.craftcreator.recipes.utils.RecipeEntry;
+import fr.eno.craftcreator.recipes.utils.RecipeInfos;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.Item;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -17,54 +17,68 @@ public abstract class BaseRecipesManager
 {
     public abstract void createRecipe(ModRecipeCreator recipe, List<Slot> slots, RecipeInfos param);
 
-    protected ItemStack getValidOutput(List<Slot> slots, int outputCount)
+    protected RecipeEntry.Output getValidOutput(List<Slot> slots, int outputCount)
     {
         for(int i = outputCount; i < slots.size(); i++)
         {
-            if(slots.get(i).hasItem())
-                return slots.get(i).getItem();
+            Slot slot = slots.get(i);
+            if(slot.hasItem())
+                return new RecipeEntry.Output(slot.getItem().getItem().getRegistryName(), slot.getItem().getCount());
         }
 
-        return ItemStack.EMPTY;
+        return RecipeEntry.Output.EMPTY;
     }
 
-    protected List<Item> getValidList(List<Slot> slots, int start, int end)
+    protected RecipeEntry.MultiInput getValidInputs(List<Slot> slots, Map<Integer ,ResourceLocation> taggedSlots, int start, int end)
     {
-        List<Item> list = new ArrayList<>();
+        RecipeEntry.MultiInput input = new RecipeEntry.MultiInput();
 
         for(int i = start; i < end; i++)
         {
             if(i > slots.size() - 1) break;
 
-            if(slots.get(i).hasItem()) list.add(slots.get(i).getItem().getItem());
+            Slot slot = slots.get(i);
+
+            if(!slot.hasItem())
+                continue;
+
+            input.add(getSingleInput(taggedSlots, slot));
         }
 
-        return list;
+        return input;
     }
 
-    protected List<Item> getValidIngredients(List<Slot> slots)
+    protected RecipeEntry.MultiOutput getValidOutputs(List<Slot> slots, int start, int end)
     {
-        List<Item> list = new ArrayList<>();
+        RecipeEntry.MultiOutput output = new RecipeEntry.MultiOutput();
+
+        for(int i = start; i < end; i++)
+        {
+            if(i > slots.size() - 1) break;
+
+            Slot slot = slots.get(i);
+
+            if(!slot.hasItem())
+                continue;
+
+            output.add(getSingleOutput(slot));
+        }
+
+        return output;
+    }
+
+    protected RecipeEntry.MultiInput getValidIngredients(List<Slot> slots)
+    {
+        RecipeEntry.MultiInput recipeMultiInput = new RecipeEntry.MultiInput();
 
         for(int i = 0; i < slots.size() - 1; i++)
         {
-            if(slots.get(i).hasItem()) list.add(slots.get(i).getItem().getItem());
+            Slot slot = slots.get(i);
+            if(slot.hasItem())
+                recipeMultiInput.add(new RecipeEntry.Input(false, slot.getItem().getItem().getRegistryName(), slot.getItem().getCount()));
         }
 
-        return list;
-    }
-
-    @SuppressWarnings("unused")
-    protected List<Slot> getValidSlots(List<Slot> slots)
-    {
-        List<Slot> list = new ArrayList<>();
-
-        for(int i = 0; i < slots.size() - 1; i++)
-        {
-            if(slots.get(i).hasItem()) list.add(slots.get(i));
-        }
-
-        return list;
+        return recipeMultiInput;
     }
 
     protected boolean isSlotsEmpty(List<Slot> slots, int inputSlotsCount, int outputSlotsCount)
@@ -73,24 +87,49 @@ public abstract class BaseRecipesManager
         boolean hasNoOutput = true;
 
         for(int i = 0; i < inputSlotsCount; i++)
-        {
             if(slots.get(i).hasItem())
             {
                 hasNoInput = false;
                 break;
             }
-        }
 
         for(int i = slots.size() - outputSlotsCount; i < slots.size(); i++)
-        {
             if(slots.get(i).hasItem())
             {
                 hasNoOutput = false;
                 break;
             }
-        }
 
         return hasNoInput || hasNoOutput;
+    }
+
+    protected RecipeEntry.Input getSingleInput(Map<Integer, ResourceLocation> taggedSlots, Slot slot)
+    {
+        if(taggedSlots.containsKey(slot.getSlotIndex()))
+            return new RecipeEntry.Input(true, taggedSlots.get(slot.getSlotIndex()), slot.getItem().getCount());
+        else
+            return new RecipeEntry.Input(false, slot.getItem().getItem().getRegistryName(), slot.getItem().getCount());
+    }
+
+    protected RecipeEntry.BlockInput getBlockInput(Slot slot)
+    {
+        if(slot.hasItem() && slot.getItem().getItem() instanceof BlockItem)
+            return new RecipeEntry.BlockInput(Block.byItem(slot.getItem().getItem()).getRegistryName());
+
+        return new RecipeEntry.BlockInput(Blocks.AIR.getRegistryName());
+    }
+
+    protected RecipeEntry.Output getSingleOutput(Slot slot)
+    {
+        return new RecipeEntry.Output(slot.getItem().getItem().getRegistryName(), slot.getItem().getCount());
+    }
+
+    protected RecipeEntry.BlockOutput getBlockOutput(Slot slot)
+    {
+        if(slot.hasItem() && slot.getItem().getItem() instanceof BlockItem)
+            return new RecipeEntry.BlockOutput(Block.byItem(slot.getItem().getItem()).getRegistryName());
+
+        return new RecipeEntry.BlockOutput(Blocks.AIR.getRegistryName());
     }
 
     protected boolean isValid(ItemStack stack)
@@ -98,21 +137,24 @@ public abstract class BaseRecipesManager
         return stack != null && !stack.isEmpty();
     }
 
-    protected Multimap<ResourceLocation, Boolean> getValidIngredients(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots)
+    protected RecipeEntry.MultiInput getValidIngredients(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots)
     {
-        Multimap<ResourceLocation, Boolean> map = ArrayListMultimap.create();
+        RecipeEntry.MultiInput recipeMultiInput = new RecipeEntry.MultiInput();
 
         for(int i = 0; i < slots.size() - 1; i++)
         {
-            if(taggedSlots.containsKey(slots.get(i).getSlotIndex()))
+            Slot slot = slots.get(i);
+
+            if(taggedSlots.containsKey(slot.getSlotIndex()))
             {
-                map.put(taggedSlots.get(i), true);
+                recipeMultiInput.add(new RecipeEntry.Input(true, taggedSlots.get(slot.getSlotIndex()), slot.getItem().getCount()));
                 continue;
             }
 
-            if(isValid(slots.get(i).getItem())) map.put(slots.get(i).getItem().getItem().getRegistryName(), false);
+            if(isValid(slots.get(i).getItem()))
+                recipeMultiInput.add(new RecipeEntry.Input(false, slot.getItem().getItem().getRegistryName(), slot.getItem().getCount()));
         }
 
-        return map;
+        return recipeMultiInput;
     }
 }

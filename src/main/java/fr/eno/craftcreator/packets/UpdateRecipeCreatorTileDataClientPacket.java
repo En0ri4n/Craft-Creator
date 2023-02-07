@@ -27,8 +27,7 @@ public class UpdateRecipeCreatorTileDataClientPacket
         this.data = data;
     }
 
-    @SuppressWarnings("unchecked")
-    public static void encode(UpdateRecipeCreatorTileDataClientPacket msg, PacketBuffer packetBuffer)
+        public static void encode(UpdateRecipeCreatorTileDataClientPacket msg, PacketBuffer packetBuffer)
     {
         packetBuffer.writeUtf(msg.dataName);
         packetBuffer.writeInt(msg.dataType.ordinal());

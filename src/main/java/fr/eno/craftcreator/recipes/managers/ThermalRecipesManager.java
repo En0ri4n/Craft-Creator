@@ -1,9 +1,9 @@
 package fr.eno.craftcreator.recipes.managers;
 
-import fr.eno.craftcreator.recipes.serializers.ThermalRecipesSerializer;
-import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import fr.eno.craftcreator.base.ModRecipeCreator;
-import fr.eno.craftcreator.utils.PairValues;
+import fr.eno.craftcreator.recipes.serializers.ThermalRecipeSerializer;
+import fr.eno.craftcreator.recipes.utils.RecipeEntry;
+import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.block.Block;
@@ -14,12 +14,10 @@ import net.minecraft.item.BucketItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings("unused")
 public class ThermalRecipesManager extends BaseRecipesManager
 {
     private static final ThermalRecipesManager INSTANCE = new ThermalRecipesManager();
@@ -51,16 +49,12 @@ public class ThermalRecipesManager extends BaseRecipesManager
 
     private void createPressRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, int energy)
     {
-        ResourceLocation input = slots.get(0).getItem().getItem().getRegistryName();
-        int count = slots.get(0).getItem().getCount();
-        ResourceLocation inputDie = slots.get(1).getItem().getItem().getRegistryName();
+        RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));
+        RecipeEntry.Input inputDie = getSingleInput(taggedSlots, slots.get(1));
 
-        if(taggedSlots.containsKey(slots.get(0).getSlotIndex()))
-            input = taggedSlots.get(slots.get(0).getSlotIndex());
+        RecipeEntry.Output output = getSingleOutput(slots.get(2));
 
-        ItemStack output = slots.get(2).getItem();
-
-        ThermalRecipesSerializer.get().serializePressRecipe(input, count, inputDie, output, energy);
+        ThermalRecipeSerializer.get().serializePressRecipe(input, inputDie, output, energy);
     }
 
     private void createInsolatorRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, double energyMod, double waterMod, RecipeInfos recipeInfos)
@@ -68,37 +62,35 @@ public class ThermalRecipesManager extends BaseRecipesManager
         if(isSlotsEmpty(slots, SlotHelper.INSOLATOR_SLOTS_INPUT.size(), SlotHelper.INSOLATOR_SLOTS_OUTPUT.size()))
             return;
 
-        PairValues<ResourceLocation, Map<ItemStack, Double>> values = processRecipe(slots, taggedSlots, recipeInfos);
+        RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));
+        RecipeEntry.MultiOutput output = getLuckedOutputs(slots, recipeInfos);
 
-        ThermalRecipesSerializer.get().serializeInsolatorRecipe(values.getFirstValue(), values.getSecondValue(), energyMod, waterMod);
+        ThermalRecipeSerializer.get().serializeInsolatorRecipe(input, output, energyMod, waterMod);
     }
 
     private void createSmelterRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, int energy, double experience, RecipeInfos recipeInfos)
     {
         if(isSlotsEmpty(slots, SlotHelper.SMELTER_SLOTS_INPUT.size(), SlotHelper.SMELTER_SLOTS_OUTPUT.size())) return;
 
-        List<List<RecipeInput>> input = new ArrayList<>(3);
+        List<RecipeEntry.MultiInput> input = Arrays.asList(new RecipeEntry.MultiInput(), new RecipeEntry.MultiInput(), new RecipeEntry.MultiInput());
 
-        Map<ItemStack, Double> output = new HashMap<>(); // Itemstack -> The item | Double -> The chance
-
+        RecipeEntry.MultiOutput output = new RecipeEntry.MultiOutput();
 
         // For inputs slots
         int i = 0;
         for(int k = 0; k < 3; k++)
         {
-            List<RecipeInput> tempList = new ArrayList<>(4);
             for(int p = 0; p < 4; p++)
             {
-                Slot slot = slots.get(i);
-                i++;
+                Slot slot = slots.get(i++);
+
                 if(!slot.hasItem()) continue;
 
                 if(taggedSlots.containsKey(slot.getSlotIndex()))
-                    tempList.add(new RecipeInput(true, taggedSlots.get(slot.getSlotIndex()), slot.getItem().getCount()));
+                    input.get(k).add(new RecipeEntry.Input(true, taggedSlots.get(slot.getSlotIndex()), slot.getItem().getCount()));
                 else
-                    tempList.add(new RecipeInput(false, slot.getItem().getItem().getRegistryName(), slot.getItem().getCount()));
+                    input.get(k).add(new RecipeEntry.Input(false, slot.getItem().getItem().getRegistryName(), slot.getItem().getCount()));
             }
-            input.add(tempList);
         }
 
         // For outputs slots
@@ -109,10 +101,10 @@ public class ThermalRecipesManager extends BaseRecipesManager
             Slot slot = slots.get(realIndex);
             if(!slot.hasItem()) continue;
 
-            output.put(slot.getItem(), recipeInfos.getValue("chance_" + k).doubleValue());
+            output.add(new RecipeEntry.LuckedOutput(slot.getItem().getItem().getRegistryName(), slot.getItem().getCount(), recipeInfos.getValue("chance_" + k).doubleValue()));
         }
 
-        ThermalRecipesSerializer.get().serializeSmelterRecipe(input, output, energy, experience);
+        ThermalRecipeSerializer.get().serializeSmelterRecipe(input, output, energy, experience);
     }
 
     private void createTreeExtractorRecipe(List<Slot> slots, int resin_amount)
@@ -126,7 +118,7 @@ public class ThermalRecipesManager extends BaseRecipesManager
 
         if(trunk.isEmpty() || leaves.isEmpty() || fluid == Fluids.EMPTY || resin_amount <= 0) return;
 
-        ThermalRecipesSerializer.get().serializeTreeExtractorRecipe(Block.byItem(trunk.getItem()), Block.byItem(leaves.getItem()), fluid, resin_amount);
+        ThermalRecipeSerializer.get().serializeTreeExtractorRecipe(Block.byItem(trunk.getItem()), Block.byItem(leaves.getItem()), fluid, resin_amount);
     }
 
     private void createPulverizerRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, double experience, RecipeInfos recipeInfos)
@@ -134,44 +126,41 @@ public class ThermalRecipesManager extends BaseRecipesManager
         if(isSlotsEmpty(slots, SlotHelper.PULVERIZER_SLOTS_INPUT.size(), SlotHelper.PULVERIZER_SLOTS_OUTPUT.size()))
             return;
 
-        PairValues<ResourceLocation, Map<ItemStack, Double>> values = processRecipe(slots, taggedSlots, recipeInfos);
+        RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));
+        RecipeEntry.MultiOutput output = getLuckedOutputs(slots, recipeInfos);
 
-        ThermalRecipesSerializer.get().serializePulverizerRecipe(values.getFirstValue(), values.getSecondValue(), experience);
+        ThermalRecipeSerializer.get().serializePulverizerRecipe(input, output, experience);
     }
 
     private void createSawmillRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, int energy, RecipeInfos recipeInfos)
     {
         if(isSlotsEmpty(slots, SlotHelper.SAWMILL_SLOTS_INPUT.size(), SlotHelper.SAWMILL_SLOTS_OUTPUT.size())) return;
 
-        PairValues<ResourceLocation, Map<ItemStack, Double>> values = processRecipe(slots, taggedSlots, recipeInfos);
+        RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));
+        RecipeEntry.MultiOutput output = getLuckedOutputs(slots, recipeInfos);
 
-        ThermalRecipesSerializer.get().serializeSawmillRecipe(values.getFirstValue(), values.getSecondValue(), energy);
+        ThermalRecipeSerializer.get().serializeSawmillRecipe(input, output, energy);
     }
 
-    private PairValues<ResourceLocation, Map<ItemStack, Double>> processRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, RecipeInfos recipeInfos)
+    private RecipeEntry.MultiOutput getLuckedOutputs(List<Slot> slots, RecipeInfos recipeInfos)
     {
-        ResourceLocation input = slots.get(0).getItem().getItem().getRegistryName();
-        Map<ItemStack, Double> outputs = new HashMap<>();
+        RecipeEntry.MultiOutput outputs = new RecipeEntry.MultiOutput();
 
-        for(int i = 0; i < slots.size() - 1; i++)
+        int luckIndex = 0;
+        for(int i = 1; i < slots.size() - 1; i++) // First slot is the input
         {
-            if(slots.get(i + 1).hasItem() && recipeInfos.contains("chance_" + i))
-                outputs.put(slots.get(i + 1).getItem(), recipeInfos.getValue("chance_" + i).doubleValue());
+            Slot slot = slots.get(i);
+            if(!slot.hasItem()) continue;
+
+            String key = "chance_" + luckIndex;
+
+            if(recipeInfos.contains(key))
+                outputs.add(new RecipeEntry.LuckedOutput(slot.getItem().getItem().getRegistryName(), slot.getItem().getCount(), recipeInfos.getValue(key).doubleValue()));
+
+            luckIndex++;
         }
 
-        if(!taggedSlots.isEmpty())
-        {
-            for(Map.Entry<Integer, ResourceLocation> taggedSlot : taggedSlots.entrySet())
-            {
-                if(taggedSlot.getKey() == slots.get(0).getSlotIndex())
-                {
-                    input = taggedSlot.getValue();
-                    break;
-                }
-            }
-        }
-
-        return PairValues.create(input, outputs);
+        return outputs;
     }
 
     public static ThermalRecipesManager get()
@@ -179,32 +168,5 @@ public class ThermalRecipesManager extends BaseRecipesManager
         return INSTANCE;
     }
 
-    public static class RecipeInput
-    {
-        private final boolean isTag;
-        private final ResourceLocation registryName;
-        private final int count;
 
-        public RecipeInput(boolean isTag, ResourceLocation registryName, int count)
-        {
-            this.isTag = isTag;
-            this.registryName = registryName;
-            this.count = count;
-        }
-
-        public boolean isTag()
-        {
-            return isTag;
-        }
-
-        public ResourceLocation registryName()
-        {
-            return registryName;
-        }
-
-        public int count()
-        {
-            return count;
-        }
-    }
 }

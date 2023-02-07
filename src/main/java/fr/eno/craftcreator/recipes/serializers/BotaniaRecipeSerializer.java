@@ -1,102 +1,97 @@
 package fr.eno.craftcreator.recipes.serializers;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Multimap;
 import com.google.gson.JsonObject;
-import fr.eno.craftcreator.recipes.utils.CraftIngredients;
 import fr.eno.craftcreator.base.SupportedMods;
-import fr.eno.craftcreator.utils.Utils;
+import fr.eno.craftcreator.recipes.utils.CraftIngredients;
+import fr.eno.craftcreator.recipes.utils.RecipeEntry;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.util.ResourceLocation;
 import vazkii.botania.api.BotaniaAPI;
 import vazkii.botania.api.brew.Brew;
 import vazkii.botania.api.recipe.*;
 import vazkii.botania.common.crafting.ModRecipeTypes;
 
-import java.util.List;
 import java.util.Objects;
 
-public class BotaniaRecipesSerializer extends ModRecipesJSSerializer
+public class BotaniaRecipeSerializer extends ModRecipeSerializer
 {
-    private static final BotaniaRecipesSerializer INSTANCE = new BotaniaRecipesSerializer();
+    private static final BotaniaRecipeSerializer INSTANCE = new BotaniaRecipeSerializer();
 
-    private BotaniaRecipesSerializer()
+    private BotaniaRecipeSerializer()
     {
         super(SupportedMods.BOTANIA);
     }
 
-    public void createInfusionRecipe(Item ingredient, Block catalyst, ItemStack result, int mana)
+    public void serializeInfusionRecipe(RecipeEntry.Input ingredient, Block catalyst, RecipeEntry.Output result, int mana)
     {
         JsonObject obj = createBaseJson(ModRecipeTypes.MANA_INFUSION_TYPE);
         obj.addProperty("mana", mana);
         if(catalyst != Blocks.AIR)
             obj.add("catalyst", mapToJsonObject(ImmutableMap.of("type", "block", "block", Objects.requireNonNull(catalyst.getRegistryName()).toString())));
 
-        obj.add("input", singletonItemJsonObject("item", Utils.notNull(ingredient.getRegistryName())));
+        obj.add("input", singletonItemJsonObject(ingredient));
         obj.add("output", getResult(result));
 
-        addRecipeToKubeJS(gson.toJson(obj), ModRecipeTypes.MANA_INFUSION_TYPE, result.getItem().getRegistryName());
+        send(obj, ModRecipeTypes.MANA_INFUSION_TYPE, result.registryName(), SerializerType.KUBE_JS);
     }
 
-    public void createElvenTradeRecipe(List<Item> ingredients, List<Item> results)
+    public void serializeElvenTradeRecipe(RecipeEntry.MultiInput ingredients, RecipeEntry.MultiOutput results)
     {
         JsonObject obj = createBaseJson(ModRecipeTypes.ELVEN_TRADE_TYPE);
         obj.add("ingredients", listWithSingletonItems(ingredients, "item"));
         obj.add("output", listWithSingletonItems(results, "item"));
 
-        addRecipeToKubeJS(gson.toJson(obj), ModRecipeTypes.ELVEN_TRADE_TYPE, results.get(0).getRegistryName());
+        send(obj, ModRecipeTypes.ELVEN_TRADE_TYPE, results.getOneOutput().registryName(), SerializerType.KUBE_JS);
     }
 
-    public void createPureDaisyRecipe(Block input, Block output, int time)
+    public void serializePureDaisyRecipe(RecipeEntry.BlockInput input, RecipeEntry.BlockOutput output, int time)
     {
         JsonObject obj = createBaseJson(ModRecipeTypes.PURE_DAISY_TYPE);
         obj.addProperty("time", time);
-        obj.add("input", mapToJsonObject(ImmutableMap.of("type", "block", "block", Objects.requireNonNull(input.getRegistryName()).toString())));
-        obj.add("output", singletonItemJsonObject("name", Utils.notNull(output.getRegistryName())));
+        obj.add("input", mapToJsonObject(ImmutableMap.of("type", "block", "block", input.registryName().toString())));
+        obj.add("output", singletonItemJsonObject("name", output.registryName().toString()));
 
-        addRecipeToKubeJS(gson.toJson(obj), ModRecipeTypes.PURE_DAISY_TYPE, output.getRegistryName());
+        send(obj, ModRecipeTypes.PURE_DAISY_TYPE, output.registryName(), SerializerType.KUBE_JS);
     }
 
-    public void createBrewRecipe(List<Item> ingredients, Brew brew)
+    public void serializeBrewRecipe(RecipeEntry.MultiInput ingredients, Brew brew)
     {
         JsonObject obj = createBaseJson(ModRecipeTypes.BREW_TYPE);
         obj.addProperty("brew", Objects.requireNonNull(BotaniaAPI.instance().getBrewRegistry().getKey(brew)).toString());
         obj.add("ingredients", listWithSingletonItems(ingredients, "item"));
 
-        addRecipeToKubeJS(gson.toJson(obj), ModRecipeTypes.BREW_TYPE, BotaniaAPI.instance().getBrewRegistry().getKey(brew));
+        send(obj, ModRecipeTypes.BREW_TYPE, BotaniaAPI.instance().getBrewRegistry().getKey(brew), SerializerType.KUBE_JS);
     }
 
-    public void createPetalRecipe(Multimap<ResourceLocation, Boolean> ingredients, ItemStack result)
+    public void serializePetalRecipe(RecipeEntry.MultiInput ingredients, RecipeEntry.Output result)
     {
         JsonObject obj = createBaseJson(ModRecipeTypes.PETAL_TYPE);
         obj.add("output", getResult(result));
-        obj.add("ingredients", getArray(ingredients));
+        obj.add("ingredients", getInputArray(ingredients));
 
-        addRecipeToKubeJS(gson.toJson(obj), ModRecipeTypes.PETAL_TYPE, result.getItem().getRegistryName());
+        send(obj, ModRecipeTypes.PETAL_TYPE, result.registryName(), SerializerType.KUBE_JS);
     }
 
-    public void createRuneRecipe(Multimap<ResourceLocation, Boolean> ingredients, ItemStack result, int mana)
+    public void serializeRuneRecipe(RecipeEntry.MultiInput ingredients, RecipeEntry.Output result, int mana)
     {
         JsonObject obj = createBaseJson(ModRecipeTypes.RUNE_TYPE);
         obj.add("output", getResult(result));
         obj.addProperty("mana", mana);
-        obj.add("ingredients", getArray(ingredients));
+        obj.add("ingredients", getInputArray(ingredients));
 
-        addRecipeToKubeJS(gson.toJson(obj), ModRecipeTypes.RUNE_TYPE, result.getItem().getRegistryName());
+        send(obj, ModRecipeTypes.RUNE_TYPE, result.registryName(), SerializerType.KUBE_JS);
     }
 
-    public void createTerraPlateRecipe(Multimap<ResourceLocation, Boolean> ingredients, ItemStack result, int mana)
+    public void serializeTerraPlateRecipe(RecipeEntry.MultiInput ingredients, RecipeEntry.Output result, int mana)
     {
         JsonObject obj = createBaseJson(ModRecipeTypes.TERRA_PLATE_TYPE);
         obj.addProperty("mana", mana);
         obj.add("result", getResult(result));
-        obj.add("ingredients", getArray(ingredients));
+        obj.add("ingredients", getInputArray(ingredients));
 
-        addRecipeToKubeJS(gson.toJson(obj), ModRecipeTypes.TERRA_PLATE_TYPE, result.getItem().getRegistryName());
+        send(obj, ModRecipeTypes.TERRA_PLATE_TYPE, result.registryName(), SerializerType.KUBE_JS);
     }
 
     @Override
@@ -179,7 +174,7 @@ public class BotaniaRecipesSerializer extends ModRecipesJSSerializer
         return outputIngredients;
     }
 
-    public static BotaniaRecipesSerializer get()
+    public static BotaniaRecipeSerializer get()
     {
         return INSTANCE;
     }

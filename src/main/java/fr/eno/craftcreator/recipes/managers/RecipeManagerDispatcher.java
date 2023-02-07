@@ -1,8 +1,8 @@
 package fr.eno.craftcreator.recipes.managers;
 
-import fr.eno.craftcreator.recipes.utils.RecipeInfos;
-import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.base.ModRecipeCreator;
+import fr.eno.craftcreator.base.SupportedMods;
+import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import net.minecraft.inventory.container.Slot;
 
 import java.util.List;

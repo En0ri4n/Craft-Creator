@@ -6,6 +6,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * this enum is used to list all the mods supported by Craft-Creator
+ * and if they are loaded or not
+ */
 public enum SupportedMods
 {
     MINECRAFT("minecraft"),

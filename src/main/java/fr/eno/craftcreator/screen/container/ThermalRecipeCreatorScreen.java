@@ -2,9 +2,10 @@ package fr.eno.craftcreator.screen.container;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
+import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.base.ModRecipeCreator;
 import fr.eno.craftcreator.container.ThermalRecipeCreatorContainer;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
-import fr.eno.craftcreator.base.ModRecipeCreator;
 import fr.eno.craftcreator.screen.container.base.MultiScreenModRecipeCreatorScreen;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
@@ -12,7 +13,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -169,19 +169,19 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
         switch(modRecipeCreator)
         {
             case TREE_EXTRACTOR:
-                return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:device_tree_extractor"));
+                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("thermal:device_tree_extractor"));
             case PULVERIZER:
-                return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:machine_pulverizer"));
+                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("thermal:machine_pulverizer"));
             case SAWMILL:
-                return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:machine_sawmill"));
+                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("thermal:machine_sawmill"));
             case SMELTER:
-                return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:machine_smelter"));
+                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("thermal:machine_smelter"));
             case INSOLATOR:
-                return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:machine_insolator"));
+                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("thermal:machine_insolator"));
             case PRESS:
-                return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:machine_press"));
+                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("thermal:machine_press"));
             case FURNACE_THERMAL:
-                return ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse("thermal:machine_furnace"));
+                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("thermal:machine_furnace"));
             default:
                 return Items.COMMAND_BLOCK;
         }

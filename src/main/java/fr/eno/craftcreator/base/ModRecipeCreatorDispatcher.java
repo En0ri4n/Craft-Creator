@@ -1,31 +1,42 @@
 package fr.eno.craftcreator.base;
 
-import fr.eno.craftcreator.recipes.serializers.BotaniaRecipesSerializer;
+import fr.eno.craftcreator.api.CommonUtils;
+import fr.eno.craftcreator.recipes.serializers.BotaniaRecipeSerializer;
 import fr.eno.craftcreator.recipes.serializers.MinecraftRecipeSerializer;
-import fr.eno.craftcreator.recipes.serializers.ModRecipesJSSerializer;
-import fr.eno.craftcreator.recipes.serializers.ThermalRecipesSerializer;
+import fr.eno.craftcreator.recipes.serializers.ModRecipeSerializer;
+import fr.eno.craftcreator.recipes.serializers.ThermalRecipeSerializer;
 import fr.eno.craftcreator.recipes.utils.CraftIngredients;
-import fr.eno.craftcreator.recipes.utils.RecipeFileUtils;
 import net.minecraft.item.crafting.IRecipe;
 
 public class ModRecipeCreatorDispatcher
 {
-    public static ModRecipesJSSerializer getSeralizer(String modId)
+    /**
+     * Get the serializer for the mod
+     * @param modId the mod id
+     * @return the serializer for the mod (Minecraft Serializer if the mod is not supported)
+     */
+    public static ModRecipeSerializer getSeralizer(String modId)
     {
         switch(SupportedMods.getMod(modId))
         {
             case BOTANIA:
-                return BotaniaRecipesSerializer.get();
+                return BotaniaRecipeSerializer.get();
             case THERMAL:
-                return ThermalRecipesSerializer.get();
+                return ThermalRecipeSerializer.get();
             default:
                 return MinecraftRecipeSerializer.get();
         }
     }
 
+    /**
+     * Get the output of the recipe
+     *
+     * @param recipe the recipe
+     * @return the output of the recipe (empty if the mod is not supported)
+     */
     public static CraftIngredients getOutput(IRecipe<?> recipe)
     {
-        String modId = RecipeFileUtils.getRecipeTypeName(recipe.getType()).getNamespace();
+        String modId = CommonUtils.getRecipeTypeName(recipe.getType()).getNamespace();
 
         if(SupportedMods.isModLoaded(modId))
         {
@@ -35,9 +46,15 @@ public class ModRecipeCreatorDispatcher
         return CraftIngredients.create();
     }
 
+    /**
+     * Get the inputs of the recipe
+     *
+     * @param recipe the recipe
+     * @return the inputs of the recipe (empty if the mod is not supported)
+     */
     public static CraftIngredients getInputs(IRecipe<?> recipe)
     {
-        String modId = RecipeFileUtils.getRecipeTypeName(recipe.getType()).getNamespace();
+        String modId = CommonUtils.getRecipeTypeName(recipe.getType()).getNamespace();
 
         if(SupportedMods.isModLoaded(modId))
         {

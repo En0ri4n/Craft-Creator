@@ -1,10 +1,11 @@
 package fr.eno.craftcreator.container;
 
+import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.base.SupportedMods;
+import fr.eno.craftcreator.container.base.CommonContainer;
 import fr.eno.craftcreator.container.slot.DefinedSlot;
 import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
-import fr.eno.craftcreator.container.base.CommonContainer;
 import fr.eno.craftcreator.init.InitContainers;
-import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.block.Block;
@@ -12,7 +13,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.BucketItem;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
 
 public class ThermalRecipeCreatorContainer extends CommonContainer
 {
@@ -27,7 +27,7 @@ public class ThermalRecipeCreatorContainer extends CommonContainer
 
             if(PositionnedSlot.isValidSlot(SlotHelper.PRESS_SLOTS_INPUT, 1, i))
             {
-                this.addSlot(new DefinedSlot(tile, i, x, y, is -> is.getItem().getTags().contains(ResourceLocation.tryParse("thermal:crafting/dies"))));
+                this.addSlot(new DefinedSlot(tile, i, x, y, is -> is.getItem().getTags().contains(ClientUtils.parse("thermal:crafting/dies"))));
                 continue;
             }
 

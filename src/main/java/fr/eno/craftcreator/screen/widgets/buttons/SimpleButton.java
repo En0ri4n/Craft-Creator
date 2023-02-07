@@ -2,7 +2,7 @@ package fr.eno.craftcreator.screen.widgets.buttons;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.utils.Utils;
+import fr.eno.craftcreator.api.ScreenUtils;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.text.ITextComponent;
 
@@ -29,9 +29,9 @@ public class SimpleButton extends Button
 	{
 		if(this.visible && this.active)
 		{
-			Utils.renderSizedButton(matrixStack, x, y, width, height, active, Utils.isMouseHover(x, y, mouseX, mouseY, width, height));
+			ScreenUtils.renderSizedButton(matrixStack, x, y, width, height, active, ScreenUtils.isMouseHover(x, y, mouseX, mouseY, width, height));
 
-			drawCenteredString(matrixStack, ClientUtils.getFont(), this.getMessage().getString(), this.x + this.width / 2, this.y + this.height / 3, 0xFFFFFF);
+			drawCenteredString(matrixStack, ClientUtils.getFontRenderer(), this.getMessage().getString(), this.x + this.width / 2, this.y + this.height / 3, 0xFFFFFF);
 		}
 	}
 

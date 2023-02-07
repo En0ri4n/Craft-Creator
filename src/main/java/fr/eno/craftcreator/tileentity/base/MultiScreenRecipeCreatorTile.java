@@ -1,8 +1,9 @@
 package fr.eno.craftcreator.tileentity.base;
 
-import fr.eno.craftcreator.recipes.utils.RecipeFileUtils;
-import fr.eno.craftcreator.base.SupportedMods;
+import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.base.ModRecipeCreator;
+import fr.eno.craftcreator.base.SupportedMods;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntityType;
@@ -17,7 +18,7 @@ public abstract class MultiScreenRecipeCreatorTile extends TaggeableInventoryCon
     public MultiScreenRecipeCreatorTile(SupportedMods mod, TileEntityType<?> blockEntityType, int slotsSize)
     {
         super(blockEntityType, slotsSize);
-        this.currentRecipeType = RecipeFileUtils.getRecipeTypeName(ModRecipeCreator.getRecipeCreatorScreens(mod).get(0).getRecipeType());
+        this.currentRecipeType = CommonUtils.getRecipeTypeName(ModRecipeCreator.getRecipeCreatorScreens(mod).get(0).getRecipeType());
         this.screenIndex = 0;
         this.isKubeJSRecipe = true;
     }
@@ -36,7 +37,7 @@ public abstract class MultiScreenRecipeCreatorTile extends TaggeableInventoryCon
                 this.setKubeJSRecipe((Boolean) data);
                 break;
             case "recipe_type":
-                this.setCurrentRecipeType(ResourceLocation.tryParse((String) data));
+                this.setCurrentRecipeType(ClientUtils.parse((String) data));
                 break;
         }
     }
@@ -103,6 +104,6 @@ public abstract class MultiScreenRecipeCreatorTile extends TaggeableInventoryCon
         super.load(state, compound);
         this.screenIndex = compound.getInt("ScreenIndex");
         this.isKubeJSRecipe = compound.getBoolean("KubeJSRecipe");
-        this.currentRecipeType = ResourceLocation.tryParse(compound.getString("RecipeType"));
+        this.currentRecipeType = ClientUtils.parse(compound.getString("RecipeType"));
     }
 }

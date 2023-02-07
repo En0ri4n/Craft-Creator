@@ -20,10 +20,6 @@ import javax.annotation.Nonnull;
 
 public class MinecraftRecipeCreatorBlock extends RecipeCreatorBlock
 {
-    public MinecraftRecipeCreatorBlock()
-    {
-    }
-
     @Override
     protected boolean hasFacing()
     {
@@ -31,7 +27,7 @@ public class MinecraftRecipeCreatorBlock extends RecipeCreatorBlock
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader p_220053_2_, BlockPos p_220053_3_, ISelectionContext p_220053_4_)
+    public VoxelShape getShape(BlockState state, IBlockReader blockReader, BlockPos blockPos, ISelectionContext selectionContext)
     {
         switch(state.getValue(RecipeCreatorBlock.FACING))
         {
@@ -49,7 +45,7 @@ public class MinecraftRecipeCreatorBlock extends RecipeCreatorBlock
     }
 
     @Override
-    protected ActionResultType onBlockUsed(@Nonnull BlockState state, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull PlayerEntity playerIn, @Nonnull Hand handIn, @Nonnull BlockRayTraceResult hit)
+    public ActionResultType use(@Nonnull BlockState state, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull PlayerEntity playerIn, @Nonnull Hand handIn, @Nonnull BlockRayTraceResult hit)
     {
         return BlockUtils.openMenu(SupportedMods.MINECRAFT, worldIn, pos, playerIn, MinecraftRecipeCreatorTile.class);
     }

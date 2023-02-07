@@ -1,11 +1,11 @@
 package fr.eno.craftcreator.container;
 
 import fr.eno.craftcreator.References;
+import fr.eno.craftcreator.base.SupportedMods;
+import fr.eno.craftcreator.container.base.CommonContainer;
 import fr.eno.craftcreator.container.slot.LockedSlot;
 import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
-import fr.eno.craftcreator.container.base.CommonContainer;
 import fr.eno.craftcreator.init.InitContainers;
-import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -22,16 +22,19 @@ public class MinecraftRecipeCreatorContainer extends CommonContainer
 
         for(int i = 0; i < SlotHelper.MINECRAFT_SLOTS_SIZE; ++i)
         {
+            int x = SlotHelper.MINECRAFT_SLOTS.get(i).getxPos();
+            int y = SlotHelper.MINECRAFT_SLOTS.get(i).getyPos();
+
             if(PositionnedSlot.isValidSlot(SlotHelper.FURNACE_SLOTS, 2, i))
             {
                 ItemStack fuel = new ItemStack(Items.EGG, 1);
                 fuel.enchant(Enchantments.ALL_DAMAGE_PROTECTION, 10);
                 fuel.setHoverName(References.getTranslate("container.minecraft.furnace.fuel"));
                 fuel.hideTooltipPart(ItemStack.TooltipDisplayFlags.ENCHANTMENTS);
-                this.addSlot(new LockedSlot(tile, i, SlotHelper.MINECRAFT_SLOTS.get(i).getxPos(), SlotHelper.MINECRAFT_SLOTS.get(i).getyPos(), fuel));
+                this.addSlot(new LockedSlot(tile, i, x, y, fuel));
             }
 
-            this.addSlot(new SimpleSlotItemHandler(this.tile, i, SlotHelper.MINECRAFT_SLOTS.get(i).getxPos(), SlotHelper.MINECRAFT_SLOTS.get(i).getyPos()));
+            this.addSlot(new SimpleSlotItemHandler(this.tile, i, x, y));
         }
 
         this.bindPlayerInventory(inventory);

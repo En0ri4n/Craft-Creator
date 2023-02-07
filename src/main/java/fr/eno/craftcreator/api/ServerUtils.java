@@ -12,8 +12,8 @@ import java.util.function.Supplier;
 
 /**
  * @author En0ri4n <br>
- *
- * Class with useful methods for server
+ * <p>
+ * This class contains some useful methods for the server.
  */
 public class ServerUtils
 {
@@ -53,6 +53,11 @@ public class ServerUtils
         return getServerLevel(ctx).getBlockEntity(pos);
     }
 
+    /**
+     * Perform a command in a specific context (server)
+     * @param ctx The context
+     * @param command The command
+     */
     public static void doCommand(CommandContext<CommandSource> ctx, String command)
     {
         ctx.getSource().getServer().getCommands().performCommand(ctx.getSource(), command);

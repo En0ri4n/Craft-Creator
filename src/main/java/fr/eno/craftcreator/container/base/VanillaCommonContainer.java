@@ -5,7 +5,6 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.Slot;
 
-@SuppressWarnings("NullableProblems")
 public abstract class VanillaCommonContainer extends Container
 {
     public VanillaCommonContainer(ContainerType<?> pMenuType, int pContainerId)

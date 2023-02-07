@@ -20,7 +20,6 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
 
-@SuppressWarnings({"deprecation", "NullableProblems"})
 public abstract class RecipeCreatorBlock extends Block
 {
     public static final DirectionProperty FACING = HorizontalBlock.FACING;
@@ -40,16 +39,13 @@ public abstract class RecipeCreatorBlock extends Block
     }
 
     @Override
-    public BlockRenderType getRenderShape(BlockState p_149645_1_)
+    public BlockRenderType getRenderShape(BlockState state)
     {
         return BlockRenderType.MODEL;
     }
 
     @Override
-    public ActionResultType use(BlockState p_225533_1_, World p_225533_2_, BlockPos p_225533_3_, PlayerEntity p_225533_4_, Hand p_225533_5_, BlockRayTraceResult p_225533_6_)
-    {
-        return onBlockUsed(p_225533_1_, p_225533_2_, p_225533_3_, p_225533_4_, p_225533_5_, p_225533_6_);
-    }
+    public abstract ActionResultType use(@Nonnull BlockState state, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull PlayerEntity playerIn, @Nonnull Hand handIn, @Nonnull BlockRayTraceResult hit);
 
     @Override
     public VoxelShape getShape(BlockState p_220053_1_, IBlockReader p_220053_2_, BlockPos p_220053_3_, ISelectionContext p_220053_4_)
@@ -58,8 +54,6 @@ public abstract class RecipeCreatorBlock extends Block
     }
 
     protected abstract TileEntity getTileEntity(BlockPos pos, BlockState state);
-
-    protected abstract ActionResultType onBlockUsed(@Nonnull BlockState state, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull PlayerEntity playerIn, @Nonnull Hand handIn, @Nonnull BlockRayTraceResult hit);
 
     protected VoxelShape getShape()
     {
