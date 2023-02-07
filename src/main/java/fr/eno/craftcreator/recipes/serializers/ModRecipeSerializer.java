@@ -1,17 +1,17 @@
 package fr.eno.craftcreator.recipes.serializers;
 
-import com.google.common.collect.Multimap;
 import com.google.gson.*;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.recipes.utils.CraftIngredients;
-import fr.eno.craftcreator.recipes.utils.RecipeFileUtils;
+import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.base.SupportedMods;
+import fr.eno.craftcreator.recipes.utils.CraftIngredients;
+import fr.eno.craftcreator.recipes.utils.RecipeEntry;
+import fr.eno.craftcreator.recipes.utils.RecipeFileUtils;
+import fr.eno.craftcreator.serializer.DatapackHelper;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
-import fr.eno.craftcreator.utils.PairValues;
 import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeType;
@@ -20,44 +20,46 @@ import net.minecraft.item.crafting.RecipeManager;
 import net.minecraft.util.IItemProvider;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 // TODO: improve code
-@SuppressWarnings("ALL")
-public abstract class ModRecipesJSSerializer
+public abstract class ModRecipeSerializer
 {
     protected static final Gson gson = new GsonBuilder().create();
     protected final SupportedMods mod;
 
-    public ModRecipesJSSerializer(SupportedMods mod)
+    public ModRecipeSerializer(SupportedMods mod)
     {
         this.mod = mod;
     }
 
-    public void removeRecipe(ModifiedRecipe modifiedRecipe)
+    public void removeRecipe(IRecipeType<?> recipeType, ModifiedRecipe modifiedRecipe)
     {
-        StringBuilder line = new StringBuilder("event.remove({");// id: '" + getRecipe(type, result).getId() + "' })";
-        for(Map.Entry<RecipeDescriptors, String> entry : modifiedRecipe.getRecipeMap().entrySet())
-        {
-            line.append("\"").append(entry.getKey().getTag()).append("\": '").append(entry.getValue()).append("',");
-        }
+        String serializedRecipe = "event.remove(" + gson.toJson(modifiedRecipe.toJson()) + ")";
 
-        String finishedLine = line.replace(line.length() - 1, line.length(), "})").toString();
-
-        if(!RecipeFileUtils.isModifiedRecipePresent(modifiedRecipe))
-            RecipeFileUtils.insertAndWriteLinesToRemoveRecipe(this.mod.getModId(), finishedLine);
+        if(!RecipeFileUtils.isModifiedRecipePresent(mod, modifiedRecipe))
+            RecipeFileUtils.addRecipeToFile(this.mod, recipeType, serializedRecipe);
     }
 
-    public static <C extends IInventory, T extends IRecipe<C>> void removeAddedRecipe(IRecipe<C> recipe)
+    public void addModifiedRecipe(ModifiedRecipe modifiedRecipe)
     {
-        RecipeFileUtils.removeAddedRecipe(recipe, recipe.getId().getNamespace());
+        String serializedRecipe = String.format("event.%s(", modifiedRecipe.getType().getDescriptor()) + gson.toJson(modifiedRecipe.toJson()) + ")";
+
+        if(!RecipeFileUtils.isModifiedRecipePresent(mod, modifiedRecipe))
+            RecipeFileUtils.addModifiedRecipe(this.mod, serializedRecipe);
     }
 
-    public static void removeModifiedRecipe(ModifiedRecipe recipe)
+    public static <C extends IInventory> void removeAddedRecipe(IRecipe<C> recipe)
     {
-        RecipeFileUtils.removeModifiedRecipe(recipe);
+        RecipeFileUtils.removeAddedRecipe(SupportedMods.getMod(recipe.getId().getNamespace()), recipe);
+    }
+
+    public static void removeModifiedRecipe(SupportedMods mod, ModifiedRecipe recipe)
+    {
+        RecipeFileUtils.removeModifiedRecipe(mod, recipe);
     }
 
     private <C extends IInventory, T extends IRecipe<C>> IRecipe<C> getRecipe(IRecipeType<T> type, IItemProvider result)
@@ -67,20 +69,20 @@ public abstract class ModRecipesJSSerializer
     }
     protected void addRecipeToKubeJS(String recipeJson, IRecipeType<?> recipeType, ResourceLocation result)
     {
-        RecipeFileUtils.insertAndWriteLines(this.mod.getModId(), recipeType, "event.custom(" + recipeJson + ")");
+        RecipeFileUtils.addRecipeToFile(this.mod, recipeType, "event.custom(" + recipeJson + ")");
         sendSuccessMessage(recipeType, result);
     }
 
     private void sendSuccessMessage(IRecipeType<?> type, ResourceLocation result)
     {
-        IFormattableTextComponent message = References.getTranslate("message.recipe.added", result.getPath(), RecipeFileUtils.getRecipeTypeName(type).getPath());
+        IFormattableTextComponent message = References.getTranslate("message.recipe.added", result.getPath(), CommonUtils.getRecipeTypeName(type).getPath());
         ClientUtils.sendClientPlayerMessage(message);
     }
 
-    protected JsonArray getArray(Multimap<ResourceLocation, Boolean> ingredients)
+    protected JsonArray getInputArray(RecipeEntry.MultiInput ingredients)
     {
         JsonArray array = new JsonArray();
-        ingredients.forEach((loc, isTag) -> array.add(singletonItemJsonObject(isTag ? "tag" : "item", loc)));
+        ingredients.getInputs().forEach(recipeInput -> array.add(singletonItemJsonObject(recipeInput)));
         return array;
     }
 
@@ -90,34 +92,34 @@ public abstract class ModRecipesJSSerializer
         result.addProperty("nbt", nbt.replace("\"", "\\\""));
     }
 
-    protected JsonObject getResult(ItemStack result)
+    protected JsonObject getResult(RecipeEntry.Output result)
     {
         Map<String, Object> map = new HashMap<>();
 
-        map.put("item", Objects.requireNonNull(result.getItem().getRegistryName()).toString());
-        if(result.getCount() > 1)
-            map.put("count", result.getCount());
+        map.put("item", result.registryName().toString());
+        if(result.count() > 1)
+            map.put("count", result.count());
 
         return mapToJsonObject(map);
     }
 
-    protected JsonArray listWithSingletonItems(List<Item> items, String key)
+    protected <T extends RecipeEntry> JsonArray listWithSingletonItems(RecipeEntry.MultiEntry<T> multiEntry, String key)
     {
         JsonArray array = new JsonArray();
-        items.forEach(item -> array.add(singletonItemJsonObject(key, Utils.notNull(item.getRegistryName()))));
+        multiEntry.getEntries().forEach(recipeEntry -> array.add(singletonItemJsonObject(key, recipeEntry.registryName().toString())));
         return array;
     }
 
-    protected JsonObject singletonItemJsonObject(String key, ResourceLocation value)
+    protected JsonObject singletonItemJsonObject(RecipeEntry recipeEntry)
     {
-        JsonObject obj = new JsonObject();
-        obj.addProperty(key, value.toString());
-        return obj;
+        return singletonItemJsonObject(recipeEntry.isTag() ? "tag" : "item", recipeEntry.registryName().toString());
     }
 
-    protected JsonObject singletonItemJsonObject(ResourceLocation key)
+    protected JsonObject singletonItemJsonObject(String key, String value)
     {
-        return singletonItemJsonObject(isItem(key) ? "item" : "tag", key);
+        JsonObject obj = new JsonObject();
+        obj.addProperty(key, value);
+        return obj;
     }
 
     protected JsonObject mapToJsonObject(Map<String, Object> map)
@@ -131,6 +133,7 @@ public abstract class ModRecipesJSSerializer
             else if(o instanceof Character) obj.addProperty(s, (Character) o);
             else if(o instanceof JsonArray) obj.add(s, (JsonArray) o);
             else if(o instanceof JsonObject) obj.add(s, (JsonObject) o);
+            else obj.addProperty(s, o.toString());
         });
         return obj;
     }
@@ -142,24 +145,15 @@ public abstract class ModRecipesJSSerializer
         return obj;
     }
 
-    protected boolean isItem(ResourceLocation resourceLocation)
-    {
-        return ForgeRegistries.ITEMS.containsKey(resourceLocation);
-    }
-
-    protected <T, V> List<PairValues<T, V>> singletonList(PairValues<T, V> value)
-    {
-        return Collections.singletonList(value);
-    }
-
-    boolean isRecipeExists(IRecipeType<?> recipeType, ResourceLocation resultOutput)
-    {
-        return recipeType != null && resultOutput != null;
-    }
-
     protected void sendFailMessage()
     {
         ClientUtils.sendClientPlayerMessage(References.getTranslate("message.recipe_failed"));
+    }
+
+    protected void send(JsonObject recipeJson, IRecipeType<?> recipeType, ResourceLocation output, SerializerType serializerType)
+    {
+        if(serializerType == SerializerType.KUBE_JS) addRecipeToKubeJS(gson.toJson(recipeJson), recipeType, output);
+        else DatapackHelper.serializeRecipe(recipeType, output, recipeJson);
     }
 
     protected void putIfNotEmpty(CraftIngredients inputIngredients, List<Ingredient> ingredients)
@@ -174,9 +168,9 @@ public abstract class ModRecipesJSSerializer
             if(ingredient.toJson().isJsonObject())
             {
                 if(ingredient.toJson().getAsJsonObject().has("tag"))
-                    inputIngredients.addIngredient(new CraftIngredients.TagIngredient(ResourceLocation.tryParse(ingredient.toJson().getAsJsonObject().get("tag").getAsString()), count));
+                    inputIngredients.addIngredient(new CraftIngredients.TagIngredient(ClientUtils.parse(ingredient.toJson().getAsJsonObject().get("tag").getAsString()), count));
                 else if(ingredient.toJson().getAsJsonObject().has("item"))
-                    inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(ResourceLocation.tryParse(ingredient.toJson().getAsJsonObject().get("item").getAsString()), count));
+                    inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(ClientUtils.parse(ingredient.toJson().getAsJsonObject().get("item").getAsString()), count));
             }
             else
             {
@@ -191,9 +185,9 @@ public abstract class ModRecipesJSSerializer
                         if(value.isJsonObject())
                         {
                             if(value.getAsJsonObject().has("tag"))
-                                multiItemIngredient.add(ResourceLocation.tryParse(value.getAsJsonObject().get("tag").getAsString()), true);
+                                multiItemIngredient.add(ClientUtils.parse(value.getAsJsonObject().get("tag").getAsString()), true);
                             else if(value.getAsJsonObject().has("item"))
-                                multiItemIngredient.add(ResourceLocation.tryParse(value.getAsJsonObject().get("item").getAsString()), false);
+                                multiItemIngredient.add(ClientUtils.parse(value.getAsJsonObject().get("item").getAsString()), false);
                         }
                     }
 
@@ -236,5 +230,12 @@ public abstract class ModRecipesJSSerializer
         {
             return tag;
         }
+    }
+
+    public enum SerializerType
+    {
+        MINECRAFT_DATAPACK,
+        KUBE_JS
+        // CRAFT_TWEAKER ( soon ;) )
     }
 }

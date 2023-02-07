@@ -4,22 +4,22 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
+import fr.eno.craftcreator.api.CommonUtils;
+import fr.eno.craftcreator.base.ModRecipeCreator;
+import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.container.base.CommonContainer;
+import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
 import fr.eno.craftcreator.init.InitPackets;
 import fr.eno.craftcreator.packets.RetrieveRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.recipes.managers.RecipeManagerDispatcher;
-import fr.eno.craftcreator.recipes.utils.RecipeFileUtils;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
-import fr.eno.craftcreator.base.SupportedMods;
+import fr.eno.craftcreator.screen.widgets.ButtonGrid;
+import fr.eno.craftcreator.screen.widgets.NumberDataFieldWidget;
 import fr.eno.craftcreator.screen.widgets.buttons.ExecuteButton;
+import fr.eno.craftcreator.screen.widgets.buttons.IconButton;
 import fr.eno.craftcreator.screen.widgets.buttons.SimpleButton;
 import fr.eno.craftcreator.screen.widgets.buttons.SimpleCheckBox;
-import fr.eno.craftcreator.base.ModRecipeCreator;
-import fr.eno.craftcreator.screen.widgets.ButtonGrid;
-import fr.eno.craftcreator.screen.widgets.buttons.IconButton;
-import fr.eno.craftcreator.screen.widgets.NumberDataFieldWidget;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerInventory;
@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@SuppressWarnings("unused")
 public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContainer> extends TaggeableSlotsContainerScreen<T>
 {
     protected int guiTextureSize = 256;
@@ -72,7 +71,6 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     protected void init()
     {
         super.init();
-        assert this.minecraft != null;
 
         this.buttonGrid = new ButtonGrid<>(this.leftPos + this.imageWidth, this.topPos, 20, 2, 4, IconButton.getButtons(getAvailableRecipesCreator().stream().map(this::getRecipeIcon).collect(Collectors.toList())), (button) ->
         {
@@ -221,13 +219,12 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     @Override
     public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        assert minecraft != null;
-
         super.render(matrixStack, mouseX, mouseY, partialTicks);
 
         this.dataFields.forEach(field ->
         {
-            if(field.visible) field.render(matrixStack, mouseX, mouseY, partialTicks);
+            if(field.visible)
+                field.render(matrixStack, mouseX, mouseY, partialTicks);
         });
 
         this.buttonGrid.render(matrixStack, mouseX, mouseY, partialTicks);
@@ -285,8 +282,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     }
 
     @Override
-    @SuppressWarnings("deprecation")
-    protected void renderBg(MatrixStack matrixStack, float partialTicks, int x, int y)
+        protected void renderBg(MatrixStack matrixStack, float partialTicks, int x, int y)
     {
         this.fillGradient(matrixStack, 0, 0, this.width, this.height, -1072689136, -804253680);
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -310,7 +306,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     @Override
     protected void renderLabels(MatrixStack matrixStack, int pMouseX, int pMouseY)
     {
-        drawCenteredString(matrixStack, ClientUtils.getFont(), References.getTranslate("screen." + this.getMenu().getMod().getModId() + "_recipe_creator." + RecipeFileUtils.getRecipeTypeName(getCurrentRecipe().getRecipeType()).getPath() + ".title"), this.imageWidth / 2, -15, 0xFFFFFF);
+        drawCenteredString(matrixStack, ClientUtils.getFontRenderer(), References.getTranslate("screen." + this.getMenu().getMod().getModId() + "_recipe_creator." + CommonUtils.getRecipeTypeName(getCurrentRecipe().getRecipeType()).getPath() + ".title"), this.imageWidth / 2, -15, 0xFFFFFF);
         if(Screen.hasShiftDown() || Screen.hasControlDown())
             drawString(matrixStack, this.font, References.getTranslate("screen.crafting.info.msg").getString(), 0, this.imageHeight + (isVanillaScreen ? 15 : 0), 0x707370);
     }
@@ -376,7 +372,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     private void updateServerIndex()
     {
         InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("screen_index", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.INT, this.currentScreenIndex));
-        InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("recipe_type", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.STRING, RecipeFileUtils.getRecipeTypeName(getCurrentRecipe().getRecipeType()).toString()));
+        InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("recipe_type", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.STRING, CommonUtils.getRecipeTypeName(getCurrentRecipe().getRecipeType()).toString()));
     }
 
     protected void updateSlots()

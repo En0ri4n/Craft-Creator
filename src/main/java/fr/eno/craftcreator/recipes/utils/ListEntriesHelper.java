@@ -2,6 +2,7 @@ package fr.eno.craftcreator.recipes.utils;
 
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import net.minecraft.inventory.IInventory;
@@ -15,7 +16,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@SuppressWarnings({"unchecked", "unused"})
 public class ListEntriesHelper
 {
     public static <T extends SimpleListWidget.Entry> List<T> getStringEntryList(SupportedMods[] mods)
@@ -27,9 +27,9 @@ public class ListEntriesHelper
         return entries;
     }
 
-    public static <C extends IInventory, R extends IRecipe<C>, T extends SimpleListWidget.Entry> List<T> getAddedRecipesEntryList(String modId, ResourceLocation recipeTypeLoc)
+    public static <C extends IInventory, R extends IRecipe<C>, T extends SimpleListWidget.Entry> List<T> getAddedRecipesEntryList(SupportedMods mod, ResourceLocation recipeTypeLoc)
     {
-        IRecipeType<R> recipeType = RecipeFileUtils.getRecipeType(recipeTypeLoc);
+        IRecipeType<R> recipeType = CommonUtils.getRecipeTypeByName(recipeTypeLoc);
 
         List<T> entries = new ArrayList<>();
 
@@ -39,19 +39,19 @@ public class ListEntriesHelper
         }
         else
         {
-            RecipeFileUtils.getAddedRecipesFor(modId, recipeType).forEach(recipe -> entries.add((T) new SimpleListWidget.RecipeEntry(recipe)));
+            RecipeFileUtils.getAddedRecipesFor(mod, recipeType).forEach(recipe -> entries.add((T) new SimpleListWidget.RecipeEntry(recipe)));
         }
 
         return entries;
     }
 
-    public static <T extends SimpleListWidget.ModifiedRecipeEntry> List<T> getModifiedRecipesEntryList()
+    public static <T extends SimpleListWidget.ModifiedRecipeEntry> List<T> getModifiedRecipesEntryList(SupportedMods mod)
     {
         List<T> entries = new ArrayList<>();
 
         if(!SupportedMods.isKubeJSLoaded()) return entries;
 
-        RecipeFileUtils.getModifiedRecipesFor().forEach(modifiedRecipe -> entries.add((T) new SimpleListWidget.ModifiedRecipeEntry(modifiedRecipe)));
+        RecipeFileUtils.getModifiedRecipes(mod).forEach(modifiedRecipe -> entries.add((T) new SimpleListWidget.ModifiedRecipeEntry(modifiedRecipe)));
 
         return entries;
     }
@@ -60,14 +60,14 @@ public class ListEntriesHelper
     {
         List<T> entries = new ArrayList<>();
 
-        Registry.RECIPE_TYPE.stream().filter(type -> RecipeFileUtils.getRecipeTypeName(type).getNamespace().equals(modId)).forEach(type -> entries.add((T) new SimpleListWidget.StringEntry(RecipeFileUtils.getRecipeTypeName(type).toString())));
+        Registry.RECIPE_TYPE.stream().filter(type -> CommonUtils.getRecipeTypeName(type).getNamespace().equals(modId)).forEach(type -> entries.add((T) new SimpleListWidget.StringEntry(CommonUtils.getRecipeTypeName(type).toString())));
 
         return entries;
     }
 
     public static <C extends IInventory, T extends IRecipe<C>, E extends SimpleListWidget.Entry> List<E> getRecipes(ResourceLocation recipeTypeLoc)
     {
-        IRecipeType<T> recipeType = RecipeFileUtils.getRecipeType(recipeTypeLoc);
+        IRecipeType<T> recipeType = CommonUtils.getRecipeTypeByName(recipeTypeLoc);
 
         List<E> entries = new ArrayList<>();
 

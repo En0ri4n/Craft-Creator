@@ -16,11 +16,6 @@ import javax.annotation.Nonnull;
 
 public class ThermalRecipeCreatorBlock extends RecipeCreatorBlock
 {
-    public ThermalRecipeCreatorBlock()
-    {
-
-    }
-
     @Override
     protected boolean hasFacing()
     {
@@ -28,7 +23,7 @@ public class ThermalRecipeCreatorBlock extends RecipeCreatorBlock
     }
 
     @Override
-    protected ActionResultType onBlockUsed(@Nonnull BlockState state, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull PlayerEntity playerIn, @Nonnull Hand handIn, @Nonnull BlockRayTraceResult hit)
+    public ActionResultType use(@Nonnull BlockState state, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull PlayerEntity playerIn, @Nonnull Hand handIn, @Nonnull BlockRayTraceResult hit)
     {
         return BlockUtils.openMenu(SupportedMods.THERMAL, worldIn, pos, playerIn, ThermalRecipeCreatorTile.class);
     }

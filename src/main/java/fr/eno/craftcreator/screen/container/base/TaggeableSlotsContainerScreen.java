@@ -2,14 +2,14 @@ package fr.eno.craftcreator.screen.container.base;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.api.ScreenUtils;
 import fr.eno.craftcreator.container.slot.CustomSlotItemHandler;
 import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
 import fr.eno.craftcreator.init.InitPackets;
 import fr.eno.craftcreator.packets.RetrieveRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataServerPacket;
-import fr.eno.craftcreator.screen.widgets.buttons.SimpleCheckBox;
 import fr.eno.craftcreator.screen.widgets.GuiList;
+import fr.eno.craftcreator.screen.widgets.buttons.SimpleCheckBox;
 import fr.eno.craftcreator.tileentity.base.TaggeableInventoryContainerTileEntity;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import net.minecraft.client.gui.screen.Screen;
@@ -76,8 +76,7 @@ public abstract class TaggeableSlotsContainerScreen<T extends Container> extends
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public void setData(String dataName, Object data)
+        public void setData(String dataName, Object data)
     {
         if(dataName.equals("tagged_slots"))
         {
@@ -211,7 +210,7 @@ public abstract class TaggeableSlotsContainerScreen<T extends Container> extends
         int x = this.leftPos;
         int y = this.topPos;
 
-        return ClientUtils.isMouseHover(x + slotIn.x, y + slotIn.y, (int) mouseX, (int) mouseY, 16, 16);
+        return ScreenUtils.isMouseHover(x + slotIn.x, y + slotIn.y, (int) mouseX, (int) mouseY, 16, 16);
     }
 
     public void setTaggedSlots(Map<Integer, ResourceLocation> taggedSlots)

@@ -1,13 +1,13 @@
 package fr.eno.craftcreator.recipes.serializers;
 
 import com.google.gson.JsonObject;
-import fr.eno.craftcreator.recipes.utils.CraftIngredients;
-import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.base.ModRecipeCreator;
+import fr.eno.craftcreator.base.SupportedMods;
+import fr.eno.craftcreator.recipes.utils.CraftIngredients;
+import fr.eno.craftcreator.recipes.utils.RecipeEntry;
 import fr.eno.craftcreator.serializer.DatapackHelper;
 import io.netty.buffer.Unpooled;
 import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.*;
 import net.minecraft.network.PacketBuffer;
@@ -16,7 +16,7 @@ import net.minecraft.util.ResourceLocation;
 import java.util.List;
 import java.util.Map;
 
-public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
+public class MinecraftRecipeSerializer extends ModRecipeSerializer
 {
     private static final MinecraftRecipeSerializer INSTANCE = new MinecraftRecipeSerializer();
 
@@ -25,38 +25,35 @@ public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
         super(SupportedMods.MINECRAFT);
     }
 
-    public void serializeFurnaceRecipe(ModRecipeCreator smeltType, ResourceLocation input, Item output, double experience, int cookTime, boolean isKubeJSRecipe)
+    public void serializeFurnaceRecipe(ModRecipeCreator smeltType, RecipeEntry.Input input, RecipeEntry.Output output, double experience, int cookTime, boolean isKubeJSRecipe)
     {
         JsonObject obj = createBaseJson(smeltType.getRecipeType());
         obj.add("ingredient", singletonItemJsonObject(input));
         obj.addProperty("experience", experience);
         obj.addProperty("cookingtime", cookTime);
-        obj.addProperty("result", output.toString());
+        obj.addProperty("result", output.registryName().toString());
 
-        if(isKubeJSRecipe) addRecipeToKubeJS(gson.toJson(obj), smeltType.getRecipeType(), output.getRegistryName());
-        else DatapackHelper.serializeRecipe(smeltType.getRecipeType(), output.getRegistryName(), obj);
+        send(obj, smeltType.getRecipeType(), output.registryName(), isKubeJSRecipe ? SerializerType.KUBE_JS : SerializerType.MINECRAFT_DATAPACK);
     }
 
-    public void serializeStoneCutterRecipe(ResourceLocation input, ResourceLocation output, int count, boolean isKubeJSRecipe)
+    public void serializeStoneCutterRecipe(RecipeEntry.Input input, RecipeEntry.Output output, boolean isKubeJSRecipe)
     {
         JsonObject obj = createBaseJson(IRecipeType.STONECUTTING);
-        obj.add("ingredient", singletonItemJsonObject("item", input));
-        obj.addProperty("result", output.toString());
-        obj.addProperty("count", count);
+        obj.add("ingredient", singletonItemJsonObject(input));
+        obj.addProperty("result", output.registryName().toString());
+        obj.addProperty("count", output.count());
 
-        if(isKubeJSRecipe) addRecipeToKubeJS(gson.toJson(obj), IRecipeType.STONECUTTING, output);
-        else DatapackHelper.serializeRecipe(IRecipeType.STONECUTTING, output, obj);
+        send(obj, IRecipeType.STONECUTTING, output.registryName(), isKubeJSRecipe ? SerializerType.KUBE_JS : SerializerType.MINECRAFT_DATAPACK);
     }
 
-    public void serializeSmithingRecipe(ResourceLocation base, ResourceLocation addition, ResourceLocation output, boolean isKubeJSRecipe)
+    public void serializeSmithingRecipe(RecipeEntry.Input base, RecipeEntry.Input addition, RecipeEntry.Output output, boolean isKubeJSRecipe)
     {
         JsonObject obj = createBaseJson(IRecipeType.SMITHING);
-        obj.add("base", singletonItemJsonObject("item", base));
-        obj.add("addition", singletonItemJsonObject("item", addition));
-        obj.add("result", singletonItemJsonObject("item", output));
+        obj.add("base", singletonItemJsonObject(base));
+        obj.add("addition", singletonItemJsonObject(addition));
+        obj.add("result", singletonItemJsonObject(output));
 
-        if(isKubeJSRecipe) addRecipeToKubeJS(gson.toJson(obj), IRecipeType.SMITHING, output);
-        else DatapackHelper.serializeRecipe(IRecipeType.SMITHING, output, obj);
+        send(obj, IRecipeType.SMITHING, output.registryName(), isKubeJSRecipe ? SerializerType.KUBE_JS : SerializerType.MINECRAFT_DATAPACK);
     }
 
     public void serializeCraftingTableRecipe(ItemStack output, List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, List<Integer> nbtSlots, boolean shaped, boolean isKubeJSRecipe)
@@ -85,8 +82,7 @@ public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
         }
         obj.add("result", resultObj);
 
-        if(isKubeJSRecipe) addRecipeToKubeJS(gson.toJson(obj), IRecipeType.CRAFTING, output.getItem().getRegistryName());
-        else DatapackHelper.serializeRecipe(IRecipeType.CRAFTING, output.getItem().getRegistryName(), obj);
+        send(obj, IRecipeType.CRAFTING, output.getItem().getRegistryName(), isKubeJSRecipe ? SerializerType.KUBE_JS : SerializerType.MINECRAFT_DATAPACK);
     }
 
     @Override

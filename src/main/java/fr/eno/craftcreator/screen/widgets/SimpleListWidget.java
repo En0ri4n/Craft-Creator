@@ -7,12 +7,12 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.recipes.serializers.ModRecipesJSSerializer;
-import fr.eno.craftcreator.recipes.utils.CraftIngredients;
+import fr.eno.craftcreator.api.ScreenUtils;
 import fr.eno.craftcreator.base.ModRecipeCreatorDispatcher;
+import fr.eno.craftcreator.recipes.serializers.ModRecipeSerializer;
+import fr.eno.craftcreator.recipes.utils.CraftIngredients;
 import fr.eno.craftcreator.utils.Callable;
 import fr.eno.craftcreator.utils.ModifiedRecipe;
-import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.list.AbstractList;
@@ -39,7 +39,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-@SuppressWarnings({"unused", "deprecation"})
 public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
 {
     private static final ResourceLocation BACKGROUND_TILE = References.getLoc("textures/gui/background_tile.png");
@@ -102,12 +101,12 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         if(hasTitleBox)
         {
             Screen.fill(pPoseStack, this.x0, this.y0 - titleBoxHeight, this.x0 + this.width, this.y0, 0xf2c3a942);
-            Screen.drawCenteredString(pPoseStack, minecraft.font, this.title, this.x0 + this.width / 2, this.y0 - this.titleBoxHeight / 2 - minecraft.font.lineHeight / 2, 0xFFFFFF);
+            Screen.drawCenteredString(pPoseStack, ClientUtils.getFontRenderer(), this.title, this.x0 + this.width / 2, this.y0 - this.titleBoxHeight / 2 - minecraft.font.lineHeight / 2, 0xFFFFFF);
             //this.renderBackground(pPoseStack);
         }
 
         this.hoveredEntry = this.isMouseOver(pMouseX, pMouseY) ? this.getEntryAtPosition(pMouseX, pMouseY) : null;
-        this.isListHovered = ClientUtils.isMouseHover(x0, y0, pMouseX, pMouseY, width, height - itemHeight);
+        this.isListHovered = ScreenUtils.isMouseHover(x0, y0, pMouseX, pMouseY, width, height - itemHeight);
         Tessellator tesselator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tesselator.getBuilder();
 
@@ -340,12 +339,12 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
 
             int color = isMouseOver ? 0xF1f115 : 0xFFFFFF;
 
-            Screen.drawString(matrixStack, ClientUtils.getFont(), stringToDisplay, hasItemDisplay ? leftPos + 16 + 5 : leftPos + width / 2 - Utils.width(stringToDisplay) / 2, (topPos + height / 2 - ClientUtils.getFont().lineHeight / 2), color);
+            Screen.drawString(matrixStack, ClientUtils.getFontRenderer(), stringToDisplay, hasItemDisplay ? leftPos + 16 + 5 : leftPos + width / 2 - ClientUtils.width(stringToDisplay) / 2, (topPos + height / 2 - ClientUtils.getFontRenderer().lineHeight / 2), color);
         }
 
         protected String getString(int width, String displayStr)
         {
-            int stringWidth = Utils.width(displayStr);
+            int stringWidth = ClientUtils.width(displayStr);
 
             if(stringWidth > width - (16 + 5))
             {
@@ -594,20 +593,17 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
 
             if(recipe.getRecipeId() != null)
             {
-                ResourceLocation recipeId = ResourceLocation.tryParse(recipe.getRecipeId());
-                IRecipe<?> recipe = ClientUtils.getClientLevel().getRecipeManager().getRecipes().stream().filter(r -> r.getId().equals(recipeId)).findFirst().orElse(null);
-
-                if(recipe != null)
-                {
-                    item = ModRecipeCreatorDispatcher.getOutput(recipe).getIcon().getItem();
-                }
+                ResourceLocation recipeId = ClientUtils.parse(recipe.getRecipeId());
+                item = ForgeRegistries.ITEMS.containsKey(recipeId) ? ForgeRegistries.ITEMS.getValue(recipeId) : Items.BARRIER;
             }
 
             int yPos = height / 2 - 16 / 2;
             ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(item), left + yPos, top + yPos);
 
-            RenderSystem.color4f(1F, 1.0F, 1.0F, 1F);
+            RenderSystem.pushMatrix();
+            RenderSystem.translatef(0F, 0F, 100F);
             ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(Items.BARRIER), left + yPos, top + yPos);
+            RenderSystem.popMatrix();
         }
 
         @Override
@@ -619,7 +615,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         public void renderTooltip(MatrixStack matrixStack, int mouseX, int mouseY)
         {
             tooltips.clear();
-            Map<ModRecipesJSSerializer.RecipeDescriptors, String> recipeDescriptors = recipe.getRecipeMap();
+            Map<ModRecipeSerializer.RecipeDescriptors, String> recipeDescriptors = recipe.getRecipeMap();
             tooltips.add(new StringTextComponent(recipeDescriptors.values().stream().findFirst().orElse(References.getLoc("empty").toString())).withStyle(TextFormatting.GREEN, TextFormatting.UNDERLINE));
             tooltips.add(new StringTextComponent(""));
             recipeDescriptors.forEach((tag, value) -> tooltips.add(new StringTextComponent(tag.toString()).withStyle(TextFormatting.DARK_PURPLE).append(new StringTextComponent(" : ")).append(new StringTextComponent(value).withStyle(TextFormatting.DARK_AQUA))));
@@ -703,7 +699,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
             matrixStack.pushPose();
             float scale = 1.1F;
             matrixStack.scale(scale, scale, scale);
-            Screen.drawCenteredString(matrixStack, ClientUtils.getFont(), displayStr, (int) ((left + width / 2) / scale), (int) ((top + height / 2 - (ClientUtils.getFont().lineHeight * scale) / 2) / scale), color);
+            Screen.drawCenteredString(matrixStack, ClientUtils.getFontRenderer(), displayStr, (int) ((left + width / 2) / scale), (int) ((top + height / 2 - (ClientUtils.getFontRenderer().lineHeight * scale) / 2) / scale), color);
             matrixStack.popPose();
 
             Item item = ForgeRegistries.ITEMS.getValue(getResourceLocation());

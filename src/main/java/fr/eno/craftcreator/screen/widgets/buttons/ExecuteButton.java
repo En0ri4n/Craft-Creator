@@ -3,7 +3,7 @@ package fr.eno.craftcreator.screen.widgets.buttons;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.utils.Utils;
+import fr.eno.craftcreator.api.ScreenUtils;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.ResourceLocation;
@@ -23,15 +23,8 @@ public class ExecuteButton extends Button
 	{
 		if(this.visible)
 		{
-			int yOffset = 0;
 			ClientUtils.bindTexture(TEXTURE);
-			
-			if(active)
-			{
-				yOffset = Utils.isMouseHover(x, y, mouseX, mouseY, width, height) ? 20 : 0;
-			}
-
-			Screen.blit(pPoseStack, x, y, this.width, this.height, 0, yOffset, 42, 20, 42, 40);
+			Screen.blit(pPoseStack, x, y, this.width, this.height, 0, ScreenUtils.isMouseHover(x, y, mouseX, mouseY, width, height) ? 20 : 0, 42, 20, 42, 40);
 		}
 	}
 }

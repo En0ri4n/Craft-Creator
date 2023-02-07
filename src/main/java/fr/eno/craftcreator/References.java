@@ -9,7 +9,6 @@ import net.minecraft.util.text.TranslationTextComponent;
  * <p>
  * This class contains all the references of the mod.
  */
-@SuppressWarnings("unused")
 public class References
 {
     /**

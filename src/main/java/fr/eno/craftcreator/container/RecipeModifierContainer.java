@@ -7,7 +7,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.network.PacketBuffer;
 
-@SuppressWarnings("unused")
 public class RecipeModifierContainer extends VanillaCommonContainer
 {
     public RecipeModifierContainer(int pContainerId, PlayerInventory inventory, PacketBuffer packet)

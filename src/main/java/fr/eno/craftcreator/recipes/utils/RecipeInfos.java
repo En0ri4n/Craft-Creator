@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings("unused")
 public class RecipeInfos
 {
     private final List<RecipeParameter> parameters;
@@ -49,15 +48,13 @@ public class RecipeInfos
         return parameter instanceof RecipeParameterBoolean && ((RecipeParameterBoolean) parameter).getBoolean();
     }
 
-    @SuppressWarnings("unchecked")
-    public <K, V> Map<K, V> getMap(String name)
+        public <K, V> Map<K, V> getMap(String name)
     {
         RecipeParameter parameter = this.getRecipeParameter(name);
         return parameter instanceof RecipeParameterMap ? ((RecipeParameterMap<K, V>) parameter).getMap() : new HashMap<>();
     }
 
-    @SuppressWarnings("unchecked")
-    public <K> List<K> getList(String name)
+        public <K> List<K> getList(String name)
     {
         RecipeParameter parameter = this.getRecipeParameter(name);
         return parameter instanceof RecipeParameterList ? ((RecipeParameterList<K>) parameter).getList() : new ArrayList<>();

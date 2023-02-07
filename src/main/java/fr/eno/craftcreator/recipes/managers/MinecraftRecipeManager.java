@@ -1,15 +1,16 @@
 package fr.eno.craftcreator.recipes.managers;
 
-import fr.eno.craftcreator.recipes.serializers.MinecraftRecipeSerializer;
-import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import fr.eno.craftcreator.base.ModRecipeCreator;
+import fr.eno.craftcreator.recipes.serializers.MinecraftRecipeSerializer;
+import fr.eno.craftcreator.recipes.utils.RecipeEntry;
+import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -42,30 +43,28 @@ public class MinecraftRecipeManager extends BaseRecipesManager
 
     private void createFurnaceRecipe(ModRecipeCreator recipe, List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, double experience, int cookingTime, boolean isKubeJSRecipe)
     {
-        ResourceLocation input = slots.get(0).getItem().getItem().getRegistryName();
-        Item output = slots.get(1).getItem().getItem();
-
-        if(taggedSlots.size() > 0 && taggedSlots.get(0) != null)
-            input = taggedSlots.get(0);
+        RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));
+        RecipeEntry.Output output = getSingleOutput(slots.get(1));
 
         MinecraftRecipeSerializer.get().serializeFurnaceRecipe(recipe, input, output, experience, cookingTime, isKubeJSRecipe);
     }
 
-    public void createSmithingTableRecipe(List<Slot> inventory, boolean isKubeJSRecipe)
+    public void createSmithingTableRecipe(List<Slot> slots, boolean isKubeJSRecipe)
     {
-        ResourceLocation base = inventory.get(0).getItem().getItem().getRegistryName();
-        ResourceLocation addition = inventory.get(1).getItem().getItem().getRegistryName();
-        Item output = inventory.get(2).getItem().getItem();
+        RecipeEntry.Input base = getSingleInput(Collections.emptyMap(), slots.get(0));
+        RecipeEntry.Input addition = getSingleInput(Collections.emptyMap(), slots.get(1));
 
-        MinecraftRecipeSerializer.get().serializeSmithingRecipe(base, addition, output.getRegistryName(), isKubeJSRecipe);
+        RecipeEntry.Output output = getSingleOutput(slots.get(2));
+
+        MinecraftRecipeSerializer.get().serializeSmithingRecipe(base, addition, output, isKubeJSRecipe);
     }
 
-    public void createStoneCutterRecipe(List<Slot> inventory, boolean isKubeJSRecipe)
+    public void createStoneCutterRecipe(List<Slot> slots, boolean isKubeJSRecipe)
     {
-        Item input = inventory.get(0).getItem().getItem();
-        ItemStack output = inventory.get(1).getItem();
+        RecipeEntry.Input input = getSingleInput(Collections.emptyMap(), slots.get(0));
+        RecipeEntry.Output output = getSingleOutput(slots.get(1));
 
-        MinecraftRecipeSerializer.get().serializeStoneCutterRecipe(input.getRegistryName(), output.getItem().getRegistryName(), output.getCount(), isKubeJSRecipe);
+        MinecraftRecipeSerializer.get().serializeStoneCutterRecipe(input, output, isKubeJSRecipe);
     }
 
     public void createCraftingTableRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, List<Integer> nbtSlots, boolean shaped, boolean isKubeJSRecipe)
