@@ -15,16 +15,37 @@ import net.minecraftforge.fml.network.NetworkHooks;
 
 public class BlockUtils
 {
+    /**
+     * Create a VoxelShape from a box (Only for compatibilty)
+     *
+     * @see VoxelShapes#box(double, double, double, double, double, double)
+     *
+     * @return the VoxelShape with the given size
+     */
     public static VoxelShape box(double x1, double y1, double z1, double x2, double y2, double z2)
     {
         return VoxelShapes.box(x1 / 16.0D, y1 / 16.0D, z1 / 16.0D, x2 / 16.0D, y2 / 16.0D, z2 / 16.0D);
     }
 
+    /**
+     * Join two VoxelShape with the given IBooleanFunction (Only for compatibilty)
+     *
+     * @see VoxelShapes#join(VoxelShape, VoxelShape, IBooleanFunction)
+     *
+     * @return the joined VoxelShape
+     */
     public static VoxelShape join(VoxelShape shape1, VoxelShape shape2, IBooleanFunction op)
     {
         return VoxelShapes.join(shape1, shape2, op);
     }
 
+    /**
+     * Open the GUI if the mod is loaded and the tile entity is the same as the given one (Only for compatibilty)
+     *
+     * @param mod the mod to check
+     * @param tileEntityClass the class of the tile entity
+     * @return the result of the action
+     */
     public static ActionResultType openMenu(SupportedMods mod, World level, BlockPos pos, PlayerEntity player, Class<? extends TileEntity> tileEntityClass)
     {
         if(!level.isClientSide && mod.isLoaded())

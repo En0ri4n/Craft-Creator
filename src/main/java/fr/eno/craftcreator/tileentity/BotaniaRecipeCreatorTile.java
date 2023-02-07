@@ -1,9 +1,9 @@
 package fr.eno.craftcreator.tileentity;
 
 import fr.eno.craftcreator.References;
+import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.container.BotaniaRecipeCreatorContainer;
 import fr.eno.craftcreator.init.InitTileEntities;
-import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.tileentity.base.MultiScreenRecipeCreatorTile;
 import fr.eno.craftcreator.utils.SlotHelper;
 import io.netty.buffer.Unpooled;

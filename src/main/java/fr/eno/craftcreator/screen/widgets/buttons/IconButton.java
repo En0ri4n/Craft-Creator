@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.utils.Utils;
+import fr.eno.craftcreator.api.ScreenUtils;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -13,7 +13,6 @@ import net.minecraft.util.text.StringTextComponent;
 import java.util.Collections;
 import java.util.List;
 
-@SuppressWarnings("NullableProblems")
 public class IconButton extends Button
 {
     private ItemStack icon;
@@ -34,7 +33,7 @@ public class IconButton extends Button
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         RenderSystem.enableBlend();
-        Utils.renderSizedButton(matrixStack, x, y, width, height, active, Utils.isMouseHover(x, y, mouseX, mouseY, width, height));
+        ScreenUtils.renderSizedButton(matrixStack, x, y, width, height, active, ScreenUtils.isMouseHover(x, y, mouseX, mouseY, width, height));
         RenderSystem.pushMatrix();
         float scale = 0.85F;
         RenderSystem.scalef(scale, scale, scale);

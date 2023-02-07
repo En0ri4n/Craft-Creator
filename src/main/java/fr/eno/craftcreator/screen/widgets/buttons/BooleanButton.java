@@ -3,7 +3,7 @@ package fr.eno.craftcreator.screen.widgets.buttons;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.utils.Utils;
+import fr.eno.craftcreator.api.ScreenUtils;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.text.StringTextComponent;
 
@@ -25,10 +25,10 @@ public class BooleanButton extends Button
 	{
 		if(this.visible)
 		{
-			Utils.renderSizedButton(pPoseStack, x, y, this.width, this.height, active, Utils.isMouseHover(x, y, mouseX, mouseY, width, height));
+			ScreenUtils.renderSizedButton(pPoseStack, x, y, this.width, this.height, active, ScreenUtils.isMouseHover(x, y, mouseX, mouseY, width, height));
 
 			String str = References.getTranslate("button.boolean." + name + "." + (isOn ? "on" : "off")).getString();
-			drawCenteredString(pPoseStack, ClientUtils.getFont(), str, this.x + this.width / 2, this.y + this.height / 3, 0xFFFFFF);
+			drawCenteredString(pPoseStack, ClientUtils.getFontRenderer(), str, this.x + this.width / 2, this.y + this.height / 3, 0xFFFFFF);
 		}
 	}
 

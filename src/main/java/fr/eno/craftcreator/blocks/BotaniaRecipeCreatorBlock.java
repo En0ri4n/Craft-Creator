@@ -21,12 +21,14 @@ public class BotaniaRecipeCreatorBlock extends RecipeCreatorBlock
     private static final VoxelShape SHAPE = BlockUtils.join(BlockUtils.box(0.0D, 0.0D, 0.0D, 16.0D, 7.0D, 16.0D),
             BlockUtils.box(1.0D, 1.0D, 1.0D, 15.0D, 8.0D, 15.0D), IBooleanFunction.ONLY_FIRST);
 
-    public BotaniaRecipeCreatorBlock()
+    @Override
+    public VoxelShape getShape()
     {
+        return SHAPE;
     }
 
     @Override
-    protected ActionResultType onBlockUsed(@Nonnull BlockState state, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull PlayerEntity playerIn, @Nonnull Hand handIn, @Nonnull BlockRayTraceResult hit)
+    public ActionResultType use(@Nonnull BlockState state, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull PlayerEntity playerIn, @Nonnull Hand handIn, @Nonnull BlockRayTraceResult hit)
     {
         return BlockUtils.openMenu(SupportedMods.BOTANIA, worldIn, pos, playerIn, BotaniaRecipeCreatorTile.class);
     }
@@ -35,11 +37,5 @@ public class BotaniaRecipeCreatorBlock extends RecipeCreatorBlock
     protected TileEntity getTileEntity(BlockPos pos, BlockState state)
     {
         return new BotaniaRecipeCreatorTile();
-    }
-
-    @Override
-    public VoxelShape getShape()
-    {
-        return SHAPE;
     }
 }

@@ -3,7 +3,8 @@ package fr.eno.craftcreator.screen.widgets;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.recipes.utils.RecipeFileUtils;
+import fr.eno.craftcreator.api.CommonUtils;
+import fr.eno.craftcreator.api.ScreenUtils;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.utils.Callable;
 import net.minecraft.client.gui.screen.Screen;
@@ -19,7 +20,6 @@ import java.awt.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@SuppressWarnings({"deprecation", "NullableProblems", "unused"})
 public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends Widget
 {
     private T selected;
@@ -57,7 +57,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
     @Override
     public void renderButton(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        this.hovered = ClientUtils.isMouseHover(x, y, mouseX, mouseY, width, height);
+        this.hovered = ScreenUtils.isMouseHover(x, y, mouseX, mouseY, width, height);
 
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.alpha);
         RenderSystem.enableBlend();
@@ -66,7 +66,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
         Screen.fill(matrixStack, this.x, this.y, this.x + this.width, this.y + this.height, 0xf2c3a942);
         Screen.fill(matrixStack, this.x + 1, this.y + 1, this.x + this.width - 1, this.y + this.height - 1, Color.DARK_GRAY.getRGB());
         int color = 0xFFFFFFFF;
-        drawCenteredString(matrixStack, ClientUtils.getFont(), this.getMessage().copy().append(" ▼"), this.x + this.width / 2, this.y + height / 2 - ClientUtils.getFont().lineHeight / 2, color | MathHelper.ceil(this.alpha * 255.0F) << 24);
+        drawCenteredString(matrixStack, ClientUtils.getFontRenderer(), this.getMessage().copy().append(" ▼"), this.x + this.width / 2, this.y + height / 2 - ClientUtils.getFontRenderer().lineHeight / 2, color | MathHelper.ceil(this.alpha * 255.0F) << 24);
 
         if(this.isFocused())
         {
@@ -100,7 +100,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
                     T entry = this.entries.get(i);
                     int rowWidth = this.getRowWidth();
                     int rowLeft = this.x0;
-                    entry.render(matrixStack, i, rowLeft, rowTop, rowWidth, itemHeight, mouseX, mouseY, ClientUtils.isMouseHover(rowLeft, rowTop, mouseX, mouseY, rowWidth, itemHeight));
+                    entry.render(matrixStack, i, rowLeft, rowTop, rowWidth, itemHeight, mouseX, mouseY, ScreenUtils.isMouseHover(rowLeft, rowTop, mouseX, mouseY, rowWidth, itemHeight));
                 }
             }
         }
@@ -116,7 +116,8 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
         return this.y0 - this.getScrollAmount() + index * this.itemHeight + this.height;
     }
 
-    private int getRowBottom(int index) {
+    private int getRowBottom(int index)
+    {
         return this.getRowTop(index) + this.itemHeight;
     }
 
@@ -160,7 +161,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
 
         if(isFocused())
         {
-            if(!ClientUtils.isMouseHover(x0, y0 + height, (int) mouseX, (int) mouseY, x1 - x0, y1 - y0 - height))
+            if(!ScreenUtils.isMouseHover(x0, y0 + height, (int) mouseX, (int) mouseY, x1 - x0, y1 - y0 - height))
             {
                 this.setFocused(false);
                 return false;
@@ -194,8 +195,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
     public void setSelected(T entry)
     {
         this.selected = entry;
-        if(this.onSelected != null)
-            this.onSelected.run(entry);
+        if(this.onSelected != null) this.onSelected.run(entry);
     }
 
     @Override
@@ -260,8 +260,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
                 T entry = this.entries.get(i);
                 int rowWidth = this.getRowWidth();
 
-                if(ClientUtils.isMouseHover(this.x0, rowTop, (int) mouseX, (int) mouseY, rowWidth, itemHeight))
-                    return entry;
+                if(ScreenUtils.isMouseHover(this.x0, rowTop, (int) mouseX, (int) mouseY, rowWidth, itemHeight)) return entry;
             }
         }
         return null;
@@ -276,7 +275,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
     {
         public static List<StringEntry> getRecipeTypes(String modid)
         {
-            return Registry.RECIPE_TYPE.stream().filter(type -> RecipeFileUtils.getRecipeTypeName(type).getNamespace().equals(modid)).map(type -> new DropdownListWidget.StringEntry(RecipeFileUtils.getRecipeTypeName(type).toString(), new StringTextComponent(RecipeFileUtils.getRecipeTypeName(type).toString()))).collect(Collectors.toList());
+            return Registry.RECIPE_TYPE.stream().filter(type -> CommonUtils.getRecipeTypeName(type).getNamespace().equals(modid)).map(type -> new DropdownListWidget.StringEntry(CommonUtils.getRecipeTypeName(type).toString(), new StringTextComponent(CommonUtils.getRecipeTypeName(type).toString()))).collect(Collectors.toList());
         }
 
         public static List<StringEntry> getModIds()
@@ -287,7 +286,9 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
 
     public static abstract class Entry<T>
     {
-        private Entry() {}
+        private Entry()
+        {
+        }
 
         public abstract T getValue();
 
@@ -320,7 +321,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
             Screen.fill(matrixStack, x + 1, y + 1, x + width - 1, y + itemHeight - 1, 0xFF585858);
 
             matrixStack.translate(0, 0, 100);
-            ClientUtils.getFont().draw(matrixStack, this.displayName.getString(), x + 2, y + Math.floorDiv(itemHeight - 8,  2), color);
+            ClientUtils.getFontRenderer().draw(matrixStack, this.displayName.getString(), x + 2, y + Math.floorDiv(itemHeight - 8, 2), color);
         }
 
         @Override

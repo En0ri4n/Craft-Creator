@@ -3,8 +3,8 @@ package fr.eno.craftcreator.screen.widgets;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.api.ScreenUtils;
 import fr.eno.craftcreator.utils.Callable;
-import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.ResourceLocation;
 
@@ -31,29 +31,29 @@ public class GuiList<T>
     {
         int width = (getMaxWidth() + 12);
         ClientUtils.bindTexture(BACKGROUND_TEXTURE);
-        Utils.renderSizedTexture(matrixStack, 4, this.guiListRight - width - 6, y, width + 6, (this.keys.size() + 1) * keyHeight + (this.keys.size() + 1) + 6, 0, 0, 16, 16, 16);
+        ScreenUtils.renderSizedTexture(matrixStack, 4, this.guiListRight - width - 6, y, width + 6, (this.keys.size() + 1) * keyHeight + (this.keys.size() + 1) + 6, 0, 0, 16, 16, 16);
 
         for(int i = 0; i < this.keys.size() + 1; i++)
         {
             int x = this.guiListRight - width - 3;
             int y = this.y + 3 + i * keyHeight + i;
-            int buttonTitle = y + keyHeight / 2 - ClientUtils.getFont().lineHeight / 2;
+            int buttonTitle = y + keyHeight / 2 - ClientUtils.getFontRenderer().lineHeight / 2;
 
-            Utils.renderSizedButton(matrixStack, x, y, width, keyHeight, true, Utils.isMouseHover(x, y, mouseX, mouseY, width, keyHeight));
+            ScreenUtils.renderSizedButton(matrixStack, x, y, width, keyHeight, true, ScreenUtils.isMouseHover(x, y, mouseX, mouseY, width, keyHeight));
             //Screen.blit(matrixStack, x, y, finalWidth - 6, keyHeight, xTexture, yTexture, widthToGet, heightToGet, textureWidth, textureHeight);
 
             if(i >= this.keys.size())
             {
-                Screen.drawCenteredString(matrixStack, ClientUtils.getFont(), References.getTranslate("screen.guiList.reset").getString(), x + width / 2 - 3, buttonTitle, 0xFFFFFF);
+                Screen.drawCenteredString(matrixStack, ClientUtils.getFontRenderer(), References.getTranslate("screen.guiList.reset").getString(), x + width / 2 - 3, buttonTitle, 0xFFFFFF);
                 continue;
             }
 
             boolean isSelected = this.selectedKey != null && this.selectedKey.toString().equals(this.keys.get(i).toString());
 
             if(isSelected)
-                Screen.drawCenteredString(matrixStack, ClientUtils.getFont(), this.keys.get(i).toString(), x + width / 2 - 3, buttonTitle, 0x0dc70d);
+                Screen.drawCenteredString(matrixStack, ClientUtils.getFontRenderer(), this.keys.get(i).toString(), x + width / 2 - 3, buttonTitle, 0x0dc70d);
             else
-                Screen.drawCenteredString(matrixStack, ClientUtils.getFont(), this.keys.get(i).toString(), x + width / 2 - 3, buttonTitle, 0xFFFFFF);
+                Screen.drawCenteredString(matrixStack, ClientUtils.getFontRenderer(), this.keys.get(i).toString(), x + width / 2 - 3, buttonTitle, 0xFFFFFF);
         }
     }
 
@@ -61,10 +61,10 @@ public class GuiList<T>
     {
         if(this.keys == null) return 0;
 
-        int max = ClientUtils.getFont().width(References.getTranslate("screen.guiList.reset").getString());
+        int max = ClientUtils.getFontRenderer().width(References.getTranslate("screen.guiList.reset").getString());
         for(T key : this.keys)
         {
-            int width = ClientUtils.getFont().width(key.toString());
+            int width = ClientUtils.getFontRenderer().width(key.toString());
 
             if(width > max)
                 max = width;
@@ -85,7 +85,7 @@ public class GuiList<T>
             int x = this.guiListRight - finalWidth + 3;
             int y = this.y + 3 + i * keyHeight + i;
 
-            if(Utils.isMouseHover(x, y, mouseX, mouseY, width - 6, keyHeight))
+            if(ScreenUtils.isMouseHover(x, y, mouseX, mouseY, width - 6, keyHeight))
             {
                 if(i >= this.keys.size())
                 {

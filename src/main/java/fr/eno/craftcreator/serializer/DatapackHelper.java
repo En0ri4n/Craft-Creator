@@ -4,7 +4,7 @@ import com.google.gson.*;
 import fr.eno.craftcreator.CraftCreator;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.recipes.utils.RecipeFileUtils;
+import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.utils.PairValues;
 import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.inventory.container.Slot;
@@ -106,7 +106,7 @@ public class DatapackHelper
             pattern.append(patterns.get(slot.getItem().getItem().getRegistryName()).getSecondValue());
         }
 
-        List<String> patternList = Utils.splitToListWithSize(pattern.toString(), 3);
+        List<String> patternList = ClientUtils.splitToListWithSize(pattern.toString(), 3);
 
         for(int i = 2; i >= 0; i -= 2)
         {
@@ -171,7 +171,7 @@ public class DatapackHelper
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(getOutputFile(type, output))))
         {
             gson.toJson(recipeJson, writer);
-            ClientUtils.sendClientPlayerMessage(Utils.createComponentFileOpener(References.getTranslate("serializer.success", getOutputFile(type, output).getName()), getOutputFile(type, output)));
+            ClientUtils.sendClientPlayerMessage(CommonUtils.createComponentFileOpener(References.getTranslate("serializer.success", getOutputFile(type, output).getName()), getOutputFile(type, output)));
         }
         catch(JsonIOException | IOException e)
         {
@@ -190,6 +190,6 @@ public class DatapackHelper
         File directory = new File(ClientUtils.getMinecraft().gameDirectory, "Craft-Creator");
         if(!directory.exists()) directory.mkdirs();
 
-        return new File(directory, output.getPath() + "_from_" + RecipeFileUtils.getRecipeTypeName(type).getPath() + ".json");
+        return new File(directory, output.getPath() + "_from_" + CommonUtils.getRecipeTypeName(type).getPath() + ".json");
     }
 }

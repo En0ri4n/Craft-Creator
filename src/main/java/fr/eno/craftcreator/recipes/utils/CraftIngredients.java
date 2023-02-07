@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings("unused")
 public class CraftIngredients
 {
     public static final CraftIngredient EMPTY = new ItemIngredient(Items.AIR.getRegistryName(), 0);

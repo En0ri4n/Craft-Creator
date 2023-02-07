@@ -1,8 +1,8 @@
 package fr.eno.craftcreator.init;
 
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.item.ItemBlockBasic;
 import fr.eno.craftcreator.base.SupportedMods;
+import fr.eno.craftcreator.item.ItemBlockBasic;
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
@@ -10,7 +10,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.function.Supplier;
 
-@SuppressWarnings("unused")
 public class InitItems
 {
 	public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, References.MOD_ID);
