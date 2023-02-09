@@ -53,4 +53,10 @@ public class ThermalRecipeCreatorContainer extends CommonContainer
     {
         return SupportedMods.THERMAL;
     }
+    
+    @Override
+    public int getContainerSize()
+    {
+        return SlotHelper.THERMAL_SLOTS_SIZE;
+    }
 }

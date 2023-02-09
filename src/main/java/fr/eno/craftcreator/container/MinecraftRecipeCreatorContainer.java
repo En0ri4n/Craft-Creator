@@ -47,4 +47,10 @@ public class MinecraftRecipeCreatorContainer extends CommonContainer
     {
         return SupportedMods.MINECRAFT;
     }
+    
+    @Override
+    public int getContainerSize()
+    {
+        return SlotHelper.MINECRAFT_SLOTS_SIZE;
+    }
 }

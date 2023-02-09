@@ -15,7 +15,14 @@ public class RetrieveRecipeCreatorTileDataServerPacket
     private final String dataName;
     private final BlockPos pos;
     private final InitPackets.PacketDataType dataType;
-
+    
+    /**
+     * Retrieve data from a tile entity on the server side
+     *
+     * @param dataName The name of the data to update
+     * @param pos The position of the tile entity
+     * @param dataType The type of the data to update
+     */
     public RetrieveRecipeCreatorTileDataServerPacket(String dataName, BlockPos pos, InitPackets.PacketDataType dataType)
     {
         this.dataName = dataName;
@@ -40,6 +47,9 @@ public class RetrieveRecipeCreatorTileDataServerPacket
 
     public static class ServerHandler
     {
+        /**
+         * Handle the packet on the server side and send the data to the client using {@link UpdateRecipeCreatorTileDataClientPacket}
+         */
         public static void handle(RetrieveRecipeCreatorTileDataServerPacket msg, Supplier<NetworkEvent.Context> ctx)
         {
             TileEntity tileEntity = ServerUtils.getBlockEntity(ctx, msg.pos);

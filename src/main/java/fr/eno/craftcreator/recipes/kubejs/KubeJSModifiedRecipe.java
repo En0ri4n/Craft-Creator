@@ -1,9 +1,12 @@
-package fr.eno.craftcreator.utils;
+package fr.eno.craftcreator.recipes.kubejs;
 
 import com.google.gson.JsonObject;
-import fr.eno.craftcreator.recipes.serializers.ModRecipeSerializer;
+import fr.eno.craftcreator.recipes.base.IModifiedRecipe;
+import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.ResourceLocationException;
 import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -11,18 +14,18 @@ import net.minecraft.util.text.TextFormatting;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ModifiedRecipe
+public class KubeJSModifiedRecipe implements IModifiedRecipe
 {
-    private final ModifiedRecipeType type;
+    private final KubeJSModifiedRecipeType type;
     private final Map<ModRecipeSerializer.RecipeDescriptors, String> recipeDescriptors;
 
-    public ModifiedRecipe(ModifiedRecipeType type)
+    public KubeJSModifiedRecipe(KubeJSModifiedRecipeType type)
     {
         this.type = type;
         this.recipeDescriptors = new HashMap<>();
     }
 
-    public ModifiedRecipe(ModifiedRecipeType type, Map<ModRecipeSerializer.RecipeDescriptors, String> recipeDescriptors)
+    public KubeJSModifiedRecipe(KubeJSModifiedRecipeType type, Map<ModRecipeSerializer.RecipeDescriptors, String> recipeDescriptors)
     {
         this.type = type;
         this.recipeDescriptors = recipeDescriptors;
@@ -67,16 +70,28 @@ public class ModifiedRecipe
     {
         return this.recipeDescriptors;
     }
+    
+    public ResourceLocation getOneValue()
+    {
+        try
+        {
+            return ResourceLocation.tryParse(this.recipeDescriptors.values().stream().findFirst().orElse(""));
+        }
+        catch(ResourceLocationException e)
+        {
+            return new ResourceLocation("modid", this.recipeDescriptors.values().stream().findFirst().orElse(""));
+        }
+    }
 
-    public ModifiedRecipeType getType()
+    public KubeJSModifiedRecipeType getType()
     {
         return type;
     }
-
+    
+    @Override
     public JsonObject toJson()
     {
         JsonObject json = new JsonObject();
-        json.addProperty("type", type.name());
         for(Map.Entry<ModRecipeSerializer.RecipeDescriptors, String> entry : recipeDescriptors.entrySet())
         {
             json.addProperty(entry.getKey().getTag(), entry.getValue());
@@ -86,7 +101,7 @@ public class ModifiedRecipe
     }
 
 
-    public enum ModifiedRecipeType
+    public enum KubeJSModifiedRecipeType
     {
         REMOVED("remove", new StringTextComponent("Removed").withStyle(TextFormatting.RED)),
         REPLACED_INPUT("replaceInput", new StringTextComponent("Input Replaced").withStyle(TextFormatting.GOLD)),
@@ -95,7 +110,7 @@ public class ModifiedRecipe
         private final String descriptor;
         private final IFormattableTextComponent title;
 
-        ModifiedRecipeType(String descriptor, IFormattableTextComponent title)
+        KubeJSModifiedRecipeType(String descriptor, IFormattableTextComponent title)
         {
             this.descriptor = descriptor;
             this.title = title;
@@ -106,9 +121,9 @@ public class ModifiedRecipe
             return descriptor;
         }
 
-        public static ModifiedRecipeType byDescriptor(String descriptor)
+        public static KubeJSModifiedRecipeType byDescriptor(String descriptor)
         {
-            for(ModifiedRecipeType type : ModifiedRecipeType.values())
+            for(KubeJSModifiedRecipeType type : KubeJSModifiedRecipeType.values())
             {
                 if(type.getDescriptor().equals(descriptor)) return type;
             }

@@ -82,4 +82,9 @@ public enum ModRecipeCreator
     {
         return Stream.of(values()).filter(recipe -> recipeTypeName.equals(CommonUtils.getRecipeTypeName(recipe.getRecipeType()))).findFirst().orElse(null);
     }
+    
+    public static ModRecipeCreator byRecipeType(IRecipeType<?> recipeType)
+    {
+        return byName(CommonUtils.getRecipeTypeName(recipeType));
+    }
 }

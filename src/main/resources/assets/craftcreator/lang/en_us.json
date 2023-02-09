@@ -12,9 +12,9 @@
 	"craftcreator.button.boolean.craftType.on": "Shaped",
 	"craftcreator.button.boolean.craftType.off": "Shapeless",
 
-	"craftcreator.serializer.success": "Recipe saved at : §a§n%s",
-	"craftcreator.message.recipe.added": "Recipe %s -> %s successfully generated !",
-	"craftcreator.message.recipe_failed": "§cA recipe with the same output already exists !",
+	"craftcreator.serializer.message.success": "Recipe saved at : §a§n%s",
+	"craftcreator.serializer.message.recipe.added": "Recipe %s -> %s successfully generated !",
+	"craftcreator.serializer.message.recipe.failed": "§cA recipe with the same output already exists !",
 
 	"craftcreator.screen.crafting.info.msg": "§oCtrl + Click on slot to see more options",
 	"craftcreator.screen.crafting.info.nbt": "§oUse NBT tags for this item",

@@ -3,6 +3,8 @@ package fr.eno.craftcreator.packets;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.init.InitPackets;
 import fr.eno.craftcreator.screen.container.base.ModRecipeCreatorDataScreen;
+import fr.eno.craftcreator.tileentity.base.MultiScreenRecipeCreatorTile;
+import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -11,14 +13,24 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
-
+/**
+ * Update the data of the opened recipe creator and the CLIENT tile entity
+ */
 public class UpdateRecipeCreatorTileDataClientPacket
 {
     private final String dataName;
     private final BlockPos pos;
     private final InitPackets.PacketDataType dataType;
     private final Object data;
-
+    
+    /**
+     * Update the data of the opened recipe creator and the CLIENT tile entity
+     *
+     * @param dataName the name of the data
+     * @param pos      the position of the tile entity
+     * @param dataType the type of the data
+     * @param data     the data
+     */
     public UpdateRecipeCreatorTileDataClientPacket(String dataName, BlockPos pos, InitPackets.PacketDataType dataType, Object data)
     {
         this.dataName = dataName;
@@ -26,13 +38,14 @@ public class UpdateRecipeCreatorTileDataClientPacket
         this.dataType = dataType;
         this.data = data;
     }
-
-        public static void encode(UpdateRecipeCreatorTileDataClientPacket msg, PacketBuffer packetBuffer)
+    
+    @SuppressWarnings("unchecked")
+    public static void encode(UpdateRecipeCreatorTileDataClientPacket msg, PacketBuffer packetBuffer)
     {
         packetBuffer.writeUtf(msg.dataName);
         packetBuffer.writeInt(msg.dataType.ordinal());
         packetBuffer.writeBlockPos(msg.pos);
-
+        
         switch(msg.dataType)
         {
             case INT:
@@ -58,13 +71,13 @@ public class UpdateRecipeCreatorTileDataClientPacket
                 break;
         }
     }
-
+    
     public static UpdateRecipeCreatorTileDataClientPacket decode(PacketBuffer packetBuffer)
     {
         String dataName = packetBuffer.readUtf();
         InitPackets.PacketDataType dataType = InitPackets.PacketDataType.values()[packetBuffer.readInt()];
         BlockPos pos = packetBuffer.readBlockPos();
-
+        
         switch(dataType)
         {
             case INT:
@@ -85,16 +98,25 @@ public class UpdateRecipeCreatorTileDataClientPacket
                 return new UpdateRecipeCreatorTileDataClientPacket(dataName, pos, dataType, -1);
         }
     }
-
+    
     public static class ClientHandler
     {
+        /**
+         * Handle the packet on the client side, update the data in the CLIENT tile entity and in the screen
+         */
         public static void handle(UpdateRecipeCreatorTileDataClientPacket msg, Supplier<NetworkEvent.Context> ctx)
         {
             if(ClientUtils.getCurrentScreen() instanceof ModRecipeCreatorDataScreen<?>)
             {
                 ((ModRecipeCreatorDataScreen<?>) ClientUtils.getCurrentScreen()).setData(msg.dataName, msg.data);
             }
-
+            
+            if(ClientUtils.getClientLevel().getBlockEntity(msg.pos) instanceof MultiScreenRecipeCreatorTile)
+            {
+                MultiScreenRecipeCreatorTile tileEntity = (MultiScreenRecipeCreatorTile) ClientUtils.getClientLevel().getBlockEntity(msg.pos);
+                Utils.notNull(tileEntity).setData(msg.dataName, msg.data);
+            }
+            
             ctx.get().setPacketHandled(true);
         }
     }

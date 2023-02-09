@@ -46,4 +46,10 @@ public class BotaniaRecipeCreatorContainer extends CommonContainer
     {
         return SupportedMods.BOTANIA;
     }
+    
+    @Override
+    public int getContainerSize()
+    {
+        return SlotHelper.BOTANIA_SLOTS_SIZE;
+    }
 }

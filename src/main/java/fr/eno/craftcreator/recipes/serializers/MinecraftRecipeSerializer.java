@@ -3,6 +3,7 @@ package fr.eno.craftcreator.recipes.serializers;
 import com.google.gson.JsonObject;
 import fr.eno.craftcreator.base.ModRecipeCreator;
 import fr.eno.craftcreator.base.SupportedMods;
+import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.utils.CraftIngredients;
 import fr.eno.craftcreator.recipes.utils.RecipeEntry;
 import fr.eno.craftcreator.serializer.DatapackHelper;
@@ -33,7 +34,7 @@ public class MinecraftRecipeSerializer extends ModRecipeSerializer
         obj.addProperty("cookingtime", cookTime);
         obj.addProperty("result", output.registryName().toString());
 
-        send(obj, smeltType.getRecipeType(), output.registryName(), isKubeJSRecipe ? SerializerType.KUBE_JS : SerializerType.MINECRAFT_DATAPACK);
+        addRecipeTo(obj, smeltType.getRecipeType(), output.registryName());
     }
 
     public void serializeStoneCutterRecipe(RecipeEntry.Input input, RecipeEntry.Output output, boolean isKubeJSRecipe)
@@ -43,7 +44,7 @@ public class MinecraftRecipeSerializer extends ModRecipeSerializer
         obj.addProperty("result", output.registryName().toString());
         obj.addProperty("count", output.count());
 
-        send(obj, IRecipeType.STONECUTTING, output.registryName(), isKubeJSRecipe ? SerializerType.KUBE_JS : SerializerType.MINECRAFT_DATAPACK);
+        addRecipeTo(obj, IRecipeType.STONECUTTING, output.registryName());
     }
 
     public void serializeSmithingRecipe(RecipeEntry.Input base, RecipeEntry.Input addition, RecipeEntry.Output output, boolean isKubeJSRecipe)
@@ -53,7 +54,7 @@ public class MinecraftRecipeSerializer extends ModRecipeSerializer
         obj.add("addition", singletonItemJsonObject(addition));
         obj.add("result", singletonItemJsonObject(output));
 
-        send(obj, IRecipeType.SMITHING, output.registryName(), isKubeJSRecipe ? SerializerType.KUBE_JS : SerializerType.MINECRAFT_DATAPACK);
+        addRecipeTo(obj, IRecipeType.SMITHING, output.registryName());
     }
 
     public void serializeCraftingTableRecipe(ItemStack output, List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, List<Integer> nbtSlots, boolean shaped, boolean isKubeJSRecipe)
@@ -82,7 +83,7 @@ public class MinecraftRecipeSerializer extends ModRecipeSerializer
         }
         obj.add("result", resultObj);
 
-        send(obj, IRecipeType.CRAFTING, output.getItem().getRegistryName(), isKubeJSRecipe ? SerializerType.KUBE_JS : SerializerType.MINECRAFT_DATAPACK);
+        addRecipeTo(obj, IRecipeType.CRAFTING, output.getItem().getRegistryName());
     }
 
     @Override

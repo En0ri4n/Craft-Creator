@@ -2,9 +2,9 @@ package fr.eno.craftcreator.serializer;
 
 import com.google.gson.*;
 import fr.eno.craftcreator.CraftCreator;
-import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.CommonUtils;
+import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.utils.PairValues;
 import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.inventory.container.Slot;
@@ -162,20 +162,22 @@ public class DatapackHelper
     /**
      * Serialize the result for the crafting recipe in the Craft-Creator Datapack
      *
-     * @param type the type of the recipe
-     * @param output the output of the recipe
+     * @param type       the type of the recipe
+     * @param output     the output of the recipe
      * @param recipeJson the JsonObject of the recipe
+     * @return the feedback
      */
-    public static void serializeRecipe(IRecipeType<?> type, ResourceLocation output, JsonObject recipeJson)
+    public static ModRecipeSerializer.Feedback serializeRecipe(IRecipeType<?> type, ResourceLocation output, JsonObject recipeJson)
     {
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(getOutputFile(type, output))))
         {
             gson.toJson(recipeJson, writer);
-            ClientUtils.sendClientPlayerMessage(CommonUtils.createComponentFileOpener(References.getTranslate("serializer.success", getOutputFile(type, output).getName()), getOutputFile(type, output)));
+            return ModRecipeSerializer.Feedback.ADDED;
         }
         catch(JsonIOException | IOException e)
         {
             CraftCreator.LOGGER.error("Can't serialize the recipe in a json file !");
+            return ModRecipeSerializer.Feedback.FILE_ERROR;
         }
     }
 

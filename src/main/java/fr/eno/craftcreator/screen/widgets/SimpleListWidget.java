@@ -4,15 +4,16 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.ScreenUtils;
 import fr.eno.craftcreator.base.ModRecipeCreatorDispatcher;
-import fr.eno.craftcreator.recipes.serializers.ModRecipeSerializer;
+import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.utils.CraftIngredients;
 import fr.eno.craftcreator.utils.Callable;
-import fr.eno.craftcreator.utils.ModifiedRecipe;
+import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.list.AbstractList;
@@ -574,9 +575,9 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
 
     public static class ModifiedRecipeEntry extends Entry
     {
-        private final ModifiedRecipe recipe;
+        private final KubeJSModifiedRecipe recipe;
 
-        public ModifiedRecipeEntry(ModifiedRecipe recipe)
+        public ModifiedRecipeEntry(KubeJSModifiedRecipe recipe)
         {
             this.recipe = recipe;
         }
@@ -599,10 +600,15 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
 
             int yPos = height / 2 - 16 / 2;
             ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(item), left + yPos, top + yPos);
-
+    
             RenderSystem.pushMatrix();
+            RenderSystem.enableBlend();
+            RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
             RenderSystem.translatef(0F, 0F, 100F);
+            RenderSystem.color4f(1F, 1F, 1F, 0.5F);
             ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(Items.BARRIER), left + yPos, top + yPos);
+            RenderSystem.disableBlend();
+            RenderSystem.defaultBlendFunc();
             RenderSystem.popMatrix();
         }
 
@@ -623,7 +629,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
             ClientUtils.getCurrentScreen().renderComponentTooltip(matrixStack, tooltips, mouseX, mouseY);
         }
 
-        public ModifiedRecipe getRecipe()
+        public KubeJSModifiedRecipe getRecipe()
         {
             return recipe;
         }

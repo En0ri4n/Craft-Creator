@@ -3,6 +3,7 @@ package fr.eno.craftcreator.recipes.serializers;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonObject;
 import fr.eno.craftcreator.base.SupportedMods;
+import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.utils.CraftIngredients;
 import fr.eno.craftcreator.recipes.utils.RecipeEntry;
 import net.minecraft.block.Block;
@@ -18,6 +19,8 @@ import java.util.Objects;
 public class BotaniaRecipeSerializer extends ModRecipeSerializer
 {
     private static final BotaniaRecipeSerializer INSTANCE = new BotaniaRecipeSerializer();
+    
+    private SerializerType currentSerializeType;
 
     private BotaniaRecipeSerializer()
     {
@@ -34,7 +37,7 @@ public class BotaniaRecipeSerializer extends ModRecipeSerializer
         obj.add("input", singletonItemJsonObject(ingredient));
         obj.add("output", getResult(result));
 
-        send(obj, ModRecipeTypes.MANA_INFUSION_TYPE, result.registryName(), SerializerType.KUBE_JS);
+        addRecipeTo(obj, ModRecipeTypes.MANA_INFUSION_TYPE, result.registryName());
     }
 
     public void serializeElvenTradeRecipe(RecipeEntry.MultiInput ingredients, RecipeEntry.MultiOutput results)
@@ -43,7 +46,7 @@ public class BotaniaRecipeSerializer extends ModRecipeSerializer
         obj.add("ingredients", listWithSingletonItems(ingredients, "item"));
         obj.add("output", listWithSingletonItems(results, "item"));
 
-        send(obj, ModRecipeTypes.ELVEN_TRADE_TYPE, results.getOneOutput().registryName(), SerializerType.KUBE_JS);
+        addRecipeTo(obj, ModRecipeTypes.ELVEN_TRADE_TYPE, results.getOneOutput().registryName());
     }
 
     public void serializePureDaisyRecipe(RecipeEntry.BlockInput input, RecipeEntry.BlockOutput output, int time)
@@ -53,7 +56,7 @@ public class BotaniaRecipeSerializer extends ModRecipeSerializer
         obj.add("input", mapToJsonObject(ImmutableMap.of("type", "block", "block", input.registryName().toString())));
         obj.add("output", singletonItemJsonObject("name", output.registryName().toString()));
 
-        send(obj, ModRecipeTypes.PURE_DAISY_TYPE, output.registryName(), SerializerType.KUBE_JS);
+        addRecipeTo(obj, ModRecipeTypes.PURE_DAISY_TYPE, output.registryName());
     }
 
     public void serializeBrewRecipe(RecipeEntry.MultiInput ingredients, Brew brew)
@@ -62,7 +65,7 @@ public class BotaniaRecipeSerializer extends ModRecipeSerializer
         obj.addProperty("brew", Objects.requireNonNull(BotaniaAPI.instance().getBrewRegistry().getKey(brew)).toString());
         obj.add("ingredients", listWithSingletonItems(ingredients, "item"));
 
-        send(obj, ModRecipeTypes.BREW_TYPE, BotaniaAPI.instance().getBrewRegistry().getKey(brew), SerializerType.KUBE_JS);
+        addRecipeTo(obj, ModRecipeTypes.BREW_TYPE, BotaniaAPI.instance().getBrewRegistry().getKey(brew));
     }
 
     public void serializePetalRecipe(RecipeEntry.MultiInput ingredients, RecipeEntry.Output result)
@@ -71,7 +74,7 @@ public class BotaniaRecipeSerializer extends ModRecipeSerializer
         obj.add("output", getResult(result));
         obj.add("ingredients", getInputArray(ingredients));
 
-        send(obj, ModRecipeTypes.PETAL_TYPE, result.registryName(), SerializerType.KUBE_JS);
+        addRecipeTo(obj, ModRecipeTypes.PETAL_TYPE, result.registryName());
     }
 
     public void serializeRuneRecipe(RecipeEntry.MultiInput ingredients, RecipeEntry.Output result, int mana)
@@ -81,7 +84,7 @@ public class BotaniaRecipeSerializer extends ModRecipeSerializer
         obj.addProperty("mana", mana);
         obj.add("ingredients", getInputArray(ingredients));
 
-        send(obj, ModRecipeTypes.RUNE_TYPE, result.registryName(), SerializerType.KUBE_JS);
+        addRecipeTo(obj, ModRecipeTypes.RUNE_TYPE, result.registryName());
     }
 
     public void serializeTerraPlateRecipe(RecipeEntry.MultiInput ingredients, RecipeEntry.Output result, int mana)
@@ -91,7 +94,7 @@ public class BotaniaRecipeSerializer extends ModRecipeSerializer
         obj.add("result", getResult(result));
         obj.add("ingredients", getInputArray(ingredients));
 
-        send(obj, ModRecipeTypes.TERRA_PLATE_TYPE, result.registryName(), SerializerType.KUBE_JS);
+        addRecipeTo(obj, ModRecipeTypes.TERRA_PLATE_TYPE, result.registryName());
     }
 
     @Override
@@ -177,5 +180,15 @@ public class BotaniaRecipeSerializer extends ModRecipeSerializer
     public static BotaniaRecipeSerializer get()
     {
         return INSTANCE;
+    }
+    
+    public SerializerType getCurrentSerializeType()
+    {
+        return currentSerializeType;
+    }
+    
+    public void setCurrentSerializeType(SerializerType currentSerializeType)
+    {
+        this.currentSerializeType = currentSerializeType;
     }
 }

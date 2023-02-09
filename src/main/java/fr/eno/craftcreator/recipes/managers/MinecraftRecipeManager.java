@@ -1,6 +1,8 @@
 package fr.eno.craftcreator.recipes.managers;
 
 import fr.eno.craftcreator.base.ModRecipeCreator;
+import fr.eno.craftcreator.recipes.base.BaseRecipesManager;
+import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.serializers.MinecraftRecipeSerializer;
 import fr.eno.craftcreator.recipes.utils.RecipeEntry;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
@@ -19,8 +21,10 @@ public class MinecraftRecipeManager extends BaseRecipesManager
     private static final MinecraftRecipeManager INSTANCE = new MinecraftRecipeManager();
 
     @Override
-    public void createRecipe(ModRecipeCreator recipe, List<Slot> slots, RecipeInfos recipeInfos)
+    public void createRecipe(ModRecipeCreator recipe, List<Slot> slots, RecipeInfos recipeInfos, ModRecipeSerializer.SerializerType serializerType)
     {
+        MinecraftRecipeSerializer.get().setSerializerType(serializerType);
+        
         switch(recipe)
         {
             case CRAFTING_TABLE:

@@ -1,6 +1,8 @@
 package fr.eno.craftcreator.recipes.managers;
 
 import fr.eno.craftcreator.base.ModRecipeCreator;
+import fr.eno.craftcreator.recipes.base.BaseRecipesManager;
+import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.serializers.BotaniaRecipeSerializer;
 import fr.eno.craftcreator.recipes.utils.RecipeEntry;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
@@ -20,8 +22,9 @@ public class BotaniaRecipesManager extends BaseRecipesManager
     private static final BotaniaRecipesManager INSTANCE = new BotaniaRecipesManager();
 
     @Override
-    public void createRecipe(ModRecipeCreator recipe, List<Slot> slots, RecipeInfos recipeInfos)
+    public void createRecipe(ModRecipeCreator recipe, List<Slot> slots, RecipeInfos recipeInfos, ModRecipeSerializer.SerializerType serializerType)
     {
+        BotaniaRecipeSerializer.get().setSerializerType(serializerType);
         switch(recipe)
         {
             case MANA_INFUSION:
