@@ -4,13 +4,13 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.base.ModRecipeCreatorDispatcher;
-import fr.eno.craftcreator.recipes.serializers.ModRecipeSerializer;
+import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import fr.eno.craftcreator.screen.widgets.SimpleTextFieldWidget;
 import fr.eno.craftcreator.screen.widgets.buttons.SimpleButton;
 import fr.eno.craftcreator.screen.widgets.buttons.SimpleCheckBox;
 import fr.eno.craftcreator.utils.EntryHelper;
-import fr.eno.craftcreator.utils.ModifiedRecipe;
+import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;
 import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -93,7 +93,7 @@ public class RemoveRecipeManagerScreen extends ListScreen
             this.recipeDescriptors.remove(ModRecipeSerializer.RecipeDescriptors.RECIPE_ID);
 
         if(!this.recipeDescriptors.isEmpty())
-            ModRecipeCreatorDispatcher.getSeralizer(getModId()).addModifiedRecipe(new ModifiedRecipe(ModifiedRecipe.ModifiedRecipeType.REMOVED, recipeDescriptors));
+            ModRecipeCreatorDispatcher.getSeralizer(getModId()).addModifiedRecipe(new KubeJSModifiedRecipe(KubeJSModifiedRecipe.KubeJSModifiedRecipeType.REMOVED, recipeDescriptors));
     }
 
     private String getModId()

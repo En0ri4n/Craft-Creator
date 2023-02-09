@@ -6,12 +6,12 @@ import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.base.ModRecipeCreatorDispatcher;
 import fr.eno.craftcreator.base.SupportedMods;
-import fr.eno.craftcreator.recipes.serializers.ModRecipeSerializer;
+import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.utils.ListEntriesHelper;
 import fr.eno.craftcreator.screen.widgets.DropdownListWidget;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import fr.eno.craftcreator.screen.widgets.buttons.SimpleButton;
-import fr.eno.craftcreator.utils.ModifiedRecipe;
+import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.util.ResourceLocation;
@@ -60,13 +60,13 @@ public class RecipeManagerScreen extends ListScreen
         this.addList(new SimpleListWidget(ClientUtils.getMinecraft(), 10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.recipes"), (entry) ->
         {
             IRecipe<?> recipeToRemove = ((SimpleListWidget.RecipeEntry) entry).getRecipe();
-            ModRecipeCreatorDispatcher.getSeralizer(this.modId).removeRecipe(getCurrentRecipeType(), new ModifiedRecipe(ModifiedRecipe.ModifiedRecipeType.REMOVED, Collections.singletonMap(ModRecipeSerializer.RecipeDescriptors.RECIPE_ID, recipeToRemove.getId().toString())));
+            ModRecipeCreatorDispatcher.getSeralizer(this.modId).removeRecipe(getCurrentRecipeType(), new KubeJSModifiedRecipe(KubeJSModifiedRecipe.KubeJSModifiedRecipeType.REMOVED, Collections.singletonMap(ModRecipeSerializer.RecipeDescriptors.RECIPE_ID, recipeToRemove.getId().toString())), ModRecipeSerializer.SerializerType.KUBE_JS);
             updateLists();
         }));
 
         this.addList(new SimpleListWidget(ClientUtils.getMinecraft(), this.width / 3 + 10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.added_recipes"), (entry) ->
         {
-            ModRecipeSerializer.removeAddedRecipe(((SimpleListWidget.RecipeEntry) entry).getRecipe());
+            ModRecipeCreatorDispatcher.getSeralizer(this.modId).removeAddedRecipeFrom(getCurrentMod(), ((SimpleListWidget.RecipeEntry) entry).getRecipe(), ModRecipeSerializer.SerializerType.KUBE_JS);
             updateLists();
         }));
 

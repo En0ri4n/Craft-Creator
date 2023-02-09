@@ -4,7 +4,7 @@ import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.commands.TestRecipesCommand;
 import fr.eno.craftcreator.init.*;
-import fr.eno.craftcreator.kubejs.KubeJSManager;
+import fr.eno.craftcreator.recipes.kubejs.KubeJSManager;
 import fr.eno.craftcreator.screen.container.BotaniaRecipeCreatorScreen;
 import fr.eno.craftcreator.screen.container.MinecraftRecipeCreatorScreen;
 import fr.eno.craftcreator.screen.container.ThermalRecipeCreatorScreen;

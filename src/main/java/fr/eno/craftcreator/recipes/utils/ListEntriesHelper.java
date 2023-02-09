@@ -4,6 +4,7 @@ import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.base.SupportedMods;
+import fr.eno.craftcreator.recipes.kubejs.KubeJSHelper;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.crafting.IRecipe;
@@ -39,7 +40,7 @@ public class ListEntriesHelper
         }
         else
         {
-            RecipeFileUtils.getAddedRecipesFor(mod, recipeType).forEach(recipe -> entries.add((T) new SimpleListWidget.RecipeEntry(recipe)));
+            KubeJSHelper.getAddedRecipesFor(mod, recipeType).forEach(recipe -> entries.add((T) new SimpleListWidget.RecipeEntry(recipe)));
         }
 
         return entries;
@@ -51,7 +52,7 @@ public class ListEntriesHelper
 
         if(!SupportedMods.isKubeJSLoaded()) return entries;
 
-        RecipeFileUtils.getModifiedRecipes(mod).forEach(modifiedRecipe -> entries.add((T) new SimpleListWidget.ModifiedRecipeEntry(modifiedRecipe)));
+        KubeJSHelper.getModifiedRecipes(mod).forEach(modifiedRecipe -> entries.add((T) new SimpleListWidget.ModifiedRecipeEntry(modifiedRecipe)));
 
         return entries;
     }

@@ -1,15 +1,16 @@
-package fr.eno.craftcreator.recipes.serializers;
+package fr.eno.craftcreator.recipes.base;
 
 import com.google.gson.*;
+import fr.eno.craftcreator.CraftCreator;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.recipes.utils.CraftIngredients;
 import fr.eno.craftcreator.recipes.utils.RecipeEntry;
-import fr.eno.craftcreator.recipes.utils.RecipeFileUtils;
+import fr.eno.craftcreator.recipes.kubejs.KubeJSHelper;
 import fr.eno.craftcreator.serializer.DatapackHelper;
-import fr.eno.craftcreator.utils.ModifiedRecipe;
+import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;
 import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -30,36 +31,35 @@ public abstract class ModRecipeSerializer
 {
     protected static final Gson gson = new GsonBuilder().create();
     protected final SupportedMods mod;
-
+    private SerializerType serializerType;
+    
     public ModRecipeSerializer(SupportedMods mod)
     {
         this.mod = mod;
     }
 
-    public void removeRecipe(IRecipeType<?> recipeType, ModifiedRecipe modifiedRecipe)
+    public void removeRecipe(IRecipeType<?> recipeType, KubeJSModifiedRecipe kubeJSModifiedRecipe, SerializerType serializerType)
     {
-        String serializedRecipe = "event.remove(" + gson.toJson(modifiedRecipe.toJson()) + ")";
-
-        if(!RecipeFileUtils.isModifiedRecipePresent(mod, modifiedRecipe))
-            RecipeFileUtils.addRecipeToFile(this.mod, recipeType, serializedRecipe);
+        if(serializerType == SerializerType.KUBE_JS)
+        {
+            String serializedRecipe = "event.remove(" + gson.toJson(kubeJSModifiedRecipe.toJson()) + ")";
+    
+            if(!KubeJSHelper.isModifiedRecipePresent(mod, kubeJSModifiedRecipe))
+                KubeJSHelper.addModifiedRecipe(mod, serializedRecipe);
+        }
     }
 
-    public void addModifiedRecipe(ModifiedRecipe modifiedRecipe)
+    public void addModifiedRecipe(KubeJSModifiedRecipe kubeJSModifiedRecipe)
     {
-        String serializedRecipe = String.format("event.%s(", modifiedRecipe.getType().getDescriptor()) + gson.toJson(modifiedRecipe.toJson()) + ")";
+        String serializedRecipe = String.format("event.%s(", kubeJSModifiedRecipe.getType().getDescriptor()) + gson.toJson(kubeJSModifiedRecipe.toJson()) + ")";
 
-        if(!RecipeFileUtils.isModifiedRecipePresent(mod, modifiedRecipe))
-            RecipeFileUtils.addModifiedRecipe(this.mod, serializedRecipe);
+        if(!KubeJSHelper.isModifiedRecipePresent(mod, kubeJSModifiedRecipe))
+            KubeJSHelper.addModifiedRecipe(this.mod, serializedRecipe);
     }
 
-    public static <C extends IInventory> void removeAddedRecipe(IRecipe<C> recipe)
+    public static void removeModifiedRecipe(SupportedMods mod, KubeJSModifiedRecipe recipe)
     {
-        RecipeFileUtils.removeAddedRecipe(SupportedMods.getMod(recipe.getId().getNamespace()), recipe);
-    }
-
-    public static void removeModifiedRecipe(SupportedMods mod, ModifiedRecipe recipe)
-    {
-        RecipeFileUtils.removeModifiedRecipe(mod, recipe);
+        KubeJSHelper.removeModifiedRecipe(mod, recipe);
     }
 
     private <C extends IInventory, T extends IRecipe<C>> IRecipe<C> getRecipe(IRecipeType<T> type, IItemProvider result)
@@ -67,15 +67,47 @@ public abstract class ModRecipeSerializer
         RecipeManager manager = ClientUtils.getClientLevel().getRecipeManager();
         return manager.getAllRecipesFor(type).stream().filter(recipe -> recipe.getResultItem().getItem() == result.asItem()).findFirst().orElse(null);
     }
-    protected void addRecipeToKubeJS(String recipeJson, IRecipeType<?> recipeType, ResourceLocation result)
+    
+    protected void addRecipeTo(JsonObject recipeJson, IRecipeType<?> recipeType, ResourceLocation result)
     {
-        RecipeFileUtils.addRecipeToFile(this.mod, recipeType, "event.custom(" + recipeJson + ")");
-        sendSuccessMessage(recipeType, result);
+        Feedback feedback;
+        
+        switch(serializerType)
+        {
+            case KUBE_JS:
+                    feedback = KubeJSHelper.addRecipeToFile(this.mod, recipeType, "event.custom(" + gson.toJson(recipeJson) + ")");
+                break;
+            default:
+            case MINECRAFT_DATAPACK:
+                feedback = DatapackHelper.serializeRecipe(recipeType, result, recipeJson);
+                break;
+        }
+        
+        sendFeedback(feedback, result.getPath(), CommonUtils.getRecipeTypeName(recipeType).getPath());
+    }
+    
+    public <C extends IInventory> void removeAddedRecipeFrom(SupportedMods mod, IRecipe<?> recipe, SerializerType serializerType)
+    {
+        Feedback feedback;
+        
+        switch(serializerType)
+        {
+            case KUBE_JS:
+                feedback = KubeJSHelper.removeAddedRecipe(mod, recipe);
+                break;
+            default:
+            case MINECRAFT_DATAPACK:
+                feedback = Feedback.FILE_ERROR;
+                break;
+        }
+    
+        CraftCreator.LOGGER.debug(feedback.args(recipe.getId().toString()).getString());
     }
 
-    private void sendSuccessMessage(IRecipeType<?> type, ResourceLocation result)
+    private void sendFeedback(Feedback feedback, Object... args)
     {
-        IFormattableTextComponent message = References.getTranslate("message.recipe.added", result.getPath(), CommonUtils.getRecipeTypeName(type).getPath());
+        IFormattableTextComponent message = feedback.args(args);
+        CraftCreator.LOGGER.debug(message.getString());
         ClientUtils.sendClientPlayerMessage(message);
     }
 
@@ -141,19 +173,8 @@ public abstract class ModRecipeSerializer
     protected JsonObject createBaseJson(IRecipeType<?> recipeType)
     {
         JsonObject obj = new JsonObject();
-        RecipeFileUtils.setRecipeType(obj, recipeType);
+        setRecipeType(obj, recipeType);
         return obj;
-    }
-
-    protected void sendFailMessage()
-    {
-        ClientUtils.sendClientPlayerMessage(References.getTranslate("message.recipe_failed"));
-    }
-
-    protected void send(JsonObject recipeJson, IRecipeType<?> recipeType, ResourceLocation output, SerializerType serializerType)
-    {
-        if(serializerType == SerializerType.KUBE_JS) addRecipeToKubeJS(gson.toJson(recipeJson), recipeType, output);
-        else DatapackHelper.serializeRecipe(recipeType, output, recipeJson);
     }
 
     protected void putIfNotEmpty(CraftIngredients inputIngredients, List<Ingredient> ingredients)
@@ -164,21 +185,23 @@ public abstract class ModRecipeSerializer
 
             if(ingredient.getItems().length > 0)
                 count = ingredient.getItems()[0].getCount();
-
-            if(ingredient.toJson().isJsonObject())
+            
+            JsonElement ingredientJson = ingredient.toJson();
+            
+            if(ingredientJson.isJsonObject())
             {
-                if(ingredient.toJson().getAsJsonObject().has("tag"))
-                    inputIngredients.addIngredient(new CraftIngredients.TagIngredient(ClientUtils.parse(ingredient.toJson().getAsJsonObject().get("tag").getAsString()), count));
-                else if(ingredient.toJson().getAsJsonObject().has("item"))
-                    inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(ClientUtils.parse(ingredient.toJson().getAsJsonObject().get("item").getAsString()), count));
+                if(ingredientJson.getAsJsonObject().has("tag"))
+                    inputIngredients.addIngredient(new CraftIngredients.TagIngredient(ClientUtils.parse(ingredientJson.getAsJsonObject().get("tag").getAsString()), count));
+                else if(ingredientJson.getAsJsonObject().has("item"))
+                    inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(ClientUtils.parse(ingredientJson.getAsJsonObject().get("item").getAsString()), count));
             }
             else
             {
-                if(ingredient.toJson().isJsonArray())
+                if(ingredientJson.isJsonArray())
                 {
                     CraftIngredients.MultiItemIngredient multiItemIngredient = new CraftIngredients.MultiItemIngredient(Utils.generateString(16), count);
 
-                    JsonArray ingredientArray = ingredient.toJson().getAsJsonArray();
+                    JsonArray ingredientArray = ingredientJson.getAsJsonArray();
 
                     for(JsonElement value : ingredientArray)
                     {
@@ -206,10 +229,46 @@ public abstract class ModRecipeSerializer
                 inputIngredients.addIngredient(new CraftIngredients.ItemLuckIngredient(stack.getItem().getRegistryName(), stack.getCount(), chances.get(i), description));
         }
     }
+    
+    protected void setRecipeType(JsonObject obj, IRecipeType<?> type)
+    {
+        obj.addProperty("type", CommonUtils.getRecipeTypeName(type).toString());
+    }
 
     public abstract CraftIngredients getOutput(IRecipe<?> recipe);
 
     public abstract CraftIngredients getInput(IRecipe<?> recipe);
+    
+    public void setSerializerType(SerializerType serializerType)
+    {
+        this.serializerType = serializerType;
+    }
+    
+    public enum Feedback
+    {
+        ADDED("serializer.message.recipe.added"),
+        REMOVED("serializer.message.recipe.removed"),
+        EXISTS("serializer.message.recipe.exists"),
+        DONT_EXISTS("serializer.message.recipe.dont_exists"),
+        FILE_ERROR("serializer.message.recipe.error");
+    
+        private final String message;
+    
+        Feedback(String message)
+        {
+            this.message = message;
+        }
+    
+        public String getMessageKey()
+        {
+            return message;
+        }
+        
+        public IFormattableTextComponent args(Object... args)
+        {
+            return References.getTranslate(getMessageKey(), args);
+        }
+    }
 
     public enum RecipeDescriptors
     {
@@ -230,6 +289,15 @@ public abstract class ModRecipeSerializer
         {
             return tag;
         }
+        
+        public static RecipeDescriptors byTag(String tag)
+        {
+            for(RecipeDescriptors descriptor : values())
+                if(descriptor.getTag().equals(tag))
+                    return descriptor;
+            
+            return null;
+        }
     }
 
     public enum SerializerType
@@ -237,5 +305,13 @@ public abstract class ModRecipeSerializer
         MINECRAFT_DATAPACK,
         KUBE_JS
         // CRAFT_TWEAKER ( soon ;) )
+    }
+    
+    public enum SerializerFunction
+    {
+        ADD,
+        REMOVE,
+        REMOVE_ADDED,
+        MODIFY
     }
 }

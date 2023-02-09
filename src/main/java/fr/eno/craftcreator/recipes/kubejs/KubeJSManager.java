@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.kubejs;
+package fr.eno.craftcreator.recipes.kubejs;
 
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.base.SupportedMods;

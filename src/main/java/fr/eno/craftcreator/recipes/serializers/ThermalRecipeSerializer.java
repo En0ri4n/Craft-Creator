@@ -8,6 +8,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import fr.eno.craftcreator.base.SupportedMods;
+import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.utils.CraftIngredients;
 import fr.eno.craftcreator.recipes.utils.RecipeEntry;
 import fr.eno.craftcreator.utils.Utils;
@@ -36,7 +37,7 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
         recipeObj.addProperty("leaves", leaves.getRegistryName().toString());
         recipeObj.add("result", mapToJsonObject(ImmutableMap.of("fluid", Utils.notNull(fluidResult.getRegistryName()), "amount", fluidAmount)));
 
-        addRecipeToKubeJS(gson.toJson(recipeObj), TCoreRecipeTypes.MAPPING_TREE_EXTRACTOR, fluidResult.getRegistryName());
+        addRecipeTo(recipeObj, TCoreRecipeTypes.MAPPING_TREE_EXTRACTOR, fluidResult.getRegistryName());
     }
 
     public void serializePulverizerRecipe(RecipeEntry.Input input, RecipeEntry.MultiOutput outputs, double exp)
@@ -45,7 +46,7 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
         recipeObj.addProperty("experience", exp);
         addIngredients(input, outputs, recipeObj);
 
-        addRecipeToKubeJS(gson.toJson(recipeObj), TCoreRecipeTypes.RECIPE_PULVERIZER, outputs.getOneOutput().registryName());
+        addRecipeTo(recipeObj, TCoreRecipeTypes.RECIPE_PULVERIZER, outputs.getOneOutput().registryName());
     }
 
     public void serializeSawmillRecipe(RecipeEntry.Input input, RecipeEntry.MultiOutput outputs, Integer energy)
@@ -54,7 +55,7 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
         recipeObj.addProperty("energy", energy);
         addIngredients(input, outputs, recipeObj);
 
-        addRecipeToKubeJS(gson.toJson(recipeObj), TCoreRecipeTypes.RECIPE_SAWMILL, outputs.getOneOutput().registryName());
+        addRecipeTo(recipeObj, TCoreRecipeTypes.RECIPE_SAWMILL, outputs.getOneOutput().registryName());
     }
 
     public void serializeSmelterRecipe(List<RecipeEntry.MultiInput> input, RecipeEntry.MultiOutput output, int energy, double experience)
@@ -121,7 +122,7 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
 
         recipeObj.add("result", resultObj);
 
-        addRecipeToKubeJS(gson.toJson(recipeObj), TCoreRecipeTypes.RECIPE_SMELTER, output.getOneOutput().registryName());
+        addRecipeTo(recipeObj, TCoreRecipeTypes.RECIPE_SMELTER, output.getOneOutput().registryName());
     }
 
     public void serializeInsolatorRecipe(RecipeEntry.Input input, RecipeEntry.MultiOutput outputs, double energyMod, double waterMod)
@@ -132,7 +133,7 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
 
         addIngredients(input, outputs, recipeObj);
 
-        addRecipeToKubeJS(gson.toJson(recipeObj), TCoreRecipeTypes.RECIPE_INSOLATOR, outputs.getOneOutput().registryName());
+        addRecipeTo(recipeObj, TCoreRecipeTypes.RECIPE_INSOLATOR, outputs.getOneOutput().registryName());
     }
 
     public void serializePressRecipe(RecipeEntry.Input input, RecipeEntry.Input inputDie, RecipeEntry.Output output, int energy)
@@ -146,7 +147,7 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
         recipeObj.add("ingredients", ingredientsArray);
         recipeObj.add("result", mapToJsonObject(ImmutableMap.of("item", output.registryName(), "count", output.count())));
 
-        addRecipeToKubeJS(gson.toJson(recipeObj), TCoreRecipeTypes.RECIPE_PRESS, output.registryName());
+        addRecipeTo(recipeObj, TCoreRecipeTypes.RECIPE_PRESS, output.registryName());
     }
 
     private void addIngredients(RecipeEntry.Input input, RecipeEntry.MultiOutput outputs, JsonObject obj)
