@@ -12,8 +12,9 @@ public class ModRecipeCreatorDispatcher
 {
     /**
      * Get the serializer for the mod
+     *
      * @param modId the mod id
-     * @return the serializer for the mod (Minecraft Serializer if the mod is not supported)
+     * @return the serializer for the mod (Minecraft Serializer if the mod is not supported, avoid NPE)
      */
     public static ModRecipeSerializer getSeralizer(String modId)
     {

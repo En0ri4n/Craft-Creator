@@ -2,6 +2,7 @@ package fr.eno.craftcreator.recipes.utils;
 
 import fr.eno.craftcreator.References;
 import net.minecraft.block.Block;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
@@ -63,6 +64,24 @@ public class RecipeEntry
         }
     }
 
+    public static class FluidInput extends Input
+    {
+        public FluidInput(Fluid fluid, int amount)
+        {
+            super(false, fluid.getRegistryName(), amount);
+        }
+
+        public Fluid getFluid()
+        {
+            return ForgeRegistries.FLUIDS.getValue(registryName());
+        }
+
+        public int getAmount()
+        {
+            return count();
+        }
+    }
+
     public static class BlockInput extends Input
     {
         public BlockInput(ResourceLocation registryName)
@@ -94,6 +113,24 @@ public class RecipeEntry
         public Item getItem()
         {
             return ForgeRegistries.ITEMS.getValue(registryName());
+        }
+    }
+
+    public static class FluidOutput extends Output
+    {
+        public FluidOutput(Fluid fluid, int amount)
+        {
+            super(fluid.getRegistryName(), amount);
+        }
+
+        public Fluid getFluid()
+        {
+            return ForgeRegistries.FLUIDS.getValue(registryName());
+        }
+
+        public int getAmount()
+        {
+            return count();
         }
     }
 

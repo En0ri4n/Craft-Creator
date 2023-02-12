@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.utils;
+package fr.eno.craftcreator.container.slot.utils;
 
 import net.minecraft.inventory.container.Slot;
 

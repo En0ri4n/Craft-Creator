@@ -4,10 +4,10 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.container.RecipeModifierContainer;
+import fr.eno.craftcreator.container.slot.utils.PositionnedSlot;
 import fr.eno.craftcreator.screen.container.base.TaggeableSlotsContainerScreen;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import fr.eno.craftcreator.screen.widgets.buttons.SimpleButton;
-import fr.eno.craftcreator.utils.PositionnedSlot;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -103,9 +103,15 @@ public class RecipeModifierManagerScreen extends TaggeableSlotsContainerScreen<R
     }
 
     @Override
-    protected List<PositionnedSlot> getTaggeableSlots()
+    protected List<PositionnedSlot> getTaggableSlots()
     {
         return Collections.emptyList();
+    }
+
+    @Override
+    protected List<PositionnedSlot> getNbtTaggableSlots()
+    {
+        return new ArrayList<>();
     }
 
     @Override

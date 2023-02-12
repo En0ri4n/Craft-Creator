@@ -5,12 +5,15 @@ import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.ScreenUtils;
 import fr.eno.craftcreator.utils.Callable;
+import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvents;
 
 import java.util.List;
 
-public class GuiList<T>
+public class GuiList<T> implements IOutsideWidget
 {
     private static final ResourceLocation BACKGROUND_TEXTURE = References.getLoc("textures/gui/container/gui_background.png");
 
@@ -19,6 +22,8 @@ public class GuiList<T>
     private final int keyHeight;
     private List<T> keys;
     private T selectedKey;
+
+    private Rectangle2d area;
 
     public GuiList(int guiListRight, int y, int keyHeight)
     {
@@ -51,9 +56,9 @@ public class GuiList<T>
             boolean isSelected = this.selectedKey != null && this.selectedKey.toString().equals(this.keys.get(i).toString());
 
             if(isSelected)
-                Screen.drawCenteredString(matrixStack, ClientUtils.getFontRenderer(), this.keys.get(i).toString(), x + width / 2 - 3, buttonTitle, 0x0dc70d);
+                Screen.drawCenteredString(matrixStack, ClientUtils.getFontRenderer(), this.keys.get(i).toString(), x + width / 2, buttonTitle, 0x0dc70d);
             else
-                Screen.drawCenteredString(matrixStack, ClientUtils.getFontRenderer(), this.keys.get(i).toString(), x + width / 2 - 3, buttonTitle, 0xFFFFFF);
+                Screen.drawCenteredString(matrixStack, ClientUtils.getFontRenderer(), this.keys.get(i).toString(), x + width / 2, buttonTitle, 0xFFFFFF);
         }
     }
 
@@ -90,7 +95,7 @@ public class GuiList<T>
                 max = width;
         }
 
-        return max + 6;
+        return max;
     }
 
     public void mouseClicked(int mouseX, int mouseY, Callable<T> result)
@@ -105,17 +110,19 @@ public class GuiList<T>
             int x = this.guiListRight - finalWidth + 3;
             int y = this.y + 3 + i * keyHeight + i;
 
-            if(ScreenUtils.isMouseHover(x, y, mouseX, mouseY, width - 6, keyHeight))
+            if(ScreenUtils.isMouseHover(x, y, mouseX, mouseY, finalWidth - 6, keyHeight))
             {
                 if(i >= this.keys.size())
                 {
                     this.setSelectedKey(null);
                     result.run(null);
+                    ClientUtils.getMinecraft().getSoundManager().play(SimpleSound.forUI(SoundEvents.UI_BUTTON_CLICK, 1F));
                     continue;
                 }
 
                 this.setSelectedKey(this.keys.get(i));
                 result.run(this.getSelectedKey());
+                ClientUtils.getMinecraft().getSoundManager().play(SimpleSound.forUI(SoundEvents.UI_BUTTON_CLICK, 1F));
             }
         }
     }
@@ -128,6 +135,7 @@ public class GuiList<T>
     public void setKeys(List<T> keys)
     {
         this.keys = keys;
+        calculateArea();
     }
 
     public T getSelectedKey()
@@ -138,5 +146,20 @@ public class GuiList<T>
     public void setSelectedKey(T selectedKey)
     {
         this.selectedKey = selectedKey;
+    }
+
+    @Override
+    public void calculateArea()
+    {
+        if(getKeys() != null)
+            area = new Rectangle2d(getX(), getY(), getWidth(), getHeight());
+        else
+            area = new Rectangle2d(0, 0, 0, 0);
+    }
+
+    @Override
+    public Rectangle2d getArea()
+    {
+        return area;
     }
 }

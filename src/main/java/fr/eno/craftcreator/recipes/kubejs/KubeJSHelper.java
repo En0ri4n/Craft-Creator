@@ -40,7 +40,7 @@ public class KubeJSHelper
     private static final Pattern RECIPE_PATTERN = Pattern.compile("\n.*event\\.custom\\(([^)]*)\\)");
     private static final Pattern MODIFIED_RECIPE_PATTERN = Pattern.compile("\n.*event\\.(.*)\\(([^)]*)\\)");
     
-    private static final List<Character> TO_ESCAPE = Arrays.asList('$', '(', ')', '{', '}');
+    private static final List<Character> TO_ESCAPE = Arrays.asList('$', '(', ')', '{', '}', '[', ']', '.');
     
     public final static String ADDED_RECIPES_START = "ADDED-RECIPES-START";
     public final static String MODIFIED_RECIPE_START = "REMOVED-RECIPES-START";

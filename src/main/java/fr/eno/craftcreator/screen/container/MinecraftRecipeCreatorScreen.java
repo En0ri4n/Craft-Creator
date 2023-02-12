@@ -6,6 +6,7 @@ import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.base.ModRecipeCreator;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.container.MinecraftRecipeCreatorContainer;
+import fr.eno.craftcreator.container.slot.utils.PositionnedSlot;
 import fr.eno.craftcreator.init.InitPackets;
 import fr.eno.craftcreator.packets.RetrieveRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataServerPacket;
@@ -13,7 +14,6 @@ import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import fr.eno.craftcreator.screen.container.base.MultiScreenModRecipeCreatorScreen;
 import fr.eno.craftcreator.screen.widgets.buttons.BooleanButton;
 import fr.eno.craftcreator.screen.widgets.buttons.pressable.NullPressable;
-import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
@@ -140,9 +140,15 @@ public class MinecraftRecipeCreatorScreen extends MultiScreenModRecipeCreatorScr
     }
 
     @Override
-    protected List<PositionnedSlot> getTaggeableSlots()
+    protected List<PositionnedSlot> getTaggableSlots()
     {
         return SlotHelper.MINECRAFT_SLOTS;
+    }
+
+    @Override
+    protected List<PositionnedSlot> getNbtTaggableSlots()
+    {
+        return SlotHelper.CRAFTING_TABLE_SLOTS_OUTPUT;
     }
 
     @Override

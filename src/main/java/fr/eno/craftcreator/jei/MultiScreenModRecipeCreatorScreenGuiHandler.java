@@ -6,12 +6,12 @@ import net.minecraft.client.renderer.Rectangle2d;
 
 import java.util.List;
 
-public class MultiScreenModRecipeCreatorScreenGuiHandler implements IGuiContainerHandler<MultiScreenModRecipeCreatorScreen<?>>
+public class MultiScreenModRecipeCreatorScreenGuiHandler<T extends MultiScreenModRecipeCreatorScreen<?>> implements IGuiContainerHandler<T>
 {
     public MultiScreenModRecipeCreatorScreenGuiHandler() {}
 
     @Override
-    public List<Rectangle2d> getGuiExtraAreas(MultiScreenModRecipeCreatorScreen<?> containerScreen)
+    public List<Rectangle2d> getGuiExtraAreas(T containerScreen)
     {
         return containerScreen.getExtraAreas();
     }

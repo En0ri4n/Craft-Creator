@@ -597,7 +597,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
             RenderSystem.enableBlend();
             RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
             RenderSystem.translatef(0F, 0F, 100F);
-            RenderSystem.color4f(1F, 1F, 1F, 0.5F);
+            ClientUtils.color4f(1F, 1F, 1F, 0.5F);
             ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(Items.BARRIER), left + yPos, top + yPos);
             RenderSystem.disableBlend();
             RenderSystem.defaultBlendFunc();

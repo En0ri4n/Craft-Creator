@@ -100,14 +100,13 @@ public abstract class ModRecipeSerializer
                 feedback = Feedback.FILE_ERROR;
                 break;
         }
-    
+
         CraftCreator.LOGGER.debug(feedback.args(recipe.getId().toString()).getString());
     }
 
     private void sendFeedback(Feedback feedback, Object... args)
     {
         IFormattableTextComponent message = feedback.args(args);
-        CraftCreator.LOGGER.debug(message.getString());
         ClientUtils.sendClientPlayerMessage(message);
     }
 
@@ -115,6 +114,13 @@ public abstract class ModRecipeSerializer
     {
         JsonArray array = new JsonArray();
         ingredients.getInputs().forEach(recipeInput -> array.add(singletonItemJsonObject(recipeInput)));
+        return array;
+    }
+
+    protected JsonArray getInputArray(RecipeEntry.Input ingredient)
+    {
+        JsonArray array = new JsonArray();
+        array.add(singletonItemJsonObject(ingredient));
         return array;
     }
 
@@ -131,6 +137,35 @@ public abstract class ModRecipeSerializer
         map.put("item", result.registryName().toString());
         if(result.count() > 1)
             map.put("count", result.count());
+
+        return mapToJsonObject(map);
+    }
+
+    protected JsonArray getResultArray(RecipeEntry.MultiOutput results)
+    {
+        JsonArray array = new JsonArray();
+        results.getOutputs().forEach(recipeOutput -> array.add(getResult(recipeOutput)));
+        return array;
+    }
+
+    protected JsonArray getResultArray(RecipeEntry.Output result)
+    {
+        JsonArray array = new JsonArray();
+        array.add(getResult(result));
+        return array;
+    }
+
+    protected JsonObject getInput(RecipeEntry.Input input)
+    {
+        Map<String, Object> map = new HashMap<>();
+
+        if(input.isTag())
+            map.put("tag", input.registryName().toString());
+        else
+            map.put("item", input.registryName().toString());
+
+        if(input.count() > 1)
+            map.put("count", input.count());
 
         return mapToJsonObject(map);
     }

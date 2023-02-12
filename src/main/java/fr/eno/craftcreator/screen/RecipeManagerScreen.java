@@ -51,13 +51,13 @@ public class RecipeManagerScreen extends ListScreen
             this.recipeTypeDropdown.setEntries(DropdownListWidget.Entries.getRecipeTypes(entry.getValue()));
             this.recipeType = ClientUtils.parse(this.recipeTypeDropdown.getEntries().get(0).getValue());
             this.searchField.setValue("");
-            updateLists();
+            updateLists(true);
         }));
 
         addWidget(recipeTypeDropdown = new DropdownListWidget<>(width / 2, 0, 200, 20, 20, DropdownListWidget.Entries.getRecipeTypes(this.modId), (entry) ->
         {
             this.recipeType = ClientUtils.parse(entry.getValue());
-            updateLists();
+            updateLists(true);
         }));
 
 
@@ -65,7 +65,7 @@ public class RecipeManagerScreen extends ListScreen
         {
             IRecipe<?> recipeToRemove = ((SimpleListWidget.RecipeEntry) entry).getRecipe();
             ModRecipeCreatorDispatcher.getSeralizer(this.modId).removeRecipe(getCurrentRecipeType(), new KubeJSModifiedRecipe(KubeJSModifiedRecipe.KubeJSModifiedRecipeType.REMOVED, Collections.singletonMap(ModRecipeSerializer.RecipeDescriptors.RECIPE_ID, recipeToRemove.getId().toString())), ModRecipeSerializer.SerializerType.KUBE_JS);
-            updateLists();
+            updateLists(false);
         }));
         
         this.addWidget(searchField = new SimpleTextFieldWidget(new StringTextComponent(""), ClientUtils.getFontRenderer(), 10, height - 30, this.width / 3 - 35, 20, textField ->
@@ -75,39 +75,39 @@ public class RecipeManagerScreen extends ListScreen
                 this.setEntries(0, ListEntriesHelper.getFilteredRecipes(this.recipeType, textField.getValue()), true);
             }
             else
-                updateLists();
+                updateLists(false);
         }));
 
         this.addButton(new SimpleButton(References.getTranslate("screen.recipe_manager.button.clear_search"), 10 + this.width / 3 - 35 + 2, height - 30, 20, 20, button ->
         {
-            updateLists();
+            updateLists(true);
             this.searchField.setValue("");
         }));
 
         this.addList(new SimpleListWidget(ClientUtils.getMinecraft(), this.width / 3 + 10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.added_recipes"), (entry) ->
         {
             ModRecipeCreatorDispatcher.getSeralizer(this.modId).removeAddedRecipeFrom(getCurrentMod(), ((SimpleListWidget.RecipeEntry) entry).getRecipe(), ModRecipeSerializer.SerializerType.KUBE_JS);
-            updateLists();
+            updateLists(false);
         }));
 
         this.addList(new SimpleListWidget(ClientUtils.getMinecraft(), this.width / 3 * 2 + 10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.modified_recipes"), (entry) ->
         {
             ModRecipeSerializer.removeModifiedRecipe(getCurrentMod(), ((SimpleListWidget.ModifiedRecipeEntry) entry).getRecipe());
-            updateLists();
+            updateLists(false);
         }));
 
-        updateLists();
+        updateLists(true);
         this.getLists().forEach(slw -> slw.setCanHaveSelected(true));
 
         this.addButton(new SimpleButton(References.getTranslate("screen.recipe_manager.button.back"), this.width / 2 - 40, this.height - bottomHeight - 7, 80, 20, button -> ClientUtils.openScreen(null)));
         this.addButton(new SimpleButton(References.getTranslate("screen.recipe_manager.button.modifier_manager"), this.width - 130, this.height - bottomHeight - 7, 120, 20, button -> ClientUtils.openScreen(new RecipeModifierManagerScreen(this))));
     }
 
-    private void updateLists()
+    private void updateLists(boolean resetScroll)
     {
-        this.setEntries(0, ListEntriesHelper.getRecipes(this.recipeType), false);
-        this.setEntries(1, ListEntriesHelper.getAddedRecipesEntryList(getCurrentMod(), this.recipeType), false);
-        this.setEntries(2, ListEntriesHelper.getModifiedRecipesEntryList(getCurrentMod()), false);
+        this.setEntries(0, ListEntriesHelper.getRecipes(this.recipeType), resetScroll);
+        this.setEntries(1, ListEntriesHelper.getAddedRecipesEntryList(getCurrentMod(), this.recipeType), resetScroll);
+        this.setEntries(2, ListEntriesHelper.getModifiedRecipesEntryList(getCurrentMod()), resetScroll);
     }
 
     private SupportedMods getCurrentMod()

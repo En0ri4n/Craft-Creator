@@ -1,12 +1,12 @@
 package fr.eno.craftcreator.recipes.managers;
 
 import fr.eno.craftcreator.base.ModRecipeCreator;
+import fr.eno.craftcreator.container.slot.utils.PositionnedSlot;
 import fr.eno.craftcreator.recipes.base.BaseRecipesManager;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.serializers.MinecraftRecipeSerializer;
 import fr.eno.craftcreator.recipes.utils.RecipeEntry;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
-import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
