@@ -1,9 +1,9 @@
 package fr.eno.craftcreator.base;
 
 import fr.eno.craftcreator.api.CommonUtils;
+import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.serializers.BotaniaRecipeSerializer;
 import fr.eno.craftcreator.recipes.serializers.MinecraftRecipeSerializer;
-import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.serializers.ThermalRecipeSerializer;
 import fr.eno.craftcreator.recipes.utils.CraftIngredients;
 import net.minecraft.item.crafting.IRecipe;

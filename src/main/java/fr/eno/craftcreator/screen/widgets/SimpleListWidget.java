@@ -11,9 +11,9 @@ import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.ScreenUtils;
 import fr.eno.craftcreator.base.ModRecipeCreatorDispatcher;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
+import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;
 import fr.eno.craftcreator.recipes.utils.CraftIngredients;
 import fr.eno.craftcreator.utils.Callable;
-import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.list.AbstractList;
@@ -30,6 +30,7 @@ import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fml.client.gui.GuiUtils;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.lwjgl.glfw.GLFW;
 
@@ -50,7 +51,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
     private final boolean hasTitleBox;
     private Callable<Entry> onSelected;
     private boolean isVisible;
-    private Callable<Entry> onDelete;
+    private final Callable<Entry> onDelete;
     private Entry hoveredEntry;
     private boolean isListHovered;
     private boolean canDisplayTooltips;
@@ -70,6 +71,11 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         this.isVisible = true;
         this.onDelete = onDelete;
         this.canDisplayTooltips = true;
+    }
+    
+    public int getSize()
+    {
+        return this.getItemCount();
     }
 
     public void setCanDisplayTooltips(boolean bool)
@@ -112,9 +118,8 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         BufferBuilder bufferbuilder = tesselator.getBuilder();
 
         // Render background
-        Entry hovered = this.isMouseOver(pMouseX, pMouseY) ? this.getEntryAtPosition(pMouseX, pMouseY) : null;
         ClientUtils.bindTexture(BACKGROUND_TILE);
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        ClientUtils.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         int alpha = 100;
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
         bufferbuilder.vertex(this.x0, this.y1, 0.0D).uv((float) this.x0 / 32.0F, (float) (this.y1 + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, alpha).endVertex();
@@ -143,18 +148,9 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
             }
 
             bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-            bufferbuilder.vertex(scrollbarPosition, this.y1, 0.0D).uv(0.0F, 1.0F).color(0, 0, 0, 255).endVertex();
-            bufferbuilder.vertex(j, this.y1, 0.0D).uv(0.0F, 1.0F).color(0, 0, 0, 255).endVertex();
-            bufferbuilder.vertex(j, this.y0, 0.0D).uv(1.0F, 0.0F).color(0, 0, 0, 255).endVertex();
-            bufferbuilder.vertex(scrollbarPosition, this.y0, 0.0D).uv(0.0F, 0.0F).color(0, 0, 0, 255).endVertex();
-            bufferbuilder.vertex(scrollbarPosition, (i2 + l1), 0.0D).uv(0.0F, 1.0F).color(128, 128, 128, 255).endVertex();
-            bufferbuilder.vertex(j, (i2 + l1), 0.0D).uv(1.0F, 1.0F).color(128, 128, 128, 255).endVertex();
-            bufferbuilder.vertex(j, i2, 0.0D).uv(1.0F, 0.0F).color(128, 128, 128, 255).endVertex();
-            bufferbuilder.vertex(scrollbarPosition, i2, 0.0D).uv(0.0F, 0.0F).color(128, 128, 128, 255).endVertex();
-            bufferbuilder.vertex(scrollbarPosition, (i2 + l1 - 1), 0.0D).uv(0.0F, 1.0F).color(192, 192, 192, 255).endVertex();
-            bufferbuilder.vertex((j - 1), (i2 + l1 - 1), 0.0D).uv(1.0F, 1.0F).color(192, 192, 192, 255).endVertex();
-            bufferbuilder.vertex((j - 1), i2, 0.0D).uv(1.0F, 0.0F).color(192, 192, 192, 255).endVertex();
-            bufferbuilder.vertex(scrollbarPosition, i2, 0.0D).uv(0.0F, 0.0F).color(192, 192, 192, 255).endVertex();
+            ClientUtils.renderQuad(bufferbuilder, scrollbarPosition, this.y0, j, this.y1, 0, 0, 0, 255);
+            ClientUtils.renderQuad(bufferbuilder, scrollbarPosition, i2, j, i2 + l1, 128, 128, 128, 255);
+            ClientUtils.renderQuad(bufferbuilder, scrollbarPosition, i2, j, i2 + 1, 192, 192, 192, 255);
             tesselator.end();
         }
 
@@ -185,14 +181,14 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
                     int i2 = this.x0 + this.width / 2 + rowWidth / 2;
                     RenderSystem.disableTexture();
                     float f = this.isFocused() ? 1.0F : 0.5F;
-                    RenderSystem.color4f(f, f, f, 1.0F);
+                    ClientUtils.color4f(f, f, f, 1.0F);
                     bufferbuilder.begin(7, DefaultVertexFormats.POSITION);
                     bufferbuilder.vertex(l1, (i1 + j1 + 2), 0.0D).endVertex();
                     bufferbuilder.vertex(i2, (i1 + j1 + 2), 0.0D).endVertex();
                     bufferbuilder.vertex(i2, (i1 - 2), 0.0D).endVertex();
                     bufferbuilder.vertex(l1, (i1 - 2), 0.0D).endVertex();
                     tesselator.end();
-                    RenderSystem.color4f(0.0F, 0.0F, 0.0F, 1.0F);
+                    ClientUtils.color4f(0.0F, 0.0F, 0.0F, 1.0F);
                     bufferbuilder.begin(7, DefaultVertexFormats.POSITION);
                     bufferbuilder.vertex((l1 + 1), (i1 + j1 + 1), 0.0D).endVertex();
                     bufferbuilder.vertex((i2 - 1), (i1 + j1 + 1), 0.0D).endVertex();
@@ -255,11 +251,12 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         return true;
     }
 
-    public void setEntries(List<? extends Entry> entries)
+    public void setEntries(List<? extends Entry> entries, boolean resetScroll)
     {
         this.clearEntries();
         entries.forEach(this::addEntry);
-        // this.setScrollAmount(0D);
+        if(resetScroll)
+            this.setScrollAmount(0D);
     }
 
     @Override
@@ -301,11 +298,6 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         {
             entry.renderTooltip(matrixStack, mouseX, mouseY);
         }
-    }
-
-    public void setOnDelete(Callable<Entry> onDelete)
-    {
-        this.onDelete = onDelete;
     }
 
     public boolean isVisible()
@@ -408,8 +400,8 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
             tooltips.add(new StringTextComponent("").withStyle(TextFormatting.DARK_AQUA));
             tooltips.add(References.getTranslate("screen.widget.simple_list.tooltip.output"));
             addToTooltip(output);
-
-            ClientUtils.getCurrentScreen().renderComponentTooltip(matrixStack, tooltips, mouseX, mouseY);
+            
+            GuiUtils.drawHoveringText(matrixStack, tooltips, mouseX, mouseY, ClientUtils.getCurrentScreen().width, ClientUtils.getCurrentScreen().height, -1, ClientUtils.getFontRenderer());
         }
 
         private void addToTooltip(CraftIngredients input)
@@ -637,18 +629,13 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
 
     public static class StringEntry extends Entry
     {
-        private List<ITextComponent> tooltips;
+        private final List<ITextComponent> tooltips;
         private final String resource;
 
         public StringEntry(String resource)
         {
             this.resource = resource;
             this.tooltips = new ArrayList<>();
-        }
-
-        public String getResource()
-        {
-            return resource;
         }
 
         @Override
@@ -671,12 +658,6 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
                 tooltips.clear();
                 ClientUtils.getCurrentScreen().renderComponentTooltip(matrixStack, tooltips, mouseX, mouseY);
             }
-        }
-
-        public StringEntry setTooltips(List<ITextComponent> tooltips)
-        {
-            this.tooltips = tooltips;
-            return this;
         }
     }
 

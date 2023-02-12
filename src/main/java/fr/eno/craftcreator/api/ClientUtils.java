@@ -1,5 +1,6 @@
 package fr.eno.craftcreator.api;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
@@ -8,7 +9,9 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.IHasContainer;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.Container;
@@ -25,7 +28,7 @@ import java.util.function.Supplier;
 /**
  * @author En0ri4n <br>
  * <p>
- * This class contains some useful methods for the client.
+ * class contains some useful methods for the client.
  */
 public class ClientUtils
 {
@@ -204,5 +207,53 @@ public class ClientUtils
         }
 
         return parts;
+    }
+    
+    /**
+     * Calls {@link RenderSystem#color4f(float, float, float, float)}
+     */
+    @SuppressWarnings("deprecation")
+    public static void color4f(float r, float g, float b, float a)
+    {
+        RenderSystem.color4f(r, g, b, a);
+    }
+
+    /**
+     * Render a quad with the specified color<br>
+     * <b>Warning:</b> This method must be called between {@link BufferBuilder#begin(int, VertexFormat)} and {@link BufferBuilder#end()}
+     */
+    public static void renderQuad(BufferBuilder bufferBuilder, int x0, int y0, int x1, int y1, int r, int g, int b, int alpha)
+    {
+        bufferBuilder.vertex(x0, y1, 0.0D).uv(0F, 1F).color(r, g, b, alpha).endVertex();
+        bufferBuilder.vertex(x1, y1, 0.0D).uv(0F, 1F).color(r, g, b, alpha).endVertex();
+        bufferBuilder.vertex(x1, y0, 0.0D).uv(1F, 0F).color(r, g, b, alpha).endVertex();
+        bufferBuilder.vertex(x0, y0, 0.0D).uv(0F, 0F).color(r, g, b, alpha).endVertex();
+    }
+
+    public static void renderBeginQuad(int a, VertexFormat format, BufferBuilder bufferBuilder, int x0, int y0, int x1, int y1, int r, int g, int b, int alpha)
+    {
+        bufferBuilder.begin(a, format);
+        renderQuad(bufferBuilder, x0, y0, x1, y1, r, g, b, alpha);
+    }
+
+    public static void renderEndQuad(BufferBuilder bufferBuilder, int x0, int y0, int x1, int y1, int r, int g, int b, int alpha)
+    {
+        renderQuad(bufferBuilder, x0, y0, x1, y1, r, g, b, alpha);
+        bufferBuilder.end();
+    }
+
+    public static void renderSingleQuad(int a, VertexFormat format, BufferBuilder bufferBuilder, int x0, int y0, int x1, int y1)
+    {
+        renderBeginQuad(a, format, bufferBuilder, x0, y0, x1, y1, 255, 255, 255, 255);
+        bufferBuilder.end();
+    }
+
+    /**
+     * Render a simple quad<br>
+     * <b>Warning:</b> This method must be called between {@link BufferBuilder#begin(int, VertexFormat)} and {@link BufferBuilder#end()}
+     */
+    public static void renderQuad(BufferBuilder bufferBuilder, int x0, int y0, int x1, int y1)
+    {
+        renderQuad(bufferBuilder, x0, y0, x1, y1, 255, 255, 255, 255);
     }
 }

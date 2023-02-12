@@ -31,7 +31,7 @@ public class GuiList<T>
     {
         int width = (getMaxWidth() + 12);
         ClientUtils.bindTexture(BACKGROUND_TEXTURE);
-        ScreenUtils.renderSizedTexture(matrixStack, 4, this.guiListRight - width - 6, y, width + 6, (this.keys.size() + 1) * keyHeight + (this.keys.size() + 1) + 6, 0, 0, 16, 16, 16);
+        ScreenUtils.renderSizedTexture(matrixStack, 4, this.guiListRight - width - 6, y, width + 6, getHeight(), 0, 0, 16, 16, 16);
 
         for(int i = 0; i < this.keys.size() + 1; i++)
         {
@@ -57,7 +57,27 @@ public class GuiList<T>
         }
     }
 
-    private int getMaxWidth()
+    public int getX()
+    {
+        return this.guiListRight - (getMaxWidth() + 12) - 6;
+    }
+
+    public int getY()
+    {
+        return this.y;
+    }
+
+    public int getWidth()
+    {
+        return getMaxWidth() + 12;
+    }
+
+    public int getHeight()
+    {
+        return (this.keys.size() + 1) * keyHeight + (this.keys.size() + 1) + 6;
+    }
+
+    public int getMaxWidth()
     {
         if(this.keys == null) return 0;
 

@@ -32,7 +32,7 @@ public abstract class TaggeableSlotsContainerScreen<T extends Container> extends
     private final Map<SlotItemHandler, ResourceLocation> taggedSlots;
     protected final List<Integer> nbtSlots;
 
-    private GuiList<ResourceLocation> guiTagList;
+    protected GuiList<ResourceLocation> guiTagList;
     private SimpleCheckBox nbtCheckBox;
     private SlotItemHandler selectedSlot;
     private final BlockPos pos;

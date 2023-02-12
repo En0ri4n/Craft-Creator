@@ -53,12 +53,22 @@ public class ButtonGrid<T extends Button>
         }
     }
 
-    protected int getWidth()
+    public int getX()
+    {
+        return x;
+    }
+
+    public int getY()
+    {
+        return y;
+    }
+
+    public int getWidth()
     {
         return buttonSpacing + Math.min(getButtonCount(), buttonPerLine) * (buttonSize + buttonSpacing);
     }
 
-    protected int getHeight()
+    public int getHeight()
     {
         return buttonSpacing + (Math.floorDiv(getButtonCount() - 1, buttonPerLine) + 1) * (buttonSpacing + buttonSize);
     }

@@ -47,6 +47,9 @@ public class MinecraftRecipeManager extends BaseRecipesManager
 
     private void createFurnaceRecipe(ModRecipeCreator recipe, List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, double experience, int cookingTime, boolean isKubeJSRecipe)
     {
+        if(!slots.get(0).hasItem() || !slots.get(1).hasItem()) // Hardcoded for now because of the special fuel slot
+            return;
+
         RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));
         RecipeEntry.Output output = getSingleOutput(slots.get(1));
 
@@ -55,6 +58,9 @@ public class MinecraftRecipeManager extends BaseRecipesManager
 
     public void createSmithingTableRecipe(List<Slot> slots, boolean isKubeJSRecipe)
     {
+        if(isSlotsEmpty(slots, 2, 1))
+            return;
+
         RecipeEntry.Input base = getSingleInput(Collections.emptyMap(), slots.get(0));
         RecipeEntry.Input addition = getSingleInput(Collections.emptyMap(), slots.get(1));
 
@@ -65,6 +71,9 @@ public class MinecraftRecipeManager extends BaseRecipesManager
 
     public void createStoneCutterRecipe(List<Slot> slots, boolean isKubeJSRecipe)
     {
+        if(isSlotsEmpty(slots, 1, 1))
+            return;
+
         RecipeEntry.Input input = getSingleInput(Collections.emptyMap(), slots.get(0));
         RecipeEntry.Output output = getSingleOutput(slots.get(1));
 
@@ -73,6 +82,9 @@ public class MinecraftRecipeManager extends BaseRecipesManager
 
     public void createCraftingTableRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, List<Integer> nbtSlots, boolean shaped, boolean isKubeJSRecipe)
     {
+        if(isSlotsEmpty(slots, 9, 1))
+            return;
+
         ItemStack output = slots.get(9).getItem();
 
         MinecraftRecipeSerializer.get().serializeCraftingTableRecipe(output, slots, taggedSlots, nbtSlots, shaped, isKubeJSRecipe);

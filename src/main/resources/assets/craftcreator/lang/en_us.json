@@ -12,9 +12,8 @@
 	"craftcreator.button.boolean.craftType.on": "Shaped",
 	"craftcreator.button.boolean.craftType.off": "Shapeless",
 
-	"craftcreator.serializer.message.success": "Recipe saved at : §a§n%s",
-	"craftcreator.serializer.message.recipe.added": "Recipe %s -> %s successfully generated !",
-	"craftcreator.serializer.message.recipe.failed": "§cA recipe with the same output already exists !",
+	"craftcreator.serializer.message.recipe.added": "§aRecipe %s §aby %s §asuccessfully generated !",
+	"craftcreator.serializer.message.recipe.exists": "§cThe recipe §4%s §cby §4%s §calready exists !",
 
 	"craftcreator.screen.crafting.info.msg": "§oCtrl + Click on slot to see more options",
 	"craftcreator.screen.crafting.info.nbt": "§oUse NBT tags for this item",
@@ -48,6 +47,7 @@
 	"craftcreator.screen.recipe_manager.list.added_recipes": "Added Recipes",
 	"craftcreator.screen.recipe_manager.list.modified_recipes": "Modified Recipes",
 	"craftcreator.screen.recipe_manager.list.recipes": "Recipes",
+	"craftcreator.screen.recipe_manager.button.clear_search": "X",
 
 	"craftcreator.screen.widget.simple_list.tooltip.input": "§6Input :",
 	"craftcreator.screen.widget.simple_list.tooltip.output": "§2Output :",

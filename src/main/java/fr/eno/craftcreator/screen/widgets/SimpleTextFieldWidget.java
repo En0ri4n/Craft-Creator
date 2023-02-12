@@ -18,7 +18,16 @@ public class SimpleTextFieldWidget extends TextFieldWidget
     @Override
     public boolean keyPressed(int p_231046_1_, int p_231046_2_, int p_231046_3_)
     {
+        boolean flag = super.keyPressed(p_231046_1_, p_231046_2_, p_231046_3_);
         this.onTextChangeCallable.run(this);
-        return super.keyPressed(p_231046_1_, p_231046_2_, p_231046_3_);
+        return flag;
+    }
+    
+    @Override
+    public boolean charTyped(char p_231042_1_, int p_231042_2_)
+    {
+        boolean flag = super.charTyped(p_231042_1_, p_231042_2_);
+        this.onTextChangeCallable.run(this);
+        return flag;
     }
 }

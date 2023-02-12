@@ -5,12 +5,12 @@ import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.base.ModRecipeCreatorDispatcher;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
+import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import fr.eno.craftcreator.screen.widgets.SimpleTextFieldWidget;
 import fr.eno.craftcreator.screen.widgets.buttons.SimpleButton;
 import fr.eno.craftcreator.screen.widgets.buttons.SimpleCheckBox;
 import fr.eno.craftcreator.utils.EntryHelper;
-import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;
 import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -18,7 +18,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
 
 import javax.annotation.Nonnull;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +72,6 @@ public class RemoveRecipeManagerScreen extends ListScreen
         this.addButton(new SimpleButton(References.getTranslate("screen.remove_manager.button.back"), this.width - 97, this.height - 35, 80, 20, (button) -> ClientUtils.openScreen(null)));
 
         this.addList(new SimpleListWidget(ClientUtils.getMinecraft(), 200, 200, 100, 100, 15,  4, 6, new StringTextComponent(""), null));
-        this.setEntries(0, Arrays.asList(new SimpleListWidget.StringEntry("test"), new SimpleListWidget.StringEntry("test2")));
         this.getList(0).setVisible(false);
 
         checkBoxes();
@@ -126,7 +124,7 @@ public class RemoveRecipeManagerScreen extends ListScreen
             this.getList(0).setVisible(false);
         });
 
-        this.setEntries(0, ClientUtils.copyPartialMatches(textFieldWidget.getValue(), entries));
+        this.setEntries(0, ClientUtils.copyPartialMatches(textFieldWidget.getValue(), entries), true);
     }
 
     @Override

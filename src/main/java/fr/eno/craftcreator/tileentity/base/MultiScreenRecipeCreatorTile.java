@@ -42,7 +42,7 @@ public abstract class MultiScreenRecipeCreatorTile extends TaggeableInventoryCon
         }
     }
 
-    private void setCurrentRecipeType(ResourceLocation recipeType)
+    public void setCurrentRecipeType(ResourceLocation recipeType)
     {
         this.currentRecipeType = recipeType;
     }
