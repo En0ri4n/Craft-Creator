@@ -9,6 +9,8 @@ import fr.eno.craftcreator.utils.Callable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.CheckboxButton;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -48,7 +50,7 @@ public class SimpleCheckBox extends CheckboxButton
             this.isHovered = ScreenUtils.isMouseHover(x, y, mouseX, mouseY, width, height);
             ClientUtils.bindTexture(TEXTURE);
             RenderSystem.enableDepthTest();
-            RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.alpha);
+            ClientUtils.color4f(1.0F, 1.0F, 1.0F, this.alpha);
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
@@ -64,7 +66,10 @@ public class SimpleCheckBox extends CheckboxButton
     {
         this.selected = !this.selected;
         if(onPress != null)
+        {
             onPress.run(this);
+            ClientUtils.playSound(SoundEvents.UI_BUTTON_CLICK, 1F, 0.25F, SoundCategory.MASTER, false);
+        }
     }
 
     @Override

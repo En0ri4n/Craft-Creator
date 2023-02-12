@@ -4,14 +4,12 @@ import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.container.base.CommonContainer;
 import fr.eno.craftcreator.container.slot.DefinedSlot;
 import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
+import fr.eno.craftcreator.container.slot.utils.DefinedPositionnedSlot;
+import fr.eno.craftcreator.container.slot.utils.PositionnedSlot;
 import fr.eno.craftcreator.init.InitContainers;
-import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.network.PacketBuffer;
-import vazkii.botania.api.brew.IBrewItem;
 
 public class BotaniaRecipeCreatorContainer extends CommonContainer
 {
@@ -21,21 +19,15 @@ public class BotaniaRecipeCreatorContainer extends CommonContainer
 
         for(int i = 0; i < SlotHelper.BOTANIA_SLOTS_SIZE; i++)
         {
+            PositionnedSlot positionnedSlot = SlotHelper.BOTANIA_SLOTS.get(i);
+
             int x = SlotHelper.BOTANIA_SLOTS.get(i).getxPos();
             int y = SlotHelper.BOTANIA_SLOTS.get(i).getyPos();
 
-            if(PositionnedSlot.contains(SlotHelper.PURE_DAISY_SLOTS_INPUT, i) || PositionnedSlot.isValidSlot(SlotHelper.MANA_INFUSION_SLOTS_INPUT, 1, i))
-            {
-                this.addSlot(new DefinedSlot(tile, i, x, y, is -> Block.byItem(is.getItem()) != Blocks.AIR));
-            }
-            else if(PositionnedSlot.contains(SlotHelper.BREWERY_SLOTS_OUTPUT, i))
-            {
-                this.addSlot(new DefinedSlot(tile, i, x, y, is -> is.getItem() instanceof IBrewItem));
-            }
+            if(positionnedSlot instanceof DefinedPositionnedSlot)
+                this.addSlot(new DefinedSlot(tile, i, x, y, ((DefinedPositionnedSlot) positionnedSlot)::isItemValid));
             else
-            {
                 this.addSlot(new SimpleSlotItemHandler(tile, i, x, y));
-            }
         }
 
         this.bindPlayerInventory(inventory);

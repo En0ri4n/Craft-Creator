@@ -1,5 +1,6 @@
 package fr.eno.craftcreator.base;
 
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.ModList;
 
 import java.util.Arrays;
@@ -49,6 +50,11 @@ public enum SupportedMods
         }
 
         return SupportedMods.MINECRAFT;
+    }
+
+    public List<ResourceLocation> getSupportedRecipeTypes()
+    {
+        return Arrays.stream(ModRecipeCreator.values()).filter(recipeCreator -> recipeCreator.getMod().equals(this)).map(ModRecipeCreator::getRecipeTypeLocation).collect(Collectors.toList());
     }
 
     public static List<SupportedMods> getSupportedLoadedMods()

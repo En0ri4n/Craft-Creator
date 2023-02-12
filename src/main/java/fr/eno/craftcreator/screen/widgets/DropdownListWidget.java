@@ -59,7 +59,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
     {
         this.hovered = ScreenUtils.isMouseHover(x, y, mouseX, mouseY, width, height);
 
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, this.alpha);
+        ClientUtils.color4f(1.0F, 1.0F, 1.0F, this.alpha);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.enableDepthTest();
@@ -275,7 +275,8 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
     {
         public static List<StringEntry> getRecipeTypes(String modid)
         {
-            return Registry.RECIPE_TYPE.stream().filter(type -> CommonUtils.getRecipeTypeName(type).getNamespace().equals(modid)).map(type -> new DropdownListWidget.StringEntry(CommonUtils.getRecipeTypeName(type).toString(), new StringTextComponent(CommonUtils.getRecipeTypeName(type).toString()))).collect(Collectors.toList());
+            // SupportedMods mod = SupportedMods.getMod(modid);
+            return Registry.RECIPE_TYPE.stream().filter(type -> CommonUtils.getRecipeTypeName(type).getNamespace().equals(modid)).map(recipeType -> new DropdownListWidget.StringEntry(CommonUtils.getRecipeTypeName(recipeType).toString(), new StringTextComponent(CommonUtils.getRecipeTypeName(recipeType).toString()))).collect(Collectors.toList()); //od.getSupportedRecipeTypes().stream().map(recipeTypeLocation -> new DropdownListWidget.StringEntry(recipeTypeLocation.toString(), new StringTextComponent(recipeTypeLocation.toString()))).collect(Collectors.toList());
         }
 
         public static List<StringEntry> getModIds()

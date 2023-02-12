@@ -5,6 +5,8 @@ import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.ISound;
+import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.IHasContainer;
 import net.minecraft.client.gui.ScreenManager;
@@ -17,6 +19,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import org.lwjgl.glfw.GLFW;
@@ -230,30 +234,18 @@ public class ClientUtils
         bufferBuilder.vertex(x0, y0, 0.0D).uv(0F, 0F).color(r, g, b, alpha).endVertex();
     }
 
-    public static void renderBeginQuad(int a, VertexFormat format, BufferBuilder bufferBuilder, int x0, int y0, int x1, int y1, int r, int g, int b, int alpha)
-    {
-        bufferBuilder.begin(a, format);
-        renderQuad(bufferBuilder, x0, y0, x1, y1, r, g, b, alpha);
-    }
-
-    public static void renderEndQuad(BufferBuilder bufferBuilder, int x0, int y0, int x1, int y1, int r, int g, int b, int alpha)
-    {
-        renderQuad(bufferBuilder, x0, y0, x1, y1, r, g, b, alpha);
-        bufferBuilder.end();
-    }
-
-    public static void renderSingleQuad(int a, VertexFormat format, BufferBuilder bufferBuilder, int x0, int y0, int x1, int y1)
-    {
-        renderBeginQuad(a, format, bufferBuilder, x0, y0, x1, y1, 255, 255, 255, 255);
-        bufferBuilder.end();
-    }
-
     /**
-     * Render a simple quad<br>
-     * <b>Warning:</b> This method must be called between {@link BufferBuilder#begin(int, VertexFormat)} and {@link BufferBuilder#end()}
+     * Play a sound with given pitch and volume
+     *
+     * @param soundEvent the sound event
+     * @param pitch the pitch
+     * @param volume the volume
+     * @param soundCategory the sound category
+     * @param attenuationLinear if the sound attenuation is linear
+     * @see net.minecraft.client.audio.SimpleSound
      */
-    public static void renderQuad(BufferBuilder bufferBuilder, int x0, int y0, int x1, int y1)
+    public static void playSound(SoundEvent soundEvent, float pitch, float volume, SoundCategory soundCategory, boolean attenuationLinear)
     {
-        renderQuad(bufferBuilder, x0, y0, x1, y1, 255, 255, 255, 255);
+        minecraftSupplier.get().getSoundManager().play(new SimpleSound(soundEvent.getLocation(), soundCategory, volume, pitch, false, 0, attenuationLinear ? ISound.AttenuationType.LINEAR : ISound.AttenuationType.NONE, 0.0D, 0.0D, 0.0D, true));
     }
 }

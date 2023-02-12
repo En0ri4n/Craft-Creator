@@ -6,11 +6,12 @@ import fr.eno.craftcreator.utils.Callable;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.util.SoundEvents;
 
 import java.util.List;
 
-public class ButtonGrid<T extends Button>
+public class ButtonGrid<T extends Button> implements IOutsideWidget
 {
     private final int x;
     private final int y;
@@ -21,6 +22,8 @@ public class ButtonGrid<T extends Button>
     private final Callable<T> onPress;
 
     private boolean isVisible;
+
+    private Rectangle2d area;
 
     public ButtonGrid(int x, int y, int buttonSize, int buttonSpacing, int buttonPerLine,List<T> buttons, Callable<T> onPress)
     {
@@ -73,7 +76,7 @@ public class ButtonGrid<T extends Button>
         return buttonSpacing + (Math.floorDiv(getButtonCount() - 1, buttonPerLine) + 1) * (buttonSpacing + buttonSize);
     }
 
-    public void onMouseClicked(double mouseX, double mouseY, int button)
+    public void onMouseClicked(double mouseX, double mouseY)
     {
         if(isVisible)
         {
@@ -109,10 +112,26 @@ public class ButtonGrid<T extends Button>
     public void setVisible(boolean isVisible)
     {
         this.isVisible = isVisible;
+        calculateArea();
     }
 
     public boolean isVisible()
     {
         return this.isVisible;
+    }
+
+    @Override
+    public void calculateArea()
+    {
+        if(isVisible)
+            this.area = new Rectangle2d(x, y, getWidth(), getHeight());
+        else
+            this.area = new Rectangle2d(0, 0, 0, 0);
+    }
+
+    @Override
+    public Rectangle2d getArea()
+    {
+        return new Rectangle2d(0, 0, 100, 100);
     }
 }

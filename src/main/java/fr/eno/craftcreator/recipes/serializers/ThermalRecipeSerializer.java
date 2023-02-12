@@ -33,8 +33,8 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
     public void serializeTreeExtractorRecipe(Block trunk, Block leaves, Fluid fluidResult, int fluidAmount)
     {
         JsonObject recipeObj = createBaseJson(TCoreRecipeTypes.MAPPING_TREE_EXTRACTOR);
-        recipeObj.addProperty("trunk", trunk.getRegistryName().toString());
-        recipeObj.addProperty("leaves", leaves.getRegistryName().toString());
+        recipeObj.addProperty("trunk", Utils.notNull(trunk.getRegistryName()).toString());
+        recipeObj.addProperty("leaves", Utils.notNull(leaves.getRegistryName()).toString());
         recipeObj.add("result", mapToJsonObject(ImmutableMap.of("fluid", Utils.notNull(fluidResult.getRegistryName()), "amount", fluidAmount)));
 
         addRecipeTo(recipeObj, TCoreRecipeTypes.MAPPING_TREE_EXTRACTOR, fluidResult.getRegistryName());
@@ -150,6 +150,30 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
         addRecipeTo(recipeObj, TCoreRecipeTypes.RECIPE_PRESS, output.registryName());
     }
 
+    public void serializeCentrifugeRecipe(RecipeEntry.Input input, RecipeEntry.MultiOutput outputs, RecipeEntry.FluidOutput fluidOutput, int energy)
+    {
+        JsonObject recipeObj = createBaseJson(TCoreRecipeTypes.RECIPE_CENTRIFUGE);
+        recipeObj.addProperty("energy", energy);
+        recipeObj.add("ingredient", getInput(input));
+        JsonArray resultObj = getResultArray(outputs);
+        resultObj.add(mapToJsonObject(ImmutableMap.of("fluid", fluidOutput.registryName(), "amount", fluidOutput.getAmount())));
+        recipeObj.add("result", resultObj);
+
+        addRecipeTo(recipeObj, TCoreRecipeTypes.RECIPE_CENTRIFUGE, outputs.getOneOutput().registryName());
+    }
+
+    public void serializeChillerRecipe(RecipeEntry.FluidInput inputFluid, RecipeEntry.Input input, RecipeEntry.Output output, int energy)
+    {
+        JsonObject recipeObj = createBaseJson(TCoreRecipeTypes.RECIPE_CHILLER);
+        recipeObj.addProperty("energy", energy);
+        JsonArray inputArray = getInputArray(input);
+        inputArray.add(mapToJsonObject(ImmutableMap.of("fluid", inputFluid.registryName(), "amount", inputFluid.getAmount())));
+        recipeObj.add("ingredients", inputArray);
+        recipeObj.add("result", getResultArray(output));
+
+        addRecipeTo(recipeObj, TCoreRecipeTypes.RECIPE_CHILLER, output.registryName());
+    }
+
     private void addIngredients(RecipeEntry.Input input, RecipeEntry.MultiOutput outputs, JsonObject obj)
     {
         obj.add("ingredient", singletonItemJsonObject(input));
@@ -205,6 +229,32 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
             putIfNotEmpty(inputIngredients, pressRecipe.getInputItems());
             inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", CraftIngredients.DataIngredient.DataUnit.ENERGY, pressRecipe.getEnergy(), false));
         }
+        else if(recipe instanceof FurnaceRecipe)
+        {
+            FurnaceRecipe furnaceRecipe = (FurnaceRecipe) recipe;
+            putIfNotEmpty(inputIngredients, furnaceRecipe.getInputItems());
+            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", CraftIngredients.DataIngredient.DataUnit.ENERGY, furnaceRecipe.getEnergy(), false));
+        }
+        else if(recipe instanceof CentrifugeRecipe)
+        {
+            CentrifugeRecipe centrifugeRecipe = (CentrifugeRecipe) recipe;
+            putIfNotEmpty(inputIngredients, centrifugeRecipe.getInputItems());
+            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", CraftIngredients.DataIngredient.DataUnit.ENERGY, centrifugeRecipe.getEnergy(), false));
+        }
+        else if(recipe instanceof ChillerRecipe)
+        {
+            ChillerRecipe chillerRecipe = (ChillerRecipe) recipe;
+            putIfNotEmpty(inputIngredients, chillerRecipe.getInputItems());
+            if(chillerRecipe.getInputFluids().size() > 0 && chillerRecipe.getInputFluids().get(0).getFluids().length > 0)
+                inputIngredients.addIngredient(new CraftIngredients.FluidIngredient(chillerRecipe.getInputFluids().get(0).getFluids()[0].getFluid().getRegistryName(), chillerRecipe.getInputFluids().get(0).getFluids()[0].getAmount()));
+            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", CraftIngredients.DataIngredient.DataUnit.ENERGY, chillerRecipe.getEnergy(), false));
+        }
+        else if(recipe instanceof CrucibleRecipe)
+        {
+            CrucibleRecipe crucibleRecipe = (CrucibleRecipe) recipe;
+            putIfNotEmpty(inputIngredients, crucibleRecipe.getInputItems());
+            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", CraftIngredients.DataIngredient.DataUnit.ENERGY, crucibleRecipe.getEnergy(), false));
+        }
 
         if(inputIngredients.isEmpty() && recipe instanceof ThermalRecipe)
         {
@@ -247,6 +297,38 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
             PressRecipe pressRecipe = (PressRecipe) recipe;
             for(ItemStack is : pressRecipe.getOutputItems())
                 outputsIngredient.addIngredient(new CraftIngredients.ItemIngredient(is.getItem().getRegistryName(), is.getCount(), "Item"));
+        }
+        else if(recipe instanceof FurnaceRecipe)
+        {
+            FurnaceRecipe furnaceRecipe = (FurnaceRecipe) recipe;
+            for(ItemStack is : furnaceRecipe.getOutputItems())
+                outputsIngredient.addIngredient(new CraftIngredients.ItemIngredient(is.getItem().getRegistryName(), is.getCount(), "Item"));
+            outputsIngredient.addIngredient(new CraftIngredients.DataIngredient("Experience", CraftIngredients.DataIngredient.DataUnit.EXPERIENCE, furnaceRecipe.getXp(), true));
+        }
+        else if(recipe instanceof CentrifugeRecipe)
+        {
+            CentrifugeRecipe centrifugeRecipe = (CentrifugeRecipe) recipe;
+            for(ItemStack is : centrifugeRecipe.getOutputItems())
+                outputsIngredient.addIngredient(new CraftIngredients.ItemIngredient(is.getItem().getRegistryName(), is.getCount(), "Item"));
+            if(centrifugeRecipe.getOutputFluids().size() > 0)
+                outputsIngredient.addIngredient(new CraftIngredients.FluidIngredient(centrifugeRecipe.getOutputFluids().get(0).getFluid().getRegistryName(), centrifugeRecipe.getOutputFluids().get(0).getAmount()));
+        }
+        else if(recipe instanceof ChillerRecipe)
+        {
+            ChillerRecipe chillerRecipe = (ChillerRecipe) recipe;
+            putIfNotEmptyLuckedItems(outputsIngredient, chillerRecipe.getOutputItems(), chillerRecipe.getOutputItemChances(), "Item");
+        }
+        else if(recipe instanceof CrucibleRecipe)
+        {
+            CrucibleRecipe crucibleRecipe = (CrucibleRecipe) recipe;
+            for(ItemStack is : crucibleRecipe.getOutputItems())
+                outputsIngredient.addIngredient(new CraftIngredients.ItemIngredient(is.getItem().getRegistryName(), is.getCount(), "Item"));
+        }
+        else if(recipe instanceof InsolatorRecipe)
+        {
+            InsolatorRecipe insolatorRecipe = (InsolatorRecipe) recipe;
+            putIfNotEmptyLuckedItems(outputsIngredient, insolatorRecipe.getOutputItems(), insolatorRecipe.getOutputItemChances(), "Item");
+            outputsIngredient.addIngredient(new CraftIngredients.DataIngredient("Experience", CraftIngredients.DataIngredient.DataUnit.EXPERIENCE, insolatorRecipe.getXp(), true));
         }
 
         if(outputsIngredient.isEmpty())

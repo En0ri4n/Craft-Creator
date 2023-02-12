@@ -5,8 +5,11 @@ import fr.eno.craftcreator.recipes.utils.RecipeEntry;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.BlockItem;
+import net.minecraft.item.BucketItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -156,5 +159,16 @@ public abstract class BaseRecipesManager
         }
 
         return recipeMultiInput;
+    }
+
+    protected Fluid getFluid(Slot slot)
+    {
+    	if(slot.hasItem() && slot.getItem().getItem() instanceof BucketItem)
+    	{
+    		BucketItem bucket = (BucketItem) slot.getItem().getItem();
+            return bucket.getFluid();
+    	}
+
+    	return Fluids.EMPTY;
     }
 }

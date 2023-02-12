@@ -48,13 +48,15 @@ public class RecipeInfos
         return parameter instanceof RecipeParameterBoolean && ((RecipeParameterBoolean) parameter).getBoolean();
     }
 
-        public <K, V> Map<K, V> getMap(String name)
+    @SuppressWarnings("unchecked")
+    public <K, V> Map<K, V> getMap(String name)
     {
         RecipeParameter parameter = this.getRecipeParameter(name);
         return parameter instanceof RecipeParameterMap ? ((RecipeParameterMap<K, V>) parameter).getMap() : new HashMap<>();
     }
 
-        public <K> List<K> getList(String name)
+    @SuppressWarnings("unchecked")
+    public <K> List<K> getList(String name)
     {
         RecipeParameter parameter = this.getRecipeParameter(name);
         return parameter instanceof RecipeParameterList ? ((RecipeParameterList<K>) parameter).getList() : new ArrayList<>();
@@ -213,7 +215,7 @@ public class RecipeInfos
         public static final String KUBEJS_RECIPE = "kubejs_recipe";
         public static final String NBT_SLOTS = "nbt_slots";
 
-        // Vanilla Furnace Parameters
+        // Vanilla Parameters
         public static final String EXPERIENCE = "experience";
         public static final String COOKING_TIME = "cooking_time";
 
@@ -223,9 +225,10 @@ public class RecipeInfos
 
         // Thermal Parameters
         public static final String ENERGY = "energy";
-        public static final String RESIN_AMOUNT = "resin_amount";
         public static final String ENERGY_MOD = "energy_mod";
         public static final String WATER_MOD = "water_mod";
+        public static final String RESIN_AMOUNT = "resin_amount";
+        public static final String FLUID_AMOUNT = "centrifuge_fluid";
     }
 
     public enum RecipeParameterType
@@ -234,6 +237,9 @@ public class RecipeInfos
         STRING,
         BOOLEAN,
         RESOURCE_LOCATION,
-        STRING_LIST, INT_LIST, EMPTY, MAP
+        STRING_LIST,
+        INT_LIST,
+        EMPTY,
+        MAP
     }
 }

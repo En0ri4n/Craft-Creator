@@ -12,8 +12,9 @@
 	"craftcreator.button.boolean.craftType.on": "Shaped",
 	"craftcreator.button.boolean.craftType.off": "Shapeless",
 
-	"craftcreator.serializer.message.recipe.added": "§aRecipe %s §aby %s §asuccessfully generated !",
-	"craftcreator.serializer.message.recipe.exists": "§cThe recipe §4%s §cby §4%s §calready exists !",
+	"craftcreator.serializer.message.recipe.added": "§aRecipe %s §aby %s §asuccessfully generated",
+	"craftcreator.serializer.message.recipe.exists": "§cRecipe §4%s §cby §4%s §calready exists !",
+	"craftcreator.serializer.message.recipe.removed": "§aCustom recipe %s §asuccessfully removed",
 
 	"craftcreator.screen.crafting.info.msg": "§oCtrl + Click on slot to see more options",
 	"craftcreator.screen.crafting.info.nbt": "§oUse NBT tags for this item",
@@ -99,8 +100,10 @@
 	"craftcreator.screen.thermal_recipe_creator.field.resin_amount": "Resin (mb) :",
 	"craftcreator.screen.thermal_recipe_creator.field.mod_energy": "Speed :",
 	"craftcreator.screen.thermal_recipe_creator.field.mod_water": "Water :",
+	"craftcreator.screen.thermal_recipe_creator.field.fluid": "Fluid (mb) :",
 
 	"craftcreator.screen.thermal_recipe_creator.slot.trunk": "Trunk",
 	"craftcreator.screen.thermal_recipe_creator.slot.leaves": "Leaves",
-    "craftcreator.screen.thermal_recipe_creator.slot.die": "Die"
+    "craftcreator.screen.thermal_recipe_creator.slot.die": "Die",
+	"craftcreator.screen.thermal_recipe_creator.slot.cast": "Cast"
 }

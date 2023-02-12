@@ -5,11 +5,11 @@ import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.base.ModRecipeCreator;
 import fr.eno.craftcreator.container.BotaniaRecipeCreatorContainer;
+import fr.eno.craftcreator.container.slot.utils.PositionnedSlot;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import fr.eno.craftcreator.screen.container.base.MultiScreenModRecipeCreatorScreen;
 import fr.eno.craftcreator.screen.widgets.NumberDataFieldWidget;
 import fr.eno.craftcreator.utils.PairValues;
-import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
@@ -22,6 +22,7 @@ import vazkii.botania.common.block.ModSubtiles;
 import vazkii.botania.common.item.ModItems;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen<BotaniaRecipeCreatorContainer>
@@ -145,9 +146,15 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     }
 
     @Override
-    protected List<PositionnedSlot> getTaggeableSlots()
+    protected List<PositionnedSlot> getTaggableSlots()
     {
         return SlotHelper.BOTANIA_SLOTS;
+    }
+
+    @Override
+    protected List<PositionnedSlot> getNbtTaggableSlots()
+    {
+        return new ArrayList<>();
     }
 
     @Override

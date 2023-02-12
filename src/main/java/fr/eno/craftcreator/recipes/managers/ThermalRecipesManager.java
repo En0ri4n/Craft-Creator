@@ -1,12 +1,12 @@
 package fr.eno.craftcreator.recipes.managers;
 
 import fr.eno.craftcreator.base.ModRecipeCreator;
+import fr.eno.craftcreator.container.slot.utils.PositionnedSlot;
 import fr.eno.craftcreator.recipes.base.BaseRecipesManager;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.serializers.ThermalRecipeSerializer;
 import fr.eno.craftcreator.recipes.utils.RecipeEntry;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
-import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.block.Block;
 import net.minecraft.fluid.Fluid;
@@ -44,15 +44,44 @@ public class ThermalRecipesManager extends BaseRecipesManager
                 createSmelterRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.ENERGY).intValue(), recipeInfos.getValue(RecipeInfos.Parameters.EXPERIENCE).doubleValue(), recipeInfos);
                 break;
             case INSOLATOR:
-                createInsolatorRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.ENERGY_MOD).doubleValue(), recipeInfos.getValue(RecipeInfos.Parameters.WATER_MOD).doubleValue(),
-                        recipeInfos);
+                createInsolatorRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.ENERGY_MOD).doubleValue(), recipeInfos.getValue(RecipeInfos.Parameters.WATER_MOD).doubleValue(), recipeInfos);
                 break;
             case PRESS:
                 createPressRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.ENERGY).intValue());
                 break;
+            case CENTRIFUGE:
+                createCentrifugeRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.ENERGY).intValue(), recipeInfos);
+                break;
+            case CHILLER:
+                createChillerRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.ENERGY).intValue(), recipeInfos);
+                break;
         }
     }
-    
+
+    private void createChillerRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, int energy, RecipeInfos recipeInfos)
+    {
+        if(isSlotsEmpty(slots, SlotHelper.CHILLER_SLOTS_INPUT.size() - 1, SlotHelper.CHILLER_SLOTS_OUTPUT.size())) return;
+
+        RecipeEntry.FluidInput inputFluid = new RecipeEntry.FluidInput(getFluid(slots.get(0)), recipeInfos.getValue(RecipeInfos.Parameters.FLUID_AMOUNT).intValue());
+        RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(1));
+
+        RecipeEntry.Output output = getSingleOutput(slots.get(2));
+
+        ThermalRecipeSerializer.get().serializeChillerRecipe(inputFluid, input, output, energy);
+    }
+
+    private void createCentrifugeRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, int energy, RecipeInfos recipeInfos)
+    {
+        if(isSlotsEmpty(slots, SlotHelper.CENTRIFUGE_SLOTS_INPUT.size(), SlotHelper.CENTRIFUGE_SLOTS_OUTPUT.size())) return;
+
+        RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));
+
+        RecipeEntry.MultiOutput output = getValidOutputs(slots, 1, slots.size() - 2);
+        RecipeEntry.FluidOutput fluidOutput = new RecipeEntry.FluidOutput(getFluid(slots.get(slots.size() - 1)), recipeInfos.getValue(RecipeInfos.Parameters.FLUID_AMOUNT).intValue());
+
+        ThermalRecipeSerializer.get().serializeCentrifugeRecipe(input, output, fluidOutput, energy);
+    }
+
     private void createPressRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, int energy)
     {
         RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));

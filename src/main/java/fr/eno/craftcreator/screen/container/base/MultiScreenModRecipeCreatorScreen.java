@@ -8,6 +8,7 @@ import fr.eno.craftcreator.base.ModRecipeCreator;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.container.base.CommonContainer;
 import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
+import fr.eno.craftcreator.container.slot.utils.PositionnedSlot;
 import fr.eno.craftcreator.init.InitPackets;
 import fr.eno.craftcreator.packets.RetrieveRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataServerPacket;
@@ -20,7 +21,6 @@ import fr.eno.craftcreator.screen.widgets.buttons.ExecuteButton;
 import fr.eno.craftcreator.screen.widgets.buttons.IconButton;
 import fr.eno.craftcreator.screen.widgets.buttons.SimpleButton;
 import fr.eno.craftcreator.screen.widgets.buttons.SimpleCheckBox;
-import fr.eno.craftcreator.utils.PositionnedSlot;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.entity.player.PlayerInventory;
@@ -121,11 +121,8 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     public List<Rectangle2d> getExtraAreas()
     {
         List<Rectangle2d> areas = new ArrayList<>();
-        if(buttonGrid.isVisible())
-            areas.add(new Rectangle2d(buttonGrid.getX(), buttonGrid.getY(), buttonGrid.getWidth(), buttonGrid.getHeight()));
-        if(guiTagList.getKeys() != null)
-            areas.add(new Rectangle2d(guiTagList.getX(), guiTagList.getY(), guiTagList.getWidth(), guiTagList.getHeight()));
-
+        areas.add(guiTagList.getArea());
+        areas.add(buttonGrid.getArea());
         return areas;
     }
     
@@ -294,7 +291,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     {
         this.dataFields.forEach(field -> field.mouseClicked(mouseX, mouseY, button));
         if(!this.buttonGrid.isMouseOver(mouseX, mouseY)) this.buttonGrid.setVisible(false);
-        else this.buttonGrid.onMouseClicked(mouseX, mouseY, button);
+        else this.buttonGrid.onMouseClicked(mouseX, mouseY);
         return super.mouseClicked(mouseX, mouseY, button);
     }
     
