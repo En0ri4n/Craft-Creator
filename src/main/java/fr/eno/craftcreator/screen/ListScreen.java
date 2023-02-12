@@ -36,9 +36,9 @@ public class ListScreen extends Screen
         return this.lists.get(index);
     }
 
-    protected void setEntries(int index, List<? extends SimpleListWidget.Entry> entries)
+    protected void setEntries(int index, List<? extends SimpleListWidget.Entry> entries, boolean resetScroll)
     {
-        this.getList(index).setEntries(entries);
+        this.getList(index).setEntries(entries, resetScroll);
     }
 
     protected void clearLists()

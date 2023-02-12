@@ -17,6 +17,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unchecked")
 public class ListEntriesHelper
 {
     public static <T extends SimpleListWidget.Entry> List<T> getStringEntryList(SupportedMods[] mods)
@@ -77,6 +78,21 @@ public class ListEntriesHelper
             if(!recipe.getId().toString().contains("kjs")) entries.add((E) new SimpleListWidget.RecipeEntry(recipe));
         });
 
+        return entries.stream().sorted(Comparator.comparing(object -> ((SimpleListWidget.RecipeEntry) object).getRecipe().getId().toString())).collect(Collectors.toList());
+    }
+    
+    public static <C extends IInventory, T extends IRecipe<C>, E extends SimpleListWidget.Entry> List<E> getFilteredRecipes(ResourceLocation recipeTypeLoc, String filter)
+    {
+        IRecipeType<T> recipeType = CommonUtils.getRecipeTypeByName(recipeTypeLoc);
+    
+        List<E> entries = new ArrayList<>();
+    
+        ClientUtils.getClientLevel().getRecipeManager().getAllRecipesFor(recipeType).forEach(recipe ->
+        {
+            if(!recipe.getId().toString().contains("kjs") && recipe.getId().toString().contains(filter))
+                entries.add((E) new SimpleListWidget.RecipeEntry(recipe));
+        });
+    
         return entries.stream().sorted(Comparator.comparing(object -> ((SimpleListWidget.RecipeEntry) object).getRecipe().getId().toString())).collect(Collectors.toList());
     }
 }

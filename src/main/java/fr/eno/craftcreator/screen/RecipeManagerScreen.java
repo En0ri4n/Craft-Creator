@@ -7,11 +7,12 @@ import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.base.ModRecipeCreatorDispatcher;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
+import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;
 import fr.eno.craftcreator.recipes.utils.ListEntriesHelper;
 import fr.eno.craftcreator.screen.widgets.DropdownListWidget;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
+import fr.eno.craftcreator.screen.widgets.SimpleTextFieldWidget;
 import fr.eno.craftcreator.screen.widgets.buttons.SimpleButton;
-import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.util.ResourceLocation;
@@ -27,6 +28,8 @@ public class RecipeManagerScreen extends ListScreen
 
     private DropdownListWidget<DropdownListWidget.StringEntry> modDropdown;
     private DropdownListWidget<DropdownListWidget.StringEntry> recipeTypeDropdown;
+    
+    private SimpleTextFieldWidget searchField;
 
     public RecipeManagerScreen()
     {
@@ -47,6 +50,7 @@ public class RecipeManagerScreen extends ListScreen
             this.modId = entry.getValue();
             this.recipeTypeDropdown.setEntries(DropdownListWidget.Entries.getRecipeTypes(entry.getValue()));
             this.recipeType = ClientUtils.parse(this.recipeTypeDropdown.getEntries().get(0).getValue());
+            this.searchField.setValue("");
             updateLists();
         }));
 
@@ -62,6 +66,22 @@ public class RecipeManagerScreen extends ListScreen
             IRecipe<?> recipeToRemove = ((SimpleListWidget.RecipeEntry) entry).getRecipe();
             ModRecipeCreatorDispatcher.getSeralizer(this.modId).removeRecipe(getCurrentRecipeType(), new KubeJSModifiedRecipe(KubeJSModifiedRecipe.KubeJSModifiedRecipeType.REMOVED, Collections.singletonMap(ModRecipeSerializer.RecipeDescriptors.RECIPE_ID, recipeToRemove.getId().toString())), ModRecipeSerializer.SerializerType.KUBE_JS);
             updateLists();
+        }));
+        
+        this.addWidget(searchField = new SimpleTextFieldWidget(new StringTextComponent(""), ClientUtils.getFontRenderer(), 10, height - 30, this.width / 3 - 35, 20, textField ->
+        {
+            if(!textField.getValue().isEmpty())
+            {
+                this.setEntries(0, ListEntriesHelper.getFilteredRecipes(this.recipeType, textField.getValue()), true);
+            }
+            else
+                updateLists();
+        }));
+
+        this.addButton(new SimpleButton(References.getTranslate("screen.recipe_manager.button.clear_search"), 10 + this.width / 3 - 35 + 2, height - 30, 20, 20, button ->
+        {
+            updateLists();
+            this.searchField.setValue("");
         }));
 
         this.addList(new SimpleListWidget(ClientUtils.getMinecraft(), this.width / 3 + 10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.added_recipes"), (entry) ->
@@ -85,9 +105,9 @@ public class RecipeManagerScreen extends ListScreen
 
     private void updateLists()
     {
-        this.setEntries(0, ListEntriesHelper.getRecipes(this.recipeType));
-        this.setEntries(1, ListEntriesHelper.getAddedRecipesEntryList(getCurrentMod(), this.recipeType));
-        this.setEntries(2, ListEntriesHelper.getModifiedRecipesEntryList(getCurrentMod()));
+        this.setEntries(0, ListEntriesHelper.getRecipes(this.recipeType), false);
+        this.setEntries(1, ListEntriesHelper.getAddedRecipesEntryList(getCurrentMod(), this.recipeType), false);
+        this.setEntries(2, ListEntriesHelper.getModifiedRecipesEntryList(getCurrentMod()), false);
     }
 
     private SupportedMods getCurrentMod()
@@ -104,6 +124,7 @@ public class RecipeManagerScreen extends ListScreen
     public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         this.renderBackground(matrixStack);
+        this.searchField.render(matrixStack, mouseX, mouseY, partialTicks);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
         modDropdown.render(matrixStack, mouseX, mouseY, partialTicks);
         recipeTypeDropdown.render(matrixStack, mouseX, mouseY, partialTicks);
