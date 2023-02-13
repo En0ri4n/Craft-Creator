@@ -228,7 +228,10 @@ public class RecipeInfos
         public static final String ENERGY_MOD = "energy_mod";
         public static final String WATER_MOD = "water_mod";
         public static final String RESIN_AMOUNT = "resin_amount";
-        public static final String FLUID_AMOUNT = "centrifuge_fluid";
+        public static final String FLUID_AMOUNT_0 = "fluid_amount_0";
+        public static final String FLUID_AMOUNT_1 = "fluid_amount_1";
+        public static final String FLUID_AMOUNT_2 = "fluid_amount_2";
+        public static final String CHANCE = "chance";
     }
 
     public enum RecipeParameterType

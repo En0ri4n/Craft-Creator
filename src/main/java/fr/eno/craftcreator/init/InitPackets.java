@@ -94,6 +94,7 @@ public class InitPackets
         BOOLEAN,
         FLOAT,
         DOUBLE,
-        MAP_INT_STRING
+        DOUBLE_ARRAY,
+        MAP_INT_RESOURCELOCATION
     }
 }

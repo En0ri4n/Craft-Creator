@@ -79,7 +79,7 @@ public class MinecraftRecipeSerializer extends ModRecipeSerializer
         if(nbtSlots.contains(9))
         {
             resultObj.addProperty("type", "forge:nbt");
-            resultObj.addProperty("nbt", slots.get(9).getItem().getTag().toString());
+            resultObj.addProperty("nbt", slots.get(9).getItem().getTag().toString().replace("\"", "\\\""));
         }
         obj.add("result", resultObj);
 

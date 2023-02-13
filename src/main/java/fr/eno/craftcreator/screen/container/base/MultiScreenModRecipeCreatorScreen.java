@@ -28,6 +28,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
@@ -92,16 +93,18 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
             if(!SupportedMods.isKubeJSLoaded()) this.isKubeJSRecipeButton.visible = false;
         }
         
-        InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("screen_index", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.INT));
-        InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("recipe_type", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.STRING));
-        
         this.addButton(executeButton = new ExecuteButton(this.leftPos + this.imageWidth / 2 - 20, this.topPos + 35, 42, (button) -> RecipeManagerDispatcher.createRecipe(this.getMenu().getMod(), getCurrentRecipe(),
                 this.getMenu().slots.stream().filter(slot -> slot instanceof SimpleSlotItemHandler).collect(Collectors.toList()), getRecipeInfos(), getCurrentSerializerType())));
         
         this.addButton(nextButton = new SimpleButton(References.getTranslate("screen.recipe_creator.button.next"), getArrowXPos(true), this.topPos + this.imageHeight - 66, 10, 20, (button) -> nextPage()));
         this.addButton(previousButton = new SimpleButton(References.getTranslate("screen.recipe_creator.button.previous"), getArrowXPos(false), this.topPos + this.imageHeight - 66, 10, 20, (button) -> previousPage()));
+
+        // Retrieve data from server
+        InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("screen_index", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.INT));
+        InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("recipe_type", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.STRING));
+        InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("fields", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.DOUBLE_ARRAY));
     }
-    
+
     protected ModRecipeSerializer.SerializerType getCurrentSerializerType()
     {
         if(isVanillaScreen && !isKubeJSRecipeButton.selected()) return ModRecipeSerializer.SerializerType.MINECRAFT_DATAPACK;
@@ -116,6 +119,20 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         
         if(dataName.equals("screen_index")) this.setCurrentScreenIndex((Integer) data);
         else if(dataName.equals("kubejs_recipe") && isVanillaScreen) this.isKubeJSRecipeButton.setSelected((boolean) data);
+        else if(dataName.equals("fields")) this.setFields((double[]) data);
+    }
+
+    private void setFields(double[] data)
+    {
+        for(int i = 0; i < data.length; i++)
+        {
+            setDataFieldValue(data[i], getDataField(i).isDouble(), i);
+        }
+    }
+
+    private double[] getFields()
+    {
+        return this.dataFields.stream().map(NumberDataFieldWidget::getValue).mapToDouble(str -> str.isEmpty() ? 1D : Double.parseDouble(str)).toArray();
     }
 
     public List<Rectangle2d> getExtraAreas()
@@ -151,8 +168,8 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     }
     
     /**
-     * This method is called when the arrow buttons are pressed.
-     * It is used to change the screen. To Override.
+     * This method is called when the screen change.<br>
+     * To Override to perform changes between screens.
      */
     protected void updateScreen()
     {
@@ -178,11 +195,11 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         }
     }
     
-    protected void setDataFieldValue(Number defaultValue, int... index)
+    protected void setDataFieldValue(Number defaultValue, boolean isDouble, int... index)
     {
         for(int i : index)
         {
-            this.dataFields.get(i).setNumberValue(defaultValue);
+            this.dataFields.get(i).setNumberValue(defaultValue, isDouble);
         }
     }
     
@@ -210,10 +227,15 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         setDataFieldSize(index, width);
     }
     
-    protected void setDataField(int index, int x, int y, int width, Number value)
+    protected void setDataField(int index, int x, int y, int width, Number value, boolean isDouble)
     {
         setDataFieldPosAndSize(index, x, y, width);
-        setDataFieldValue(value, index);
+        setDataFieldValue(value, isDouble, index);
+    }
+
+    protected void setDataFieldTooltip(int index, IFormattableTextComponent tooltip)
+    {
+        getDataField(index).setTooltip(tooltip);
     }
     
     protected void setExecuteButtonPos(int x, int y)
@@ -267,7 +289,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         matrixStack.popPose();
     }
     
-    protected NumberDataFieldWidget getNumberField(int index)
+    protected NumberDataFieldWidget getDataField(int index)
     {
         return this.dataFields.get(index);
     }
@@ -282,7 +304,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     @Override
     public boolean charTyped(char codePoint, int modifiers)
     {
-        if(Character.isDigit(codePoint) || codePoint == '.') this.dataFields.forEach(field -> field.charTyped(codePoint, modifiers));
+        this.dataFields.forEach(field -> field.charTyped(codePoint, modifiers));
         return super.charTyped(codePoint, modifiers);
     }
     
@@ -375,7 +397,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     {
         for(int i = 0; i < count; i++)
         {
-            NumberDataFieldWidget numberDataFieldWidget = new NumberDataFieldWidget(this.font, x, y, width, 10, defaultValue);
+            NumberDataFieldWidget numberDataFieldWidget = new NumberDataFieldWidget(this.font, x, y, width, 10, defaultValue, defaultValue instanceof Double);
             numberDataFieldWidget.setValue(String.valueOf(defaultValue));
             this.dataFields.add(numberDataFieldWidget);
         }
@@ -393,10 +415,12 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         this.getMenu().getTile().setCurrentRecipeType(CommonUtils.getRecipeTypeName(getCurrentRecipe().getRecipeType()));
     }
     
-    private void updateServerData()
+    protected void updateServerData()
     {
         InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("screen_index", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.INT, this.currentScreenIndex));
         InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("recipe_type", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.STRING, CommonUtils.getRecipeTypeName(getCurrentRecipe().getRecipeType()).toString()));
+        InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("fields", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.DOUBLE_ARRAY, getFields()));
+        if(isVanillaScreen) InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("kubejs_recipe", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.BOOLEAN, this.isKubeJSRecipeButton.selected()));
     }
     
     protected void updateSlots()
@@ -404,12 +428,12 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         this.getMenu().activeSlots(false);
         this.getCurrentRecipe().getSlots().forEach(ds -> this.getMenu().slots.stream().filter(s -> s.getSlotIndex() == ds.getIndex() && s instanceof SimpleSlotItemHandler).findFirst().ifPresent(slot -> ((SimpleSlotItemHandler) slot).setActive(true)));
     }
-    
+
     @Override
     public void onClose()
     {
         super.onClose();
-        
-        if(isVanillaScreen) InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("kubejs_recipe", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.BOOLEAN, this.isKubeJSRecipeButton.selected()));
+
+        updateServerData();
     }
 }

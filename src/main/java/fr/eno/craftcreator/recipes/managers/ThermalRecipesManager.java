@@ -38,71 +38,118 @@ public class ThermalRecipesManager extends BaseRecipesManager
                 createPulverizerRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.EXPERIENCE).doubleValue(), recipeInfos);
                 break;
             case SAWMILL:
-                createSawmillRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.ENERGY).intValue(), recipeInfos);
+                createSawmillRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos);
                 break;
             case SMELTER:
-                createSmelterRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.ENERGY).intValue(), recipeInfos.getValue(RecipeInfos.Parameters.EXPERIENCE).doubleValue(), recipeInfos);
+                createSmelterRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.EXPERIENCE).doubleValue(), recipeInfos);
                 break;
             case INSOLATOR:
-                createInsolatorRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.ENERGY_MOD).doubleValue(), recipeInfos.getValue(RecipeInfos.Parameters.WATER_MOD).doubleValue(), recipeInfos);
+                createInsolatorRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.WATER_MOD).doubleValue(), recipeInfos);
                 break;
             case PRESS:
-                createPressRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.ENERGY).intValue());
+                createPressRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos);
                 break;
             case CENTRIFUGE:
-                createCentrifugeRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.ENERGY).intValue(), recipeInfos);
+                createCentrifugeRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos);
                 break;
             case CHILLER:
-                createChillerRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.ENERGY).intValue(), recipeInfos);
+                createChillerRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos);
+                break;
+            case CRUCIBLE:
+                createCrucibleRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos);
+                break;
+            case REFINERY:
+                createRefineryRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos);
+                break;
+            case BOTTLER:
+                createBottlerRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos);
                 break;
         }
     }
 
-    private void createChillerRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, int energy, RecipeInfos recipeInfos)
+    private void createBottlerRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, RecipeInfos recipeInfos)
+    {
+        if(isSlotsEmpty(slots, SlotHelper.BOTTLER_SLOTS_INPUT.size(), SlotHelper.BOTTLER_SLOTS_OUTPUT.size())) return;
+
+        RecipeEntry.FluidInput inputFluid = new RecipeEntry.FluidInput(getFluid(slots.get(0)), recipeInfos.getValue(RecipeInfos.Parameters.FLUID_AMOUNT_0).intValue());
+
+        RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(1));
+
+        RecipeEntry.Output output = new RecipeEntry.Output(slots.get(2).getItem().getItem().getRegistryName(), slots.get(2).getItem().getCount());
+
+        ThermalRecipeSerializer.get().serializeBottlerRecipe(input, inputFluid, output, recipeInfos.getValue(RecipeInfos.Parameters.ENERGY), recipeInfos.getBoolean(RecipeInfos.Parameters.ENERGY_MOD));
+    }
+
+    private void createRefineryRecipe(List<Slot> slots, RecipeInfos recipeInfos)
+    {
+        if(isSlotsEmpty(slots, SlotHelper.REFINERY_SLOTS_INPUT.size(), SlotHelper.REFINERY_SLOTS_OUTPUT.size())) return;
+
+        RecipeEntry.FluidInput inputFluid = new RecipeEntry.FluidInput(getFluid(slots.get(0)), recipeInfos.getValue(RecipeInfos.Parameters.FLUID_AMOUNT_0).intValue());
+
+        RecipeEntry.LuckedOutput outputItem = new RecipeEntry.LuckedOutput(slots.get(1).getItem().getItem().getRegistryName(), slots.get(1).getItem().getCount(), recipeInfos.getValue(RecipeInfos.Parameters.CHANCE).doubleValue());
+
+        RecipeEntry.FluidOutput outputFluid = new RecipeEntry.FluidOutput(getFluid(slots.get(2)), recipeInfos.getValue(RecipeInfos.Parameters.FLUID_AMOUNT_1).intValue());
+        RecipeEntry.FluidOutput secondOutputFluid = new RecipeEntry.FluidOutput(getFluid(slots.get(3)), recipeInfos.getValue(RecipeInfos.Parameters.FLUID_AMOUNT_2).intValue());
+
+        ThermalRecipeSerializer.get().serializeRefineryRecipe(inputFluid, outputItem, outputFluid, secondOutputFluid, recipeInfos.getValue(RecipeInfos.Parameters.ENERGY), recipeInfos.getBoolean(RecipeInfos.Parameters.ENERGY_MOD));
+    }
+
+    private void createCrucibleRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, RecipeInfos recipeInfos)
+    {
+        if(isSlotsEmpty(slots, SlotHelper.CRUCIBLE_SLOTS_INPUT.size(), SlotHelper.CRUCIBLE_SLOTS_OUTPUT.size())) return;
+
+        RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));
+
+        RecipeEntry.FluidOutput output = new RecipeEntry.FluidOutput(getFluid(slots.get(1)), recipeInfos.getValue(RecipeInfos.Parameters.FLUID_AMOUNT_0).intValue());
+
+        ThermalRecipeSerializer.get().serializeCrucibleRecipe(input, output, recipeInfos.getValue(RecipeInfos.Parameters.ENERGY), recipeInfos.getBoolean(RecipeInfos.Parameters.ENERGY_MOD));
+    }
+
+    private void createChillerRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, RecipeInfos recipeInfos)
     {
         if(isSlotsEmpty(slots, SlotHelper.CHILLER_SLOTS_INPUT.size() - 1, SlotHelper.CHILLER_SLOTS_OUTPUT.size())) return;
 
-        RecipeEntry.FluidInput inputFluid = new RecipeEntry.FluidInput(getFluid(slots.get(0)), recipeInfos.getValue(RecipeInfos.Parameters.FLUID_AMOUNT).intValue());
+        RecipeEntry.FluidInput inputFluid = new RecipeEntry.FluidInput(getFluid(slots.get(0)), recipeInfos.getValue(RecipeInfos.Parameters.FLUID_AMOUNT_0).intValue());
         RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(1));
 
         RecipeEntry.Output output = getSingleOutput(slots.get(2));
 
-        ThermalRecipeSerializer.get().serializeChillerRecipe(inputFluid, input, output, energy);
+        ThermalRecipeSerializer.get().serializeChillerRecipe(inputFluid, input, output, recipeInfos.getValue(RecipeInfos.Parameters.ENERGY), recipeInfos.getBoolean(RecipeInfos.Parameters.ENERGY_MOD));
     }
 
-    private void createCentrifugeRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, int energy, RecipeInfos recipeInfos)
+    private void createCentrifugeRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, RecipeInfos recipeInfos)
     {
         if(isSlotsEmpty(slots, SlotHelper.CENTRIFUGE_SLOTS_INPUT.size(), SlotHelper.CENTRIFUGE_SLOTS_OUTPUT.size())) return;
 
         RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));
 
         RecipeEntry.MultiOutput output = getValidOutputs(slots, 1, slots.size() - 2);
-        RecipeEntry.FluidOutput fluidOutput = new RecipeEntry.FluidOutput(getFluid(slots.get(slots.size() - 1)), recipeInfos.getValue(RecipeInfos.Parameters.FLUID_AMOUNT).intValue());
+        RecipeEntry.FluidOutput fluidOutput = new RecipeEntry.FluidOutput(getFluid(slots.get(slots.size() - 1)), recipeInfos.getValue(RecipeInfos.Parameters.FLUID_AMOUNT_0).intValue());
 
-        ThermalRecipeSerializer.get().serializeCentrifugeRecipe(input, output, fluidOutput, energy);
+        ThermalRecipeSerializer.get().serializeCentrifugeRecipe(input, output, fluidOutput, recipeInfos.getValue(RecipeInfos.Parameters.ENERGY), recipeInfos.getBoolean(RecipeInfos.Parameters.ENERGY_MOD));
     }
 
-    private void createPressRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, int energy)
+    private void createPressRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, RecipeInfos recipeInfos)
     {
         RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));
         RecipeEntry.Input inputDie = getSingleInput(taggedSlots, slots.get(1));
         
         RecipeEntry.Output output = getSingleOutput(slots.get(2));
         
-        ThermalRecipeSerializer.get().serializePressRecipe(input, inputDie, output, energy);
+        ThermalRecipeSerializer.get().serializePressRecipe(input, inputDie, output, recipeInfos.getValue(RecipeInfos.Parameters.ENERGY), recipeInfos.getBoolean(RecipeInfos.Parameters.ENERGY_MOD));
     }
     
-    private void createInsolatorRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, double energyMod, double waterMod, RecipeInfos recipeInfos)
+    private void createInsolatorRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, double waterMod, RecipeInfos recipeInfos)
     {
         if(isSlotsEmpty(slots, SlotHelper.INSOLATOR_SLOTS_INPUT.size(), SlotHelper.INSOLATOR_SLOTS_OUTPUT.size())) return;
         
         RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));
         RecipeEntry.MultiOutput output = getLuckedOutputs(slots, recipeInfos);
         
-        ThermalRecipeSerializer.get().serializeInsolatorRecipe(input, output, energyMod, waterMod);
+        ThermalRecipeSerializer.get().serializeInsolatorRecipe(input, output, waterMod, recipeInfos.getValue(RecipeInfos.Parameters.ENERGY), recipeInfos.getBoolean(RecipeInfos.Parameters.ENERGY_MOD));
     }
     
-    private void createSmelterRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, int energy, double experience, RecipeInfos recipeInfos)
+    private void createSmelterRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, double experience, RecipeInfos recipeInfos)
     {
         if(isSlotsEmpty(slots, SlotHelper.SMELTER_SLOTS_INPUT.size(), SlotHelper.SMELTER_SLOTS_OUTPUT.size())) return;
         
@@ -136,7 +183,7 @@ public class ThermalRecipesManager extends BaseRecipesManager
             output.add(new RecipeEntry.LuckedOutput(slot.getItem().getItem().getRegistryName(), slot.getItem().getCount(), recipeInfos.getValue("chance_" + k).doubleValue()));
         }
         
-        ThermalRecipeSerializer.get().serializeSmelterRecipe(input, output, energy, experience);
+        ThermalRecipeSerializer.get().serializeSmelterRecipe(input, output, experience, recipeInfos.getValue(RecipeInfos.Parameters.ENERGY), recipeInfos.getBoolean(RecipeInfos.Parameters.ENERGY_MOD));
     }
     
     private void createTreeExtractorRecipe(List<Slot> slots, int resin_amount)
@@ -159,17 +206,17 @@ public class ThermalRecipesManager extends BaseRecipesManager
         RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));
         RecipeEntry.MultiOutput output = getLuckedOutputs(slots, recipeInfos);
         
-        ThermalRecipeSerializer.get().serializePulverizerRecipe(input, output, experience);
+        ThermalRecipeSerializer.get().serializePulverizerRecipe(input, output, experience, recipeInfos.getValue(RecipeInfos.Parameters.ENERGY), recipeInfos.getBoolean(RecipeInfos.Parameters.ENERGY_MOD));
     }
     
-    private void createSawmillRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, int energy, RecipeInfos recipeInfos)
+    private void createSawmillRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, RecipeInfos recipeInfos)
     {
         if(isSlotsEmpty(slots, SlotHelper.SAWMILL_SLOTS_INPUT.size(), SlotHelper.SAWMILL_SLOTS_OUTPUT.size())) return;
         
         RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));
         RecipeEntry.MultiOutput output = getLuckedOutputs(slots, recipeInfos);
         
-        ThermalRecipeSerializer.get().serializeSawmillRecipe(input, output, energy);
+        ThermalRecipeSerializer.get().serializeSawmillRecipe(input, output, recipeInfos.getValue(RecipeInfos.Parameters.ENERGY), recipeInfos.getBoolean(RecipeInfos.Parameters.ENERGY_MOD));
     }
     
     private RecipeEntry.MultiOutput getLuckedOutputs(List<Slot> slots, RecipeInfos recipeInfos)
@@ -191,7 +238,7 @@ public class ThermalRecipesManager extends BaseRecipesManager
         
         return outputs;
     }
-    
+
     public static ThermalRecipesManager get()
     {
         return INSTANCE;

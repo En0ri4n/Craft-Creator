@@ -57,7 +57,7 @@ public abstract class TaggeableSlotsContainerScreen<T extends Container> extends
 
         if(this.pos != null)
         {
-            InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("tagged_slots", this.pos, InitPackets.PacketDataType.MAP_INT_STRING));
+            InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("tagged_slots", this.pos, InitPackets.PacketDataType.MAP_INT_RESOURCELOCATION));
             InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("nbt_slots", this.pos, InitPackets.PacketDataType.INT_ARRAY));
         }
 
@@ -111,7 +111,7 @@ public abstract class TaggeableSlotsContainerScreen<T extends Container> extends
     {
         if(this.pos != null)
         {
-            InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("tagged_slots", this.pos, InitPackets.PacketDataType.MAP_INT_STRING, getTagged(this.taggedSlots)));
+            InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("tagged_slots", this.pos, InitPackets.PacketDataType.MAP_INT_RESOURCELOCATION, getTagged(this.taggedSlots)));
             InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("nbt_slots", this.pos, InitPackets.PacketDataType.INT_ARRAY, getNbtSlots(this.nbtSlots)));
         }
     }

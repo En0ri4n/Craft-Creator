@@ -13,6 +13,7 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
+
 /**
  * Update the data of the opened recipe creator and the CLIENT tile entity
  */
@@ -22,7 +23,7 @@ public class UpdateRecipeCreatorTileDataClientPacket
     private final BlockPos pos;
     private final InitPackets.PacketDataType dataType;
     private final Object data;
-    
+
     /**
      * Update the data of the opened recipe creator and the CLIENT tile entity
      *
@@ -38,14 +39,14 @@ public class UpdateRecipeCreatorTileDataClientPacket
         this.dataType = dataType;
         this.data = data;
     }
-    
+
     @SuppressWarnings("unchecked")
     public static void encode(UpdateRecipeCreatorTileDataClientPacket msg, PacketBuffer packetBuffer)
     {
         packetBuffer.writeUtf(msg.dataName);
         packetBuffer.writeInt(msg.dataType.ordinal());
         packetBuffer.writeBlockPos(msg.pos);
-        
+
         switch(msg.dataType)
         {
             case INT:
@@ -54,13 +55,19 @@ public class UpdateRecipeCreatorTileDataClientPacket
             case INT_ARRAY:
                 packetBuffer.writeVarIntArray((int[]) msg.data);
                 break;
+            case DOUBLE_ARRAY:
+                double[] doubleArray = (double[]) msg.data;
+                packetBuffer.writeInt(doubleArray.length);
+                for(double d1 : doubleArray)
+                    packetBuffer.writeDouble(d1);
+                break;
             case STRING:
                 packetBuffer.writeUtf((String) msg.data);
                 break;
             case BOOLEAN:
                 packetBuffer.writeBoolean((boolean) msg.data);
                 break;
-            case MAP_INT_STRING:
+            case MAP_INT_RESOURCELOCATION:
                 Map<Integer, ResourceLocation> map = (Map<Integer, ResourceLocation>) msg.data;
                 packetBuffer.writeInt(map.size());
                 map.forEach((index, loc) ->
@@ -71,24 +78,29 @@ public class UpdateRecipeCreatorTileDataClientPacket
                 break;
         }
     }
-    
+
     public static UpdateRecipeCreatorTileDataClientPacket decode(PacketBuffer packetBuffer)
     {
         String dataName = packetBuffer.readUtf();
         InitPackets.PacketDataType dataType = InitPackets.PacketDataType.values()[packetBuffer.readInt()];
         BlockPos pos = packetBuffer.readBlockPos();
-        
+
         switch(dataType)
         {
             case INT:
                 return new UpdateRecipeCreatorTileDataClientPacket(dataName, pos, dataType, packetBuffer.readInt());
             case INT_ARRAY:
                 return new UpdateRecipeCreatorTileDataClientPacket(dataName, pos, dataType, packetBuffer.readVarIntArray());
+            case DOUBLE_ARRAY:
+                double[] doubleArray = new double[packetBuffer.readInt()];
+                for(int i = 0; i < doubleArray.length; i++)
+                    doubleArray[i] = packetBuffer.readDouble();
+                return new UpdateRecipeCreatorTileDataClientPacket(dataName, pos, dataType, doubleArray);
             case STRING:
                 return new UpdateRecipeCreatorTileDataClientPacket(dataName, pos, dataType, packetBuffer.readUtf());
             case BOOLEAN:
                 return new UpdateRecipeCreatorTileDataClientPacket(dataName, pos, dataType, packetBuffer.readBoolean());
-            case MAP_INT_STRING:
+            case MAP_INT_RESOURCELOCATION:
                 Map<Integer, ResourceLocation> map = new HashMap<>();
                 int size = packetBuffer.readInt();
                 for(int i = 0; i < size; i++)
@@ -98,7 +110,7 @@ public class UpdateRecipeCreatorTileDataClientPacket
                 return new UpdateRecipeCreatorTileDataClientPacket(dataName, pos, dataType, -1);
         }
     }
-    
+
     public static class ClientHandler
     {
         /**
@@ -110,13 +122,13 @@ public class UpdateRecipeCreatorTileDataClientPacket
             {
                 ((ModRecipeCreatorDataScreen<?>) ClientUtils.getCurrentScreen()).setData(msg.dataName, msg.data);
             }
-            
+
             if(ClientUtils.getClientLevel().getBlockEntity(msg.pos) instanceof MultiScreenRecipeCreatorTile)
             {
                 MultiScreenRecipeCreatorTile tileEntity = (MultiScreenRecipeCreatorTile) ClientUtils.getClientLevel().getBlockEntity(msg.pos);
                 Utils.notNull(tileEntity).setData(msg.dataName, msg.data);
             }
-            
+
             ctx.get().setPacketHandled(true);
         }
     }

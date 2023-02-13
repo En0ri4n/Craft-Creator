@@ -3,14 +3,12 @@ package fr.eno.craftcreator.screen.widgets;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.api.ScreenUtils;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.utils.Callable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -138,14 +136,14 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
 
     protected int getMaxPosition()
     {
-        return this.entries.size() * this.itemHeight + this.height;
+        return this.entries.size() * this.itemHeight + height + itemHeight * 2;
     }
 
     @Nonnull
     @Override
     public ITextComponent getMessage()
     {
-        return this.selected.getDisplayName();
+        return this.getSelectedEntry().getDisplayName();
     }
 
     @Override
@@ -275,8 +273,8 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
     {
         public static List<StringEntry> getRecipeTypes(String modid)
         {
-            // SupportedMods mod = SupportedMods.getMod(modid);
-            return Registry.RECIPE_TYPE.stream().filter(type -> CommonUtils.getRecipeTypeName(type).getNamespace().equals(modid)).map(recipeType -> new DropdownListWidget.StringEntry(CommonUtils.getRecipeTypeName(recipeType).toString(), new StringTextComponent(CommonUtils.getRecipeTypeName(recipeType).toString()))).collect(Collectors.toList()); //od.getSupportedRecipeTypes().stream().map(recipeTypeLocation -> new DropdownListWidget.StringEntry(recipeTypeLocation.toString(), new StringTextComponent(recipeTypeLocation.toString()))).collect(Collectors.toList());
+            SupportedMods mod = SupportedMods.getMod(modid);
+            return mod.getSupportedRecipeTypes().stream().map(recipeTypeLocation -> new StringEntry(recipeTypeLocation.toString(), new StringTextComponent(recipeTypeLocation.toString()))).collect(Collectors.toList());//Registry.RECIPE_TYPE.stream().filter(type -> CommonUtils.getRecipeTypeName(type).getNamespace().equals(modid)).map(recipeType -> new DropdownListWidget.StringEntry(CommonUtils.getRecipeTypeName(recipeType).toString(), new StringTextComponent(CommonUtils.getRecipeTypeName(recipeType).toString()))).collect(Collectors.toList());
         }
 
         public static List<StringEntry> getModIds()
@@ -287,9 +285,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
 
     public static abstract class Entry<T>
     {
-        private Entry()
-        {
-        }
+        private Entry() {}
 
         public abstract T getValue();
 

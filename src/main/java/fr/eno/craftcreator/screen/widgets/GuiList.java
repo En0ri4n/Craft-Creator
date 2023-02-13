@@ -154,7 +154,7 @@ public class GuiList<T> implements IOutsideWidget
         if(getKeys() != null)
             area = new Rectangle2d(getX(), getY(), getWidth(), getHeight());
         else
-            area = new Rectangle2d(0, 0, 0, 0);
+            area = new Rectangle2d(100, 100, 100, 100);
     }
 
     @Override
