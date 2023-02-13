@@ -68,7 +68,7 @@ public abstract class CommonContainer extends VanillaCommonContainer
                     return ItemStack.EMPTY;
                 }
             }
-            else if(!this.moveItemStackTo(itemstack1, mod.getSlots().stream().map(PositionnedSlot::getIndex).min(Integer::compareTo).orElse(0), mod.getSlots().stream().map(PositionnedSlot::getIndex).max(Integer::compareTo).orElse(getContainerSize()), false))
+            else if(!this.moveItemStackTo(itemstack1, mod.getSlots().stream().map(PositionnedSlot::getIndex).min(Integer::compareTo).orElse(0), mod.getSlots().stream().map(PositionnedSlot::getIndex).max(Integer::compareTo).orElse(getContainerSize()) + 1, false))
             {
                 return ItemStack.EMPTY;
             }

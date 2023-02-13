@@ -1,7 +1,9 @@
 package fr.eno.craftcreator.jei;
 
 import fr.eno.craftcreator.References;
+import fr.eno.craftcreator.screen.container.BotaniaRecipeCreatorScreen;
 import fr.eno.craftcreator.screen.container.MinecraftRecipeCreatorScreen;
+import fr.eno.craftcreator.screen.container.ThermalRecipeCreatorScreen;
 import fr.eno.craftcreator.screen.container.base.MultiScreenModRecipeCreatorScreen;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -25,5 +27,7 @@ public class RecipeCreatorJEI implements IModPlugin
     {
         IGuiContainerHandler<MultiScreenModRecipeCreatorScreen<?>> guiContainerHandler = new MultiScreenModRecipeCreatorScreenGuiHandler<>();
         registration.addGuiContainerHandler(MinecraftRecipeCreatorScreen.class, guiContainerHandler);
+        registration.addGuiContainerHandler(BotaniaRecipeCreatorScreen.class, guiContainerHandler);
+        registration.addGuiContainerHandler(ThermalRecipeCreatorScreen.class, guiContainerHandler);
     }
 }

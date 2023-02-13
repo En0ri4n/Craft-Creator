@@ -81,6 +81,11 @@ public class SimpleCheckBox extends CheckboxButton
         }
     }
 
+    public void setTooltip(ITextComponent tooltip)
+    {
+        this.tooltip = tooltip;
+    }
+
     @Override
     public boolean selected()
     {

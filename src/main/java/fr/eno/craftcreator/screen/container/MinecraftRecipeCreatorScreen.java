@@ -107,8 +107,8 @@ public class MinecraftRecipeCreatorScreen extends MultiScreenModRecipeCreatorScr
             case FURNACE_SMELTING:
             case FURNACE_SMOKING:
             case CAMPFIRE_COOKING:
-                recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.EXPERIENCE, getNumberField(0).getDoubleValue()));
-                recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.COOKING_TIME, getNumberField(1).getIntValue()));
+                recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.EXPERIENCE, getDataField(0).getDoubleValue()));
+                recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.COOKING_TIME, getDataField(1).getIntValue()));
                 break;
         }
         return this.recipeInfos;
@@ -181,9 +181,9 @@ public class MinecraftRecipeCreatorScreen extends MultiScreenModRecipeCreatorScr
     }
 
     @Override
-    public void onClose()
+    protected void updateServerData()
     {
-        super.onClose();
+        super.updateServerData();
 
         InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("shaped", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.BOOLEAN, this.craftTypeButton.isOn()));
     }

@@ -53,6 +53,7 @@ public class SlotHelper
     // Thermal
     public static final int THERMAL_SLOTS_SIZE;
     public static final List<PositionnedSlot> THERMAL_SLOTS;
+    public static final List<PositionnedSlot> THERMAL_SLOTS_INPUT;
     public static final List<PositionnedSlot> THERMAL_SLOTS_OUTPUT;
     public static final List<PositionnedSlot> TREE_EXTRACTOR_SLOTS;
     public static final List<PositionnedSlot> TREE_EXTRACTOR_SLOTS_INPUT;
@@ -81,6 +82,15 @@ public class SlotHelper
     public static final List<PositionnedSlot> CHILLER_SLOTS;
     public static final List<PositionnedSlot> CHILLER_SLOTS_INPUT;
     public static final List<PositionnedSlot> CHILLER_SLOTS_OUTPUT;
+    public static final List<PositionnedSlot> CRUCIBLE_SLOTS;
+    public static final List<PositionnedSlot> CRUCIBLE_SLOTS_INPUT;
+    public static final List<PositionnedSlot> CRUCIBLE_SLOTS_OUTPUT;
+    public static final List<PositionnedSlot> REFINERY_SLOTS;
+    public static final List<PositionnedSlot> REFINERY_SLOTS_INPUT;
+    public static final List<PositionnedSlot> REFINERY_SLOTS_OUTPUT;
+    public static final List<PositionnedSlot> BOTTLER_SLOTS;
+    public static final List<PositionnedSlot> BOTTLER_SLOTS_INPUT;
+    public static final List<PositionnedSlot> BOTTLER_SLOTS_OUTPUT;
 
     static
     {
@@ -178,9 +188,22 @@ public class SlotHelper
         CHILLER_SLOTS_INPUT = Arrays.asList(new DefinedPositionnedSlot(thermalSlots++, 29, 98, is -> is.getItem() instanceof BucketItem), new DefinedPositionnedSlot(thermalSlots++, 83, 98, is -> is.getItem().getTags().contains(ClientUtils.parse("thermal:crafting/casts"))));
         CHILLER_SLOTS_OUTPUT = Collections.singletonList(new PositionnedSlot(thermalSlots++, 189, 72));
         CHILLER_SLOTS = Stream.of(CHILLER_SLOTS_INPUT, CHILLER_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
+        // Crucible
+        CRUCIBLE_SLOTS_INPUT = Collections.singletonList(new PositionnedSlot(thermalSlots++, 63, 98));
+        CRUCIBLE_SLOTS_OUTPUT = Collections.singletonList(new DefinedPositionnedSlot(thermalSlots++, 189, 72, is -> is.getItem() instanceof BucketItem));
+        CRUCIBLE_SLOTS = Stream.of(CRUCIBLE_SLOTS_INPUT, CRUCIBLE_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
+        // Refinery
+        REFINERY_SLOTS_INPUT = Collections.singletonList(new PositionnedSlot(thermalSlots++, 63, 98));
+        REFINERY_SLOTS_OUTPUT = Arrays.asList(new PositionnedSlot(thermalSlots++, 189, 33), new DefinedPositionnedSlot(thermalSlots++, 189, 72, is -> is.getItem() instanceof BucketItem), new DefinedPositionnedSlot(thermalSlots++, 189, 111, is -> is.getItem() instanceof BucketItem));
+        REFINERY_SLOTS = Stream.of(REFINERY_SLOTS_INPUT, REFINERY_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
+        // Brewer
+        BOTTLER_SLOTS_INPUT = Arrays.asList(new DefinedPositionnedSlot(thermalSlots++, 29, 98, is -> is.getItem() instanceof BucketItem), new PositionnedSlot(thermalSlots++, 83, 98));
+        BOTTLER_SLOTS_OUTPUT = Collections.singletonList(new PositionnedSlot(thermalSlots++, 189, 72));
+        BOTTLER_SLOTS = Stream.of(BOTTLER_SLOTS_INPUT, BOTTLER_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
 
-        THERMAL_SLOTS_OUTPUT = Stream.of(TREE_EXTRACTOR_SLOTS_OUTPUT, PULVERIZER_SLOTS_OUTPUT, SAWMILL_SLOTS_OUTPUT, SMELTER_SLOTS_OUTPUT, INSOLATOR_SLOTS_OUTPUT, PRESS_SLOTS_OUTPUT, FURNACE_THERMAL_SLOTS_OUTPUT, CENTRIFUGE_SLOTS_OUTPUT, CHILLER_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
-        THERMAL_SLOTS = Stream.of(TREE_EXTRACTOR_SLOTS, PULVERIZER_SLOTS, SAWMILL_SLOTS, SMELTER_SLOTS, INSOLATOR_SLOTS, PRESS_SLOTS, FURNACE_THERMAL_SLOTS, CENTRIFUGE_SLOTS, CHILLER_SLOTS).flatMap(Collection::stream).collect(Collectors.toList());
+        THERMAL_SLOTS_INPUT = Stream.of(TREE_EXTRACTOR_SLOTS_INPUT, PULVERIZER_SLOTS_INPUT, SAWMILL_SLOTS_INPUT, SMELTER_SLOTS_INPUT, INSOLATOR_SLOTS_INPUT, PRESS_SLOTS_INPUT, FURNACE_THERMAL_SLOTS_INPUT, CENTRIFUGE_SLOTS_INPUT, CHILLER_SLOTS_INPUT, CRUCIBLE_SLOTS_INPUT, REFINERY_SLOTS_INPUT, BOTTLER_SLOTS_INPUT).flatMap(Collection::stream).collect(Collectors.toList());
+        THERMAL_SLOTS_OUTPUT = Stream.of(TREE_EXTRACTOR_SLOTS_OUTPUT, PULVERIZER_SLOTS_OUTPUT, SAWMILL_SLOTS_OUTPUT, SMELTER_SLOTS_OUTPUT, INSOLATOR_SLOTS_OUTPUT, PRESS_SLOTS_OUTPUT, FURNACE_THERMAL_SLOTS_OUTPUT, CENTRIFUGE_SLOTS_OUTPUT, CHILLER_SLOTS_OUTPUT, CRUCIBLE_SLOTS_OUTPUT, REFINERY_SLOTS_OUTPUT, BOTTLER_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
+        THERMAL_SLOTS = Stream.of(TREE_EXTRACTOR_SLOTS, PULVERIZER_SLOTS, SAWMILL_SLOTS, SMELTER_SLOTS, INSOLATOR_SLOTS, PRESS_SLOTS, FURNACE_THERMAL_SLOTS, CENTRIFUGE_SLOTS, CHILLER_SLOTS, CRUCIBLE_SLOTS, REFINERY_SLOTS, BOTTLER_SLOTS).flatMap(Collection::stream).collect(Collectors.toList());
         THERMAL_SLOTS_SIZE = thermalSlots;
     }
 }

@@ -163,7 +163,7 @@ public class RecipeEntry
             return true;
         }
 
-        public double luck()
+        public double getLuck()
         {
             return luck;
         }

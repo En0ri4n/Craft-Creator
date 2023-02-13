@@ -7,26 +7,26 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 
 public class NumberDataFieldWidget extends TextFieldWidget
 {
     private ITextComponent tooltip;
+    private boolean isDouble;
 
-    public NumberDataFieldWidget(FontRenderer font, int x, int y, int width, int height, Number defaultValue)
+    public NumberDataFieldWidget(FontRenderer font, int x, int y, int width, int height, Number defaultValue, boolean isDouble)
     {
         super(font, x, y, width, height, new StringTextComponent(""));
         this.tooltip = new StringTextComponent("");
         this.setValue(String.valueOf(defaultValue));
+        this.isDouble = isDouble;
     }
 
     @Override
     public boolean charTyped(char codePoint, int modifiers)
     {
-        if(Character.isDigit(codePoint) || codePoint == '.') return super.charTyped(codePoint, modifiers);
+        if(Character.isDigit(codePoint) || (codePoint == '.' && isDouble() && !getValue().contains("."))) return super.charTyped(codePoint, modifiers);
 
         return false;
     }
@@ -37,15 +37,13 @@ public class NumberDataFieldWidget extends TextFieldWidget
         if(!ScreenUtils.isMouseHover(x, y, mouseX, mouseY, width, height) || !this.visible || !this.active || this.tooltip.getString().isEmpty())
             return;
 
-        List<ITextComponent> tooltips = new ArrayList<>();
-        tooltips.add(new StringTextComponent("Value :").withStyle(TextFormatting.GRAY));
-        tooltips.add(this.tooltip.copy().withStyle(TextFormatting.DARK_GRAY));
-        ClientUtils.getCurrentScreen().renderComponentTooltip(poseStack, tooltips, mouseX, mouseY);
+        ClientUtils.getCurrentScreen().renderComponentTooltip(poseStack, Collections.singletonList(tooltip), mouseX, mouseY);
     }
 
-    public void setNumberValue(Number number)
+    public void setNumberValue(Number number, boolean isDouble)
     {
-        this.setValue(String.valueOf(number));
+        this.isDouble = isDouble;
+        this.setValue(isDouble ? String.valueOf(number.doubleValue()) : String.valueOf(number.intValue()));
     }
 
     public double getDoubleValue()
@@ -61,5 +59,10 @@ public class NumberDataFieldWidget extends TextFieldWidget
     public void setTooltip(ITextComponent tooltip)
     {
         this.tooltip = tooltip;
+    }
+
+    public boolean isDouble()
+    {
+        return isDouble;
     }
 }

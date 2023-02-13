@@ -89,21 +89,28 @@
 	"craftcreator.screen.thermal_recipe_creator.press.title": "Press Recipe Creator",
 	"craftcreator.screen.thermal_recipe_creator.centrifuge.title": "Centrifuge Recipe Creator",
 	"craftcreator.screen.thermal_recipe_creator.brewer.title": "Brewer Recipe Creator",
-	"craftcreator.screen.thermal_recipe_creator.fermenter.title": "Fermenter Recipe Creator",
-	"craftcreator.screen.thermal_recipe_creator.carpenter.title": "Carpenter Recipe Creator",
 	"craftcreator.screen.thermal_recipe_creator.sawmill.title": "Sawmill Recipe Creator",
 	"craftcreator.screen.thermal_recipe_creator.furnace.title": "Furnace Recipe Creator",
+	"craftcreator.screen.thermal_recipe_creator.bottler.title": "Bottler Recipe Creator",
 
 	"craftcreator.screen.thermal_recipe_creator.field.energy": "Energy :",
+	"craftcreator.screen.thermal_recipe_creator.field.energy.tooltip": "§aEnergy : §8The amount of energy in RF",
+	"craftcreator.screen.thermal_recipe_creator.field.mod_energy": "Mod Energy :",
+	"craftcreator.screen.thermal_recipe_creator.field.mod_energy.tooltip": "§aUse Energy Mod :\n§6Energy calculated with this coefficient and the default energy of the current machine\n §70.5 = 50% of the default energy\n §81 = 100% of the default energy\n §92 = 200% of the default energy\n\n§cCurrent Default Energy : §6%d",
 	"craftcreator.screen.thermal_recipe_creator.field.experience": "Exp. Gained :",
+	"craftcreator.screen.thermal_recipe_creator.field.experience.tooltip": "§aExperience Gained : §8The amount of experience gained",
 	"craftcreator.screen.thermal_recipe_creator.field.chances": "Luck :",
+	"craftcreator.screen.thermal_recipe_creator.field.chances.tooltip": "§aLuck :\n§6The chance of getting a bonus output\n§80.0 = §70%\n§80.5 = §750%\n§81.0 = §7100%",
 	"craftcreator.screen.thermal_recipe_creator.field.resin_amount": "Resin (mb) :",
-	"craftcreator.screen.thermal_recipe_creator.field.mod_energy": "Speed :",
+	"craftcreator.screen.thermal_recipe_creator.field.resin_amount.tooltip": "§aResin (mb) : §6The amount of resin in mb",
 	"craftcreator.screen.thermal_recipe_creator.field.mod_water": "Water :",
+	"craftcreator.screen.thermal_recipe_creator.field.mod_water.tooltip": "§aWater :\n§6The amount of water calculated with this coefficient and the default water needed",
 	"craftcreator.screen.thermal_recipe_creator.field.fluid": "Fluid (mb) :",
+	"craftcreator.screen.thermal_recipe_creator.field.fluid.tooltip": "§aFluid :\n§6The fluid that will be used in the recipe\n§6Put here the amount of fluid in mb",
 
 	"craftcreator.screen.thermal_recipe_creator.slot.trunk": "Trunk",
 	"craftcreator.screen.thermal_recipe_creator.slot.leaves": "Leaves",
     "craftcreator.screen.thermal_recipe_creator.slot.die": "Die",
-	"craftcreator.screen.thermal_recipe_creator.slot.cast": "Cast"
+	"craftcreator.screen.thermal_recipe_creator.slot.cast": "Cast",
+	"craftcreator.screen.thermal_recipe_creator.slot.fluid": "Fluid"
 }

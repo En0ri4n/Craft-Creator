@@ -9,11 +9,14 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 
+import java.util.Arrays;
+
 public abstract class MultiScreenRecipeCreatorTile extends TaggeableInventoryContainerTileEntity
 {
     private int screenIndex;
     private ResourceLocation currentRecipeType;
     private boolean isKubeJSRecipe;
+    private double[] fields;
 
     public MultiScreenRecipeCreatorTile(SupportedMods mod, TileEntityType<?> blockEntityType, int slotsSize)
     {
@@ -21,6 +24,7 @@ public abstract class MultiScreenRecipeCreatorTile extends TaggeableInventoryCon
         this.currentRecipeType = CommonUtils.getRecipeTypeName(ModRecipeCreator.getRecipeCreatorScreens(mod).get(0).getRecipeType());
         this.screenIndex = 0;
         this.isKubeJSRecipe = true;
+        this.fields = new double[1];
     }
 
     @Override
@@ -39,7 +43,15 @@ public abstract class MultiScreenRecipeCreatorTile extends TaggeableInventoryCon
             case "recipe_type":
                 this.setCurrentRecipeType(ClientUtils.parse((String) data));
                 break;
+            case "fields":
+                this.setFields((double[]) data);
+                break;
         }
+    }
+
+    private void setFields(double[] fields)
+    {
+        this.fields = fields;
     }
 
     public void setCurrentRecipeType(ResourceLocation recipeType)
@@ -63,9 +75,16 @@ public abstract class MultiScreenRecipeCreatorTile extends TaggeableInventoryCon
                 return this.isKubeJSRecipe();
             case "recipe_type":
                 return this.getCurrentRecipeType().toString();
+            case "fields":
+                return this.getFields();
         }
 
         return super.getData(dataName);
+    }
+
+    private double[] getFields()
+    {
+        return fields;
     }
 
     public ResourceLocation getCurrentRecipeType()
@@ -95,6 +114,7 @@ public abstract class MultiScreenRecipeCreatorTile extends TaggeableInventoryCon
         compoundTag.putInt("ScreenIndex", this.screenIndex);
         compoundTag.putBoolean("KubeJSRecipe", this.isKubeJSRecipe);
         compoundTag.putString("RecipeType", this.currentRecipeType.toString());
+        compoundTag.putLongArray("Fields", Arrays.stream(this.fields).mapToLong(Double::doubleToLongBits).toArray());
         return compoundTag;
     }
 
@@ -105,5 +125,6 @@ public abstract class MultiScreenRecipeCreatorTile extends TaggeableInventoryCon
         this.screenIndex = compound.getInt("ScreenIndex");
         this.isKubeJSRecipe = compound.getBoolean("KubeJSRecipe");
         this.currentRecipeType = ClientUtils.parse(compound.getString("RecipeType"));
+        this.fields = Arrays.stream(compound.getLongArray("Fields")).mapToDouble(Double::longBitsToDouble).toArray();
     }
 }

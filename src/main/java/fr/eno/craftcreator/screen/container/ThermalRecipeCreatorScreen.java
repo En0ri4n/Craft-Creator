@@ -1,20 +1,27 @@
 package fr.eno.craftcreator.screen.container;
 
+import cofh.thermal.core.init.TCoreRecipeTypes;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.base.ModRecipeCreator;
 import fr.eno.craftcreator.container.ThermalRecipeCreatorContainer;
 import fr.eno.craftcreator.container.slot.utils.PositionnedSlot;
+import fr.eno.craftcreator.init.InitPackets;
+import fr.eno.craftcreator.packets.RetrieveRecipeCreatorTileDataServerPacket;
+import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import fr.eno.craftcreator.screen.container.base.MultiScreenModRecipeCreatorScreen;
+import fr.eno.craftcreator.screen.widgets.buttons.SimpleCheckBox;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -24,7 +31,16 @@ import java.util.List;
 
 public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen<ThermalRecipeCreatorContainer>
 {
-    private static final int ENERGY_FIELD = 0, EXPERIENCE_FIELD = 1, ENERGY_MOD_FIELD = 2, RESIN_FIELD = 3, CHANCES_FIELD = 3, FLUID = 3, WATER_MOD = 7;
+    private static final int ENERGY_FIELD = 0,
+            EXPERIENCE_FIELD = 1,
+            RESIN_FIELD = 3,
+            CHANCES_FIELD = 3,
+            FLUID_FIELD_0 = 4,
+            FLUID_FIELD_1 = 5,
+            FLUID_FIELD_2 = 6,
+            WATER_MOD = 7;
+
+    private SimpleCheckBox isEnergyModCheckBox;
 
     public ThermalRecipeCreatorScreen(ThermalRecipeCreatorContainer screenContainer, PlayerInventory inv, ITextComponent titleIn)
     {
@@ -37,9 +53,13 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     @Override
     protected void init()
     {
+        InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("is_energy_mod", getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.BOOLEAN));
+
         super.init();
 
         addNumberField(leftPos + imageWidth - 44, topPos + imageHeight / 2, 35, -1, 8);
+
+        addButton(isEnergyModCheckBox = new SimpleCheckBox(leftPos + 6, topPos + imageHeight / 2 + 26, 10, 10, new StringTextComponent(""), false, b -> setDataFieldValue(b.selected() ? 1D : 100, b.selected(), ENERGY_FIELD)));
 
         updateScreen();
     }
@@ -55,26 +75,33 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     {
         super.getRecipeInfos();
 
-        this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.ENERGY_MOD, getNumberField(ENERGY_MOD_FIELD).getDoubleValue()));
-        this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.EXPERIENCE, getNumberField(EXPERIENCE_FIELD).getDoubleValue()));
-        this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.ENERGY, getNumberField(ENERGY_FIELD).getIntValue()));
+        this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.ENERGY, isEnergyModCheckBox.selected() ? getDataField(ENERGY_FIELD).getDoubleValue() : getDataField(ENERGY_FIELD).getIntValue()));
+        this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterBoolean(RecipeInfos.Parameters.ENERGY_MOD, isEnergyModCheckBox.selected()));
+        this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.EXPERIENCE, getDataField(EXPERIENCE_FIELD).getDoubleValue()));
 
         switch(getCurrentRecipe())
         {
             case TREE_EXTRACTOR:
-                this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.RESIN_AMOUNT, getNumberField(RESIN_FIELD).getIntValue()));
+                this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.RESIN_AMOUNT, getDataField(RESIN_FIELD).getIntValue()));
             case PULVERIZER:
             case SAWMILL:
             case SMELTER:
             case INSOLATOR:
                 for(int i = 0; i < 4; i++)
-                    this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber("chance_" + i, getNumberField(CHANCES_FIELD + i).getDoubleValue()));
+                    this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber("chance_" + i, getDataField(CHANCES_FIELD + i).getDoubleValue()));
                 if(getCurrentRecipe() == ModRecipeCreator.INSOLATOR)
-                    this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.WATER_MOD, getNumberField(WATER_MOD).getDoubleValue()));
+                    this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.WATER_MOD, getDataField(WATER_MOD).getDoubleValue()));
                 break;
             case CENTRIFUGE:
             case CHILLER:
-                this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.FLUID_AMOUNT, getNumberField(FLUID).getIntValue()));
+            case BOTTLER:
+            case CRUCIBLE:
+                this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.FLUID_AMOUNT_0, getDataField(FLUID_FIELD_0).getIntValue()));
+                break;
+            case REFINERY:
+                this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.FLUID_AMOUNT_0, getDataField(FLUID_FIELD_0).getIntValue()));
+                this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.FLUID_AMOUNT_1, getDataField(FLUID_FIELD_1).getIntValue()));
+                this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.CHANCE, getDataField(CHANCES_FIELD).getDoubleValue()));
                 break;
         }
 
@@ -86,10 +113,16 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     {
         super.updateScreen();
 
-        showDataField(ENERGY_FIELD, EXPERIENCE_FIELD, ENERGY_MOD_FIELD);
-        setDataField(ENERGY_FIELD, this.leftPos + 8, this.topPos + this.imageHeight / 2 + 23, 45, 100);
-        setDataField(EXPERIENCE_FIELD, this.leftPos + this.imageWidth - 73 - 8, this.topPos + this.imageHeight / 2 + 23, 73, 0.1D);
-        setDataField(ENERGY_MOD_FIELD, this.leftPos + 65, this.topPos + this.imageHeight / 2 + 23, 45, 1D);
+        showDataField(ENERGY_FIELD, EXPERIENCE_FIELD);
+        setDataField(EXPERIENCE_FIELD, this.leftPos + this.imageWidth - 73 - 8, this.topPos + this.imageHeight / 2 + 23, 73, 0.1D, true);
+
+        setDataField(ENERGY_FIELD, this.leftPos + 20, this.topPos + this.imageHeight / 2 + 23, 70, isEnergyModCheckBox.selected() ? 1D : 100, isEnergyModCheckBox.selected());
+        if(isEnergyModCheckBox.selected())
+            setDataFieldTooltip(ENERGY_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.mod_energy.tooltip", getDefaultEnergy(getCurrentRecipe().getRecipeType())));
+        else
+            setDataFieldTooltip(ENERGY_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.energy.tooltip"));
+
+        setDataFieldTooltip(EXPERIENCE_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.experience.tooltip"));
 
         setExecuteButtonPos(this.leftPos + this.imageWidth / 2 - this.executeButton.getWidth() / 2, this.topPos + this.imageHeight / 2 - this.executeButton.getHeight() / 2 + 22);
 
@@ -97,27 +130,49 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
         {
             case TREE_EXTRACTOR:
                 showDataField(RESIN_FIELD);
-                setDataField(RESIN_FIELD, leftPos + imageWidth / 4 * 3 - 12, topPos + imageHeight / 3 - 13, 55, 25);
+                setDataField(RESIN_FIELD, leftPos + imageWidth / 4 * 3 - 12, topPos + imageHeight / 3 - 13, 55, 25, false);
+                setDataFieldTooltip(RESIN_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.resin.tooltip"));
                 break;
             case INSOLATOR:
-                showDataField(7);
-                setDataField(7, this.leftPos + 48, this.topPos + this.imageHeight / 3 - 15, 45, 1D);
+                showDataField(WATER_MOD);
+                setDataField(WATER_MOD, this.leftPos + 48, this.topPos + this.imageHeight / 3 - 10, 45, 1D, true);
+                setDataFieldTooltip(WATER_MOD, References.getTranslate("screen.thermal_recipe_creator.field.mod_water.tooltip"));
             case SAWMILL:
             case PULVERIZER:
             case SMELTER:
                 for(int i = 0; i < 4; i++)
                 {
                     showDataField(CHANCES_FIELD + i);
-                    setDataField(CHANCES_FIELD + i, leftPos + imageWidth / 4 * 3 - 12, topPos + 33 + i * 26, 40, 1D);
+                    setDataField(CHANCES_FIELD + i, leftPos + imageWidth / 4 * 3 - 12, topPos + 33 + i * 26, 40, 1D, true);
+                    setDataFieldTooltip(CHANCES_FIELD + i, References.getTranslate("screen.thermal_recipe_creator.field.chances.tooltip"));
                 }
                 break;
             case CENTRIFUGE:
-                showDataField(FLUID);
-                setDataField(FLUID, leftPos + imageWidth / 4 * 3, topPos + imageHeight / 3 - 23, 55, 100);
+                showDataField(FLUID_FIELD_0);
+                setDataField(FLUID_FIELD_0, leftPos + imageWidth / 4 * 3, topPos + imageHeight / 3 - 23, 55, 100, false);
+                setDataFieldTooltip(FLUID_FIELD_0, References.getTranslate("screen.thermal_recipe_creator.field.fluid.tooltip"));
                 break;
+            case BOTTLER:
             case CHILLER:
-                showDataField(FLUID);
-                setDataField(FLUID, leftPos + 8, topPos + imageHeight / 3 - 9, 55, 100);
+                showDataField(FLUID_FIELD_0);
+                setDataField(FLUID_FIELD_0, leftPos + 8, topPos + imageHeight / 3 - 9, 55, 100, false);
+                setDataFieldTooltip(FLUID_FIELD_0, References.getTranslate("screen.thermal_recipe_creator.field.fluid.tooltip"));
+                break;
+            case CRUCIBLE:
+                showDataField(FLUID_FIELD_0);
+                setDataField(FLUID_FIELD_0, leftPos + imageWidth / 4 * 3 - 12, topPos + imageHeight / 3 - 13, 55, 25, false);
+                setDataFieldTooltip(FLUID_FIELD_0, References.getTranslate("screen.thermal_recipe_creator.field.fluid.tooltip"));
+                break;
+            case REFINERY:
+                showDataField(FLUID_FIELD_0, FLUID_FIELD_1, FLUID_FIELD_2, CHANCES_FIELD);
+                setDataField(FLUID_FIELD_0, leftPos + imageWidth / 4 - 31, topPos + imageHeight / 3 - 9, 55, 100, false);
+                setDataField(CHANCES_FIELD, leftPos + imageWidth / 4 * 3 - 12, topPos + 33, 40, 1D, true);
+                setDataField(FLUID_FIELD_1, leftPos + imageWidth / 4 * 3 - 12, topPos + imageHeight / 3 - 13, 55, 100, false);
+                setDataField(FLUID_FIELD_2, leftPos + imageWidth / 4 * 3 - 12, topPos + imageHeight / 2 - 17, 55, 100, false);
+                setDataFieldTooltip(FLUID_FIELD_0, References.getTranslate("screen.thermal_recipe_creator.field.fluid.tooltip"));
+                setDataFieldTooltip(FLUID_FIELD_1, References.getTranslate("screen.thermal_recipe_creator.field.fluid.tooltip"));
+                setDataFieldTooltip(FLUID_FIELD_2, References.getTranslate("screen.thermal_recipe_creator.field.fluid.tooltip"));
+                setDataFieldTooltip(CHANCES_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.chances.tooltip"));
                 break;
         }
     }
@@ -128,9 +183,8 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
         super.render(matrixStack, mouseX, mouseY, partialTicks);
 
         // General fields of thermal : energy, experience and mod energy, may be not used at all by recipes
-        renderDataFieldTitle(ENERGY_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.energy"), matrixStack);
+        renderDataFieldTitle(ENERGY_FIELD, References.getTranslate(isEnergyModCheckBox.selected() ? "screen.thermal_recipe_creator.field.mod_energy" : "screen.thermal_recipe_creator.field.energy"), matrixStack);
         renderDataFieldTitle(EXPERIENCE_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.experience"), matrixStack);
-        renderDataFieldTitle(ENERGY_MOD_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.mod_energy"), matrixStack);
 
         switch(getCurrentRecipe())
         {
@@ -151,12 +205,26 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
                 break;
             case CHILLER:
                 renderSlotTitle(1, References.getTranslate("screen.thermal_recipe_creator.slot.cast"), matrixStack);
+            case BOTTLER:
             case CENTRIFUGE:
-                renderDataFieldTitle(FLUID, References.getTranslate("screen.thermal_recipe_creator.field.fluid"), matrixStack);
+            case CRUCIBLE:
+                renderDataFieldTitle(FLUID_FIELD_0, References.getTranslate("screen.thermal_recipe_creator.field.fluid"), matrixStack);
+                break;
+            case REFINERY:
+                renderDataFieldTitle(FLUID_FIELD_0, References.getTranslate("screen.thermal_recipe_creator.field.fluid"), matrixStack);
+                renderDataFieldTitle(FLUID_FIELD_1, References.getTranslate("screen.thermal_recipe_creator.field.fluid"), matrixStack);
+                renderDataFieldTitle(FLUID_FIELD_2, References.getTranslate("screen.thermal_recipe_creator.field.fluid"), matrixStack);
+                renderDataFieldTitle(CHANCES_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.chances"), matrixStack);
                 break;
         }
 
         this.renderTooltip(matrixStack, mouseX, mouseY);
+    }
+
+    @Override
+    protected void renderTooltip(MatrixStack poseStack, int mouseX, int mouseY)
+    {
+        super.renderTooltip(poseStack, mouseX, mouseY);
     }
 
     @Override
@@ -174,13 +242,51 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     @Override
     protected List<PositionnedSlot> getTaggableSlots()
     {
-        return SlotHelper.THERMAL_SLOTS;
+        return SlotHelper.THERMAL_SLOTS_INPUT;
     }
 
     @Override
     protected List<PositionnedSlot> getNbtTaggableSlots()
     {
         return new ArrayList<>();
+    }
+
+    private int getDefaultEnergy(IRecipeType<?> thermalRecipeType)
+    {
+        // Default energy values for thermal recipes (in RF)
+        // Can be improved
+        if(thermalRecipeType == TCoreRecipeTypes.RECIPE_SAWMILL) return 2000;
+        else if(thermalRecipeType == TCoreRecipeTypes.RECIPE_FURNACE) return 2000;
+        else if(thermalRecipeType == TCoreRecipeTypes.RECIPE_PRESS) return 2400;
+        else if(thermalRecipeType == TCoreRecipeTypes.RECIPE_CHILLER) return 4000;
+        else if(thermalRecipeType == TCoreRecipeTypes.RECIPE_PULVERIZER) return 4000;
+        else if(thermalRecipeType == TCoreRecipeTypes.RECIPE_SMELTER) return 3200;
+        else if(thermalRecipeType == TCoreRecipeTypes.RECIPE_CENTRIFUGE) return 4000;
+        else if(thermalRecipeType == TCoreRecipeTypes.RECIPE_CRUCIBLE) return 40000;
+        else if(thermalRecipeType == TCoreRecipeTypes.RECIPE_REFINERY) return 8000;
+        else if(thermalRecipeType == TCoreRecipeTypes.RECIPE_BOTTLER) return 400;
+
+        return -1;
+    }
+
+    @Override
+    protected void updateServerData()
+    {
+        super.updateServerData();
+
+        InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("is_energy_mod", getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.BOOLEAN, isEnergyModCheckBox.selected()));
+    }
+
+    @Override
+    public void setData(String dataName, Object data)
+    {
+        super.setData(dataName, data);
+
+        if(dataName.equals("is_energy_mod"))
+        {
+            isEnergyModCheckBox.setSelected((Boolean) data);
+            setDataFieldValue(isEnergyModCheckBox.selected() ? getDataField(ENERGY_FIELD).getDoubleValue() : getDataField(ENERGY_FIELD).getIntValue(), isEnergyModCheckBox.selected(), ENERGY_FIELD);
+        }
     }
 
     @Override
@@ -206,6 +312,12 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
                 return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("thermal:machine_centrifuge"));
             case CHILLER:
                 return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("thermal:machine_chiller"));
+            case CRUCIBLE:
+                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("thermal:machine_crucible"));
+            case REFINERY:
+                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("thermal:machine_refinery"));
+            case BOTTLER:
+                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("thermal:machine_bottler"));
             default:
                 return Items.COMMAND_BLOCK;
         }

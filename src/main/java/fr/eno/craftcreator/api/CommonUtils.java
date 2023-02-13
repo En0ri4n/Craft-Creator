@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.util.ResourceLocation;
@@ -11,6 +12,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.event.ClickEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import java.io.File;
@@ -45,6 +47,11 @@ public class CommonUtils
     public static ResourceLocation getRecipeTypeName(IRecipeType<?> recipeType)
     {
         return Registry.RECIPE_TYPE.getKey(recipeType);
+    }
+
+    public static Item getItemById(ResourceLocation resourceLocation)
+    {
+        return ForgeRegistries.ITEMS.getValue(resourceLocation);
     }
 
     /**

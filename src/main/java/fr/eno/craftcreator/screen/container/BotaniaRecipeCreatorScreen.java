@@ -51,7 +51,7 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
         {
             if(textField.visible)
             {
-                if(textField.getValue().isEmpty()) textField.setNumberValue(100);
+                if(textField.getValue().isEmpty()) textField.setNumberValue(100, false);
 
                 if(this.getCurrentRecipe().equals(ModRecipeCreator.PURE_DAISY))
                 {
