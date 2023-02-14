@@ -149,12 +149,12 @@ public class RecipeEntry
 
     public static class LuckedOutput extends Output
     {
-        private final double luck;
+        private final double chance;
 
-        public LuckedOutput(ResourceLocation registryName, int count, double luck)
+        public LuckedOutput(ResourceLocation registryName, int count, double chance)
         {
             super(registryName, count);
-            this.luck = luck;
+            this.chance = chance;
         }
 
         @Override
@@ -163,9 +163,9 @@ public class RecipeEntry
             return true;
         }
 
-        public double getLuck()
+        public double getChance()
         {
-            return luck;
+            return chance;
         }
     }
 

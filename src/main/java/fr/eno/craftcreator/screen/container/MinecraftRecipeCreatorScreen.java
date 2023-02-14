@@ -142,7 +142,7 @@ public class MinecraftRecipeCreatorScreen extends MultiScreenModRecipeCreatorScr
     @Override
     protected List<PositionnedSlot> getTaggableSlots()
     {
-        return SlotHelper.MINECRAFT_SLOTS;
+        return SlotHelper.MINECRAFT_SLOTS_INPUT;
     }
 
     @Override

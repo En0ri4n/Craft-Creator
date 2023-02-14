@@ -64,7 +64,23 @@ public class ThermalRecipesManager extends BaseRecipesManager
             case BOTTLER:
                 createBottlerRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos);
                 break;
+            case PYROLYZER:
+                createPyrolyzerRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.EXPERIENCE).doubleValue(), recipeInfos);
+                break;
         }
+    }
+
+    private void createPyrolyzerRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, double experience, RecipeInfos recipeInfos)
+    {
+        if(isSlotsEmpty(slots, SlotHelper.PYROLYZER_SLOTS_INPUT.size(), SlotHelper.PYROLYZER_SLOTS_OUTPUT.size())) return;
+
+        RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));
+
+        RecipeEntry.MultiOutput outputItems = getLuckedOutputs(slots, recipeInfos);
+
+        RecipeEntry.FluidOutput outputFluid = new RecipeEntry.FluidOutput(getFluid(slots.get(5)), recipeInfos.getValue(RecipeInfos.Parameters.FLUID_AMOUNT_0).intValue());
+
+        ThermalRecipeSerializer.get().serializePyrolyzerRecipe(input, outputItems, outputFluid, experience, recipeInfos.getValue(RecipeInfos.Parameters.ENERGY), recipeInfos.getBoolean(RecipeInfos.Parameters.ENERGY_MOD));
     }
 
     private void createBottlerRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, RecipeInfos recipeInfos)

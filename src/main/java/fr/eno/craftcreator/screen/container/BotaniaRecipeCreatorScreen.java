@@ -148,7 +148,7 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     @Override
     protected List<PositionnedSlot> getTaggableSlots()
     {
-        return SlotHelper.BOTANIA_SLOTS;
+        return SlotHelper.BOTANIA_SLOTS_INPUT;
     }
 
     @Override

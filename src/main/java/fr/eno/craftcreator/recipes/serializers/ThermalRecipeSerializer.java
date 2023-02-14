@@ -114,17 +114,7 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
             recipeObj.add("ingredients", ingredientsObj);
         }
 
-        JsonArray resultObj = new JsonArray();
-
-        for(RecipeEntry.Output recipeOutput : output.getOutputs())
-        {
-            JsonObject resultValueObj = new JsonObject();
-            resultValueObj.addProperty("item", recipeOutput.registryName().toString());
-            resultValueObj.addProperty("count", recipeOutput.count());
-            resultObj.add(resultValueObj);
-        }
-
-        recipeObj.add("result", resultObj);
+        recipeObj.add("result", getResultArray(output));
 
         addRecipeTo(recipeObj, TCoreRecipeTypes.RECIPE_SMELTER, output.getOneOutput().registryName());
     }
@@ -144,8 +134,7 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
     {
         JsonObject recipeObj = createBaseJson(TCoreRecipeTypes.RECIPE_PRESS);
         addEnergy(recipeObj, energy, isModEnergy);
-        JsonArray ingredientsArray = new JsonArray();
-        ingredientsArray.add(mapToJsonObject(ImmutableMap.of(input.isTag() ? "tag" : "item", input.registryName(), "count", input.count())));
+        JsonArray ingredientsArray = getInputArray(input);
         if(!inputDie.registryName().equals(Items.AIR.getRegistryName()))
             ingredientsArray.add(singletonItemJsonObject(inputDie));
         recipeObj.add("ingredients", ingredientsArray);
@@ -195,7 +184,7 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
         recipeObj.add("ingredient", mapToJsonObject(ImmutableMap.of("fluid", inputFluid.registryName(), "amount", inputFluid.getAmount())));
         JsonArray resultObj = getResultArray(outputItem);
         if(outputItem.getItem() != Items.AIR)
-            resultObj.add(mapToJsonObject(ImmutableMap.of("item", outputItem.registryName(), "count", outputItem.count(), "chance", outputItem.getLuck())));
+            resultObj.add(mapToJsonObject(ImmutableMap.of("item", outputItem.registryName(), "count", outputItem.count(), "chance", outputItem.getChance())));
         if(outputFluid.getFluid() != Fluids.EMPTY)
             resultObj.add(mapToJsonObject(ImmutableMap.of("fluid", outputFluid.registryName(), "amount", outputFluid.getAmount())));
         if(secondOutputFluid.getFluid() != Fluids.EMPTY)
@@ -216,6 +205,20 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
 
         addRecipeTo(recipeObj, TCoreRecipeTypes.RECIPE_BOTTLER, output.registryName());
     }
+
+    public void serializePyrolyzerRecipe(RecipeEntry.Input input, RecipeEntry.MultiOutput outputItems, RecipeEntry.FluidOutput outputFluid, double experience, Number energy, boolean isEnergyMod)
+    {
+        JsonObject recipeObj = createBaseJson(TCoreRecipeTypes.RECIPE_PYROLYZER);
+        addEnergy(recipeObj, energy, isEnergyMod);
+        recipeObj.addProperty("experience", experience);
+        recipeObj.add("ingredient", getInput(input));
+        JsonArray resultObj = getResultArray(outputItems);
+        if(outputFluid.getFluid() != Fluids.EMPTY)
+            resultObj.add(mapToJsonObject(ImmutableMap.of("fluid", outputFluid.registryName(), "amount", outputFluid.getAmount())));
+        recipeObj.add("result", resultObj);
+
+        addRecipeTo(recipeObj, TCoreRecipeTypes.RECIPE_PYROLYZER, outputItems.getOneOutput().registryName());
+    }
     
     private void addEnergy(JsonObject obj, Number energy, boolean isModEnergy)
     {
@@ -234,7 +237,7 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
             JsonObject itemResultObj = new JsonObject();
             itemResultObj.addProperty("item", output.registryName().toString());
             itemResultObj.addProperty("count", output.count());
-            if(output instanceof RecipeEntry.LuckedOutput && ((RecipeEntry.LuckedOutput) output).getLuck() != 1D) itemResultObj.addProperty("chance", ((RecipeEntry.LuckedOutput) output).getLuck());
+            if(output instanceof RecipeEntry.LuckedOutput && ((RecipeEntry.LuckedOutput) output).getChance() != 1D) itemResultObj.addProperty("chance", ((RecipeEntry.LuckedOutput) output).getChance());
             resultObj.add(itemResultObj);
         }
         obj.add("result", resultObj);
@@ -316,6 +319,12 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
                     inputIngredients.addIngredient(new CraftIngredients.FluidIngredient(fluidIngredient.getFluid().getRegistryName(), fluidIngredient.getAmount()));
             inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", CraftIngredients.DataIngredient.DataUnit.ENERGY, bottlerRecipe.getEnergy(), false));
         }
+        else if(recipe instanceof PyrolyzerRecipe)
+        {
+            PyrolyzerRecipe pyrolyzerRecipe = (PyrolyzerRecipe) recipe;
+            putIfNotEmpty(inputIngredients, pyrolyzerRecipe.getInputItems());
+            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", CraftIngredients.DataIngredient.DataUnit.ENERGY, pyrolyzerRecipe.getEnergy(), false));
+        }
 
         if(inputIngredients.isEmpty() && recipe instanceof ThermalRecipe)
         {
@@ -371,8 +380,8 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
             CentrifugeRecipe centrifugeRecipe = (CentrifugeRecipe) recipe;
             for(ItemStack is : centrifugeRecipe.getOutputItems())
                 outputsIngredient.addIngredient(new CraftIngredients.ItemIngredient(is.getItem().getRegistryName(), is.getCount(), "Item"));
-            if(centrifugeRecipe.getOutputFluids().size() > 0)
-                outputsIngredient.addIngredient(new CraftIngredients.FluidIngredient(centrifugeRecipe.getOutputFluids().get(0).getFluid().getRegistryName(), centrifugeRecipe.getOutputFluids().get(0).getAmount()));
+            for(FluidStack fluidStack : centrifugeRecipe.getOutputFluids())
+                outputsIngredient.addIngredient(new CraftIngredients.FluidIngredient(fluidStack.getFluid().getRegistryName(), fluidStack.getAmount()));
         }
         else if(recipe instanceof ChillerRecipe)
         {
@@ -382,15 +391,21 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
         else if(recipe instanceof CrucibleRecipe)
         {
             CrucibleRecipe crucibleRecipe = (CrucibleRecipe) recipe;
-            for(FluidIngredient fi : crucibleRecipe.getInputFluids())
-                for(FluidStack fluidIngredient : fi.getFluids())
-                    outputsIngredient.addIngredient(new CraftIngredients.FluidIngredient(fluidIngredient.getFluid().getRegistryName(), fluidIngredient.getAmount()));
+            for(FluidStack fluidStack : crucibleRecipe.getOutputFluids())
+                    outputsIngredient.addIngredient(new CraftIngredients.FluidIngredient(fluidStack.getFluid().getRegistryName(), fluidStack.getAmount()));
         }
         else if(recipe instanceof BottlerRecipe)
         {
             BottlerRecipe bottlerRecipe = (BottlerRecipe) recipe;
             for(ItemStack stack : bottlerRecipe.getOutputItems())
                     outputsIngredient.addIngredient(new CraftIngredients.ItemIngredient(stack.getItem().getRegistryName(), stack.getCount()));
+        }
+        else if(recipe instanceof PyrolyzerRecipe)
+        {
+            PyrolyzerRecipe pyrolyzerRecipe = (PyrolyzerRecipe) recipe;
+            putIfNotEmptyLuckedItems(outputsIngredient, pyrolyzerRecipe.getOutputItems(), pyrolyzerRecipe.getOutputItemChances(), "Item");
+            for(FluidStack fluidStack : pyrolyzerRecipe.getOutputFluids())
+                outputsIngredient.addIngredient(new CraftIngredients.FluidIngredient(fluidStack.getFluid().getRegistryName(), fluidStack.getAmount()));
         }
 
         if(outputsIngredient.isEmpty())

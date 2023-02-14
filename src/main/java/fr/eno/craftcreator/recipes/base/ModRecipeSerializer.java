@@ -141,10 +141,29 @@ public abstract class ModRecipeSerializer
         return mapToJsonObject(map);
     }
 
+    private JsonObject getLuckedResult(RecipeEntry.LuckedOutput result)
+    {
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("item", result.registryName().toString());
+        if(result.count() > 1)
+            map.put("count", result.count());
+        if(result.getChance() != 1D)
+            map.put("chance", result.getChance());
+
+        return mapToJsonObject(map);
+    }
+
     protected JsonArray getResultArray(RecipeEntry.MultiOutput results)
     {
         JsonArray array = new JsonArray();
-        results.getOutputs().forEach(recipeOutput -> array.add(getResult(recipeOutput)));
+        results.getOutputs().forEach(recipeOutput ->
+        {
+            if(recipeOutput instanceof RecipeEntry.LuckedOutput)
+                array.add(getLuckedResult(((RecipeEntry.LuckedOutput) recipeOutput)));
+            else
+                array.add(getResult(recipeOutput));
+        });
         return array;
     }
 
