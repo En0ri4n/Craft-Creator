@@ -17,16 +17,25 @@ public class SlotHelper
     // Minecraft
     public static final int MINECRAFT_SLOTS_SIZE;
     public static final List<PositionnedSlot> MINECRAFT_SLOTS;
+    public static final List<PositionnedSlot> MINECRAFT_SLOTS_INPUT;
+    public static final List<PositionnedSlot> MINECRAFT_SLOTS_OUTPUT;
     public static final List<PositionnedSlot> CRAFTING_TABLE_SLOTS;
     public static final List<PositionnedSlot> CRAFTING_TABLE_SLOTS_INPUT;
     public static final List<PositionnedSlot> CRAFTING_TABLE_SLOTS_OUTPUT;
     public static final List<PositionnedSlot> FURNACE_SLOTS;
+    public static final List<PositionnedSlot> FURNACE_SLOTS_INPUT;
+    public static final List<PositionnedSlot> FURNACE_SLOTS_OUTPUT;
     public static final List<PositionnedSlot> SMITHING_TABLE_SLOTS;
+    public static final List<PositionnedSlot> SMITHING_TABLE_SLOTS_INPUT;
+    public static final List<PositionnedSlot> SMITHING_TABLE_SLOTS_OUTPUT;
     public static final List<PositionnedSlot> STONECUTTER_SLOTS;
+    public static final List<PositionnedSlot> STONECUTTER_SLOTS_INPUT;
+    public static final List<PositionnedSlot> STONECUTTER_SLOTS_OUTPUT;
 
     // Botania
     public static final int BOTANIA_SLOTS_SIZE;
     public static final List<PositionnedSlot> BOTANIA_SLOTS;
+    public static final List<PositionnedSlot> BOTANIA_SLOTS_INPUT;
     public static final List<PositionnedSlot> BOTANIA_SLOTS_OUTPUT;
     public static final List<PositionnedSlot> MANA_INFUSION_SLOTS;
     public static final List<PositionnedSlot> MANA_INFUSION_SLOTS_INPUT;
@@ -91,10 +100,13 @@ public class SlotHelper
     public static final List<PositionnedSlot> BOTTLER_SLOTS;
     public static final List<PositionnedSlot> BOTTLER_SLOTS_INPUT;
     public static final List<PositionnedSlot> BOTTLER_SLOTS_OUTPUT;
+    public static final List<PositionnedSlot> PYROLYZER_SLOTS;
+    public static final List<PositionnedSlot> PYROLYZER_SLOTS_INPUT;
+    public static final List<PositionnedSlot> PYROLYZER_SLOTS_OUTPUT;
 
     static
     {
-        // Vanilla, homemade
+        // Minecraft Vanilla, homemade
         int minecraftSlots = 0;
         // Crafting table
         CRAFTING_TABLE_SLOTS_INPUT = new ArrayList<>();
@@ -104,12 +116,20 @@ public class SlotHelper
         CRAFTING_TABLE_SLOTS_OUTPUT = Collections.singletonList(new PositionnedSlot(minecraftSlots++, 124, 35));
         CRAFTING_TABLE_SLOTS = Stream.of(CRAFTING_TABLE_SLOTS_INPUT, CRAFTING_TABLE_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
         // Furnace
+        FURNACE_SLOTS_INPUT = Collections.singletonList(new PositionnedSlot(minecraftSlots++, 56, 17));
+        FURNACE_SLOTS_OUTPUT = Collections.singletonList(new PositionnedSlot(minecraftSlots++, 116, 35));
         FURNACE_SLOTS = Arrays.asList(new PositionnedSlot(minecraftSlots++, 56, 17), new PositionnedSlot(minecraftSlots++, 116, 35), new PositionnedSlot(minecraftSlots++, 56, 53));
         // Smithing table
-        SMITHING_TABLE_SLOTS = Arrays.asList(new PositionnedSlot(minecraftSlots++, 27, 47), new PositionnedSlot(minecraftSlots++, 76, 47), new PositionnedSlot(minecraftSlots++, 134, 47));
+        SMITHING_TABLE_SLOTS_INPUT = Arrays.asList(new PositionnedSlot(minecraftSlots++, 27, 47), new PositionnedSlot(minecraftSlots++, 76, 47));
+        SMITHING_TABLE_SLOTS_OUTPUT = Collections.singletonList(new PositionnedSlot(minecraftSlots++, 134, 47));
+        SMITHING_TABLE_SLOTS = Stream.of(SMITHING_TABLE_SLOTS_INPUT, SMITHING_TABLE_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
         // Stonecutter
-        STONECUTTER_SLOTS = Arrays.asList(new PositionnedSlot(minecraftSlots++, 39, 33), new PositionnedSlot(minecraftSlots++, 114, 33));
+        STONECUTTER_SLOTS_INPUT = Collections.singletonList(new PositionnedSlot(minecraftSlots++, 39, 33));
+        STONECUTTER_SLOTS_OUTPUT = Collections.singletonList(new PositionnedSlot(minecraftSlots++, 114, 33));
+        STONECUTTER_SLOTS = Stream.of(STONECUTTER_SLOTS_INPUT, STONECUTTER_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
 
+        MINECRAFT_SLOTS_INPUT = Stream.of(CRAFTING_TABLE_SLOTS_INPUT, FURNACE_SLOTS_INPUT, SMITHING_TABLE_SLOTS_INPUT, STONECUTTER_SLOTS_INPUT).flatMap(Collection::stream).collect(Collectors.toList());
+        MINECRAFT_SLOTS_OUTPUT = Stream.of(CRAFTING_TABLE_SLOTS_OUTPUT, FURNACE_SLOTS_OUTPUT, SMITHING_TABLE_SLOTS_OUTPUT, STONECUTTER_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
         MINECRAFT_SLOTS = Stream.of(CRAFTING_TABLE_SLOTS, FURNACE_SLOTS, SMITHING_TABLE_SLOTS, STONECUTTER_SLOTS).flatMap(Collection::stream).collect(Collectors.toList());
         MINECRAFT_SLOTS_SIZE = minecraftSlots;
 
@@ -145,6 +165,7 @@ public class SlotHelper
         TERRA_PLATE_SLOTS_OUTPUT = Collections.singletonList(new PositionnedSlot(botaniaSlots++, 134, 33));
         TERRA_PLATE_SLOTS = Stream.of(TERRA_PLATE_SLOTS_INPUT, TERRA_PLATE_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
 
+        BOTANIA_SLOTS_INPUT = Stream.of(MANA_INFUSION_SLOTS_INPUT, ELVEN_TRADE_SLOTS_INPUT, PURE_DAISY_SLOTS_INPUT, BREWERY_SLOTS_INPUT, PETAL_APOTHECARY_SLOTS_INPUT, RUNIC_ALTAR_SLOTS_INPUT, TERRA_PLATE_SLOTS_INPUT).flatMap(Collection::stream).collect(Collectors.toList());
         BOTANIA_SLOTS_OUTPUT = Stream.of(MANA_INFUSION_SLOTS_OUTPUT, ELVEN_TRADE_SLOTS_OUTPUT, PURE_DAISY_SLOTS_OUTPUT, BREWERY_SLOTS_OUTPUT, PETAL_APOTHECARY_SLOTS_OUTPUT, RUNIC_ALTAR_SLOTS_OUTPUT, TERRA_PLATE_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
         BOTANIA_SLOTS = Stream.of(MANA_INFUSION_SLOTS, ELVEN_TRADE_SLOTS, PURE_DAISY_SLOTS, BREWERY_SLOTS, PETAL_APOTHECARY_SLOTS, RUNIC_ALTAR_SLOTS, TERRA_PLATE_SLOTS).flatMap(Collection::stream).collect(Collectors.toList());
         BOTANIA_SLOTS_SIZE = botaniaSlots;
@@ -200,10 +221,15 @@ public class SlotHelper
         BOTTLER_SLOTS_INPUT = Arrays.asList(new DefinedPositionnedSlot(thermalSlots++, 29, 98, is -> is.getItem() instanceof BucketItem), new PositionnedSlot(thermalSlots++, 83, 98));
         BOTTLER_SLOTS_OUTPUT = Collections.singletonList(new PositionnedSlot(thermalSlots++, 189, 72));
         BOTTLER_SLOTS = Stream.of(BOTTLER_SLOTS_INPUT, BOTTLER_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
+        // Pyrolyzer
+        PYROLYZER_SLOTS_INPUT = Collections.singletonList(new PositionnedSlot(thermalSlots++, 63, 98));
+        PYROLYZER_SLOTS_OUTPUT = Arrays.asList(new PositionnedSlot(thermalSlots++, 189, 33), new PositionnedSlot(thermalSlots++, 189, 59), new PositionnedSlot(thermalSlots++, 189, 85), new PositionnedSlot(thermalSlots++, 189, 111), new DefinedPositionnedSlot(thermalSlots++, 259, 86, is -> is.getItem() instanceof BucketItem));
+        PYROLYZER_SLOTS = Stream.of(PYROLYZER_SLOTS_INPUT, PYROLYZER_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
 
-        THERMAL_SLOTS_INPUT = Stream.of(TREE_EXTRACTOR_SLOTS_INPUT, PULVERIZER_SLOTS_INPUT, SAWMILL_SLOTS_INPUT, SMELTER_SLOTS_INPUT, INSOLATOR_SLOTS_INPUT, PRESS_SLOTS_INPUT, FURNACE_THERMAL_SLOTS_INPUT, CENTRIFUGE_SLOTS_INPUT, CHILLER_SLOTS_INPUT, CRUCIBLE_SLOTS_INPUT, REFINERY_SLOTS_INPUT, BOTTLER_SLOTS_INPUT).flatMap(Collection::stream).collect(Collectors.toList());
-        THERMAL_SLOTS_OUTPUT = Stream.of(TREE_EXTRACTOR_SLOTS_OUTPUT, PULVERIZER_SLOTS_OUTPUT, SAWMILL_SLOTS_OUTPUT, SMELTER_SLOTS_OUTPUT, INSOLATOR_SLOTS_OUTPUT, PRESS_SLOTS_OUTPUT, FURNACE_THERMAL_SLOTS_OUTPUT, CENTRIFUGE_SLOTS_OUTPUT, CHILLER_SLOTS_OUTPUT, CRUCIBLE_SLOTS_OUTPUT, REFINERY_SLOTS_OUTPUT, BOTTLER_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
-        THERMAL_SLOTS = Stream.of(TREE_EXTRACTOR_SLOTS, PULVERIZER_SLOTS, SAWMILL_SLOTS, SMELTER_SLOTS, INSOLATOR_SLOTS, PRESS_SLOTS, FURNACE_THERMAL_SLOTS, CENTRIFUGE_SLOTS, CHILLER_SLOTS, CRUCIBLE_SLOTS, REFINERY_SLOTS, BOTTLER_SLOTS).flatMap(Collection::stream).collect(Collectors.toList());
+
+        THERMAL_SLOTS_INPUT = Stream.of(TREE_EXTRACTOR_SLOTS_INPUT, PULVERIZER_SLOTS_INPUT, SAWMILL_SLOTS_INPUT, SMELTER_SLOTS_INPUT, INSOLATOR_SLOTS_INPUT, PRESS_SLOTS_INPUT, FURNACE_THERMAL_SLOTS_INPUT, CENTRIFUGE_SLOTS_INPUT, CHILLER_SLOTS_INPUT, CRUCIBLE_SLOTS_INPUT, REFINERY_SLOTS_INPUT, BOTTLER_SLOTS_INPUT, PYROLYZER_SLOTS_INPUT).flatMap(Collection::stream).collect(Collectors.toList());
+        THERMAL_SLOTS_OUTPUT = Stream.of(TREE_EXTRACTOR_SLOTS_OUTPUT, PULVERIZER_SLOTS_OUTPUT, SAWMILL_SLOTS_OUTPUT, SMELTER_SLOTS_OUTPUT, INSOLATOR_SLOTS_OUTPUT, PRESS_SLOTS_OUTPUT, FURNACE_THERMAL_SLOTS_OUTPUT, CENTRIFUGE_SLOTS_OUTPUT, CHILLER_SLOTS_OUTPUT, CRUCIBLE_SLOTS_OUTPUT, REFINERY_SLOTS_OUTPUT, BOTTLER_SLOTS_OUTPUT, PYROLYZER_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
+        THERMAL_SLOTS = Stream.of(TREE_EXTRACTOR_SLOTS, PULVERIZER_SLOTS, SAWMILL_SLOTS, SMELTER_SLOTS, INSOLATOR_SLOTS, PRESS_SLOTS, FURNACE_THERMAL_SLOTS, CENTRIFUGE_SLOTS, CHILLER_SLOTS, CRUCIBLE_SLOTS, REFINERY_SLOTS, BOTTLER_SLOTS, PYROLYZER_SLOTS).flatMap(Collection::stream).collect(Collectors.toList());
         THERMAL_SLOTS_SIZE = thermalSlots;
     }
 }
