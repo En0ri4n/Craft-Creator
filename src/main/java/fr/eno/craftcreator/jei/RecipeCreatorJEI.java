@@ -2,6 +2,7 @@ package fr.eno.craftcreator.jei;
 
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.screen.container.BotaniaRecipeCreatorScreen;
+import fr.eno.craftcreator.screen.container.CreateRecipeCreatorScreen;
 import fr.eno.craftcreator.screen.container.MinecraftRecipeCreatorScreen;
 import fr.eno.craftcreator.screen.container.ThermalRecipeCreatorScreen;
 import fr.eno.craftcreator.screen.container.base.MultiScreenModRecipeCreatorScreen;
@@ -19,7 +20,7 @@ public class RecipeCreatorJEI implements IModPlugin
     @Override
     public ResourceLocation getPluginUid()
     {
-        return References.getLoc("jei_plugin");
+        return References.getLoc("jeiplugin");
     }
 
     @Override
@@ -29,5 +30,6 @@ public class RecipeCreatorJEI implements IModPlugin
         registration.addGuiContainerHandler(MinecraftRecipeCreatorScreen.class, guiContainerHandler);
         registration.addGuiContainerHandler(BotaniaRecipeCreatorScreen.class, guiContainerHandler);
         registration.addGuiContainerHandler(ThermalRecipeCreatorScreen.class, guiContainerHandler);
+        registration.addGuiContainerHandler(CreateRecipeCreatorScreen.class, guiContainerHandler);
     }
 }
