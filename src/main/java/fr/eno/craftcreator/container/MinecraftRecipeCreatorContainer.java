@@ -25,15 +25,6 @@ public class MinecraftRecipeCreatorContainer extends CommonContainer
             int x = SlotHelper.MINECRAFT_SLOTS.get(i).getxPos();
             int y = SlotHelper.MINECRAFT_SLOTS.get(i).getyPos();
 
-            if(PositionnedSlot.isValidSlot(SlotHelper.FURNACE_SLOTS, 2, i))
-            {
-                ItemStack fuel = new ItemStack(Items.EGG, 1);
-                fuel.enchant(Enchantments.ALL_DAMAGE_PROTECTION, 10);
-                fuel.setHoverName(References.getTranslate("container.minecraft.furnace.fuel"));
-                fuel.hideTooltipPart(ItemStack.TooltipDisplayFlags.ENCHANTMENTS);
-                this.addSlot(new LockedSlot(tile, i, x, y, fuel));
-            }
-
             this.addSlot(new SimpleSlotItemHandler(this.tile, i, x, y));
         }
 

@@ -131,7 +131,7 @@ public abstract class TaggeableSlotsContainerScreen<T extends Container> extends
     {
         Slot slot = this.getSelectedSlot(mouseX, mouseY);
 
-        if(slot instanceof CustomSlotItemHandler && PositionnedSlot.contains(this.getTaggableSlots(), slot.getSlotIndex()))
+        if(slot instanceof CustomSlotItemHandler)
         {
             boolean checkInventory = ((SlotItemHandler) slot).getItemHandler() instanceof TaggeableInventoryContainerTileEntity;
 
@@ -144,21 +144,31 @@ public abstract class TaggeableSlotsContainerScreen<T extends Container> extends
                 return super.mouseClicked(mouseX, mouseY, button);
             }
 
-            this.guiTagList.setKeys(null);
-            this.guiTagList.setSelectedKey(null);
-            this.selectedSlot = null;
-
-            if(checkInventory && Screen.hasControlDown() && slot.getItem().getItem().getTags().stream().findFirst().isPresent())
+            if(PositionnedSlot.contains(this.getTaggableSlots(), slot.getSlotIndex()))
             {
-                this.selectedSlot = (SlotItemHandler) slot;
-                this.guiTagList.setKeys(new ArrayList<>(slot.getItem().getItem().getTags()));
-                this.nbtCheckBox.setSelected(this.nbtSlots.contains(slot.getSlotIndex()));
+                this.guiTagList.setKeys(null);
+                this.guiTagList.setSelectedKey(null);
+                this.selectedSlot = null;
 
-                if(this.taggedSlots.containsKey(this.selectedSlot)) this.guiTagList.setSelectedKey(this.taggedSlots.get(this.selectedSlot));
+                if(checkInventory && Screen.hasControlDown() && slot.getItem().getItem().getTags().stream().findFirst().isPresent())
+                {
+                    this.selectedSlot = (SlotItemHandler) slot;
+                    this.guiTagList.setKeys(new ArrayList<>(slot.getItem().getItem().getTags()));
+                    this.nbtCheckBox.setSelected(this.nbtSlots.contains(slot.getSlotIndex()));
 
-                return true;
+                    if(this.taggedSlots.containsKey(this.selectedSlot)) this.guiTagList.setSelectedKey(this.taggedSlots.get(this.selectedSlot));
+
+                    return true;
+                }
+                else if(checkInventory && Screen.hasControlDown() && slot.hasItem())
+                {
+                    this.selectedSlot = (SlotItemHandler) slot;
+                    this.nbtCheckBox.setSelected(this.nbtSlots.contains(slot.getSlotIndex()));
+                    return true;
+                }
             }
-            else if(checkInventory && Screen.hasControlDown() && slot.hasItem())
+
+            if(checkInventory && Screen.hasControlDown() && slot.hasItem())
             {
                 this.selectedSlot = (SlotItemHandler) slot;
                 this.nbtCheckBox.setSelected(this.nbtSlots.contains(slot.getSlotIndex()));
@@ -186,7 +196,7 @@ public abstract class TaggeableSlotsContainerScreen<T extends Container> extends
         this.guiTagList.setKeys(null);
         this.guiTagList.setSelectedKey(null);
         this.selectedSlot = null;
-        return super.mouseClicked(mouseX, mouseY, button);
+        return this.nbtCheckBox.isMouseOver(mouseX, mouseY) ? true : super.mouseClicked(mouseX, mouseY, button);
     }
 
     private Slot getSelectedSlot(double mouseX, double mouseY)

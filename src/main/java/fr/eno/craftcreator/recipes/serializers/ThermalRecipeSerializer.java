@@ -348,18 +348,18 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
         else if(recipe instanceof PulverizerRecipe)
         {
             PulverizerRecipe pulverizerRecipe = (PulverizerRecipe) recipe;
-            putIfNotEmptyLuckedItems(outputsIngredient, pulverizerRecipe.getOutputItems(), pulverizerRecipe.getOutputItemChances(), "Item");
+            putIfNotEmptyLuckedItems(outputsIngredient, pulverizerRecipe.getOutputItems(), pulverizerRecipe.getOutputItemChances());
             outputsIngredient.addIngredient(new CraftIngredients.DataIngredient("Experience", CraftIngredients.DataIngredient.DataUnit.EXPERIENCE, pulverizerRecipe.getXp(), true));
         }
         else if(recipe instanceof SawmillRecipe)
         {
             SawmillRecipe sawmillRecipe = (SawmillRecipe) recipe;
-            putIfNotEmptyLuckedItems(outputsIngredient, sawmillRecipe.getOutputItems(), sawmillRecipe.getOutputItemChances(), "Item");
+            putIfNotEmptyLuckedItems(outputsIngredient, sawmillRecipe.getOutputItems(), sawmillRecipe.getOutputItemChances());
         }
         else if(recipe instanceof SmelterRecipe)
         {
             SmelterRecipe smelterRecipe = (SmelterRecipe) recipe;
-            putIfNotEmptyLuckedItems(outputsIngredient, smelterRecipe.getOutputItems(), smelterRecipe.getOutputItemChances(), "Item");
+            putIfNotEmptyLuckedItems(outputsIngredient, smelterRecipe.getOutputItems(), smelterRecipe.getOutputItemChances());
             outputsIngredient.addIngredient(new CraftIngredients.DataIngredient("Experience", CraftIngredients.DataIngredient.DataUnit.EXPERIENCE, smelterRecipe.getXp(), true));
         }
         else if(recipe instanceof PressRecipe)
@@ -386,7 +386,7 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
         else if(recipe instanceof ChillerRecipe)
         {
             ChillerRecipe chillerRecipe = (ChillerRecipe) recipe;
-            putIfNotEmptyLuckedItems(outputsIngredient, chillerRecipe.getOutputItems(), chillerRecipe.getOutputItemChances(), "Item");
+            putIfNotEmptyLuckedItems(outputsIngredient, chillerRecipe.getOutputItems(), chillerRecipe.getOutputItemChances());
         }
         else if(recipe instanceof CrucibleRecipe)
         {
@@ -403,7 +403,7 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
         else if(recipe instanceof PyrolyzerRecipe)
         {
             PyrolyzerRecipe pyrolyzerRecipe = (PyrolyzerRecipe) recipe;
-            putIfNotEmptyLuckedItems(outputsIngredient, pyrolyzerRecipe.getOutputItems(), pyrolyzerRecipe.getOutputItemChances(), "Item");
+            putIfNotEmptyLuckedItems(outputsIngredient, pyrolyzerRecipe.getOutputItems(), pyrolyzerRecipe.getOutputItemChances());
             for(FluidStack fluidStack : pyrolyzerRecipe.getOutputFluids())
                 outputsIngredient.addIngredient(new CraftIngredients.FluidIngredient(fluidStack.getFluid().getRegistryName(), fluidStack.getAmount()));
         }

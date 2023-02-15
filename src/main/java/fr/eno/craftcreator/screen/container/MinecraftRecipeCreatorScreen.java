@@ -2,7 +2,6 @@ package fr.eno.craftcreator.screen.container;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.base.ModRecipeCreator;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.container.MinecraftRecipeCreatorContainer;
@@ -130,9 +129,6 @@ public class MinecraftRecipeCreatorScreen extends MultiScreenModRecipeCreatorScr
             case CAMPFIRE_COOKING:
                 renderDataFieldAndTitle(0, References.getTranslate("screen.minecraft_recipe_creator_screen.field.experience"), matrixStack, mouseX, mouseY, partialTicks);
                 renderDataFieldAndTitle(1, References.getTranslate("screen.minecraft_recipe_creator_screen.field.cooking_time"), matrixStack, mouseX, mouseY, partialTicks);
-                // Only for >> FLAMES <<
-                ClientUtils.bindTexture(getCurrentRecipe().getGuiTexture());
-                blit(matrixStack, this.leftPos + 57, this.topPos + 37, 176, 0, 14, 14, 256, 256);
                 break;
         }
 

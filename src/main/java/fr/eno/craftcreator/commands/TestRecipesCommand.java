@@ -88,7 +88,7 @@ public class TestRecipesCommand
 			e.printStackTrace();
 		}
 
-		File recipeFolder = new File(packFolder, "data\\craft_creator\\recipes");
+		File recipeFolder = new File(packFolder, "data\\craftcreator\\recipes");
 		recipeFolder.mkdirs();
 
 		return recipeFolder;

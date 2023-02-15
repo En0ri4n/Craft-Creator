@@ -35,14 +35,9 @@ public class ListEntriesHelper
 
         List<T> entries = new ArrayList<>();
 
-        if(!SupportedMods.isKubeJSLoaded())
-        {
-            ClientUtils.getClientLevel().getRecipeManager().getAllRecipesFor(recipeType).stream().filter(recipe -> recipe.getId().getNamespace().equals(References.MOD_ID)).forEach(recipe -> entries.add((T) new SimpleListWidget.RecipeEntry(recipe)));
-        }
-        else
-        {
-            KubeJSHelper.getAddedRecipesFor(mod, recipeType).forEach(recipe -> entries.add((T) new SimpleListWidget.RecipeEntry(recipe)));
-        }
+        ClientUtils.getClientLevel().getRecipeManager().getAllRecipesFor(recipeType).stream().filter(recipe -> recipe.getId().getNamespace().equals(References.MOD_ID)).forEach(recipe -> entries.add((T) new SimpleListWidget.RecipeEntry(recipe)));
+
+        if(SupportedMods.isKubeJSLoaded()) KubeJSHelper.getAddedRecipesFor(mod, recipeType).forEach(recipe -> entries.add((T) new SimpleListWidget.RecipeEntry(recipe)));
 
         return entries;
     }
@@ -75,24 +70,23 @@ public class ListEntriesHelper
 
         ClientUtils.getClientLevel().getRecipeManager().getAllRecipesFor(recipeType).forEach(recipe ->
         {
-            if(!recipe.getId().toString().contains("kjs")) entries.add((E) new SimpleListWidget.RecipeEntry(recipe));
+            if(!recipe.getId().toString().contains("kjs") && !recipe.getId().getNamespace().equals(References.MOD_ID)) entries.add((E) new SimpleListWidget.RecipeEntry(recipe));
         });
 
         return entries.stream().sorted(Comparator.comparing(object -> ((SimpleListWidget.RecipeEntry) object).getRecipe().getId().toString())).collect(Collectors.toList());
     }
-    
+
     public static <C extends IInventory, T extends IRecipe<C>, E extends SimpleListWidget.Entry> List<E> getFilteredRecipes(ResourceLocation recipeTypeLoc, String filter)
     {
         IRecipeType<T> recipeType = CommonUtils.getRecipeTypeByName(recipeTypeLoc);
-    
+
         List<E> entries = new ArrayList<>();
-    
+
         ClientUtils.getClientLevel().getRecipeManager().getAllRecipesFor(recipeType).forEach(recipe ->
         {
-            if(!recipe.getId().toString().contains("kjs") && recipe.getId().toString().contains(filter))
-                entries.add((E) new SimpleListWidget.RecipeEntry(recipe));
+            if(!recipe.getId().toString().contains("kjs") && recipe.getId().toString().contains(filter)) entries.add((E) new SimpleListWidget.RecipeEntry(recipe));
         });
-    
+
         return entries.stream().sorted(Comparator.comparing(object -> ((SimpleListWidget.RecipeEntry) object).getRecipe().getId().toString())).collect(Collectors.toList());
     }
 }

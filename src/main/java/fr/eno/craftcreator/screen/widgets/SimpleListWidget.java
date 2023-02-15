@@ -47,6 +47,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
     private final ITextComponent title;
     private final int titleBoxHeight;
     private final int scrollBarWidth;
+    private final boolean canDelete;
     private boolean canHaveSelected;
     private final boolean hasTitleBox;
     private Callable<Entry> onSelected;
@@ -56,7 +57,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
     private boolean isListHovered;
     private boolean canDisplayTooltips;
 
-    public SimpleListWidget(Minecraft mcIn, int leftIn, int topIn, int widthIn, int heightIn, int slotHeightIn, int titleBoxHeight, int scrollBarWidth, ITextComponent titleIn, @Nullable Callable<Entry> onDelete)
+    public SimpleListWidget(Minecraft mcIn, int leftIn, int topIn, int widthIn, int heightIn, int slotHeightIn, int titleBoxHeight, int scrollBarWidth, ITextComponent titleIn, @Nullable Callable<Entry> onDelete, boolean canDelete)
     {
         super(mcIn, widthIn - scrollBarWidth, heightIn - titleBoxHeight, 0, 0, slotHeightIn);
         this.x0 = leftIn;
@@ -71,6 +72,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         this.isVisible = true;
         this.onDelete = onDelete;
         this.canDisplayTooltips = true;
+        this.canDelete = canDelete;
     }
     
     public int getSize()
@@ -209,7 +211,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
     {
         if(keyCode == GLFW.GLFW_KEY_DELETE)
         {
-            if(this.getSelected() != null && this.onDelete != null)
+            if(this.getSelected() != null && this.onDelete != null && canDelete)
             {
                 this.onDelete.run(this.getSelected());
                 this.setSelected(null);

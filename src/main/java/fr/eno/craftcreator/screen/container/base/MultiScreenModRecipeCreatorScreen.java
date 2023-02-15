@@ -13,7 +13,7 @@ import fr.eno.craftcreator.init.InitPackets;
 import fr.eno.craftcreator.packets.RetrieveRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
-import fr.eno.craftcreator.recipes.managers.RecipeManagerDispatcher;
+import fr.eno.craftcreator.base.RecipeManagerDispatcher;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import fr.eno.craftcreator.screen.widgets.ButtonGrid;
 import fr.eno.craftcreator.screen.widgets.NumberDataFieldWidget;
@@ -90,7 +90,11 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         {
             InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("kubejs_recipe", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.BOOLEAN));
             this.addButton(isKubeJSRecipeButton = new SimpleCheckBox(leftPos, topPos + imageHeight + 2, 10, 10, References.getTranslate("screen.recipe_creator_screen.kube_js_button"), false));
-            if(!SupportedMods.isKubeJSLoaded()) this.isKubeJSRecipeButton.visible = false;
+            if(!SupportedMods.isKubeJSLoaded())
+            {
+                isKubeJSRecipeButton.visible = false;
+                isKubeJSRecipeButton.setSelected(false);
+            }
         }
         
         this.addButton(executeButton = new ExecuteButton(this.leftPos + this.imageWidth / 2 - 20, this.topPos + 35, 42, (button) -> RecipeManagerDispatcher.createRecipe(this.getMenu().getMod(), getCurrentRecipe(),
@@ -107,7 +111,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
 
     protected ModRecipeSerializer.SerializerType getCurrentSerializerType()
     {
-        if(isVanillaScreen && !isKubeJSRecipeButton.selected()) return ModRecipeSerializer.SerializerType.MINECRAFT_DATAPACK;
+        if(isVanillaScreen && !isKubeJSRecipeButton.selected() || !SupportedMods.isKubeJSLoaded()) return ModRecipeSerializer.SerializerType.MINECRAFT_DATAPACK;
         
         return ModRecipeSerializer.SerializerType.KUBE_JS;
     }
