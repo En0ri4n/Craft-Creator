@@ -48,7 +48,7 @@ public class RecipeModifierManagerScreen extends TaggeableSlotsContainerScreen<R
 
         int bottomHeight = 20;
 
-        this.lists.add(new SimpleListWidget(ClientUtils.getMinecraft(), 5, 5, this.width / 4, this.height - bottomHeight, 15, 15, 5, References.getTranslate("screen.recipe_manager.list.modified_recipes"), null, false));
+        this.lists.add(new SimpleListWidget(5, 5, this.width / 4, this.height - bottomHeight, 15, 15, 5, References.getTranslate("screen.recipe_manager.list.modified_recipes"), null, false));
 
         //this.lists.get(0).setEntries(ListEntriesHelper.getModifiedRecipesEntryList());
 

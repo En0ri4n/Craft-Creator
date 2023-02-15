@@ -9,7 +9,6 @@ import fr.eno.craftcreator.container.slot.utils.PositionnedSlot;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import fr.eno.craftcreator.screen.container.base.MultiScreenModRecipeCreatorScreen;
 import fr.eno.craftcreator.screen.widgets.NumberDataFieldWidget;
-import fr.eno.craftcreator.utils.PairValues;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
@@ -21,7 +20,6 @@ import vazkii.botania.common.block.ModBlocks;
 import vazkii.botania.common.block.ModSubtiles;
 import vazkii.botania.common.item.ModItems;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,17 +33,23 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     }
 
     @Override
-    protected void init()
+    protected void initFields()
     {
-        super.init();
-
         addNumberField(leftPos + imageWidth - 44, topPos + imageHeight / 2 - 16, 35, 100, 1);
-
-        updateScreen();
     }
 
     @Override
-    protected RecipeInfos getRecipeInfos()
+    protected void initWidgets()
+    {
+    }
+
+    @Override
+    protected void retrieveExtraData()
+    {
+    }
+
+    @Override
+    protected RecipeInfos getExtraRecipeInfos(RecipeInfos recipeInfos)
     {
         for(NumberDataFieldWidget textField : dataFields)
         {
@@ -55,22 +59,20 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
 
                 if(this.getCurrentRecipe().equals(ModRecipeCreator.PURE_DAISY))
                 {
-                    this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.TIME, textField.getIntValue()));
+                    recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.TIME, textField.getIntValue()));
                     continue;
                 }
 
-                this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.MANA, textField.getIntValue()));
+                recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.MANA, textField.getIntValue()));
             }
         }
 
-        return this.recipeInfos;
+        return recipeInfos;
     }
 
     @Override
-    protected void updateScreen()
+    protected void updateGui()
     {
-        super.updateScreen();
-
         int dataFieldY = topPos + imageHeight / 2 - 15;
 
         switch(getCurrentRecipe())
@@ -104,10 +106,8 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     }
 
     @Override
-    public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void renderGui(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
-
         switch(getCurrentRecipe())
         {
             case MANA_INFUSION:
@@ -141,8 +141,6 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
                 renderDataFieldAndTitle(MANA_FIELD, References.getTranslate("screen.botania_recipe_creator.field.time"), matrixStack, mouseX, mouseY, partialTicks);
                 break;
         }
-
-        this.renderTooltip(matrixStack, mouseX, mouseY);
     }
 
     @Override
@@ -177,27 +175,7 @@ public class BotaniaRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
             case PURE_DAISY:
                 return ModSubtiles.pureDaisy.asItem();
             default:
-                return Items.AIR;
-        }
-    }
-
-    protected PairValues<Integer, Integer> getIconPos()
-    {
-        switch(getCurrentRecipe())
-        {
-            case MANA_INFUSION:
-            case ELVEN_TRADE:
-                return PairValues.create(this.leftPos + imageWidth / 2 - 8, this.topPos + 14);
-            case BREWERY:
-                return PairValues.create(this.leftPos + 34, this.topPos + 33);
-            case PETAL_APOTHECARY:
-                return PairValues.create(this.leftPos + Math.floorDiv(imageWidth, 2) + 21, this.topPos + 4);
-            case RUNIC_ALTAR:
-                return PairValues.create(this.leftPos + Math.floorDiv(imageWidth, 2) + 16, this.topPos + 4);
-            case TERRA_PLATE:
-                return PairValues.create(this.leftPos + 34, this.topPos + 34);
-            default:
-                return PairValues.create(0, 0);
+                return Items.COMMAND_BLOCK;
         }
     }
 }

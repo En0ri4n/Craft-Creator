@@ -104,6 +104,15 @@ public class SlotHelper
     public static final List<PositionnedSlot> PYROLYZER_SLOTS_INPUT;
     public static final List<PositionnedSlot> PYROLYZER_SLOTS_OUTPUT;
 
+    // Create
+    public static final int CREATE_SLOTS_SIZE;
+    public static final List<PositionnedSlot> CREATE_SLOTS;
+    public static final List<PositionnedSlot> CREATE_SLOTS_INPUT;
+    public static final List<PositionnedSlot> CREATE_SLOTS_OUTPUT;
+    public static final List<PositionnedSlot> CRUSHING_SLOTS;
+    public static final List<PositionnedSlot> CRUSHING_SLOTS_INPUT;
+    public static final List<PositionnedSlot> CRUSHING_SLOTS_OUTPUT;
+
     static
     {
         // Minecraft Vanilla, homemade
@@ -231,5 +240,18 @@ public class SlotHelper
         THERMAL_SLOTS_OUTPUT = Stream.of(TREE_EXTRACTOR_SLOTS_OUTPUT, PULVERIZER_SLOTS_OUTPUT, SAWMILL_SLOTS_OUTPUT, SMELTER_SLOTS_OUTPUT, INSOLATOR_SLOTS_OUTPUT, PRESS_SLOTS_OUTPUT, FURNACE_THERMAL_SLOTS_OUTPUT, CENTRIFUGE_SLOTS_OUTPUT, CHILLER_SLOTS_OUTPUT, CRUCIBLE_SLOTS_OUTPUT, REFINERY_SLOTS_OUTPUT, BOTTLER_SLOTS_OUTPUT, PYROLYZER_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
         THERMAL_SLOTS = Stream.of(TREE_EXTRACTOR_SLOTS, PULVERIZER_SLOTS, SAWMILL_SLOTS, SMELTER_SLOTS, INSOLATOR_SLOTS, PRESS_SLOTS, FURNACE_THERMAL_SLOTS, CENTRIFUGE_SLOTS, CHILLER_SLOTS, CRUCIBLE_SLOTS, REFINERY_SLOTS, BOTTLER_SLOTS, PYROLYZER_SLOTS).flatMap(Collection::stream).collect(Collectors.toList());
         THERMAL_SLOTS_SIZE = thermalSlots;
+
+
+        // Create
+        int createSlots = 0;
+        // Crushing Wheels
+        CRUSHING_SLOTS_INPUT = Collections.singletonList(new PositionnedSlot(createSlots++, 63, 98));
+        CRUSHING_SLOTS_OUTPUT = Arrays.asList(new PositionnedSlot(createSlots++, 189, 33), new PositionnedSlot(createSlots++, 189, 59), new PositionnedSlot(createSlots++, 189, 85), new PositionnedSlot(createSlots++, 189, 111));
+        CRUSHING_SLOTS = Stream.of(CRUSHING_SLOTS_INPUT, CRUSHING_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
+
+        CREATE_SLOTS_INPUT = Stream.of(CRUSHING_SLOTS_INPUT).flatMap(Collection::stream).collect(Collectors.toList());
+        CREATE_SLOTS_OUTPUT = Stream.of(CRUSHING_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
+        CREATE_SLOTS = Stream.of(CREATE_SLOTS_INPUT, CREATE_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
+        CREATE_SLOTS_SIZE = createSlots;
     }
 }

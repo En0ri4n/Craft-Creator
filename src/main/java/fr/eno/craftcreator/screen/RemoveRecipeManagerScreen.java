@@ -71,7 +71,7 @@ public class RemoveRecipeManagerScreen extends ListScreen
         this.addButton(new SimpleButton(References.getTranslate("screen.remove_manager.button.remove"), this.width / 2 - 80, this.height - 50, 160, 20, (button) -> sendRemovedRecipe()));
         this.addButton(new SimpleButton(References.getTranslate("screen.remove_manager.button.back"), this.width - 97, this.height - 35, 80, 20, (button) -> ClientUtils.openScreen(new RecipeManagerScreen())));
 
-        this.addList(new SimpleListWidget(ClientUtils.getMinecraft(), 200, 200, 100, 100, 15,  4, 6, new StringTextComponent(""), null, false));
+        this.addList(new SimpleListWidget(200, 200, 100, 100, 15,  4, 6, new StringTextComponent(""), null, false));
         this.getList(0).setVisible(false);
 
         checkBoxes();
