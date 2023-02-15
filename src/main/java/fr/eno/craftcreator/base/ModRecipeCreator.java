@@ -46,7 +46,10 @@ public enum ModRecipeCreator
     CRUCIBLE(SupportedMods.THERMAL, ClientUtils.parse("thermal:crucible"), "crucible_recipe_creator.png", SlotHelper.CRUCIBLE_SLOTS),
     REFINERY(SupportedMods.THERMAL, ClientUtils.parse("thermal:refinery"), "refinery_recipe_creator.png", SlotHelper.REFINERY_SLOTS),
     BOTTLER(SupportedMods.THERMAL, ClientUtils.parse("thermal:bottler"), "bottler_recipe_creator.png", SlotHelper.BOTTLER_SLOTS),
-    PYROLYZER(SupportedMods.THERMAL, ClientUtils.parse("thermal:pyrolyzer"), "pyrolyzer_recipe_creator.png", SlotHelper.PYROLYZER_SLOTS),;
+    PYROLYZER(SupportedMods.THERMAL, ClientUtils.parse("thermal:pyrolyzer"), "pyrolyzer_recipe_creator.png", SlotHelper.PYROLYZER_SLOTS),
+
+    // Create
+    CRUSHING(SupportedMods.CREATE, ClientUtils.parse("create:crushing"), "crushing_recipe_creator.png", SlotHelper.CRUSHING_SLOTS),;
 
     private final SupportedMods mod;
     private final ResourceLocation recipeTypeLocation;

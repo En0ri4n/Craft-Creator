@@ -62,7 +62,7 @@ public class RecipeManagerScreen extends ListScreen
         }));
 
 
-        this.addList(new SimpleListWidget(ClientUtils.getMinecraft(), 10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.recipes"), (entry) ->
+        this.addList(new SimpleListWidget(10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.recipes"), (entry) ->
         {
             IRecipe<?> recipeToRemove = ((SimpleListWidget.RecipeEntry) entry).getRecipe();
             ModRecipeCreatorDispatcher.getSeralizer(this.modId).removeRecipe(new KubeJSModifiedRecipe(KubeJSModifiedRecipe.KubeJSModifiedRecipeType.REMOVED, Collections.singletonMap(ModRecipeSerializer.RecipeDescriptors.RECIPE_ID, recipeToRemove.getId().toString())), ModRecipeSerializer.SerializerType.KUBE_JS);
@@ -85,7 +85,7 @@ public class RecipeManagerScreen extends ListScreen
             this.searchField.setValue("");
         }));
 
-        this.addList(new SimpleListWidget(ClientUtils.getMinecraft(), this.width / 3 + 10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.added_recipes"), (entry) ->
+        this.addList(new SimpleListWidget(this.width / 3 + 10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.added_recipes"), (entry) ->
         {
             SimpleListWidget.RecipeEntry recipeEntry = (SimpleListWidget.RecipeEntry) entry;
 
@@ -100,7 +100,7 @@ public class RecipeManagerScreen extends ListScreen
             }
         }, true));
 
-        this.addList(new SimpleListWidget(ClientUtils.getMinecraft(), this.width / 3 * 2 + 10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.modified_recipes"), (entry) ->
+        this.addList(new SimpleListWidget(this.width / 3 * 2 + 10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.modified_recipes"), (entry) ->
         {
             ModRecipeSerializer.removeModifiedRecipe(getCurrentMod(), ((SimpleListWidget.ModifiedRecipeEntry) entry).getRecipe());
             updateLists(false);

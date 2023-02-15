@@ -23,8 +23,6 @@ public class ButtonGrid<T extends Button> implements IOutsideWidget
 
     private boolean isVisible;
 
-    private Rectangle2d area;
-
     public ButtonGrid(int x, int y, int buttonSize, int buttonSpacing, int buttonPerLine,List<T> buttons, Callable<T> onPress)
     {
         this.x = x;
@@ -112,7 +110,6 @@ public class ButtonGrid<T extends Button> implements IOutsideWidget
     public void setVisible(boolean isVisible)
     {
         this.isVisible = isVisible;
-        calculateArea();
     }
 
     public boolean isVisible()
@@ -121,17 +118,11 @@ public class ButtonGrid<T extends Button> implements IOutsideWidget
     }
 
     @Override
-    public void calculateArea()
-    {
-        if(isVisible)
-            this.area = new Rectangle2d(x, y, getWidth(), getHeight());
-        else
-            this.area = new Rectangle2d(0, 0, 0, 0);
-    }
-
-    @Override
     public Rectangle2d getArea()
     {
-        return new Rectangle2d(0, 0, 100, 100);
+        if(isVisible)
+            return new Rectangle2d(x, y, getWidth(), getHeight());
+        else
+            return new Rectangle2d(x, y, 0, 0);
     }
 }

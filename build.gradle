@@ -25,9 +25,7 @@ println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty '
 
 minecraft {
 
-    mappings channel: 'parchment', version: "1.16.5-2022.03.06-1.16.5"
-    // mappings channel: 'snapshot', version: '20210309-1.16.5'
-    // mappings channel: 'official', version: "1.16.5"
+    mappings channel: 'parchment', version: "${mc_version}-${parchment_version}"
 
     runs {
         client {
@@ -35,16 +33,8 @@ minecraft {
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
 
-            // Recommended logging data for a userdev environment
-            // The markers can be changed as needed.
-            // "SCAN": For mods scan.
-            // "REGISTRIES": For firing of registry events.
-            // "REGISTRYDUMP": For getting the contents of all registries.
             property 'forge.logging.markers', 'REGISTRIES'
 
-            // Recommended logging level for the console
-            // You can set various levels here.
-            // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
             property 'forge.logging.console.level', 'debug'
 
             mods {
@@ -59,16 +49,8 @@ minecraft {
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
 
-            // Recommended logging data for a userdev environment
-            // The markers can be changed as needed.
-            // "SCAN": For mods scan.
-            // "REGISTRIES": For firing of registry events.
-            // "REGISTRYDUMP": For getting the contents of all registries.
             property 'forge.logging.markers', 'REGISTRIES'
 
-            // Recommended logging level for the console
-            // You can set various levels here.
-            // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
             property 'forge.logging.console.level', 'debug'
 
             mods {
@@ -83,20 +65,12 @@ minecraft {
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
 
-            // Recommended logging data for a userdev environment
-            // The markers can be changed as needed.
-            // "SCAN": For mods scan.
-            // "REGISTRIES": For firing of registry events.
-            // "REGISTRYDUMP": For getting the contents of all registries.
             property 'forge.logging.markers', 'REGISTRIES'
 
-            // Recommended logging level for the console
-            // You can set various levels here.
-            // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
             property 'forge.logging.console.level', 'debug'
 
             // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
-            args '--mod', 'craftcreator', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            args '--mod', "${craftcreator_id}", '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 
             mods {
                 craftcreator {
@@ -131,7 +105,7 @@ repositories {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.5-36.2.34'
+    minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
 
     // JEI
     // compile against the JEI API but do not include it at runtime
@@ -153,21 +127,27 @@ dependencies {
     // Patchouli (Botania Dependency)
     implementation fg.deobf("curse.maven:patchouli-${patchouli_project_id}:${patchouli_cursefileid}")
 
-    // Thermal Series
+    // Thermal Expansion
+    implementation fg.deobf("curse.maven:thermal-expansion-${thermal_expansion_project_id}:${thermal_expansion_cursefileid}") // Thermal Expansion
+    // Thermal Foundation (Thermal Expansion Dependency)
     implementation fg.deobf("curse.maven:thermal-foundation-${thermal_foundation_project_id}:${thermal_foundation_cursefileid}")
-    implementation fg.deobf("curse.maven:thermal-expansion-${thermal_expansion_project_id}:${thermal_expansion_cursefileid}")
+    // CoFH Core (Thermal Dependency)
     implementation fg.deobf("curse.maven:cofh-core-${cofh_core_project_id}:${cofh_core_cursefileid}")
-    // Thermal Series Dependency
+
+    // Create
+    implementation fg.deobf("curse.maven:create-${create_project_id}:${create_cursefileid}") // Create
+    // Flywheel (Create Dependency)
+    implementation fg.deobf("curse.maven:flywheel-${flywheel_project_id}:${flywheel_cursefileid}")
 }
 
 jar {
     manifest {
         attributes([
-                "Specification-Title"     : project.name,
+                "Specification-Title"     : "${craftcreator_name}",
                 "Specification-Vendor"    : "En0ri4n",
                 "Specification-Version"   : "1", // We are version 1 of ourselves
-                "Implementation-Title"    : project.name,
-                "Implementation-Version"  : version,
+                "Implementation-Title"    : "${craftcreator_name}",
+                "Implementation-Version"  : "${craftcreator_version}",
                 "Implementation-Vendor"   : "En0ri4n",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])

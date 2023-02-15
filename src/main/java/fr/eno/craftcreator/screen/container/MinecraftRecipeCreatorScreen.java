@@ -19,7 +19,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.text.ITextComponent;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 
 public class MinecraftRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen<MinecraftRecipeCreatorContainer>
@@ -33,16 +32,22 @@ public class MinecraftRecipeCreatorScreen extends MultiScreenModRecipeCreatorScr
     }
 
     @Override
-    protected void init()
+    protected void initFields()
     {
-        super.init();
-        InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("shaped", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.BOOLEAN));
-        this.addButton(craftTypeButton = new BooleanButton("craftType", leftPos + 100, topPos + 60, 68, 20, true, NullPressable.get()));
-
         addNumberField(leftPos + 8, topPos + 30, 40, 0.1D, 1);
         addNumberField(leftPos + 8, topPos + 60, 40, 200, 1);
+    }
 
-        updateScreen();
+    @Override
+    protected void initWidgets()
+    {
+        this.addButton(craftTypeButton = new BooleanButton("craftType", leftPos + 100, topPos + 60, 68, 20, true, NullPressable.get()));
+    }
+
+    @Override
+    protected void retrieveExtraData()
+    {
+        InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("shaped", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.BOOLEAN));
     }
 
     @Override
@@ -59,10 +64,8 @@ public class MinecraftRecipeCreatorScreen extends MultiScreenModRecipeCreatorScr
     }
 
     @Override
-    protected void updateScreen()
+    protected void updateGui()
     {
-        super.updateScreen();
-
         this.craftTypeButton.visible = false;
 
         switch(getCurrentRecipe())
@@ -94,9 +97,8 @@ public class MinecraftRecipeCreatorScreen extends MultiScreenModRecipeCreatorScr
     }
 
     @Override
-    protected RecipeInfos getRecipeInfos()
+    protected RecipeInfos getExtraRecipeInfos(RecipeInfos recipeInfos)
     {
-        super.getRecipeInfos();
         switch(getCurrentRecipe())
         {
             case CRAFTING_TABLE:
@@ -110,14 +112,12 @@ public class MinecraftRecipeCreatorScreen extends MultiScreenModRecipeCreatorScr
                 recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.COOKING_TIME, getDataField(1).getIntValue()));
                 break;
         }
-        return this.recipeInfos;
+        return recipeInfos;
     }
 
     @Override
-    public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void renderGui(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
-
         switch(getCurrentRecipe())
         {
             case CRAFTING_TABLE:
@@ -131,8 +131,6 @@ public class MinecraftRecipeCreatorScreen extends MultiScreenModRecipeCreatorScr
                 renderDataFieldAndTitle(1, References.getTranslate("screen.minecraft_recipe_creator_screen.field.cooking_time"), matrixStack, mouseX, mouseY, partialTicks);
                 break;
         }
-
-        renderTooltip(matrixStack, mouseX, mouseY);
     }
 
     @Override
@@ -177,10 +175,8 @@ public class MinecraftRecipeCreatorScreen extends MultiScreenModRecipeCreatorScr
     }
 
     @Override
-    protected void updateServerData()
+    protected void updateExtraServerData()
     {
-        super.updateServerData();
-
         InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("shaped", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.BOOLEAN, this.craftTypeButton.isOn()));
     }
 }

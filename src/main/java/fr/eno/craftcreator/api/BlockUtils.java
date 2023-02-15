@@ -16,7 +16,7 @@ import net.minecraftforge.fml.network.NetworkHooks;
 public class BlockUtils
 {
     /**
-     * Create a VoxelShape from a box (Only for compatibilty)
+     * Create a VoxelShape from a box (from 0 to 16) (Only for compatibilty)
      *
      * @see VoxelShapes#box(double, double, double, double, double, double)
      *
@@ -25,6 +25,18 @@ public class BlockUtils
     public static VoxelShape box(double x1, double y1, double z1, double x2, double y2, double z2)
     {
         return VoxelShapes.box(x1 / 16.0D, y1 / 16.0D, z1 / 16.0D, x2 / 16.0D, y2 / 16.0D, z2 / 16.0D);
+    }
+
+    /**
+     * Create a VoxelShape from a box (from 0 to 1) (Only for compatibilty)
+     *
+     * @see VoxelShapes#box(double, double, double, double, double, double)
+     *
+     * @return the VoxelShape with the given size
+     */
+    public static VoxelShape create(double x1, double y1, double z1, double x2, double y2, double z2)
+    {
+        return VoxelShapes.box(x1, y1, z1, x2, y2, z2);
     }
 
     /**

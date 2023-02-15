@@ -1,10 +1,7 @@
 package fr.eno.craftcreator.init;
 
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.container.BotaniaRecipeCreatorContainer;
-import fr.eno.craftcreator.container.MinecraftRecipeCreatorContainer;
-import fr.eno.craftcreator.container.RecipeModifierContainer;
-import fr.eno.craftcreator.container.ThermalRecipeCreatorContainer;
+import fr.eno.craftcreator.container.*;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraftforge.common.extensions.IForgeContainerType;
@@ -22,6 +19,7 @@ public class InitContainers
 	public static final RegistryObject<ContainerType<MinecraftRecipeCreatorContainer>> MINECRAFT_RECIPE_CREATOR = register("minecraft_recipe_creator", MinecraftRecipeCreatorContainer::new);
 	public static final RegistryObject<ContainerType<BotaniaRecipeCreatorContainer>> BOTANIA_RECIPE_CREATOR = register("botania_recipe_creator", BotaniaRecipeCreatorContainer::new);
     public static final RegistryObject<ContainerType<ThermalRecipeCreatorContainer>> THERMAL_RECIPE_CREATOR = register("thermal_recipe_creator", ThermalRecipeCreatorContainer::new);
+	public static final RegistryObject<ContainerType<CreateRecipeCreatorContainer>> CREATE_RECIPE_CREATOR = register("create_recipe_creator", CreateRecipeCreatorContainer::new);
 
 	private static <T extends Container> RegistryObject<ContainerType<T>> register(String registryName, IContainerFactory<T> container)
 	{

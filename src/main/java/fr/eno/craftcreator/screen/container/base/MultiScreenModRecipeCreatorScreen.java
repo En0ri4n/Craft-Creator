@@ -5,6 +5,7 @@ import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.base.ModRecipeCreator;
+import fr.eno.craftcreator.base.RecipeManagerDispatcher;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.container.base.CommonContainer;
 import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
@@ -13,7 +14,6 @@ import fr.eno.craftcreator.init.InitPackets;
 import fr.eno.craftcreator.packets.RetrieveRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
-import fr.eno.craftcreator.base.RecipeManagerDispatcher;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import fr.eno.craftcreator.screen.widgets.ButtonGrid;
 import fr.eno.craftcreator.screen.widgets.NumberDataFieldWidget;
@@ -33,7 +33,6 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,8 +56,6 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     
     protected final List<NumberDataFieldWidget> dataFields;
     
-    protected final RecipeInfos recipeInfos;
-    
     protected int currentScreenIndex;
     
     public MultiScreenModRecipeCreatorScreen(T screenContainer, PlayerInventory inv, ITextComponent titleIn, BlockPos pos)
@@ -66,21 +63,21 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         super(screenContainer, inv, titleIn, pos);
         this.dataFields = new ArrayList<>();
         this.currentScreenIndex = 0;
-        this.recipeInfos = RecipeInfos.create();
     }
     
     @Override
     protected void init()
     {
         super.init();
+
+        initFields();
         
         this.buttonGrid = new ButtonGrid<>(this.leftPos + this.imageWidth, this.topPos, 20, 2, 4, IconButton.getButtons(getAvailableRecipesCreator().stream().map(this::getRecipeIcon).collect(Collectors.toList())), (button) ->
         {
             this.currentScreenIndex = this.buttonGrid.getButtons().indexOf(button);
             updateData();
             updateScreen();
-            
-            this.buttonGrid.setVisible(false);
+
             this.recipeTypeButton.setItem(button.getItem());
         });
         
@@ -98,16 +95,43 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         }
         
         this.addButton(executeButton = new ExecuteButton(this.leftPos + this.imageWidth / 2 - 20, this.topPos + 35, 42, (button) -> RecipeManagerDispatcher.createRecipe(this.getMenu().getMod(), getCurrentRecipe(),
-                this.getMenu().slots.stream().filter(slot -> slot instanceof SimpleSlotItemHandler).collect(Collectors.toList()), getRecipeInfos(), getCurrentSerializerType())));
+                this.getMenu().slots.stream().filter(slot -> slot instanceof SimpleSlotItemHandler).collect(Collectors.toList()), getRecipeInfos(RecipeInfos.create()), getCurrentSerializerType())));
         
         this.addButton(nextButton = new SimpleButton(References.getTranslate("screen.recipe_creator.button.next"), getArrowXPos(true), this.topPos + this.imageHeight - 66, 10, 20, (button) -> nextPage()));
         this.addButton(previousButton = new SimpleButton(References.getTranslate("screen.recipe_creator.button.previous"), getArrowXPos(false), this.topPos + this.imageHeight - 66, 10, 20, (button) -> previousPage()));
 
+        initWidgets();
+
+        retrieveData();
+    }
+
+    /**
+     * Called before retrieving data from server, used to init fields
+     */
+    protected abstract void initFields();
+
+    /**
+     * Called to init widgets
+     */
+    protected abstract void initWidgets();
+
+    /**
+     * Called to retrieve extra data from server<br>
+     * Override {@link #retrieveExtraData()} to retrieve other datas
+     */
+    private void retrieveData()
+    {
         // Retrieve data from server
         InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("screen_index", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.INT));
         InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("recipe_type", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.STRING));
         InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("fields", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.DOUBLE_ARRAY));
+        retrieveExtraData();
     }
+
+    /**
+     * Used to retrieve extra data from server (called after {@link #initFields()} and {@link #initWidgets()})
+     */
+    protected abstract void retrieveExtraData();
 
     protected ModRecipeSerializer.SerializerType getCurrentSerializerType()
     {
@@ -130,6 +154,8 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     {
         for(int i = 0; i < data.length; i++)
         {
+            if(i >= this.dataFields.size()) break;
+
             setDataFieldValue(data[i], getDataField(i).isDouble(), i);
         }
     }
@@ -152,15 +178,15 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         return right ? this.leftPos + this.imageWidth + 3 : this.leftPos - 3 - 10;
     }
     
-    protected RecipeInfos getRecipeInfos()
+    private RecipeInfos getRecipeInfos(RecipeInfos recipeInfos)
     {
-        this.recipeInfos.getParameters().clear();
-        
-        this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterMap<>(RecipeInfos.Parameters.TAGGED_SLOTS, this.getTagged()));
-        this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterList<>(RecipeInfos.Parameters.NBT_SLOTS, this.nbtSlots));
-        if(isVanillaScreen) this.recipeInfos.addParameter(new RecipeInfos.RecipeParameterBoolean(RecipeInfos.Parameters.KUBEJS_RECIPE, this.isKubeJSRecipeButton.selected() && SupportedMods.isKubeJSLoaded()));
-        return this.recipeInfos;
+        recipeInfos.addParameter(new RecipeInfos.RecipeParameterMap<>(RecipeInfos.Parameters.TAGGED_SLOTS, this.getTagged()));
+        recipeInfos.addParameter(new RecipeInfos.RecipeParameterList<>(RecipeInfos.Parameters.NBT_SLOTS, this.nbtSlots));
+        if(isVanillaScreen) recipeInfos.addParameter(new RecipeInfos.RecipeParameterBoolean(RecipeInfos.Parameters.KUBEJS_RECIPE, this.isKubeJSRecipeButton.selected() && SupportedMods.isKubeJSLoaded()));
+        return getExtraRecipeInfos(recipeInfos);
     }
+
+    protected abstract RecipeInfos getExtraRecipeInfos(RecipeInfos recipeInfos);
     
     private Map<Integer, ResourceLocation> getTagged()
     {
@@ -175,7 +201,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
      * This method is called when the screen change.<br>
      * To Override to perform changes between screens.
      */
-    protected void updateScreen()
+    private void updateScreen()
     {
         hideDataFields();
         this.updateSlots();
@@ -184,7 +210,11 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         previousButton.visible = hasPrevious();
         
         this.recipeTypeButton.setItem(getRecipeIcon(getCurrentRecipe()));
+
+        updateGui();
     }
+
+    protected abstract void updateGui();
     
     protected void hideDataFields()
     {
@@ -259,7 +289,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     }
     
     @Override
-    public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         super.render(matrixStack, mouseX, mouseY, partialTicks);
         
@@ -269,8 +299,14 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         });
         
         this.buttonGrid.render(matrixStack, mouseX, mouseY, partialTicks);
+
+        renderGui(matrixStack, mouseX, mouseY, partialTicks);
+
+        renderTooltip(matrixStack, mouseX, mouseY);
     }
-    
+
+    protected abstract void renderGui(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks);
+
     @Override
     protected void renderComponentHoverEffect(MatrixStack pPoseStack, Style pStyle, int pMouseX, int pMouseY)
     {
@@ -329,6 +365,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         ClientUtils.bindTexture(getCurrentRecipe().getGuiTexture());
         blit(matrixStack, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, this.guiTextureSize, this.guiTextureSize);
         renderBackground(matrixStack);
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new net.minecraftforge.client.event.GuiScreenEvent.BackgroundDrawnEvent(this, matrixStack));
     }
     
     protected abstract Item getRecipeIcon(ModRecipeCreator modRecipeCreator);
@@ -418,14 +455,24 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         this.getMenu().getTile().setScreenIndex(this.currentScreenIndex);
         this.getMenu().getTile().setCurrentRecipeType(CommonUtils.getRecipeTypeName(getCurrentRecipe().getRecipeType()));
     }
-    
-    protected void updateServerData()
+
+    /**
+     * Send packets to the server to update the tile data, sent when screen change and when the screen is closed<br>
+     * Override {@link #updateExtraServerData()} to send extra data
+     */
+    private void updateServerData()
     {
         InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("screen_index", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.INT, this.currentScreenIndex));
         InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("recipe_type", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.STRING, CommonUtils.getRecipeTypeName(getCurrentRecipe().getRecipeType()).toString()));
         InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("fields", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.DOUBLE_ARRAY, getFields()));
         if(isVanillaScreen) InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("kubejs_recipe", this.getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.BOOLEAN, this.isKubeJSRecipeButton.selected()));
+        updateExtraServerData();
     }
+
+    /**
+     * Called after {@link #updateServerData()} to update extra data on the server
+     */
+    protected void updateExtraServerData() {}
     
     protected void updateSlots()
     {

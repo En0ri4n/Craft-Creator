@@ -1,8 +1,10 @@
-package fr.eno.craftcreator.recipes.managers;
+package fr.eno.craftcreator.base;
 
-import fr.eno.craftcreator.base.ModRecipeCreator;
-import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
+import fr.eno.craftcreator.recipes.managers.BotaniaRecipesManager;
+import fr.eno.craftcreator.recipes.managers.CreateRecipesManager;
+import fr.eno.craftcreator.recipes.managers.MinecraftRecipeManager;
+import fr.eno.craftcreator.recipes.managers.ThermalRecipesManager;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import net.minecraft.inventory.container.Slot;
 
@@ -26,6 +28,9 @@ public class RecipeManagerDispatcher
                 break;
             case THERMAL:
                 ThermalRecipesManager.get().createRecipe(recipe, slots, recipeInfos, serializerType);
+                break;
+            case CREATE:
+                CreateRecipesManager.get().createRecipe(recipe, slots, recipeInfos, serializerType);
                 break;
             case MINECRAFT:
                 MinecraftRecipeManager.get().createRecipe(recipe, slots, recipeInfos, serializerType);

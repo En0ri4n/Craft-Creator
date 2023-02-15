@@ -14,7 +14,6 @@ import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;
 import fr.eno.craftcreator.recipes.utils.CraftIngredients;
 import fr.eno.craftcreator.utils.Callable;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.list.AbstractList;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -57,9 +56,9 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
     private boolean isListHovered;
     private boolean canDisplayTooltips;
 
-    public SimpleListWidget(Minecraft mcIn, int leftIn, int topIn, int widthIn, int heightIn, int slotHeightIn, int titleBoxHeight, int scrollBarWidth, ITextComponent titleIn, @Nullable Callable<Entry> onDelete, boolean canDelete)
+    public SimpleListWidget(int leftIn, int topIn, int widthIn, int heightIn, int slotHeightIn, int titleBoxHeight, int scrollBarWidth, ITextComponent titleIn, @Nullable Callable<Entry> onDelete, boolean canDelete)
     {
-        super(mcIn, widthIn - scrollBarWidth, heightIn - titleBoxHeight, 0, 0, slotHeightIn);
+        super(ClientUtils.getMinecraft(), widthIn - scrollBarWidth, heightIn - titleBoxHeight, 0, 0, slotHeightIn);
         this.x0 = leftIn;
         this.x1 = leftIn + widthIn - scrollBarWidth;
         this.y0 = topIn + titleBoxHeight;

@@ -6,6 +6,7 @@ import fr.eno.craftcreator.commands.TestRecipesCommand;
 import fr.eno.craftcreator.init.*;
 import fr.eno.craftcreator.recipes.kubejs.KubeJSManager;
 import fr.eno.craftcreator.screen.container.BotaniaRecipeCreatorScreen;
+import fr.eno.craftcreator.screen.container.CreateRecipeCreatorScreen;
 import fr.eno.craftcreator.screen.container.MinecraftRecipeCreatorScreen;
 import fr.eno.craftcreator.screen.container.ThermalRecipeCreatorScreen;
 import fr.eno.craftcreator.utils.EntryHelper;
@@ -54,6 +55,7 @@ public class CraftCreator
             CommonUtils.setDefaultBlockRender(InitBlocks.BOTANIA_RECIPE_CREATOR.get());
             CommonUtils.setDefaultBlockRender(InitBlocks.MINECRAFT_RECIPE_CREATOR.get());
             CommonUtils.setDefaultBlockRender(InitBlocks.THERMAL_RECIPE_CREATOR.get());
+            CommonUtils.setDefaultBlockRender(InitBlocks.CREATE_RECIPE_CREATOR.get());
         });
     }
 
@@ -66,6 +68,7 @@ public class CraftCreator
             ClientUtils.registerScreen(InitContainers.MINECRAFT_RECIPE_CREATOR.get(), MinecraftRecipeCreatorScreen::new);
             ClientUtils.registerScreen(InitContainers.BOTANIA_RECIPE_CREATOR.get(), BotaniaRecipeCreatorScreen::new);
             ClientUtils.registerScreen(InitContainers.THERMAL_RECIPE_CREATOR.get(), ThermalRecipeCreatorScreen::new);
+            ClientUtils.registerScreen(InitContainers.CREATE_RECIPE_CREATOR.get(), CreateRecipeCreatorScreen::new);
         });
     }
 

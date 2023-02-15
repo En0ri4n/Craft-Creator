@@ -3,6 +3,7 @@ package fr.eno.craftcreator.base;
 import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.serializers.BotaniaRecipeSerializer;
+import fr.eno.craftcreator.recipes.serializers.CreateRecipeSerializer;
 import fr.eno.craftcreator.recipes.serializers.MinecraftRecipeSerializer;
 import fr.eno.craftcreator.recipes.serializers.ThermalRecipeSerializer;
 import fr.eno.craftcreator.recipes.utils.CraftIngredients;
@@ -14,7 +15,7 @@ public class ModRecipeCreatorDispatcher
      * Get the serializer for the mod
      *
      * @param modId the mod id
-     * @return the serializer for the mod (Minecraft Serializer if the mod is not supported, avoid NPE)
+     * @return the serializer for the mod (Minecraft Serializer if the mod is not supported, avoiding null value)
      */
     public static ModRecipeSerializer getSeralizer(String modId)
     {
@@ -24,6 +25,8 @@ public class ModRecipeCreatorDispatcher
                 return BotaniaRecipeSerializer.get();
             case THERMAL:
                 return ThermalRecipeSerializer.get();
+            case CREATE:
+                return CreateRecipeSerializer.get();
             default:
                 return MinecraftRecipeSerializer.get();
         }
