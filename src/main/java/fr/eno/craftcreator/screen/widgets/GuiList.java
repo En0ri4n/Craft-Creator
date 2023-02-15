@@ -23,8 +23,6 @@ public class GuiList<T> implements IOutsideWidget
     private List<T> keys;
     private T selectedKey;
 
-    private Rectangle2d area;
-
     public GuiList(int guiListRight, int y, int keyHeight)
     {
         this.guiListRight = guiListRight;
@@ -135,7 +133,6 @@ public class GuiList<T> implements IOutsideWidget
     public void setKeys(List<T> keys)
     {
         this.keys = keys;
-        calculateArea();
     }
 
     public T getSelectedKey()
@@ -149,17 +146,11 @@ public class GuiList<T> implements IOutsideWidget
     }
 
     @Override
-    public void calculateArea()
-    {
-        if(getKeys() != null)
-            area = new Rectangle2d(getX(), getY(), getWidth(), getHeight());
-        else
-            area = new Rectangle2d(100, 100, 100, 100);
-    }
-
-    @Override
     public Rectangle2d getArea()
     {
-        return area;
+        if(getKeys() != null)
+            return new Rectangle2d(getX(), getY(), getWidth(), getHeight());
+        else
+            return new Rectangle2d(getX(), getY(), 0, 0);
     }
 }
