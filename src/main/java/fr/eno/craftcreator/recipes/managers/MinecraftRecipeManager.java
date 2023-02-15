@@ -47,7 +47,7 @@ public class MinecraftRecipeManager extends BaseRecipesManager
 
     private void createFurnaceRecipe(ModRecipeCreator recipe, List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, double experience, int cookingTime, boolean isKubeJSRecipe)
     {
-        if(!slots.get(0).hasItem() || !slots.get(1).hasItem()) // Hardcoded for now because of the special fuel slot
+        if(isSlotsEmpty(slots, SlotHelper.FURNACE_SLOTS_INPUT.size(), SlotHelper.FURNACE_SLOTS_OUTPUT.size()))
             return;
 
         RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));

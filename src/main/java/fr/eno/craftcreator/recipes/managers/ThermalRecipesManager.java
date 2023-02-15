@@ -147,6 +147,8 @@ public class ThermalRecipesManager extends BaseRecipesManager
 
     private void createPressRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, RecipeInfos recipeInfos)
     {
+        if(isSlotsEmpty(slots, SlotHelper.PRESS_SLOTS_INPUT.size(), SlotHelper.PRESS_SLOTS_OUTPUT.size())) return;
+
         RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));
         RecipeEntry.Input inputDie = getSingleInput(taggedSlots, slots.get(1));
         

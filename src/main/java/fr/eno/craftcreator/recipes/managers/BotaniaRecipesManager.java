@@ -25,6 +25,7 @@ public class BotaniaRecipesManager extends BaseRecipesManager
     public void createRecipe(ModRecipeCreator recipe, List<Slot> slots, RecipeInfos recipeInfos, ModRecipeSerializer.SerializerType serializerType)
     {
         BotaniaRecipeSerializer.get().setSerializerType(serializerType);
+
         switch(recipe)
         {
             case MANA_INFUSION:
@@ -59,7 +60,7 @@ public class BotaniaRecipesManager extends BaseRecipesManager
         RecipeEntry.BlockInput catalystItem = getBlockInput(slots.get(1));
         RecipeEntry.Output output = getValidOutput(slots, SlotHelper.MANA_INFUSION_SLOTS_OUTPUT.size());
 
-        BotaniaRecipeSerializer.get().serializeInfusionRecipe(input, catalystItem.getBlock(), output, mana);
+        BotaniaRecipeSerializer.get().serializeInfusionRecipe(input, catalystItem, output, mana);
     }
 
     private void createElvenTradeRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots)

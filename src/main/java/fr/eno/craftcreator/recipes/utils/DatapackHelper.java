@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.serializer;
+package fr.eno.craftcreator.recipes.utils;
 
 import com.google.gson.*;
 import fr.eno.craftcreator.CraftCreator;
@@ -8,6 +8,7 @@ import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.utils.PairValues;
 import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.inventory.container.Slot;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.util.ResourceLocation;
 
@@ -31,7 +32,7 @@ public class DatapackHelper
      * @param slots the slots of the crafting grid
      * @return the ingredients in a JsonArray
      */
-    public static JsonArray createShapelessIngredientsJsonArray(List<Slot> slots)
+    public static JsonArray createShapelessIngredientsJsonArray(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots)
     {
         JsonArray ingredients = new JsonArray();
 
@@ -40,7 +41,14 @@ public class DatapackHelper
             if(!slot.hasItem()) continue;
 
             JsonObject obj = new JsonObject();
-            obj.addProperty("item", Utils.notNull(slot.getItem().getItem().getRegistryName()).getPath());
+
+            if(taggedSlots.containsKey(slot.getSlotIndex()))
+            {
+                obj.addProperty("tag", taggedSlots.get(slot.getSlotIndex()).toString());
+                continue;
+            }
+
+            obj.addProperty("item", Utils.notNull(slot.getItem().getItem().getRegistryName()).toString());
             ingredients.add(obj);
         }
 
@@ -193,5 +201,20 @@ public class DatapackHelper
         if(!directory.exists()) directory.mkdirs();
 
         return new File(directory, output.getPath() + "_from_" + CommonUtils.getRecipeTypeName(type).getPath() + ".json");
+    }
+
+    /**
+     * Delete the recipe in the Craft-Creator Datapack
+     *
+     * @param recipe the recipe to delete
+     */
+    public static void deleteRecipe(IRecipe<?> recipe)
+    {
+        File generatorFolder = new File(ClientUtils.getMinecraft().gameDirectory, "Craft-Creator");
+        if(!generatorFolder.exists()) return;
+
+        for(File file : generatorFolder.listFiles())
+            if(file.getName().contains(recipe.getId().getPath() + ".json"))
+                file.delete();
     }
 }

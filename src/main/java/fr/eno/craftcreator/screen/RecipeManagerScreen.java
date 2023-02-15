@@ -8,6 +8,7 @@ import fr.eno.craftcreator.base.ModRecipeCreatorDispatcher;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;
+import fr.eno.craftcreator.recipes.utils.DatapackHelper;
 import fr.eno.craftcreator.recipes.utils.ListEntriesHelper;
 import fr.eno.craftcreator.screen.widgets.DropdownListWidget;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
@@ -64,9 +65,9 @@ public class RecipeManagerScreen extends ListScreen
         this.addList(new SimpleListWidget(ClientUtils.getMinecraft(), 10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.recipes"), (entry) ->
         {
             IRecipe<?> recipeToRemove = ((SimpleListWidget.RecipeEntry) entry).getRecipe();
-            ModRecipeCreatorDispatcher.getSeralizer(this.modId).removeRecipe(getCurrentRecipeType(), new KubeJSModifiedRecipe(KubeJSModifiedRecipe.KubeJSModifiedRecipeType.REMOVED, Collections.singletonMap(ModRecipeSerializer.RecipeDescriptors.RECIPE_ID, recipeToRemove.getId().toString())), ModRecipeSerializer.SerializerType.KUBE_JS);
+            ModRecipeCreatorDispatcher.getSeralizer(this.modId).removeRecipe(new KubeJSModifiedRecipe(KubeJSModifiedRecipe.KubeJSModifiedRecipeType.REMOVED, Collections.singletonMap(ModRecipeSerializer.RecipeDescriptors.RECIPE_ID, recipeToRemove.getId().toString())), ModRecipeSerializer.SerializerType.KUBE_JS);
             updateLists(false);
-        }));
+        }, SupportedMods.isKubeJSLoaded()));
         
         this.addWidget(searchField = new SimpleTextFieldWidget(new StringTextComponent(""), ClientUtils.getFontRenderer(), 10, height - 30, this.width / 3 - 35, 20, textField ->
         {
@@ -86,15 +87,24 @@ public class RecipeManagerScreen extends ListScreen
 
         this.addList(new SimpleListWidget(ClientUtils.getMinecraft(), this.width / 3 + 10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.added_recipes"), (entry) ->
         {
-            ModRecipeCreatorDispatcher.getSeralizer(this.modId).removeAddedRecipeFrom(getCurrentMod(), ((SimpleListWidget.RecipeEntry) entry).getRecipe(), ModRecipeSerializer.SerializerType.KUBE_JS);
-            updateLists(false);
-        }));
+            SimpleListWidget.RecipeEntry recipeEntry = (SimpleListWidget.RecipeEntry) entry;
+
+            if(SupportedMods.getSupportedLoadedMods().stream().map(SupportedMods::getModId).noneMatch(modId -> modId.equals(recipeEntry.getRecipe().getId().getPath())))
+            {
+                DatapackHelper.deleteRecipe(recipeEntry.getRecipe());
+            }
+            else if(SupportedMods.isKubeJSLoaded())
+            {
+                ModRecipeCreatorDispatcher.getSeralizer(this.modId).removeAddedRecipeFrom(getCurrentMod(), recipeEntry.getRecipe(), ModRecipeSerializer.SerializerType.KUBE_JS);
+                updateLists(false);
+            }
+        }, true));
 
         this.addList(new SimpleListWidget(ClientUtils.getMinecraft(), this.width / 3 * 2 + 10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.modified_recipes"), (entry) ->
         {
             ModRecipeSerializer.removeModifiedRecipe(getCurrentMod(), ((SimpleListWidget.ModifiedRecipeEntry) entry).getRecipe());
             updateLists(false);
-        }));
+        }, SupportedMods.isKubeJSLoaded()));
 
         updateLists(true);
         this.getLists().forEach(slw -> slw.setCanHaveSelected(true));

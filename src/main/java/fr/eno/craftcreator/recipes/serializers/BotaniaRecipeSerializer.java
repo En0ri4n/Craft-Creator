@@ -6,7 +6,6 @@ import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.utils.CraftIngredients;
 import fr.eno.craftcreator.recipes.utils.RecipeEntry;
-import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.crafting.IRecipe;
 import vazkii.botania.api.BotaniaAPI;
@@ -19,20 +18,18 @@ import java.util.Objects;
 public class BotaniaRecipeSerializer extends ModRecipeSerializer
 {
     private static final BotaniaRecipeSerializer INSTANCE = new BotaniaRecipeSerializer();
-    
-    private SerializerType currentSerializeType;
 
-    private BotaniaRecipeSerializer()
+    protected BotaniaRecipeSerializer()
     {
         super(SupportedMods.BOTANIA);
     }
 
-    public void serializeInfusionRecipe(RecipeEntry.Input ingredient, Block catalyst, RecipeEntry.Output result, int mana)
+    public void serializeInfusionRecipe(RecipeEntry.Input ingredient, RecipeEntry.BlockInput catalyst, RecipeEntry.Output result, int mana)
     {
         JsonObject obj = createBaseJson(ModRecipeTypes.MANA_INFUSION_TYPE);
         obj.addProperty("mana", mana);
-        if(catalyst != Blocks.AIR)
-            obj.add("catalyst", mapToJsonObject(ImmutableMap.of("type", "block", "block", Objects.requireNonNull(catalyst.getRegistryName()).toString())));
+        if(catalyst.getBlock() != Blocks.AIR)
+            obj.add("catalyst", mapToJsonObject(ImmutableMap.of("type", "block", "block", Objects.requireNonNull(catalyst.registryName()).toString())));
 
         obj.add("input", singletonItemJsonObject(ingredient));
         obj.add("output", getResult(result));
@@ -43,8 +40,8 @@ public class BotaniaRecipeSerializer extends ModRecipeSerializer
     public void serializeElvenTradeRecipe(RecipeEntry.MultiInput ingredients, RecipeEntry.MultiOutput results)
     {
         JsonObject obj = createBaseJson(ModRecipeTypes.ELVEN_TRADE_TYPE);
-        obj.add("ingredients", listWithSingletonItems(ingredients, "item"));
-        obj.add("output", listWithSingletonItems(results, "item"));
+        obj.add("ingredients", listWithSingletonItems(ingredients));
+        obj.add("output", listWithSingletonItems(results));
 
         addRecipeTo(obj, ModRecipeTypes.ELVEN_TRADE_TYPE, results.getOneOutput().registryName());
     }
@@ -63,7 +60,7 @@ public class BotaniaRecipeSerializer extends ModRecipeSerializer
     {
         JsonObject obj = createBaseJson(ModRecipeTypes.BREW_TYPE);
         obj.addProperty("brew", Objects.requireNonNull(BotaniaAPI.instance().getBrewRegistry().getKey(brew)).toString());
-        obj.add("ingredients", listWithSingletonItems(ingredients, "item"));
+        obj.add("ingredients", listWithSingletonItems(ingredients));
 
         addRecipeTo(obj, ModRecipeTypes.BREW_TYPE, BotaniaAPI.instance().getBrewRegistry().getKey(brew));
     }
@@ -180,15 +177,5 @@ public class BotaniaRecipeSerializer extends ModRecipeSerializer
     public static BotaniaRecipeSerializer get()
     {
         return INSTANCE;
-    }
-    
-    public SerializerType getCurrentSerializeType()
-    {
-        return currentSerializeType;
-    }
-    
-    public void setCurrentSerializeType(SerializerType currentSerializeType)
-    {
-        this.currentSerializeType = currentSerializeType;
     }
 }

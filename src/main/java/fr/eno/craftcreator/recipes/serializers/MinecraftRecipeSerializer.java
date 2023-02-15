@@ -6,7 +6,7 @@ import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.utils.CraftIngredients;
 import fr.eno.craftcreator.recipes.utils.RecipeEntry;
-import fr.eno.craftcreator.serializer.DatapackHelper;
+import fr.eno.craftcreator.recipes.utils.DatapackHelper;
 import io.netty.buffer.Unpooled;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
@@ -70,7 +70,7 @@ public class MinecraftRecipeSerializer extends ModRecipeSerializer
         else
         {
             obj.addProperty("type", "minecraft:crafting_shapeless");
-            obj.add("ingredients", DatapackHelper.createShapelessIngredientsJsonArray(slots));
+            obj.add("ingredients", DatapackHelper.createShapelessIngredientsJsonArray(slots, taggedSlots));
         }
 
         JsonObject resultObj = new JsonObject();
@@ -79,7 +79,7 @@ public class MinecraftRecipeSerializer extends ModRecipeSerializer
         if(nbtSlots.contains(9))
         {
             resultObj.addProperty("type", "forge:nbt");
-            resultObj.addProperty("nbt", slots.get(9).getItem().getTag().toString().replace("\"", "\\\""));
+            resultObj.addProperty("nbt", slots.get(9).getItem().getTag().toString().replace("\"", "\""));
         }
         obj.add("result", resultObj);
 

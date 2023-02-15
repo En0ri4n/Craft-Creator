@@ -18,6 +18,8 @@ import java.util.Map;
 
 public abstract class BaseRecipesManager
 {
+    protected BaseRecipesManager() {}
+
     public abstract void createRecipe(ModRecipeCreator recipe, List<Slot> slots, RecipeInfos param, ModRecipeSerializer.SerializerType serializerType);
 
     protected RecipeEntry.Output getValidOutput(List<Slot> slots, int outputCount)

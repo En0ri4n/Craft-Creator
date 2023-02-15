@@ -116,9 +116,9 @@ public class SlotHelper
         CRAFTING_TABLE_SLOTS_OUTPUT = Collections.singletonList(new PositionnedSlot(minecraftSlots++, 124, 35));
         CRAFTING_TABLE_SLOTS = Stream.of(CRAFTING_TABLE_SLOTS_INPUT, CRAFTING_TABLE_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
         // Furnace
-        FURNACE_SLOTS_INPUT = Collections.singletonList(new PositionnedSlot(minecraftSlots++, 56, 17));
+        FURNACE_SLOTS_INPUT = Collections.singletonList(new PositionnedSlot(minecraftSlots++, 56, 35));
         FURNACE_SLOTS_OUTPUT = Collections.singletonList(new PositionnedSlot(minecraftSlots++, 116, 35));
-        FURNACE_SLOTS = Arrays.asList(new PositionnedSlot(minecraftSlots++, 56, 17), new PositionnedSlot(minecraftSlots++, 116, 35), new PositionnedSlot(minecraftSlots++, 56, 53));
+        FURNACE_SLOTS = Stream.of(FURNACE_SLOTS_INPUT, FURNACE_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
         // Smithing table
         SMITHING_TABLE_SLOTS_INPUT = Arrays.asList(new PositionnedSlot(minecraftSlots++, 27, 47), new PositionnedSlot(minecraftSlots++, 76, 47));
         SMITHING_TABLE_SLOTS_OUTPUT = Collections.singletonList(new PositionnedSlot(minecraftSlots++, 134, 47));
