@@ -1,41 +1,85 @@
 package fr.eno.craftcreator.blocks;
 
+
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
-import javax.annotation.Nonnull;
-
-@SuppressWarnings("deprecation")
-public abstract class RecipeCreatorBlock extends BaseEntityBlock
+public abstract class RecipeCreatorBlock extends Block implements EntityBlock
 {
+    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+
     public RecipeCreatorBlock()
     {
-        super(BlockBehaviour.Properties.of(Material.METAL).sound(SoundType.STONE).strength(999999F));
+        super(Block.Properties.of(Material.METAL).sound(SoundType.STONE).strength(999999F));
+        BlockState stateHolder = this.defaultBlockState();
+        if(hasFacing())
+            stateHolder = stateHolder.setValue(FACING, Direction.NORTH);
+        this.registerDefaultState(stateHolder);
     }
 
-    @Nonnull
-    @Override
-    public abstract InteractionResult use(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit);
+    protected boolean hasFacing()
+    {
+        return false;
+    }
 
-    @Nonnull
     @Override
-    public RenderShape getRenderShape(@NotNull BlockState pState)
+    public RenderShape getRenderShape(BlockState state)
     {
         return RenderShape.MODEL;
     }
-    @org.jetbrains.annotations.Nullable
+
     @Override
-    public abstract BlockEntity newBlockEntity(@NotNull BlockPos pPos, @NotNull BlockState pState);
+    public abstract InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult);
+
+    @Override
+    public VoxelShape getShape(BlockState p_60555_, BlockGetter p_60556_, BlockPos p_60557_, CollisionContext p_60558_)
+    {
+        return getShape();
+    }
+
+    protected abstract BlockEntity getTileEntity(BlockPos pos, BlockState state);
+
+    protected VoxelShape getShape()
+    {
+        return Shapes.block();
+    }
+
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context)
+    {
+        BlockState stateHolder = this.defaultBlockState();
+        if(hasFacing())
+            stateHolder = stateHolder.setValue(FACING, context.getHorizontalDirection().getOpposite());
+        return stateHolder;
+    }
+
+
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state)
+    {
+        return getTileEntity(pos, state);
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> stateBuilder)
+    {
+        if(hasFacing())
+            stateBuilder.add(FACING);
+    }
 }

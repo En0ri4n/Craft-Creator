@@ -1,9 +1,11 @@
 package fr.eno.craftcreator.commands;
 
+
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
+import fr.eno.craftcreator.api.ServerUtils;
 import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
@@ -46,9 +48,9 @@ public class TestRecipesCommand
 				e.printStackTrace();
 			}
 
-		ctx.getSource().getServer().getCommands().performCommand(ctx.getSource(), "/reload");
+		ServerUtils.doCommand(ctx, "/reload");
 		ctx.getSource().sendSuccess(new TextComponent(ChatFormatting.GREEN + "Recipes has been loaded successfully !"), false);
-		register(ctx.getSource().getServer().getFunctions().getDispatcher());
+		register(ctx.getSource().getServer().getCommands().getDispatcher());
 
 		return 0;
 	}
@@ -87,7 +89,7 @@ public class TestRecipesCommand
 			e.printStackTrace();
 		}
 
-		File recipeFolder = new File(packFolder, "data\\craft_creator\\recipes");
+		File recipeFolder = new File(packFolder, "data\\craftcreator\\recipes");
 		recipeFolder.mkdirs();
 
 		return recipeFolder;

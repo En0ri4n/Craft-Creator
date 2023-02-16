@@ -1,5 +1,6 @@
 package fr.eno.craftcreator.init;
 
+
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.packets.RetrieveRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataClientPacket;
@@ -37,6 +38,9 @@ public class InitPackets
                 .networkProtocolVersion(() -> PROTOCOL_VERSION)
                 .simpleChannel();
         packetId = 0;
+
+        // Register packets
+        registerPackets();
     }
 
     private static SimpleChannel getNetWork()
@@ -49,7 +53,7 @@ public class InitPackets
         return network;
     }
 
-    public static void registerMessages()
+    public static void registerPackets()
     {
         registerServerMessage(RetrieveRecipeCreatorTileDataServerPacket.class, RetrieveRecipeCreatorTileDataServerPacket::encode, RetrieveRecipeCreatorTileDataServerPacket::decode, RetrieveRecipeCreatorTileDataServerPacket.ServerHandler::handle);
 
@@ -91,6 +95,7 @@ public class InitPackets
         BOOLEAN,
         FLOAT,
         DOUBLE,
-        MAP_INT_STRING
+        DOUBLE_ARRAY,
+        MAP_INT_RESOURCELOCATION
     }
 }

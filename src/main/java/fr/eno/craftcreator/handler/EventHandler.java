@@ -1,12 +1,12 @@
 package fr.eno.craftcreator.handler;
 
+
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.screen.ModSelectionScreen;
-import fr.eno.craftcreator.utils.ClientUtils;
-import fr.eno.craftcreator.utils.Utils;
+import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.api.CommonUtils;
+import fr.eno.craftcreator.screen.RecipeManagerScreen;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -18,17 +18,15 @@ public class EventHandler
     public static void onKey(InputEvent.KeyInputEvent e)
     {
         if(ClientUtils.KEY_OPEN_RECIPES_MENU.isDown() && ClientUtils.getCurrentScreen() == null)
-            ClientUtils.openScreen(new ModSelectionScreen());
+            ClientUtils.openScreen(new RecipeManagerScreen());
     }
 
     @SubscribeEvent
     public static void onPlayerJoin(net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent event)
     {
-        Player player = event.getPlayer();
+        MutableComponent issueMsg = CommonUtils.createComponentUrlOpener(References.getTranslate("message.join_issue"), "https://github.com/En0ri4n/Craft-Creator/issues");
 
-        MutableComponent issueMsg = Utils.createComponentUrlOpener(References.getTranslate("message.join_issue"), "https://github.com/En0ri4n/Craft-Creator/issues");
-
-        player.sendMessage(References.getTranslate("message.join", new TranslatableComponent(ClientUtils.KEY_OPEN_RECIPES_MENU.getKey().getDisplayName().getString()).getString()), player.getUUID());
-        player.sendMessage(issueMsg, player.getUUID());
+        ClientUtils.sendMessage(event.getPlayer(), References.getTranslate("message.join", new TranslatableComponent(ClientUtils.KEY_OPEN_RECIPES_MENU.getKey().getDisplayName().getString()).getString()));
+        ClientUtils.sendMessage(event.getPlayer(), issueMsg);
     }
 }

@@ -1,14 +1,16 @@
 package fr.eno.craftcreator.packets;
 
+
+import fr.eno.craftcreator.api.ServerUtils;
 import fr.eno.craftcreator.init.InitPackets;
-import fr.eno.craftcreator.tileentity.utils.InventoryDataContainerTileEntity;
-import fr.eno.craftcreator.utils.ServerUtils;
+import fr.eno.craftcreator.tileentity.base.InventoryDataContainerTileEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.network.NetworkEvent;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -35,11 +37,33 @@ public class UpdateRecipeCreatorTileDataServerPacket
 
         switch(msg.dataType)
         {
-            case INT -> packetBuffer.writeInt((int) msg.data);
-            case INT_ARRAY -> packetBuffer.writeVarIntArray((int[]) msg.data);
-            case STRING -> packetBuffer.writeUtf((String) msg.data);
-            case BOOLEAN -> packetBuffer.writeBoolean((boolean) msg.data);
-            case MAP_INT_STRING -> packetBuffer.writeMap((Map<Integer, ResourceLocation>) msg.data, FriendlyByteBuf::writeInt, FriendlyByteBuf::writeResourceLocation);
+            case INT:
+                packetBuffer.writeInt((int) msg.data);
+                break;
+            case INT_ARRAY:
+                packetBuffer.writeVarIntArray((int[]) msg.data);
+                break;
+            case DOUBLE_ARRAY:
+                double[] doubleArray = (double[]) msg.data;
+                packetBuffer.writeInt(doubleArray.length);
+                for(double d : doubleArray)
+                    packetBuffer.writeDouble(d);
+                break;
+            case STRING:
+                packetBuffer.writeUtf((String) msg.data);
+                break;
+            case BOOLEAN:
+                packetBuffer.writeBoolean((boolean) msg.data);
+                break;
+            case MAP_INT_RESOURCELOCATION:
+                Map<Integer, ResourceLocation> map = (Map<Integer, ResourceLocation>) msg.data;
+                packetBuffer.writeInt(map.size());
+                map.forEach((index, loc) ->
+                {
+                    packetBuffer.writeInt(index);
+                    packetBuffer.writeResourceLocation(loc);
+                });
+                break;
         }
     }
 
@@ -48,34 +72,31 @@ public class UpdateRecipeCreatorTileDataServerPacket
         String dataName = packetBuffer.readUtf();
         InitPackets.PacketDataType dataType = InitPackets.PacketDataType.values()[packetBuffer.readInt()];
         BlockPos pos = packetBuffer.readBlockPos();
-        Object data;
 
         switch(dataType)
         {
-            case INT -> {
-                data = packetBuffer.readInt();
-                return new UpdateRecipeCreatorTileDataServerPacket(dataName, pos, dataType, data);
-            }
-            case INT_ARRAY -> {
-                data = packetBuffer.readVarIntArray();
-                return new UpdateRecipeCreatorTileDataServerPacket(dataName, pos, dataType, data);
-            }
-            case STRING -> {
-                data = packetBuffer.readUtf();
-                return new UpdateRecipeCreatorTileDataServerPacket(dataName, pos, dataType, data);
-            }
-            case BOOLEAN -> {
-                data = packetBuffer.readBoolean();
-                return new UpdateRecipeCreatorTileDataServerPacket(dataName, pos, dataType, data);
-            }
-            case MAP_INT_STRING -> {
-                data = packetBuffer.readMap(FriendlyByteBuf::readInt, FriendlyByteBuf::readResourceLocation);
-                return new UpdateRecipeCreatorTileDataServerPacket(dataName, pos, dataType, data);
-            }
-            default -> data = -1;
+            case INT:
+                return new UpdateRecipeCreatorTileDataServerPacket(dataName, pos, dataType, packetBuffer.readInt());
+            case INT_ARRAY:
+                return new UpdateRecipeCreatorTileDataServerPacket(dataName, pos, dataType, packetBuffer.readVarIntArray());
+            case DOUBLE_ARRAY:
+                double[] doubleArray = new double[packetBuffer.readInt()];
+                for(int i = 0; i < doubleArray.length; i++)
+                    doubleArray[i] = packetBuffer.readDouble();
+                return new UpdateRecipeCreatorTileDataServerPacket(dataName, pos, dataType, doubleArray);
+            case STRING:
+                return new UpdateRecipeCreatorTileDataServerPacket(dataName, pos, dataType, packetBuffer.readUtf());
+            case BOOLEAN:
+                return new UpdateRecipeCreatorTileDataServerPacket(dataName, pos, dataType, packetBuffer.readBoolean());
+            case MAP_INT_RESOURCELOCATION:
+                Map<Integer, ResourceLocation> map = new HashMap<>();
+                int size = packetBuffer.readInt();
+                for(int i = 0; i < size; i++)
+                    map.put(packetBuffer.readInt(), packetBuffer.readResourceLocation());
+                return new UpdateRecipeCreatorTileDataServerPacket(dataName, pos, dataType, map);
+            default:
+                return new UpdateRecipeCreatorTileDataServerPacket(dataName, pos, dataType, -1);
         }
-
-        return new UpdateRecipeCreatorTileDataServerPacket(dataName, pos, dataType, data);
     }
 
     public static class ServerHandler
@@ -84,8 +105,9 @@ public class UpdateRecipeCreatorTileDataServerPacket
         {
             BlockEntity tile = ServerUtils.getBlockEntity(ctx, msg.pos);
 
-            if(tile instanceof InventoryDataContainerTileEntity dataContainerTile)
+            if(tile instanceof InventoryDataContainerTileEntity)
             {
+                InventoryDataContainerTileEntity dataContainerTile = (InventoryDataContainerTileEntity) tile;
                 dataContainerTile.setData(msg.dataName, msg.data);
             }
 

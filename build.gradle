@@ -10,17 +10,15 @@ buildscript {
     }
 }
 
-plugins {
-    id 'eclipse'
-    id 'maven-publish'
-}
+apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
+
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 
-
-version = '1.0.0'
+version = "${craftcreator_version}"
 group = 'fr.eno.craftcreator' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'craftcreator'
+archivesBaseName = "${craftcreator_name}"
 
 // Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
@@ -105,29 +103,53 @@ repositories {
             includeGroup "curse.maven"
         }
     }
+
+    maven {
+        // location of the maven that hosts JEI files
+        name = "Progwml6 maven"
+        url = "https://dvs1.progwml6.com/files/maven/"
+    }
+    maven {
+        // location of a maven mirror for JEI files, as a fallback
+        name = "ModMaven"
+        url = "https://modmaven.dev"
+    }
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.18.2-40.1.80'
+    minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
+
+    // JEI
+    // compile against the JEI API but do not include it at runtime
+    compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api")
+    // at runtime, use the full JEI jar
+    runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}")
 
     // KubeJS
-    implementation fg.deobf("curse.maven:kubejs-${kubejs_project_id}:${kubejs_cursefile_id}")
-    implementation fg.deobf("curse.maven:rhino-forge-${rhino_project_id}:${rhino_cursefile_id}")
-    implementation fg.deobf("curse.maven:architectury-forge-${architectury_project_id}:${architectury_cursefile_id}")
+    implementation fg.deobf("curse.maven:kubejs-${kubejs_project_id}:${kubejs_cursefile_id}") // KubeJS
+    // Rhino (KubeJS Dependency)
+    implementation fg.deobf("curse.maven:rhino-${rhino_project_id}:${rhino_cursefile_id}")
+    // Architectury (KubeJS Dependency)
+    implementation fg.deobf("curse.maven:architectury-${architectury_project_id}:${architectury_cursefile_id}")
 
     // Botania
-    implementation fg.deobf("curse.maven:botania-${botania_project_id}:${botania_cursefile_id}")
-    implementation fg.deobf("curse.maven:curios-forge-${curios_project_id}:${curios_cursefile_id}")
+    implementation fg.deobf("curse.maven:botania-${botania_project_id}:${botania_cursefile_id}") // Botania
+    // Curios (Botania Dependency)
+    implementation fg.deobf("curse.maven:curios-${curios_project_id}:${curios_cursefile_id}")
+    // Patchouli (Botania Dependency)
     implementation fg.deobf("curse.maven:patchouli-${patchouli_project_id}:${patchouli_cursefile_id}")
 
     // Thermal Expansion
-    implementation fg.deobf("curse.maven:thermal-expansion-${thermal_expansion_project_id}:${thermal_expansion_cursefile_id}")
-
-    // Thermal Foundation
+    implementation fg.deobf("curse.maven:thermal-expansion-${thermal_expansion_project_id}:${thermal_expansion_cursefile_id}") // Thermal Expansion
+    // Thermal Foundation (Thermal Expansion Dependency)
     implementation fg.deobf("curse.maven:thermal-foundation-${thermal_foundation_project_id}:${thermal_foundation_cursefile_id}")
-
-    // Thermal Depedency
+    // CoFH Core (Thermal Dependency)
     implementation fg.deobf("curse.maven:cofh-core-${cofh_core_project_id}:${cofh_core_cursefile_id}")
+
+    // Create
+    implementation fg.deobf("curse.maven:create-${create_project_id}:${create_cursefile_id}") // Create
+    // Flywheel (Create Dependency)
+    implementation fg.deobf("curse.maven:flywheel-${flywheel_project_id}:${flywheel_cursefile_id}")
 }
 
 jar {

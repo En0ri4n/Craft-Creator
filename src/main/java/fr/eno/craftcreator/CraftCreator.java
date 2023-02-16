@@ -1,15 +1,16 @@
 package fr.eno.craftcreator;
 
+
+import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.commands.TestRecipesCommand;
 import fr.eno.craftcreator.init.*;
-import fr.eno.craftcreator.kubejs.KubeJSManager;
-import fr.eno.craftcreator.recipes.utils.SupportedMods;
-import fr.eno.craftcreator.screen.container.*;
-import fr.eno.craftcreator.utils.ClientUtils;
+import fr.eno.craftcreator.recipes.kubejs.KubeJSManager;
+import fr.eno.craftcreator.screen.container.BotaniaRecipeCreatorScreen;
+import fr.eno.craftcreator.screen.container.CreateRecipeCreatorScreen;
+import fr.eno.craftcreator.screen.container.MinecraftRecipeCreatorScreen;
+import fr.eno.craftcreator.screen.container.ThermalRecipeCreatorScreen;
 import fr.eno.craftcreator.utils.EntryHelper;
-import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.ClientRegistry;
@@ -25,8 +26,6 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.function.Predicate;
-
 @Mod(References.MOD_ID)
 public class CraftCreator
 {
@@ -36,8 +35,6 @@ public class CraftCreator
     {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        KubeJSManager.initialize();
-
         bus.addListener(this::setup);
         bus.addListener(this::clientSetup);
 
@@ -46,19 +43,21 @@ public class CraftCreator
         InitBlocks.BLOCKS.register(bus);
         InitContainers.CONTAINERS.register(bus);
         InitItems.ITEMS.register(bus);
-        InitTileEntities.TILE_ENTITY.register(bus);
+        InitTileEntities.TILE_ENTITIES.register(bus);
 
         InitPackets.initNetwork();
-        InitPackets.registerMessages();
+        KubeJSManager.initialize();
     }
 
     private void setup(final FMLCommonSetupEvent event)
     {
-        Predicate<RenderType> render = (r) -> r == RenderType.cutout();
-
-        ItemBlockRenderTypes.setRenderLayer(InitBlocks.STONE_CUTTER_RECIPE_CREATOR.get(), render);
-        ItemBlockRenderTypes.setRenderLayer(InitBlocks.CRAFTING_TABLE_RECIPE_CREATOR.get(), render);
-        ItemBlockRenderTypes.setRenderLayer(InitBlocks.FURNACE_RECIPE_CREATOR.get(), render);
+        event.enqueueWork(() ->
+        {
+            CommonUtils.setDefaultBlockRender(InitBlocks.BOTANIA_RECIPE_CREATOR.get());
+            CommonUtils.setDefaultBlockRender(InitBlocks.MINECRAFT_RECIPE_CREATOR.get());
+            CommonUtils.setDefaultBlockRender(InitBlocks.THERMAL_RECIPE_CREATOR.get());
+            CommonUtils.setDefaultBlockRender(InitBlocks.CREATE_RECIPE_CREATOR.get());
+        });
     }
 
     public void clientSetup(FMLClientSetupEvent event)
@@ -67,13 +66,10 @@ public class CraftCreator
         {
             ClientRegistry.registerKeyBinding(ClientUtils.KEY_OPEN_RECIPES_MENU);
 
-            MenuScreens.register(InitContainers.CRAFTING_TABLE_RECIPE_CREATOR.get(), CraftingTableRecipeCreatorScreen::new);
-            MenuScreens.register(InitContainers.FURNACE_RECIPE_CREATOR.get(), FurnaceRecipeCreatorScreen::new);
-            MenuScreens.register(InitContainers.STONE_CUTTER_RECIPE_CREATOR.get(), StoneCutterRecipeCreatorScreen::new);
-            MenuScreens.register(InitContainers.SMITHING_TABLE_RECIPE_CREATOR.get(), SmithingTableRecipeCreatorScreen::new);
-
-            if(SupportedMods.BOTANIA.isLoaded()) MenuScreens.register(InitContainers.BOTANIA_RECIPE_CREATOR.get(), BotaniaRecipeCreatorScreen::new);
-            if(SupportedMods.THERMAL.isLoaded()) MenuScreens.register(InitContainers.THERMAL_RECIPE_CREATOR.get(), ThermalRecipeCreatorScreen::new);
+            ClientUtils.registerScreen(InitContainers.MINECRAFT_RECIPE_CREATOR.get(), MinecraftRecipeCreatorScreen::new);
+            ClientUtils.registerScreen(InitContainers.BOTANIA_RECIPE_CREATOR.get(), BotaniaRecipeCreatorScreen::new);
+            ClientUtils.registerScreen(InitContainers.THERMAL_RECIPE_CREATOR.get(), ThermalRecipeCreatorScreen::new);
+            ClientUtils.registerScreen(InitContainers.CREATE_RECIPE_CREATOR.get(), CreateRecipeCreatorScreen::new);
         });
     }
 
@@ -94,7 +90,7 @@ public class CraftCreator
         @Override
         public ItemStack makeIcon()
         {
-            return new ItemStack(InitItems.CRAFTING_TABLE_RECIPE_CREATOR.get());
+            return new ItemStack(InitItems.MINECRAFT_RECIPE_CREATOR.get());
         }
     };
 }

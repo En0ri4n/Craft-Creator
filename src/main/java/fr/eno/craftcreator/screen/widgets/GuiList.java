@@ -1,19 +1,22 @@
 package fr.eno.craftcreator.screen.widgets;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.screen.buttons.ExecuteButton;
+import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.api.ScreenUtils;
 import fr.eno.craftcreator.utils.Callable;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
 
 import java.util.List;
 
-public class GuiList<T>
+public class GuiList<T> implements IOutsideWidget
 {
-    final Minecraft mc = Minecraft.getInstance();
+    private static final ResourceLocation BACKGROUND_TEXTURE = References.getLoc("textures/gui/container/gui_background.png");
 
     private final int guiListRight;
     private final int y;
@@ -30,53 +33,68 @@ public class GuiList<T>
 
     public void render(PoseStack matrixStack, int mouseX, int mouseY)
     {
-        int width = getMaxWidth();
-        RenderSystem.setShaderTexture(0, References.getLoc("textures/gui/container/gui_background.png"));
-        Screen.blit(matrixStack, this.guiListRight - (width + 10), y, width + 10, (this.keys.size() + 1) * keyHeight + (this.keys.size() + 1) + 6, 0, 0, 256, 256, 256, 256);
+        int width = (getMaxWidth() + 12);
+        ClientUtils.bindTexture(BACKGROUND_TEXTURE);
+        ScreenUtils.renderSizedTexture(matrixStack, 4, this.guiListRight - width - 6, y, width + 6, getHeight(), 0, 0, 16, 16, 16);
 
         for(int i = 0; i < this.keys.size() + 1; i++)
         {
-            RenderSystem.setShaderTexture(0, References.getLoc("textures/gui/buttons/basic_button.png"));
-
-            int finalWidth = (width + 10);
-            int x = this.guiListRight - finalWidth + 3;
+            int x = this.guiListRight - width - 3;
             int y = this.y + 3 + i * keyHeight + i;
-            int buttonTitle = y + keyHeight / 2 - mc.font.lineHeight / 2;
+            int buttonTitle = y + keyHeight / 2 - ClientUtils.getFontRenderer().lineHeight / 2;
 
-            if(ExecuteButton.isMouseHover(x, y, mouseX, mouseY, finalWidth, keyHeight))
-                Screen.blit(matrixStack, x, y, finalWidth - 6, keyHeight, 0, 20, 100, 20, 100, 60);
-            else
-                Screen.blit(matrixStack, x, y, finalWidth - 6, keyHeight, 0, 40, 100, 20, 100, 60);
+            ScreenUtils.renderSizedButton(matrixStack, x, y, width, keyHeight, true, ScreenUtils.isMouseHover(x, y, mouseX, mouseY, width, keyHeight));
+            //Screen.blit(matrixStack, x, y, finalWidth - 6, keyHeight, xTexture, yTexture, widthToGet, heightToGet, textureWidth, textureHeight);
 
             if(i >= this.keys.size())
             {
-                GuiComponent.drawCenteredString(matrixStack, mc.font, References.getTranslate("screen.guiList.reset").getString(), x + finalWidth / 2 - 3, buttonTitle, 0xFFFFFF);
+                Screen.drawCenteredString(matrixStack, ClientUtils.getFontRenderer(), References.getTranslate("screen.guiList.reset").getString(), x + width / 2 - 3, buttonTitle, 0xFFFFFF);
                 continue;
             }
 
             boolean isSelected = this.selectedKey != null && this.selectedKey.toString().equals(this.keys.get(i).toString());
 
             if(isSelected)
-                GuiComponent.drawCenteredString(matrixStack, mc.font, this.keys.get(i).toString(), x + finalWidth / 2 - 3, buttonTitle, 0x0dc70d);
+                Screen.drawCenteredString(matrixStack, ClientUtils.getFontRenderer(), this.keys.get(i).toString(), x + width / 2, buttonTitle, 0x0dc70d);
             else
-                GuiComponent.drawCenteredString(matrixStack, mc.font, this.keys.get(i).toString(), x + finalWidth / 2 - 3, buttonTitle, 0xFFFFFF);
+                Screen.drawCenteredString(matrixStack, ClientUtils.getFontRenderer(), this.keys.get(i).toString(), x + width / 2, buttonTitle, 0xFFFFFF);
         }
     }
 
-    private int getMaxWidth()
+    public int getX()
+    {
+        return this.guiListRight - (getMaxWidth() + 12) - 6;
+    }
+
+    public int getY()
+    {
+        return this.y;
+    }
+
+    public int getWidth()
+    {
+        return getMaxWidth() + 12;
+    }
+
+    public int getHeight()
+    {
+        return (this.keys.size() + 1) * keyHeight + (this.keys.size() + 1) + 6;
+    }
+
+    public int getMaxWidth()
     {
         if(this.keys == null) return 0;
 
-        int max = mc.font.width(References.getTranslate("screen.guiList.reset").getString());
+        int max = ClientUtils.getFontRenderer().width(References.getTranslate("screen.guiList.reset").getString());
         for(T key : this.keys)
         {
-            int width = mc.font.width(key.toString());
+            int width = ClientUtils.getFontRenderer().width(key.toString());
 
             if(width > max)
                 max = width;
         }
 
-        return max + 6;
+        return max;
     }
 
     public void mouseClicked(int mouseX, int mouseY, Callable<T> result)
@@ -91,17 +109,19 @@ public class GuiList<T>
             int x = this.guiListRight - finalWidth + 3;
             int y = this.y + 3 + i * keyHeight + i;
 
-            if(ExecuteButton.isMouseHover(x, y, mouseX, mouseY, width - 6, keyHeight))
+            if(ScreenUtils.isMouseHover(x, y, mouseX, mouseY, finalWidth - 6, keyHeight))
             {
                 if(i >= this.keys.size())
                 {
                     this.setSelectedKey(null);
                     result.run(null);
+                    ClientUtils.getMinecraft().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1F));
                     continue;
                 }
 
                 this.setSelectedKey(this.keys.get(i));
                 result.run(this.getSelectedKey());
+                ClientUtils.getMinecraft().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1F));
             }
         }
     }
@@ -124,5 +144,14 @@ public class GuiList<T>
     public void setSelectedKey(T selectedKey)
     {
         this.selectedKey = selectedKey;
+    }
+
+    @Override
+    public Rect2i getArea()
+    {
+        if(getKeys() != null)
+            return new Rect2i(getX(), getY(), getWidth(), getHeight());
+        else
+            return new Rect2i(getX(), getY(), 0, 0);
     }
 }

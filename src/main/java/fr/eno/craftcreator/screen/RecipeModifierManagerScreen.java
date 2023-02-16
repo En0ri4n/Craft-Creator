@@ -1,15 +1,14 @@
 package fr.eno.craftcreator.screen;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
+import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.container.RecipeModifierContainer;
-import fr.eno.craftcreator.recipes.utils.ListEntriesHelper;
-import fr.eno.craftcreator.screen.buttons.SimpleButton;
-import fr.eno.craftcreator.screen.container.TaggeableSlotsContainerScreen;
+import fr.eno.craftcreator.container.slot.utils.PositionnedSlot;
+import fr.eno.craftcreator.screen.container.base.TaggeableSlotsContainerScreen;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
-import fr.eno.craftcreator.utils.ClientUtils;
-import fr.eno.craftcreator.utils.PositionnedSlot;
+import fr.eno.craftcreator.screen.widgets.buttons.SimpleButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
@@ -20,7 +19,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -51,9 +49,9 @@ public class RecipeModifierManagerScreen extends TaggeableSlotsContainerScreen<R
 
         int bottomHeight = 20;
 
-        this.lists.add(new SimpleListWidget(minecraft, 5, 5, this.width / 4, this.height - bottomHeight, 15, 15, 5, References.getTranslate("screen.recipe_manager.list.modified_recipes"), null));
+        this.lists.add(new SimpleListWidget(5, 5, this.width / 4, this.height - bottomHeight, 15, 15, 5, References.getTranslate("screen.recipe_manager.list.modified_recipes"), null, false));
 
-        this.lists.get(0).setEntries(ListEntriesHelper.getModifiedRecipesEntryList());
+        //this.lists.get(0).setEntries(ListEntriesHelper.getModifiedRecipesEntryList());
 
         this.addRenderableWidget(new SimpleButton(References.getTranslate("screen.recipe_modifier.button.back"), this.width / 2 - 40, this.height - bottomHeight - 7, 80, 20, button -> ClientUtils.openScreen(this.parent)));
     }
@@ -66,7 +64,7 @@ public class RecipeModifierManagerScreen extends TaggeableSlotsContainerScreen<R
         this.lists.get(0).render(matrixStack, mouseX, mouseY, partialTicks);
         String msg = "NOT IMPLEMENTED YET";
         Screen.drawString(matrixStack, this.font, msg, this.width / 2 - this.font.width(msg) / 2, this.height / 2 - this.font.lineHeight / 2, 0xFFFF0000);
-        ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(Items.POINTED_DRIPSTONE), 100, 100);
+        ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(Items.ACACIA_BOAT), 100, 100);
     }
 
     @Override
@@ -94,21 +92,27 @@ public class RecipeModifierManagerScreen extends TaggeableSlotsContainerScreen<R
     }
 
     @Override
-    protected void renderBg(PoseStack matrixStack, float pPartialTick, int pMouseX, int pMouseY)
+    protected void renderBg(PoseStack matrixStack, float partialTicks, int pX, int pY)
     {
-        RenderSystem.setShaderTexture(0, GUI_TEXTURE);
+        ClientUtils.bindTexture(GUI_TEXTURE);
         int size = 256;
         int x = (this.width - (this.width / 4 + 5)) / 2 + (this.width / 4 + 5) - size / 2;
         int y = 5 + (this.height - 20 - 5) / 2 - size / 2;
         blit(matrixStack, x, y, size, size, 0, 0, size, size, size, size);
 
-        super.renderBg(matrixStack, pPartialTick, pMouseX, pMouseY);
+        super.renderBackground(matrixStack);
     }
 
     @Override
-    protected List<PositionnedSlot> getTaggeableSlots()
+    protected List<PositionnedSlot> getTaggableSlots()
     {
         return Collections.emptyList();
+    }
+
+    @Override
+    protected List<PositionnedSlot> getNbtTaggableSlots()
+    {
+        return new ArrayList<>();
     }
 
     @Override
@@ -117,7 +121,6 @@ public class RecipeModifierManagerScreen extends TaggeableSlotsContainerScreen<R
         return References.getTranslate("screen.recipe_modifier.title");
     }
 
-    @Nullable
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player)
     {

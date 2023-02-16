@@ -1,17 +1,16 @@
 package fr.eno.craftcreator.container;
 
+
+import fr.eno.craftcreator.base.SupportedMods;
+import fr.eno.craftcreator.container.base.CommonContainer;
 import fr.eno.craftcreator.container.slot.DefinedSlot;
 import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
-import fr.eno.craftcreator.container.utils.CommonContainer;
+import fr.eno.craftcreator.container.slot.utils.DefinedPositionnedSlot;
+import fr.eno.craftcreator.container.slot.utils.PositionnedSlot;
 import fr.eno.craftcreator.init.InitContainers;
-import fr.eno.craftcreator.recipes.utils.SupportedMods;
-import fr.eno.craftcreator.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.BucketItem;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 
 public class ThermalRecipeCreatorContainer extends CommonContainer
 {
@@ -21,26 +20,29 @@ public class ThermalRecipeCreatorContainer extends CommonContainer
 
         for(int i = 0; i < SlotHelper.THERMAL_SLOTS_SIZE; i++)
         {
-            if(PositionnedSlot.contains(SlotHelper.TREE_EXTRACTOR_SLOTS, i))
-            {
-                if(PositionnedSlot.contains(SlotHelper.TREE_EXTRACTOR_SLOTS_OUTPUT, i))
-                {
-                    this.addSlot(new DefinedSlot(tile, i, SlotHelper.THERMAL_SLOTS.get(i).getxPos(), SlotHelper.THERMAL_SLOTS.get(i).getyPos(), stack -> stack.getItem() instanceof BucketItem));
-                    continue;
-                }
-                this.addSlot(new DefinedSlot(tile, i, SlotHelper.THERMAL_SLOTS.get(i).getxPos(), SlotHelper.THERMAL_SLOTS.get(i).getyPos(), is -> Block.byItem(is.getItem()) != Blocks.AIR));
-                continue;
-            }
+            PositionnedSlot positionnedSlot = SlotHelper.THERMAL_SLOTS.get(i);
 
-            this.addSlot(new SimpleSlotItemHandler(tile, i, SlotHelper.THERMAL_SLOTS.get(i).getxPos(), SlotHelper.THERMAL_SLOTS.get(i).getyPos()));
+            int x = SlotHelper.THERMAL_SLOTS.get(i).getxPos();
+            int y = SlotHelper.THERMAL_SLOTS.get(i).getyPos();
+
+            if(positionnedSlot instanceof DefinedPositionnedSlot)
+                this.addSlot(new DefinedSlot(tile, i, x, y, ((DefinedPositionnedSlot) positionnedSlot)::isItemValid));
+            else
+                this.addSlot(new SimpleSlotItemHandler(tile, i, x, y));
         }
 
-        this.bindPlayerInventory(inventory, 60, 90);
+        this.bindInventory(inventory, 60, 90);
     }
 
     @Override
     public SupportedMods getMod()
     {
         return SupportedMods.THERMAL;
+    }
+    
+    @Override
+    public int getContainerSize()
+    {
+        return SlotHelper.THERMAL_SLOTS_SIZE;
     }
 }

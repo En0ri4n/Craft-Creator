@@ -1,32 +1,33 @@
 package fr.eno.craftcreator.screen.widgets;
 
+
 import com.mojang.blaze3d.vertex.PoseStack;
-import fr.eno.craftcreator.utils.ClientUtils;
-import net.minecraft.ChatFormatting;
+import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.api.ScreenUtils;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.Collections;
 
 public class NumberDataFieldWidget extends EditBox
 {
     private Component tooltip;
+    private boolean isDouble;
 
-    public NumberDataFieldWidget(Font font, int x, int y, int width, int height, Number defaultValue)
+    public NumberDataFieldWidget(Font font, int x, int y, int width, int height, Number defaultValue, boolean isDouble)
     {
         super(font, x, y, width, height, new TextComponent(""));
         this.tooltip = new TextComponent("");
         this.setValue(String.valueOf(defaultValue));
+        this.isDouble = isDouble;
     }
 
     @Override
     public boolean charTyped(char codePoint, int modifiers)
     {
-        if(Character.isDigit(codePoint) || codePoint == '.') return super.charTyped(codePoint, modifiers);
+        if(Character.isDigit(codePoint) || (codePoint == '.' && isDouble() && !getValue().contains("."))) return super.charTyped(codePoint, modifiers);
 
         return false;
     }
@@ -34,18 +35,16 @@ public class NumberDataFieldWidget extends EditBox
     @Override
     public void renderToolTip(PoseStack poseStack, int mouseX, int mouseY)
     {
-        if(!ClientUtils.isMouseHover(x, y, mouseX, mouseY, width, height) || !this.visible || !this.active || this.tooltip.getString().isEmpty())
+        if(!ScreenUtils.isMouseHover(x, y, mouseX, mouseY, width, height) || !this.visible || !this.active || this.tooltip.getString().isEmpty())
             return;
 
-        List<Component> tooltips = new ArrayList<>();
-        tooltips.add(new TextComponent("Value :").withStyle(ChatFormatting.GRAY));
-        tooltips.add(this.tooltip.copy().withStyle(ChatFormatting.DARK_GRAY));
-        ClientUtils.getCurrentScreen().renderTooltip(poseStack, tooltips, Optional.empty(), mouseX, mouseY);
+        ClientUtils.getCurrentScreen().renderComponentTooltip(poseStack, Collections.singletonList(tooltip), mouseX, mouseY);
     }
 
-    public void setNumberValue(Number number)
+    public void setNumberValue(Number number, boolean isDouble)
     {
-        this.setValue(String.valueOf(number));
+        this.isDouble = isDouble;
+        this.setValue(isDouble ? String.valueOf(number.doubleValue()) : String.valueOf(number.intValue()));
     }
 
     public double getDoubleValue()
@@ -61,5 +60,10 @@ public class NumberDataFieldWidget extends EditBox
     public void setTooltip(Component tooltip)
     {
         this.tooltip = tooltip;
+    }
+
+    public boolean isDouble()
+    {
+        return isDouble;
     }
 }

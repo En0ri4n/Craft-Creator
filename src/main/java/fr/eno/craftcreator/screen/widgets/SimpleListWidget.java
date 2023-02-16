@@ -1,59 +1,62 @@
 package fr.eno.craftcreator.screen.widgets;
 
+
+import cofh.lib.util.helpers.MathHelper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.recipes.serializers.ModRecipesJSSerializer;
+import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.api.ScreenUtils;
+import fr.eno.craftcreator.base.ModRecipeCreatorDispatcher;
+import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
+import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;
 import fr.eno.craftcreator.recipes.utils.CraftIngredients;
-import fr.eno.craftcreator.recipes.utils.ModRecipeCreatorDispatcher;
 import fr.eno.craftcreator.utils.Callable;
-import fr.eno.craftcreator.utils.ClientUtils;
-import fr.eno.craftcreator.utils.ModifiedRecipe;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.gui.components.AbstractSelectionList;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-@SuppressWarnings("unused")
-public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry>
+public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Entry>
 {
     private static final ResourceLocation BACKGROUND_TILE = References.getLoc("textures/gui/background_tile.png");
     private final Component title;
     private final int titleBoxHeight;
     private final int scrollBarWidth;
+    private final boolean canDelete;
     private boolean canHaveSelected;
     private final boolean hasTitleBox;
     private Callable<Entry> onSelected;
     private boolean isVisible;
-    private Callable<Entry> onDelete;
+    private final Callable<Entry> onDelete;
     private Entry hoveredEntry;
     private boolean isListHovered;
+    private boolean canDisplayTooltips;
 
-    public SimpleListWidget(Minecraft mcIn, int leftIn, int topIn, int widthIn, int heightIn, int slotHeightIn, int titleBoxHeight, int scrollBarWidth, Component titleIn, @Nullable Callable<Entry> onDelete)
+    public SimpleListWidget(int leftIn, int topIn, int widthIn, int heightIn, int slotHeightIn, int titleBoxHeight, int scrollBarWidth, Component titleIn, Callable<Entry> onDelete, boolean canDelete)
     {
-        super(mcIn, widthIn - scrollBarWidth, heightIn - titleBoxHeight, 0, 0, slotHeightIn);
+        super(ClientUtils.getMinecraft(), widthIn - scrollBarWidth, heightIn - titleBoxHeight, 0, 0, slotHeightIn);
         this.x0 = leftIn;
         this.x1 = leftIn + widthIn - scrollBarWidth;
         this.y0 = topIn + titleBoxHeight;
@@ -65,22 +68,18 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
         this.hasTitleBox = true;
         this.isVisible = true;
         this.onDelete = onDelete;
+        this.canDisplayTooltips = true;
+        this.canDelete = canDelete;
+    }
+    
+    public int getSize()
+    {
+        return this.getItemCount();
     }
 
-    public SimpleListWidget(Minecraft mcIn, int x, int y, int widthIn, int heightIn, int slotHeightIn, int scrollBarWidth, @Nullable Callable<Entry> onDelete)
+    public void setCanDisplayTooltips(boolean bool)
     {
-        super(mcIn, widthIn - scrollBarWidth, heightIn, 0, 0, slotHeightIn);
-        this.x0 = x;
-        this.x1 = x + widthIn - scrollBarWidth;
-        this.y0 = y;
-        this.y1 = y + heightIn;
-        this.title = new TextComponent("");
-        this.titleBoxHeight = 0;
-        this.scrollBarWidth = scrollBarWidth;
-        this.canHaveSelected = true;
-        this.hasTitleBox = false;
-        this.isVisible = true;
-        this.onDelete = onDelete;
+        this.canDisplayTooltips = bool;
     }
 
     public void setCanHaveSelected(boolean bool)
@@ -108,19 +107,18 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
         if(hasTitleBox)
         {
             Screen.fill(pPoseStack, this.x0, this.y0 - titleBoxHeight, this.x0 + this.width, this.y0, 0xf2c3a942);
-            Screen.drawCenteredString(pPoseStack, minecraft.font, this.title, this.x0 + this.width / 2, this.y0 - this.titleBoxHeight / 2 - minecraft.font.lineHeight / 2, 0xFFFFFF);
+            Screen.drawCenteredString(pPoseStack, ClientUtils.getFontRenderer(), this.title, this.x0 + this.width / 2, this.y0 - this.titleBoxHeight / 2 - minecraft.font.lineHeight / 2, 0xFFFFFF);
             //this.renderBackground(pPoseStack);
         }
 
         this.hoveredEntry = this.isMouseOver(pMouseX, pMouseY) ? this.getEntryAtPosition(pMouseX, pMouseY) : null;
-        this.isListHovered = ClientUtils.isMouseHover(this.x0, this.y0 - titleBoxHeight, this.x1, this.y1, pMouseX, pMouseY);
+        this.isListHovered = ScreenUtils.isMouseHover(x0, y0, pMouseX, pMouseY, width, height - itemHeight);
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder bufferbuilder = tesselator.getBuilder();
 
         // Render background
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-        Entry hovered = this.isMouseOver(pMouseX, pMouseY) ? this.getEntryAtPosition(pMouseX, pMouseY) : null;
-        RenderSystem.setShaderTexture(0, BACKGROUND_TILE);
+        ClientUtils.bindTexture(BACKGROUND_TILE);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         int alpha = 100;
         bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
@@ -138,12 +136,13 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
         int scrollbarPosition = this.getScrollbarPosition();
         int j = scrollbarPosition + 6;
         int maxScroll = this.getMaxScroll();
+        int i = getScrollbarPosition();
         if(maxScroll > 0)
         {
             RenderSystem.disableTexture();
             RenderSystem.setShader(GameRenderer::getPositionColorShader);
             int l1 = (int) ((float) ((this.y1 - this.y0) * (this.y1 - this.y0)) / (float) this.getMaxPosition());
-            l1 = Mth.clamp(l1, 32, this.y1 - this.y0 - 8);
+            l1 = MathHelper.clamp(l1, 32, this.y1 - this.y0 - 8);
             int i2 = (int) this.getScrollAmount() * (this.y1 - this.y0 - l1) / maxScroll + this.y0;
             if(i2 < this.y0)
             {
@@ -151,18 +150,18 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
             }
 
             bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-            bufferbuilder.vertex(scrollbarPosition, this.y1, 0.0D).color(0, 0, 0, 255).endVertex();
-            bufferbuilder.vertex(j, this.y1, 0.0D).color(0, 0, 0, 255).endVertex();
-            bufferbuilder.vertex(j, this.y0, 0.0D).color(0, 0, 0, 255).endVertex();
-            bufferbuilder.vertex(scrollbarPosition, this.y0, 0.0D).color(0, 0, 0, 255).endVertex();
-            bufferbuilder.vertex(scrollbarPosition, (i2 + l1), 0.0D).color(128, 128, 128, 255).endVertex();
-            bufferbuilder.vertex(j, (i2 + l1), 0.0D).color(128, 128, 128, 255).endVertex();
-            bufferbuilder.vertex(j, i2, 0.0D).color(128, 128, 128, 255).endVertex();
-            bufferbuilder.vertex(scrollbarPosition, i2, 0.0D).color(128, 128, 128, 255).endVertex();
-            bufferbuilder.vertex(scrollbarPosition, (i2 + l1 - 1), 0.0D).color(192, 192, 192, 255).endVertex();
-            bufferbuilder.vertex((j - 1), (i2 + l1 - 1), 0.0D).color(192, 192, 192, 255).endVertex();
-            bufferbuilder.vertex((j - 1), i2, 0.0D).color(192, 192, 192, 255).endVertex();
-            bufferbuilder.vertex(scrollbarPosition, i2, 0.0D).color(192, 192, 192, 255).endVertex();
+            bufferbuilder.vertex((double)i, (double)this.y1, 0.0D).color(0, 0, 0, 255).endVertex();
+            bufferbuilder.vertex((double)j, (double)this.y1, 0.0D).color(0, 0, 0, 255).endVertex();
+            bufferbuilder.vertex(j, (double)this.y0, 0.0D).color(0, 0, 0, 255).endVertex();
+            bufferbuilder.vertex((double)i, (double)this.y0, 0.0D).color(0, 0, 0, 255).endVertex();
+            bufferbuilder.vertex((double)i, (double)(i2 + l1), 0.0D).color(128, 128, 128, 255).endVertex();
+            bufferbuilder.vertex((double)j, (double)(i2 + l1), 0.0D).color(128, 128, 128, 255).endVertex();
+            bufferbuilder.vertex((double)j, (double)i2, 0.0D).color(128, 128, 128, 255).endVertex();
+            bufferbuilder.vertex((double)i, (double)i2, 0.0D).color(128, 128, 128, 255).endVertex();
+            bufferbuilder.vertex((double)i, (double)(i2 + l1 - 1), 0.0D).color(192, 192, 192, 255).endVertex();
+            bufferbuilder.vertex((double)(j - 1), (double)(i2 + l1 - 1), 0.0D).color(192, 192, 192, 255).endVertex();
+            bufferbuilder.vertex((double)(j - 1), (double)i2, 0.0D).color(192, 192, 192, 255).endVertex();
+            bufferbuilder.vertex((double)i, (double)i2, 0.0D).color(192, 192, 192, 255).endVertex();
             tesselator.end();
         }
 
@@ -194,14 +193,14 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
                     RenderSystem.disableTexture();
                     RenderSystem.setShader(GameRenderer::getPositionShader);
                     float f = this.isFocused() ? 1.0F : 0.5F;
-                    RenderSystem.setShaderColor(f, f, f, 1.0F);
+                    ClientUtils.color4f(f, f, f, 1.0F);
                     bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
                     bufferbuilder.vertex(l1, (i1 + j1 + 2), 0.0D).endVertex();
                     bufferbuilder.vertex(i2, (i1 + j1 + 2), 0.0D).endVertex();
                     bufferbuilder.vertex(i2, (i1 - 2), 0.0D).endVertex();
                     bufferbuilder.vertex(l1, (i1 - 2), 0.0D).endVertex();
                     tesselator.end();
-                    RenderSystem.setShaderColor(0.0F, 0.0F, 0.0F, 1.0F);
+                    ClientUtils.color4f(0.0F, 0.0F, 0.0F, 1.0F);
                     bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
                     bufferbuilder.vertex((l1 + 1), (i1 + j1 + 1), 0.0D).endVertex();
                     bufferbuilder.vertex((i2 - 1), (i1 + j1 + 1), 0.0D).endVertex();
@@ -212,7 +211,7 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
                 }
 
                 int rowLeft = this.getRowLeft();
-                entry.render(matrixStack, itemIndex, rowTop, rowLeft, rowWidth, j1, mouseX, mouseY, Objects.equals(this.hoveredEntry, entry), partialTicks);
+                entry.render(matrixStack, itemIndex, rowTop, rowLeft, rowWidth, j1, mouseX, mouseY, Objects.equals(this.hoveredEntry, entry) && canDisplayTooltips, partialTicks);
             }
         }
     }
@@ -222,7 +221,7 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
     {
         if(keyCode == GLFW.GLFW_KEY_DELETE)
         {
-            if(this.getSelected() != null && this.onDelete != null)
+            if(this.getSelected() != null && this.onDelete != null && canDelete)
             {
                 this.onDelete.run(this.getSelected());
                 this.setSelected(null);
@@ -233,6 +232,15 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
         {
             return super.keyPressed(keyCode, scanCode, modifiers);
         }
+
+        return true;
+    }
+
+    @Override
+    public boolean mouseScrolled(double p_93416_, double p_93417_, double p_93418_)
+    {
+        if(this.isListHovered)
+            return super.mouseScrolled(p_93416_, p_93417_, p_93418_);
 
         return true;
     }
@@ -255,21 +263,23 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
         return true;
     }
 
-    public void setEntries(List<Entry> entries)
+    public void setEntries(List<? extends Entry> entries, boolean resetScroll)
     {
         this.clearEntries();
         entries.forEach(this::addEntry);
-        this.setScrollAmount(0D);
+        if(resetScroll)
+            this.setScrollAmount(0D);
     }
 
     @Override
-    public void setSelected(@Nullable Entry entry)
+    public void setSelected(Entry entry)
     {
         if(this.onSelected != null)
         {
             this.onSelected.run(entry);
             this.onSelected = null;
         }
+
         super.setSelected(entry);
     }
 
@@ -296,15 +306,10 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
     {
         Entry entry = getEntryAtPosition(mouseX, mouseY);
 
-        if(entry != null)
+        if(entry != null && isListHovered && canDisplayTooltips)
         {
             entry.renderTooltip(matrixStack, mouseX, mouseY);
         }
-    }
-
-    public void setOnDelete(Callable<Entry> onDelete)
-    {
-        this.onDelete = onDelete;
     }
 
     public boolean isVisible()
@@ -317,9 +322,14 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
         isVisible = visible;
     }
 
-    public static abstract class Entry extends ObjectSelectionList.Entry<SimpleListWidget.Entry>
+    @Override
+    public void updateNarration(NarrationElementOutput p_169152_)
     {
-        protected Minecraft minecraft = Minecraft.getInstance();
+        // NO-OP
+    }
+
+    public abstract static class Entry extends AbstractSelectionList.Entry<Entry>
+    {
         protected final List<Component> tooltips;
 
         protected Entry()
@@ -340,12 +350,12 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
 
             int color = isMouseOver ? 0xF1f115 : 0xFFFFFF;
 
-            Screen.drawString(matrixStack, minecraft.font, stringToDisplay, hasItemDisplay ? leftPos + 16 + 5 : leftPos + width / 2 - minecraft.font.width(stringToDisplay) / 2, (topPos + height / 2 - minecraft.font.lineHeight / 2), color);
+            Screen.drawString(matrixStack, ClientUtils.getFontRenderer(), stringToDisplay, hasItemDisplay ? leftPos + 16 + 5 : leftPos + width / 2 - ClientUtils.width(stringToDisplay) / 2, (topPos + height / 2 - ClientUtils.getFontRenderer().lineHeight / 2), color);
         }
 
         protected String getString(int width, String displayStr)
         {
-            int stringWidth = minecraft.font.width(displayStr);
+            int stringWidth = ClientUtils.width(displayStr);
 
             if(stringWidth > width - (16 + 5))
             {
@@ -384,7 +394,7 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
             matrixStack.pushPose();
             float scale = 1F;
             int yPos = height / 2 - 16 / 2;
-            minecraft.getItemRenderer().renderAndDecorateItem(item, (int) ((left + 1) / scale), (int) ((top + yPos) / scale));
+            ClientUtils.getItemRenderer().renderAndDecorateFakeItem(item, (int) ((left + 1) / scale), (int) ((top + yPos) / scale));
             matrixStack.popPose();
         }
 
@@ -408,9 +418,8 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
             tooltips.add(new TextComponent("").withStyle(ChatFormatting.DARK_AQUA));
             tooltips.add(References.getTranslate("screen.widget.simple_list.tooltip.output"));
             addToTooltip(output);
-
-            assert minecraft.screen != null;
-            minecraft.screen.renderTooltip(matrixStack, tooltips, Optional.empty(), mouseX, mouseY);
+            
+            ClientUtils.getCurrentScreen().renderTooltip(matrixStack, tooltips, Optional.empty(), mouseX, mouseY);
         }
 
         private void addToTooltip(CraftIngredients input)
@@ -427,13 +436,16 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
 
                 MutableComponent ingredientValue = new TextComponent("");
 
-                if(craftIngredient instanceof CraftIngredients.BlockIngredient blockIngredient)
+                if(craftIngredient instanceof CraftIngredients.BlockIngredient)
                 {
+                    CraftIngredients.BlockIngredient blockIngredient = (CraftIngredients.BlockIngredient) craftIngredient;
                     ingredientValue.append(new TextComponent(blockIngredient.getId().toString()));
                     ingredientValue.withStyle(ChatFormatting.DARK_AQUA);
                 }
-                else if(craftIngredient instanceof CraftIngredients.ItemLuckIngredient itemLuckIngredient)
+                else if(craftIngredient instanceof CraftIngredients.ItemLuckIngredient)
                 {
+                    CraftIngredients.ItemLuckIngredient itemLuckIngredient = (CraftIngredients.ItemLuckIngredient) craftIngredient;
+
                     ingredientValue.append(new TextComponent(itemLuckIngredient.getId().toString())).withStyle(ChatFormatting.DARK_AQUA);
 
                     MutableComponent countComponent = new TextComponent(" (x").append(String.valueOf(itemLuckIngredient.getCount())).append(")").withStyle(ChatFormatting.GRAY);
@@ -445,8 +457,10 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
                         ingredientValue.append(luckComponent);
                     }
                 }
-                else if(craftIngredient instanceof CraftIngredients.MultiItemIngredient multiItemIngredient)
+                else if(craftIngredient instanceof CraftIngredients.MultiItemIngredient)
                 {
+                    CraftIngredients.MultiItemIngredient multiItemIngredient = (CraftIngredients.MultiItemIngredient) craftIngredient;
+
                     MutableComponent countComponent = new TextComponent(" (x").append(String.valueOf(multiItemIngredient.getCount())).append(")").withStyle(ChatFormatting.GRAY);
                     ingredientTooltipLine.append(countComponent);
                     tooltips.add(ingredientTooltipLine);
@@ -456,27 +470,31 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
                         MutableComponent itemEntryComponent = new TextComponent("    ").append(new TextComponent("- ").withStyle(ChatFormatting.WHITE));
                         itemEntryComponent.append(new TextComponent(isTag ? "Tag" : "Item").withStyle(ChatFormatting.YELLOW));
                         itemEntryComponent.append(new TextComponent(" : ").withStyle(ChatFormatting.WHITE));
-                        itemEntryComponent.append(new TextComponent(resourceLocation.toString()).withStyle(ChatFormatting.GOLD));
+                        itemEntryComponent.append(new TextComponent(resourceLocation.toString()).withStyle(ChatFormatting.RED));
                         tooltips.add(itemEntryComponent);
                     });
                     continue;
                 }
-                else if(craftIngredient instanceof CraftIngredients.TagIngredient tagIngredient)
+                else if(craftIngredient instanceof CraftIngredients.TagIngredient)
                 {
+                    CraftIngredients.TagIngredient tagIngredient = (CraftIngredients.TagIngredient) craftIngredient;
                     ingredientValue.append(new TextComponent(tagIngredient.getId().toString())).withStyle(ChatFormatting.DARK_AQUA);
 
                     MutableComponent countComponent = new TextComponent(" (x").append(String.valueOf(tagIngredient.getCount())).append(")").withStyle(ChatFormatting.GRAY);
                     ingredientValue.append(countComponent);
                 }
-                else if(craftIngredient instanceof CraftIngredients.ItemIngredient itemIngredient)
+                else if(craftIngredient instanceof CraftIngredients.ItemIngredient)
                 {
+                    CraftIngredients.ItemIngredient itemIngredient = (CraftIngredients.ItemIngredient) craftIngredient;
                     ingredientValue.append(new TextComponent(itemIngredient.getId().toString())).withStyle(ChatFormatting.DARK_AQUA);
 
                     MutableComponent countComponent = new TextComponent(" (x").append(String.valueOf(itemIngredient.getCount())).append(")").withStyle(ChatFormatting.GRAY);
                     ingredientValue.append(countComponent);
                 }
-                else if(craftIngredient instanceof CraftIngredients.FluidIngredient fluidIngredient)
+                else if(craftIngredient instanceof CraftIngredients.FluidIngredient)
                 {
+                    CraftIngredients.FluidIngredient fluidIngredient = (CraftIngredients.FluidIngredient) craftIngredient;
+
                     ingredientValue.append(new TextComponent(fluidIngredient.getId().toString()));
                     ingredientValue.withStyle(ChatFormatting.BLUE);
 
@@ -486,13 +504,16 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
                     component.withStyle(ChatFormatting.GRAY);
                     ingredientValue.append(component);
                 }
-                else if(craftIngredient instanceof CraftIngredients.DataIngredient dataIngredient)
+                else if(craftIngredient instanceof CraftIngredients.DataIngredient)
                 {
-                    ingredientValue.append(new TextComponent(String.valueOf(dataIngredient.getData())).withStyle(ChatFormatting.LIGHT_PURPLE));
+                    CraftIngredients.DataIngredient dataIngredient = (CraftIngredients.DataIngredient) craftIngredient;
+                    ingredientValue.append(new TextComponent("" + (dataIngredient.isDouble() ? dataIngredient.getData().doubleValue() : dataIngredient.getData().intValue())).withStyle(ChatFormatting.LIGHT_PURPLE));
                     ingredientValue.append(new TextComponent(" ").append(dataIngredient.getUnit().getDisplayUnit()).withStyle(ChatFormatting.DARK_GRAY));
                 }
-                else if(craftIngredient instanceof CraftIngredients.NBTIngredient nbtIngredient)
+                else if(craftIngredient instanceof CraftIngredients.NBTIngredient)
                 {
+                    CraftIngredients.NBTIngredient nbtIngredient = (CraftIngredients.NBTIngredient) craftIngredient;
+
                     tooltips.add(ingredientTooltipLine);
 
                     getNbtComponent(tooltips, gson.fromJson(nbtIngredient.getNbt().getAsString(), JsonObject.class), 1);
@@ -507,9 +528,9 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
 
         public void getNbtComponent(List<Component> parent, JsonObject compoundTag, int step)
         {
-            for(String nbtKey : compoundTag.keySet())
+            for(String nbtKey : compoundTag.entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList()))
             {
-                MutableComponent itemEntryKey = new TextComponent("    ".repeat(step)).append(new TextComponent(nbtKey).withStyle(ChatFormatting.RED)).append(new TextComponent(" : ").withStyle(ChatFormatting.WHITE));
+                MutableComponent itemEntryKey = new TextComponent(String.join("", Collections.nCopies(step, "    "))).append(new TextComponent(nbtKey).withStyle(ChatFormatting.RED)).append(new TextComponent(" : ").withStyle(ChatFormatting.WHITE));
 
                 parent.add(itemEntryKey);
 
@@ -560,19 +581,13 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
         {
             return recipe;
         }
-
-        @Override
-        public @NotNull Component getNarration()
-        {
-            return new TextComponent(this.recipe.getId().toString());
-        }
     }
 
     public static class ModifiedRecipeEntry extends Entry
     {
-        private final ModifiedRecipe recipe;
+        private final KubeJSModifiedRecipe recipe;
 
-        public ModifiedRecipeEntry(ModifiedRecipe recipe)
+        public ModifiedRecipeEntry(KubeJSModifiedRecipe recipe)
         {
             this.recipe = recipe;
         }
@@ -587,29 +602,24 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
 
             Item item = Items.BARRIER;
 
-            if(recipe.getOutputItem() != null)
+            if(recipe.getRecipeId() != null)
             {
-                try
-                {
-                    item = ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(recipe.getOutputItem()));
-                }
-                catch(Exception ignored)
-                {
-                }
-            }
-            else if(recipe.getInputItem() != null)
-            {
-                try
-                {
-                    item = ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(recipe.getInputItem()));
-                }
-                catch(Exception ignored)
-                {
-                }
+                ResourceLocation recipeId = ClientUtils.parse(recipe.getRecipeId());
+                item = ForgeRegistries.ITEMS.containsKey(recipeId) ? ForgeRegistries.ITEMS.getValue(recipeId) : Items.BARRIER;
             }
 
             int yPos = height / 2 - 16 / 2;
-            minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(item), left + yPos, top + yPos);
+            ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(item), left + yPos, top + yPos);
+
+            matrixStack.pushPose();
+            RenderSystem.enableBlend();
+            RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+            matrixStack.translate(0F, 0F, 100F);
+            ClientUtils.color4f(1F, 1F, 1F, 0.5F);
+            ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(Items.BARRIER), left + yPos, top + yPos);
+            RenderSystem.disableBlend();
+            RenderSystem.defaultBlendFunc();
+            matrixStack.popPose();
         }
 
         @Override
@@ -621,41 +631,29 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
         public void renderTooltip(PoseStack matrixStack, int mouseX, int mouseY)
         {
             tooltips.clear();
-            Map<ModRecipesJSSerializer.RecipeDescriptors, String> recipeDescriptors = recipe.getRecipeMap();
+            Map<ModRecipeSerializer.RecipeDescriptors, String> recipeDescriptors = recipe.getRecipeMap();
             tooltips.add(new TextComponent(recipeDescriptors.values().stream().findFirst().orElse(References.getLoc("empty").toString())).withStyle(ChatFormatting.GREEN, ChatFormatting.UNDERLINE));
             tooltips.add(new TextComponent(""));
             recipeDescriptors.forEach((tag, value) -> tooltips.add(new TextComponent(tag.toString()).withStyle(ChatFormatting.DARK_PURPLE).append(new TextComponent(" : ")).append(new TextComponent(value).withStyle(ChatFormatting.DARK_AQUA))));
 
-            ClientUtils.getCurrentScreen().renderTooltip(matrixStack, tooltips, Optional.empty(), mouseX, mouseY);
+            ClientUtils.getCurrentScreen().renderComponentTooltip(matrixStack, tooltips, mouseX, mouseY);
         }
 
-        public ModifiedRecipe getRecipe()
+        public KubeJSModifiedRecipe getRecipe()
         {
             return recipe;
-        }
-
-        @Override
-        public Component getNarration()
-        {
-            Optional<String> descriptor = this.recipe.getRecipeMap().values().stream().findFirst();
-            return descriptor.isPresent() ? new TextComponent(descriptor.get()) : TextComponent.EMPTY;
         }
     }
 
     public static class StringEntry extends Entry
     {
-        private List<Component> tooltips;
+        private final List<Component> tooltips;
         private final String resource;
 
         public StringEntry(String resource)
         {
             this.resource = resource;
             this.tooltips = new ArrayList<>();
-        }
-
-        public String getResource()
-        {
-            return resource;
         }
 
         @Override
@@ -673,23 +671,11 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
         @Override
         public void renderTooltip(PoseStack matrixStack, int mouseX, int mouseY)
         {
-            if(!tooltips.isEmpty() && minecraft.screen != null)
+            if(!tooltips.isEmpty() && ClientUtils.getCurrentScreen() != null)
             {
                 tooltips.clear();
-                minecraft.screen.renderTooltip(matrixStack, tooltips, Optional.empty(), mouseX, mouseY);
+                ClientUtils.getCurrentScreen().renderComponentTooltip(matrixStack, tooltips, mouseX, mouseY);
             }
-        }
-
-        public StringEntry setTooltips(List<Component> tooltips)
-        {
-            this.tooltips = tooltips;
-            return this;
-        }
-
-        @Override
-        public Component getNarration()
-        {
-            return new TextComponent(this.resource);
         }
     }
 
@@ -718,13 +704,13 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
             matrixStack.pushPose();
             float scale = 1.1F;
             matrixStack.scale(scale, scale, scale);
-            Screen.drawCenteredString(matrixStack, minecraft.font, displayStr, (int) ((left + width / 2) / scale), (int) ((top + height / 2 - (minecraft.font.lineHeight * scale) / 2) / scale), color);
+            Screen.drawCenteredString(matrixStack, ClientUtils.getFontRenderer(), displayStr, (int) ((left + width / 2) / scale), (int) ((top + height / 2 - (ClientUtils.getFontRenderer().lineHeight * scale) / 2) / scale), color);
             matrixStack.popPose();
 
             Item item = ForgeRegistries.ITEMS.getValue(getResourceLocation());
 
             int yPos = height / 2 - 16 / 2;
-            minecraft.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(item == null ? Items.BARRIER : item), left + yPos, top + yPos);
+            ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(item == null ? Items.BARRIER : item), left + yPos, top + yPos);
         }
 
         @Override
@@ -736,17 +722,11 @@ public class SimpleListWidget extends ObjectSelectionList<SimpleListWidget.Entry
         @Override
         public void renderTooltip(PoseStack matrixStack, int mouseX, int mouseY)
         {
-            if(!tooltips.isEmpty() && minecraft.screen != null)
+            if(!tooltips.isEmpty() && ClientUtils.getCurrentScreen() != null)
             {
                 tooltips.clear();
-                minecraft.screen.renderTooltip(matrixStack, tooltips, Optional.empty(), mouseX, mouseY);
+                ClientUtils.getCurrentScreen().renderComponentTooltip(matrixStack, tooltips, mouseX, mouseY);
             }
-        }
-
-        @Override
-        public Component getNarration()
-        {
-            return new TextComponent(this.resourceLocation.toString());
         }
     }
 }

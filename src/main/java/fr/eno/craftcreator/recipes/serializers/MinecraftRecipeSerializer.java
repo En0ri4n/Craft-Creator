@@ -1,22 +1,25 @@
 package fr.eno.craftcreator.recipes.serializers;
 
+
 import com.google.gson.JsonObject;
+import fr.eno.craftcreator.base.ModRecipeCreator;
+import fr.eno.craftcreator.base.SupportedMods;
+import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.utils.CraftIngredients;
-import fr.eno.craftcreator.recipes.utils.SupportedMods;
-import fr.eno.craftcreator.screen.utils.ModRecipeCreator;
-import fr.eno.craftcreator.serializer.DatapackHelper;
+import fr.eno.craftcreator.recipes.utils.DatapackHelper;
+import fr.eno.craftcreator.recipes.utils.RecipeEntry;
 import io.netty.buffer.Unpooled;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 
 import java.util.List;
 import java.util.Map;
 
-public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
+public class MinecraftRecipeSerializer extends ModRecipeSerializer
 {
     private static final MinecraftRecipeSerializer INSTANCE = new MinecraftRecipeSerializer();
 
@@ -25,38 +28,35 @@ public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
         super(SupportedMods.MINECRAFT);
     }
 
-    public void serializeFurnaceRecipe(ModRecipeCreator smeltType, ResourceLocation input, Item output, double experience, int cookTime, boolean isKubeJSRecipe)
+    public void serializeFurnaceRecipe(ModRecipeCreator smeltType, RecipeEntry.Input input, RecipeEntry.Output output, double experience, int cookTime, boolean isKubeJSRecipe)
     {
         JsonObject obj = createBaseJson(smeltType.getRecipeType());
         obj.add("ingredient", singletonItemJsonObject(input));
         obj.addProperty("experience", experience);
         obj.addProperty("cookingtime", cookTime);
-        obj.addProperty("result", output.toString());
+        obj.addProperty("result", output.registryName().toString());
 
-        if(isKubeJSRecipe) addRecipeToKubeJS(gson.toJson(obj), smeltType.getRecipeType(), output.getRegistryName());
-        else DatapackHelper.serializeRecipe(smeltType.getRecipeType(), output.getRegistryName(), obj);
+        addRecipeTo(obj, smeltType.getRecipeType(), output.registryName());
     }
 
-    public void serializeStoneCutterRecipe(ResourceLocation input, ResourceLocation output, int count, boolean isKubeJSRecipe)
+    public void serializeStoneCutterRecipe(RecipeEntry.Input input, RecipeEntry.Output output, boolean isKubeJSRecipe)
     {
         JsonObject obj = createBaseJson(RecipeType.STONECUTTING);
-        obj.add("ingredient", singletonItemJsonObject("item", input));
-        obj.addProperty("result", output.toString());
-        obj.addProperty("count", count);
+        obj.add("ingredient", singletonItemJsonObject(input));
+        obj.addProperty("result", output.registryName().toString());
+        obj.addProperty("count", output.count());
 
-        if(isKubeJSRecipe) addRecipeToKubeJS(gson.toJson(obj), RecipeType.STONECUTTING, output);
-        else DatapackHelper.serializeRecipe(RecipeType.STONECUTTING, output, obj);
+        addRecipeTo(obj, RecipeType.STONECUTTING, output.registryName());
     }
 
-    public void serializeSmithingRecipe(ResourceLocation base, ResourceLocation addition, ResourceLocation output, boolean isKubeJSRecipe)
+    public void serializeSmithingRecipe(RecipeEntry.Input base, RecipeEntry.Input addition, RecipeEntry.Output output, boolean isKubeJSRecipe)
     {
         JsonObject obj = createBaseJson(RecipeType.SMITHING);
-        obj.add("base", singletonItemJsonObject("item", base));
-        obj.add("addition", singletonItemJsonObject("item", addition));
-        obj.addProperty("result", output.toString());
+        obj.add("base", singletonItemJsonObject(base));
+        obj.add("addition", singletonItemJsonObject(addition));
+        obj.add("result", singletonItemJsonObject(output));
 
-        if(isKubeJSRecipe) addRecipeToKubeJS(gson.toJson(obj), RecipeType.SMITHING, output);
-        else DatapackHelper.serializeRecipe(RecipeType.SMITHING, output, obj);
+        addRecipeTo(obj, RecipeType.SMITHING, output.registryName());
     }
 
     public void serializeCraftingTableRecipe(ItemStack output, List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, List<Integer> nbtSlots, boolean shaped, boolean isKubeJSRecipe)
@@ -72,7 +72,7 @@ public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
         else
         {
             obj.addProperty("type", "minecraft:crafting_shapeless");
-            obj.add("ingredients", DatapackHelper.createShapelessIngredientsJsonArray(slots));
+            obj.add("ingredients", DatapackHelper.createShapelessIngredientsJsonArray(slots, taggedSlots));
         }
 
         JsonObject resultObj = new JsonObject();
@@ -81,12 +81,13 @@ public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
         if(nbtSlots.contains(9))
         {
             resultObj.addProperty("type", "forge:nbt");
-            resultObj.addProperty("nbt", slots.get(9).getItem().getTag().toString());
+            CompoundTag nbt = slots.get(9).getItem().getTag();
+            nbt.remove("display"); // Remove display to avoid issues with the name and lore (no one wants to see a lore like +NBT in the recipe)
+            resultObj.addProperty("nbt", escape(nbt.toString(), false));
         }
         obj.add("result", resultObj);
 
-        if(isKubeJSRecipe) addRecipeToKubeJS(gson.toJson(obj), RecipeType.CRAFTING, output.getItem().getRegistryName());
-        else DatapackHelper.serializeRecipe(RecipeType.CRAFTING, output.getItem().getRegistryName(), obj);
+        addRecipeTo(obj, RecipeType.CRAFTING, output.getItem().getRegistryName());
     }
 
     @Override
@@ -94,21 +95,23 @@ public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
     {
         CraftIngredients inputIngredients = CraftIngredients.create();
 
-        if(recipe instanceof UpgradeRecipe smithRecipe) // Fields are not accessible so we need to do this :(
+        if(recipe instanceof UpgradeRecipe) // Fields are not accessible so we need to do this :(
         {
+            UpgradeRecipe smithingRecipe = (UpgradeRecipe) recipe;
             FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.buffer());
-            UpgradeRecipe.Serializer serializer = (UpgradeRecipe.Serializer) smithRecipe.getSerializer();
-            serializer.toNetwork(buffer, smithRecipe);
+            UpgradeRecipe.Serializer serializer = (UpgradeRecipe.Serializer) smithingRecipe.getSerializer();
+            serializer.toNetwork(buffer, smithingRecipe);
             Ingredient base = Ingredient.fromNetwork(buffer);
             Ingredient addition = Ingredient.fromNetwork(buffer);
             inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(base.getItems()[0].getItem().getRegistryName(), 1, "Base"));
             inputIngredients.addIngredient(new CraftIngredients.ItemIngredient(addition.getItems()[0].getItem().getRegistryName(), 1, "Addition"));
         }
-        else if(recipe instanceof AbstractCookingRecipe abstractCookingRecipe)
+        else if(recipe instanceof AbstractCookingRecipe)
         {
+            AbstractCookingRecipe abstractCookingRecipe = (AbstractCookingRecipe) recipe;
             putIfNotEmpty(inputIngredients, abstractCookingRecipe.getIngredients());
-            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Cooking Time", CraftIngredients.DataIngredient.DataUnit.TICK, abstractCookingRecipe.getCookingTime()));
-            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Experience", CraftIngredients.DataIngredient.DataUnit.EXPERIENCE, abstractCookingRecipe.getExperience()));
+            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Cooking Time", CraftIngredients.DataIngredient.DataUnit.TICK, abstractCookingRecipe.getCookingTime(), false));
+            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Experience", CraftIngredients.DataIngredient.DataUnit.EXPERIENCE, abstractCookingRecipe.getExperience(), false));
         }
 
         if(inputIngredients.isEmpty()) putIfNotEmpty(inputIngredients, recipe.getIngredients());
@@ -121,8 +124,9 @@ public class MinecraftRecipeSerializer extends ModRecipesJSSerializer
     {
         CraftIngredients ingredients = CraftIngredients.create();
 
-        if(recipe instanceof CraftingRecipe craftingRecipe)
+        if(recipe instanceof CraftingRecipe)
         {
+            CraftingRecipe craftingRecipe = (CraftingRecipe) recipe;
             ingredients.addIngredient(new CraftIngredients.ItemIngredient(recipe.getResultItem().getItem().getRegistryName(), recipe.getResultItem().getCount()));
             if(craftingRecipe.getResultItem().hasTag())
                 ingredients.addIngredient(new CraftIngredients.NBTIngredient(craftingRecipe.getResultItem().getTag()));

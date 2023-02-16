@@ -1,5 +1,6 @@
 package fr.eno.craftcreator.recipes.utils;
 
+
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
@@ -7,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings("unused")
 public class RecipeInfos
 {
     private final List<RecipeParameter> parameters;
@@ -216,7 +216,7 @@ public class RecipeInfos
         public static final String KUBEJS_RECIPE = "kubejs_recipe";
         public static final String NBT_SLOTS = "nbt_slots";
 
-        // Vanilla Furnace Parameters
+        // Vanilla Parameters
         public static final String EXPERIENCE = "experience";
         public static final String COOKING_TIME = "cooking_time";
 
@@ -226,9 +226,13 @@ public class RecipeInfos
 
         // Thermal Parameters
         public static final String ENERGY = "energy";
-        public static final String RESIN_AMOUNT = "resin_amount";
         public static final String ENERGY_MOD = "energy_mod";
         public static final String WATER_MOD = "water_mod";
+        public static final String RESIN_AMOUNT = "resin_amount";
+        public static final String FLUID_AMOUNT_0 = "fluid_amount_0";
+        public static final String FLUID_AMOUNT_1 = "fluid_amount_1";
+        public static final String FLUID_AMOUNT_2 = "fluid_amount_2";
+        public static final String CHANCE = "chance";
     }
 
     public enum RecipeParameterType
@@ -237,6 +241,9 @@ public class RecipeInfos
         STRING,
         BOOLEAN,
         RESOURCE_LOCATION,
-        STRING_LIST, INT_LIST, EMPTY, MAP
+        STRING_LIST,
+        INT_LIST,
+        EMPTY,
+        MAP
     }
 }

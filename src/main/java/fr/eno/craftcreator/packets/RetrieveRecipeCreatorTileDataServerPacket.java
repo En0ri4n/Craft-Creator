@@ -1,8 +1,9 @@
 package fr.eno.craftcreator.packets;
 
+
+import fr.eno.craftcreator.api.ServerUtils;
 import fr.eno.craftcreator.init.InitPackets;
-import fr.eno.craftcreator.tileentity.utils.InventoryDataContainerTileEntity;
-import fr.eno.craftcreator.utils.ServerUtils;
+import fr.eno.craftcreator.tileentity.base.InventoryDataContainerTileEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -15,7 +16,14 @@ public class RetrieveRecipeCreatorTileDataServerPacket
     private final String dataName;
     private final BlockPos pos;
     private final InitPackets.PacketDataType dataType;
-
+    
+    /**
+     * Retrieve data from a tile entity on the server side
+     *
+     * @param dataName The name of the data to update
+     * @param pos The position of the tile entity
+     * @param dataType The type of the data to update
+     */
     public RetrieveRecipeCreatorTileDataServerPacket(String dataName, BlockPos pos, InitPackets.PacketDataType dataType)
     {
         this.dataName = dataName;
@@ -40,13 +48,16 @@ public class RetrieveRecipeCreatorTileDataServerPacket
 
     public static class ServerHandler
     {
+        /**
+         * Handle the packet on the server side and send the data to the client using {@link UpdateRecipeCreatorTileDataClientPacket}
+         */
         public static void handle(RetrieveRecipeCreatorTileDataServerPacket msg, Supplier<NetworkEvent.Context> ctx)
         {
             BlockEntity tileEntity = ServerUtils.getBlockEntity(ctx, msg.pos);
 
-            if(tileEntity instanceof InventoryDataContainerTileEntity tile)
+            if(tileEntity instanceof InventoryDataContainerTileEntity)
             {
-                InitPackets.NetworkHelper.sendToPlayer(ServerUtils.getServerPlayer(ctx), new UpdateRecipeCreatorTileDataClientPacket(msg.dataName, msg.pos, msg.dataType, tile.getData(msg.dataName)));
+                InitPackets.NetworkHelper.sendToPlayer(ServerUtils.getServerPlayer(ctx), new UpdateRecipeCreatorTileDataClientPacket(msg.dataName, msg.pos, msg.dataType, ((InventoryDataContainerTileEntity) tileEntity).getData(msg.dataName)));
             }
 
             ctx.get().setPacketHandled(true);

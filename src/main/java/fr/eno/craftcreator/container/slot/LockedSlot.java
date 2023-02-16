@@ -1,27 +1,32 @@
 package fr.eno.craftcreator.container.slot;
 
+
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
 
 public class LockedSlot extends SimpleSlotItemHandler
-{	
-	public LockedSlot(IItemHandler inventoryIn, int index, int xPosition, int yPosition, ItemStack stack)
+{
+	private final ItemStack lockedStack;
+
+	public LockedSlot(IItemHandler inventoryIn, int index, int xPosition, int yPosition, ItemStack lockedStack)
 	{
 		super(inventoryIn, index, xPosition, yPosition);
-		mayPlace(stack);
+		this.lockedStack = lockedStack;
 	}
 
 	@Override
-	public boolean mayPickup(Player playerIn)
+	protected boolean canPickup(Player playerIn)
 	{
 		return false;
 	}
 
+	@Nonnull
 	@Override
-	public boolean mayPlace(@NotNull ItemStack stack)
+	public ItemStack getItem()
 	{
-		return super.mayPlace(stack);
+		return this.lockedStack;
 	}
 }
