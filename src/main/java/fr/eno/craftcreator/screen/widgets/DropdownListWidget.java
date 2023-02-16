@@ -13,6 +13,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.util.Mth;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
@@ -65,7 +66,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends A
         Screen.fill(matrixStack, this.x, this.y, this.x + this.width, this.y + this.height, 0xf2c3a942);
         Screen.fill(matrixStack, this.x + 1, this.y + 1, this.x + this.width - 1, this.y + this.height - 1, Color.DARK_GRAY.getRGB());
         int color = 0xFFFFFFFF;
-        drawCenteredString(matrixStack, ClientUtils.getFontRenderer(), this.getMessage().copy().append(" ▼"), this.x + this.width / 2, this.y + height / 2 - ClientUtils.getFontRenderer().lineHeight / 2, color | MathHelper.ceil(this.alpha * 255.0F) << 24);
+        drawCenteredString(matrixStack, ClientUtils.getFontRenderer(), this.getMessage().copy().append(" ▼"), this.x + this.width / 2, this.y + height / 2 - ClientUtils.getFontRenderer().lineHeight / 2, color | Mth.ceil(this.alpha * 255.0F) << 24);
 
         if(this.isFocused())
         {
