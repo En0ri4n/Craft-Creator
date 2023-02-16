@@ -11,6 +11,7 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.*;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 
@@ -79,7 +80,9 @@ public class MinecraftRecipeSerializer extends ModRecipeSerializer
         if(nbtSlots.contains(9))
         {
             resultObj.addProperty("type", "forge:nbt");
-            resultObj.addProperty("nbt", slots.get(9).getItem().getTag().toString().replace("\"", "\""));
+            CompoundNBT nbt = slots.get(9).getItem().getTag();
+            nbt.remove("display"); // Remove display to avoid issues with the name and lore (no one wants to see a lore like +NBT in the recipe)
+            resultObj.addProperty("nbt", escape(nbt.toString(), false));
         }
         obj.add("result", resultObj);
 
