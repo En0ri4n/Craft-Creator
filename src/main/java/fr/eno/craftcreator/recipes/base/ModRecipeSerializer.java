@@ -20,14 +20,14 @@ import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.IFormattableTextComponent;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 // TODO: improve code
 public abstract class ModRecipeSerializer
 {
-    protected static final Gson gson = new GsonBuilder().create();
+    private static final List<Character> TO_ESCAPE = Arrays.asList('$', '(', ')', '{', '}', '[', ']', '.');
+    protected static final Gson GSON = new GsonBuilder().setLenient().create();
+
     protected final SupportedMods mod;
     protected SerializerType currentSerializeType;
     
@@ -40,7 +40,7 @@ public abstract class ModRecipeSerializer
     {
         if(serializerType == SerializerType.KUBE_JS)
         {
-            String serializedRecipe = "event.remove(" + gson.toJson(kubeJSModifiedRecipe.toJson()) + ")";
+            String serializedRecipe = "event.remove(" + GSON.toJson(kubeJSModifiedRecipe.toJson()) + ")";
     
             if(!KubeJSHelper.isModifiedRecipePresent(mod, kubeJSModifiedRecipe))
                 KubeJSHelper.addModifiedRecipe(mod, serializedRecipe);
@@ -49,7 +49,7 @@ public abstract class ModRecipeSerializer
 
     public void addModifiedRecipe(KubeJSModifiedRecipe kubeJSModifiedRecipe)
     {
-        String serializedRecipe = String.format("event.%s(", kubeJSModifiedRecipe.getType().getDescriptor()) + gson.toJson(kubeJSModifiedRecipe.toJson()) + ")";
+        String serializedRecipe = String.format("event.%s(", kubeJSModifiedRecipe.getType().getDescriptor()) + GSON.toJson(kubeJSModifiedRecipe.toJson()) + ")";
 
         if(!KubeJSHelper.isModifiedRecipePresent(mod, kubeJSModifiedRecipe))
             KubeJSHelper.addModifiedRecipe(this.mod, serializedRecipe);
@@ -75,7 +75,7 @@ public abstract class ModRecipeSerializer
         switch(currentSerializeType)
         {
             case KUBE_JS:
-                    feedback = KubeJSHelper.addRecipeToFile(this.mod, recipeType, "event.custom(" + gson.toJson(recipeJson) + ")");
+                    feedback = KubeJSHelper.addRecipeToFile(this.mod, recipeType, "event.custom(" + GSON.toJson(recipeJson) + ")");
                 break;
             default:
             case MINECRAFT_DATAPACK:
@@ -329,6 +329,24 @@ public abstract class ModRecipeSerializer
         JsonObject obj = new JsonObject();
         obj.addProperty("type", CommonUtils.getRecipeTypeName(recipeType).toString());
         return obj;
+    }
+
+    /**
+     * Escape illegals character from the current string
+     *
+     * @param toEscape the string to escape
+     * @param isPattern if the string is a pattern
+     * @return the escaped string
+     */
+    public static String escape(String toEscape, boolean isPattern)
+    {
+        List<Character> list = Collections.singletonList('"');
+
+        for(Character c : isPattern ? TO_ESCAPE : list)
+            toEscape = toEscape.replace(String.valueOf(c), String.valueOf('\\') + c);
+
+        System.out.println(isPattern + " : " + toEscape);
+        return toEscape;
     }
 
     /**

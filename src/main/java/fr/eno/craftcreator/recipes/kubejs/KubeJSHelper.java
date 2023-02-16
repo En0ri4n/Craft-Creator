@@ -40,8 +40,6 @@ public class KubeJSHelper
     private static final Pattern RECIPE_PATTERN = Pattern.compile("\n.*event\\.custom\\(([^)]*)\\)");
     private static final Pattern MODIFIED_RECIPE_PATTERN = Pattern.compile("\n.*event\\.(.*)\\(([^)]*)\\)");
     
-    private static final List<Character> TO_ESCAPE = Arrays.asList('$', '(', ')', '{', '}', '[', ']', '.');
-    
     public final static String ADDED_RECIPES_START = "ADDED-RECIPES-START";
     public final static String MODIFIED_RECIPE_START = "REMOVED-RECIPES-START";
     
@@ -214,7 +212,7 @@ public class KubeJSHelper
         Matcher modifiedRecipeMatcher = getMatcher(Pattern.compile(MODIFIED_RECIPE_START + "()"), fileContent);
         if(!modifiedRecipeMatcher.find()) return ModRecipeSerializer.Feedback.FILE_ERROR;
     
-        Matcher existingRecipeMatcher = getMatcher(Pattern.compile(escape(serializedModifiedRecipe)), fileContent);
+        Matcher existingRecipeMatcher = getMatcher(Pattern.compile(ModRecipeSerializer.escape(serializedModifiedRecipe, true)), fileContent);
         if(existingRecipeMatcher.find()) return ModRecipeSerializer.Feedback.EXISTS;
         
         writeTo(recipeFile, getReplacedContent(modifiedRecipeMatcher, "\n\t" + serializedModifiedRecipe));
@@ -233,7 +231,7 @@ public class KubeJSHelper
         Matcher recipeTypeMatcher = getMatcher(getRecipeTypePattern(recipeType), fileContent);
         if(!recipeTypeMatcher.find()) return ModRecipeSerializer.Feedback.FILE_ERROR;
         
-        Matcher existingRecipeMatcher = getMatcher(Pattern.compile(escape(serializedRecipe)), fileContent);
+        Matcher existingRecipeMatcher = getMatcher(Pattern.compile(ModRecipeSerializer.escape(serializedRecipe, true)), fileContent);
         if(existingRecipeMatcher.find()) return ModRecipeSerializer.Feedback.EXISTS;
         
         writeTo(getRecipeFile(mod), getReplacedContent(recipeTypeMatcher, "\n\t" + serializedRecipe));
@@ -255,13 +253,6 @@ public class KubeJSHelper
         }
         
         return contentToCheck;
-    }
-    
-    private static String escape(String toEscape)
-    {
-        for(Character c : TO_ESCAPE)
-            toEscape = toEscape.replace(String.valueOf(c), "\\" + c);
-        return toEscape;
     }
     
     private static String checkTypeGroup(String recipeFileContent, IRecipeType<?> recipeType)
