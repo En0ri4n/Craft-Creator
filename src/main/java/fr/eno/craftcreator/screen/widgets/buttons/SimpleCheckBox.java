@@ -1,7 +1,5 @@
 package fr.eno.craftcreator.screen.widgets.buttons;
 
-
-import cofh.lib.util.helpers.MathHelper;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -15,6 +13,7 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 
 import javax.annotation.Nonnull;
 
@@ -58,7 +57,7 @@ public class SimpleCheckBox extends Checkbox
             Screen.blit(matrixStack, this.x, this.y, this.width, this.height, !isFocused() ? 0 : 20, !selected() ? 0 : 20, 20, 20, 64, 64);
             this.renderBg(matrixStack, ClientUtils.getMinecraft(), mouseX, mouseY);
 
-            drawString(matrixStack, ClientUtils.getFontRenderer(), this.getMessage(), this.x + this.width + 4, this.y + (this.height - 8) / 2, 14737632 | MathHelper.ceil(this.alpha * 255.0F) << 24);
+            drawString(matrixStack, ClientUtils.getFontRenderer(), this.getMessage(), this.x + this.width + 4, this.y + (this.height - 8) / 2, 14737632 | Mth.ceil(this.alpha * 255.0F) << 24);
         }
     }
 

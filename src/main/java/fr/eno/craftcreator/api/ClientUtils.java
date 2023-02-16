@@ -3,7 +3,6 @@ package fr.eno.craftcreator.api;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.base.SupportedMods;

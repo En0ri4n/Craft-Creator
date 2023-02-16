@@ -1,7 +1,5 @@
 package fr.eno.craftcreator.screen.widgets;
 
-
-import cofh.lib.util.helpers.MathHelper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -25,6 +23,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -142,7 +141,7 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
             RenderSystem.disableTexture();
             RenderSystem.setShader(GameRenderer::getPositionColorShader);
             int l1 = (int) ((float) ((this.y1 - this.y0) * (this.y1 - this.y0)) / (float) this.getMaxPosition());
-            l1 = MathHelper.clamp(l1, 32, this.y1 - this.y0 - 8);
+            l1 = Mth.clamp(l1, 32, this.y1 - this.y0 - 8);
             int i2 = (int) this.getScrollAmount() * (this.y1 - this.y0 - l1) / maxScroll + this.y0;
             if(i2 < this.y0)
             {

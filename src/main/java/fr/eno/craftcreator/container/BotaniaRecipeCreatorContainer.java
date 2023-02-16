@@ -9,7 +9,6 @@ import fr.eno.craftcreator.container.slot.utils.DefinedPositionnedSlot;
 import fr.eno.craftcreator.container.slot.utils.PositionnedSlot;
 import fr.eno.craftcreator.init.InitContainers;
 import fr.eno.craftcreator.utils.SlotHelper;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 

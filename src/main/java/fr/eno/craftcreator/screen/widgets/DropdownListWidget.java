@@ -1,7 +1,6 @@
 package fr.eno.craftcreator.screen.widgets;
 
 
-import cofh.lib.util.helpers.MathHelper;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.api.ClientUtils;
@@ -79,7 +78,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends A
                 RenderSystem.disableTexture();
                 int y0 = this.y0 + height;
                 int currentHeight = (int) ((float) ((this.y1 - y0) * (this.y1 - y0)) / (float) this.getMaxPosition());
-                currentHeight = MathHelper.clamp(currentHeight, 32, this.y1 - y0 - 8);
+                currentHeight = Mth.clamp(currentHeight, 32, this.y1 - y0 - 8);
                 int currentY = this.scrollAmount * (this.y1 - y0 - currentHeight) / getMaxScrollAmount() + y0;
                 if(currentY < y0)
                 {
@@ -219,7 +218,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends A
             {
                 double d0 = Math.max(1, this.getMaxScrollAmount());
                 int i = this.y1 - this.y0;
-                int j = MathHelper.clamp((int) ((float) (i * i) / (float) this.getMaxPosition()), 32, i - 8);
+                int j = Mth.clamp((int) ((float) (i * i) / (float) this.getMaxPosition()), 32, i - 8);
                 double d1 = Math.max(1.0D, d0 / (double) (i - j));
                 this.setScrollAmount(this.getScrollAmount() + p_231045_8_ * d1);
             }
