@@ -610,15 +610,15 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
             int yPos = height / 2 - 16 / 2;
             ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(item), left + yPos, top + yPos);
 
-            matrixStack.pushPose();
+            RenderSystem.getModelViewStack().pushPose();
             RenderSystem.enableBlend();
             RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-            matrixStack.translate(0F, 0F, 100F);
+            RenderSystem.getModelViewStack().translate(0D, 0D, 100D);
             ClientUtils.color4f(1F, 1F, 1F, 0.5F);
             ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(Items.BARRIER), left + yPos, top + yPos);
             RenderSystem.disableBlend();
             RenderSystem.defaultBlendFunc();
-            matrixStack.popPose();
+            RenderSystem.getModelViewStack().popPose();
         }
 
         @Override

@@ -99,7 +99,10 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends A
                     T entry = this.entries.get(i);
                     int rowWidth = this.getRowWidth();
                     int rowLeft = this.x0;
+                    matrixStack.pushPose();
+                    matrixStack.translate(0.0D, 0.0D, 100.0D);
                     entry.render(matrixStack, i, rowLeft, rowTop, rowWidth, itemHeight, mouseX, mouseY, ScreenUtils.isMouseHover(rowLeft, rowTop, mouseX, mouseY, rowWidth, itemHeight));
+                    matrixStack.popPose();
                 }
             }
         }
