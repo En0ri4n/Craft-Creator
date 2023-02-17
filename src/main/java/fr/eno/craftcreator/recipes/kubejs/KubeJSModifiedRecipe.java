@@ -1,6 +1,5 @@
 package fr.eno.craftcreator.recipes.kubejs;
 
-
 import com.google.gson.JsonObject;
 import fr.eno.craftcreator.recipes.base.IModifiedRecipe;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
@@ -72,16 +71,17 @@ public class KubeJSModifiedRecipe implements IModifiedRecipe
         return this.recipeDescriptors;
     }
     
-    public ResourceLocation getOneValue()
+    public MutableComponent getDisplayTitle()
     {
-        try
-        {
-            return ResourceLocation.tryParse(this.recipeDescriptors.values().stream().findFirst().orElse(""));
-        }
-        catch(ResourceLocationException e)
-        {
-            return new ResourceLocation("modid", this.recipeDescriptors.values().stream().findFirst().orElse(""));
-        }
+        if(recipeDescriptors.containsKey(ModRecipeSerializer.RecipeDescriptors.RECIPE_ID))
+            return new TextComponent(recipeDescriptors.get(ModRecipeSerializer.RecipeDescriptors.RECIPE_ID));
+        else if(recipeDescriptors.containsKey(ModRecipeSerializer.RecipeDescriptors.INPUT_ITEM))
+            return new TextComponent(recipeDescriptors.get(ModRecipeSerializer.RecipeDescriptors.INPUT_ITEM));
+        else if(recipeDescriptors.containsKey(ModRecipeSerializer.RecipeDescriptors.OUTPUT_ITEM))
+            return new TextComponent(recipeDescriptors.get(ModRecipeSerializer.RecipeDescriptors.OUTPUT_ITEM));
+        else if(recipeDescriptors.containsKey(ModRecipeSerializer.RecipeDescriptors.RECIPE_TYPE))
+            return new TextComponent(recipeDescriptors.get(ModRecipeSerializer.RecipeDescriptors.RECIPE_TYPE));
+        else return new TextComponent(recipeDescriptors.getOrDefault(ModRecipeSerializer.RecipeDescriptors.MOD_ID, "Unknown"));
     }
 
     public KubeJSModifiedRecipeType getType()

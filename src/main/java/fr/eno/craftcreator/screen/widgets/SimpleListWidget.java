@@ -329,6 +329,9 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
 
     public abstract static class Entry extends AbstractSelectionList.Entry<Entry>
     {
+        protected static final Gson gson = new GsonBuilder().setLenient().create();
+        private static final Pattern numberPattern = Pattern.compile("[0-9]+");
+
         protected final List<Component> tooltips;
 
         protected Entry()
@@ -367,66 +370,13 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
             }
             return displayStr;
         }
-    }
 
-    public static class RecipeEntry extends Entry
-    {
-        private final Gson gson = new GsonBuilder().setLenient().create();
-        private final Pattern numberPattern = Pattern.compile("[0-9]+");
-
-        private final Recipe<?> recipe;
-
-        public RecipeEntry(Recipe<?> recipe)
-        {
-            this.recipe = recipe;
-        }
-
-        @Override
-        public void render(@Nonnull PoseStack matrixStack, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean isMouseOver, float partialTicks)
-        {
-            String displayStr = recipe.getId().toString().substring(recipe.getId().toString().indexOf(':') + 1);
-
-            displayTruncatedString(matrixStack, displayStr, left, top, width, height, true, isMouseOver);
-
-            ItemStack item = ModRecipeCreatorDispatcher.getOutput(recipe).getIcon();
-
-            matrixStack.pushPose();
-            float scale = 1F;
-            int yPos = height / 2 - 16 / 2;
-            ClientUtils.getItemRenderer().renderAndDecorateFakeItem(item, (int) ((left + 1) / scale), (int) ((top + yPos) / scale));
-            matrixStack.popPose();
-        }
-
-        @Override
-        public String toString()
-        {
-            return recipe.getId().toString();
-        }
-
-        public void renderTooltip(PoseStack matrixStack, int mouseX, int mouseY)
-        {
-            tooltips.clear();
-            CraftIngredients input = ModRecipeCreatorDispatcher.getInputs(recipe);
-            CraftIngredients output = ModRecipeCreatorDispatcher.getOutput(recipe);
-
-            tooltips.add(new TextComponent(this.recipe.getId().toString()).withStyle(ChatFormatting.GREEN, ChatFormatting.UNDERLINE));
-            tooltips.add(new TextComponent(""));
-            tooltips.add(References.getTranslate("screen.widget.simple_list.tooltip.input"));
-            addToTooltip(input);
-
-            tooltips.add(new TextComponent("").withStyle(ChatFormatting.DARK_AQUA));
-            tooltips.add(References.getTranslate("screen.widget.simple_list.tooltip.output"));
-            addToTooltip(output);
-            
-            ClientUtils.getCurrentScreen().renderTooltip(matrixStack, tooltips, Optional.empty(), mouseX, mouseY);
-        }
-
-        private void addToTooltip(CraftIngredients input)
+        static void addToTooltip(List<Component> tooltips, CraftIngredients input)
         {
             for(CraftIngredients.CraftIngredient craftIngredient : input.getIngredientsWithCount())
             {
                 MutableComponent ingredientTooltipLine = new TextComponent(craftIngredient.getDescription());
-                ChatFormatting baseColor = ChatFormatting.AQUA;
+                ChatFormatting baseColor = ChatFormatting.BLUE;
                 ingredientTooltipLine.withStyle(baseColor);
 
                 MutableComponent separator = new TextComponent(" : ");
@@ -525,7 +475,7 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
             }
         }
 
-        public void getNbtComponent(List<Component> parent, JsonObject compoundTag, int step)
+        protected static void getNbtComponent(List<Component> parent, JsonObject compoundTag, int step)
         {
             for(String nbtKey : compoundTag.entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList()))
             {
@@ -574,6 +524,56 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
                     itemEntryKey.append(value.withStyle(ChatFormatting.GOLD));
                 }
             }
+        }
+    }
+
+    public static class RecipeEntry extends Entry
+    {
+        private final Recipe<?> recipe;
+
+        public RecipeEntry(Recipe<?> recipe)
+        {
+            this.recipe = recipe;
+        }
+
+        @Override
+        public void render(@Nonnull PoseStack matrixStack, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean isMouseOver, float partialTicks)
+        {
+            String displayStr = recipe.getId().toString().substring(recipe.getId().toString().indexOf(':') + 1);
+
+            displayTruncatedString(matrixStack, displayStr, left, top, width, height, true, isMouseOver);
+
+            ItemStack item = ModRecipeCreatorDispatcher.getOutput(recipe).getIcon();
+
+            matrixStack.pushPose();
+            float scale = 1F;
+            int yPos = height / 2 - 16 / 2;
+            ClientUtils.getItemRenderer().renderAndDecorateFakeItem(item, (int) ((left + 1) / scale), (int) ((top + yPos) / scale));
+            matrixStack.popPose();
+        }
+
+        @Override
+        public String toString()
+        {
+            return recipe.getId().toString();
+        }
+
+        public void renderTooltip(PoseStack matrixStack, int mouseX, int mouseY)
+        {
+            tooltips.clear();
+            CraftIngredients input = ModRecipeCreatorDispatcher.getInputs(recipe);
+            CraftIngredients output = ModRecipeCreatorDispatcher.getOutput(recipe);
+
+            tooltips.add(new TextComponent(this.recipe.getId().toString()).withStyle(ChatFormatting.GREEN, ChatFormatting.UNDERLINE));
+            tooltips.add(new TextComponent(""));
+            tooltips.add(References.getTranslate("screen.widget.simple_list.tooltip.input"));
+            addToTooltip(tooltips, input);
+
+            tooltips.add(new TextComponent("").withStyle(ChatFormatting.DARK_AQUA));
+            tooltips.add(References.getTranslate("screen.widget.simple_list.tooltip.output"));
+            addToTooltip(tooltips, output);
+
+            ClientUtils.getCurrentScreen().renderTooltip(matrixStack, tooltips, Optional.empty(), mouseX, mouseY);
         }
 
         public Recipe<?> getRecipe()
@@ -631,9 +631,9 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
         {
             tooltips.clear();
             Map<ModRecipeSerializer.RecipeDescriptors, String> recipeDescriptors = recipe.getRecipeMap();
-            tooltips.add(new TextComponent(recipeDescriptors.values().stream().findFirst().orElse(References.getLoc("empty").toString())).withStyle(ChatFormatting.GREEN, ChatFormatting.UNDERLINE));
+            tooltips.add(recipe.getDisplayTitle().withStyle(ChatFormatting.GREEN, ChatFormatting.UNDERLINE));
             tooltips.add(new TextComponent(""));
-            recipeDescriptors.forEach((tag, value) -> tooltips.add(new TextComponent(tag.toString()).withStyle(ChatFormatting.DARK_PURPLE).append(new TextComponent(" : ")).append(new TextComponent(value).withStyle(ChatFormatting.DARK_AQUA))));
+            recipeDescriptors.forEach((tag, value) -> tooltips.add(new TextComponent(tag.getDisplay().getString()).withStyle(ChatFormatting.DARK_PURPLE).append(new TextComponent(" : ").withStyle(ChatFormatting.WHITE)).append(new TextComponent(value).withStyle(ChatFormatting.DARK_AQUA))));
 
             ClientUtils.getCurrentScreen().renderComponentTooltip(matrixStack, tooltips, mouseX, mouseY);
         }
