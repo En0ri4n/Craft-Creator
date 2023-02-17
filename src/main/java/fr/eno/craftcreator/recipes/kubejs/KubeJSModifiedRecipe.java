@@ -5,8 +5,6 @@ import fr.eno.craftcreator.recipes.base.IModifiedRecipe;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.ResourceLocationException;
 import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -71,16 +69,17 @@ public class KubeJSModifiedRecipe implements IModifiedRecipe
         return this.recipeDescriptors;
     }
     
-    public ResourceLocation getOneValue()
+    public IFormattableTextComponent getDisplayTitle()
     {
-        try
-        {
-            return ResourceLocation.tryParse(this.recipeDescriptors.values().stream().findFirst().orElse(""));
-        }
-        catch(ResourceLocationException e)
-        {
-            return new ResourceLocation("modid", this.recipeDescriptors.values().stream().findFirst().orElse(""));
-        }
+        if(recipeDescriptors.containsKey(ModRecipeSerializer.RecipeDescriptors.RECIPE_ID))
+            return new StringTextComponent(recipeDescriptors.get(ModRecipeSerializer.RecipeDescriptors.RECIPE_ID));
+        else if(recipeDescriptors.containsKey(ModRecipeSerializer.RecipeDescriptors.INPUT_ITEM))
+            return new StringTextComponent(recipeDescriptors.get(ModRecipeSerializer.RecipeDescriptors.INPUT_ITEM));
+        else if(recipeDescriptors.containsKey(ModRecipeSerializer.RecipeDescriptors.OUTPUT_ITEM))
+            return new StringTextComponent(recipeDescriptors.get(ModRecipeSerializer.RecipeDescriptors.OUTPUT_ITEM));
+        else if(recipeDescriptors.containsKey(ModRecipeSerializer.RecipeDescriptors.RECIPE_TYPE))
+            return new StringTextComponent(recipeDescriptors.get(ModRecipeSerializer.RecipeDescriptors.RECIPE_TYPE));
+        else return new StringTextComponent(recipeDescriptors.getOrDefault(ModRecipeSerializer.RecipeDescriptors.MOD_ID, "Unknown"));
     }
 
     public KubeJSModifiedRecipeType getType()
