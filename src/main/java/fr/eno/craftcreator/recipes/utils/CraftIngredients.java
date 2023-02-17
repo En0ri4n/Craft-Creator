@@ -42,26 +42,24 @@ public class CraftIngredients
 
     public List<CraftIngredient> getIngredientsWithCount()
     {
-        this.ingredients.stream().filter(CraftIngredient::hasCount).forEach(ingredient ->
+        for(CraftIngredient craftIngredient : this.ingredients)
         {
-            ((CountedIngredient) ingredient).addCount((int) (this.ingredients.stream().filter(i -> i.equals(ingredient)).mapToInt(o -> (int) ((CountedIngredient) o).getCount()).sum() - ((CountedIngredient) ingredient).getCount()));
-            if(!contains(ingredientsWithCount, ingredient))
+            if(!contains(this.ingredientsWithCount, craftIngredient) || !craftIngredient.hasCount())
             {
-                if(ingredient instanceof MultiItemIngredient)
+                this.ingredientsWithCount.add(craftIngredient);
+            }
+            else
+            {
+                for(CraftIngredient ingre : this.ingredientsWithCount)
                 {
-                    if(((MultiItemIngredient) ingredient).getIds().size() > 0)
-                        this.ingredientsWithCount.add(ingredient);
-                }
-                else
-                {
-                    this.ingredientsWithCount.add(ingredient);
+                    if(ingre.getType().equals(craftIngredient.getType()) && ingre.getId().equals(craftIngredient.getId()) && ingre.getDescription().equals(craftIngredient.getDescription()))
+                    {
+                        CountedIngredient countedIngredient = (CountedIngredient) ingre;
+                        countedIngredient.setCount(countedIngredient.getCount() + ((CountedIngredient) craftIngredient).getCount());
+                        break;
+                    }
                 }
             }
-        });
-
-        for(CraftIngredient ingredient : this.ingredients)
-        {
-            if(!ingredient.hasCount()) this.ingredientsWithCount.add(ingredient);
         }
 
         return this.ingredientsWithCount;

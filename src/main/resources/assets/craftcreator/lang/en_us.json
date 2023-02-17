@@ -54,6 +54,12 @@
 	"craftcreator.screen.widget.simple_list.tooltip.input": "§6Input :",
 	"craftcreator.screen.widget.simple_list.tooltip.output": "§2Output :",
 
+	"craftcreator.serializer.recipe.descriptor.input": "§5Input",
+	"craftcreator.serializer.recipe.descriptor.output": "§9Output",
+	"craftcreator.serializer.recipe.descriptor.mod": "§6Mod",
+	"craftcreator.serializer.recipe.descriptor.type": "§cType",
+	"craftcreator.serializer.recipe.descriptor.id": "§1Id",
+
 	"craftcreator.screen.remove_manager.title": "Remove Recipe",
 	"craftcreator.screen.remove_manager.button.has_input_item": "Input Item :",
 	"craftcreator.screen.remove_manager.button.has_output_item": "Output Item :",
