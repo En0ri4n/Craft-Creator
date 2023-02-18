@@ -18,6 +18,7 @@ import java.awt.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// TODO: Extend SimpleListWidget
 public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends Widget
 {
     private T selected;
@@ -98,7 +99,10 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
                     T entry = this.entries.get(i);
                     int rowWidth = this.getRowWidth();
                     int rowLeft = this.x0;
+                    RenderSystem.pushMatrix();
+                    RenderSystem.translatef(0.0F, 0.0F, 100.0F);
                     entry.render(matrixStack, i, rowLeft, rowTop, rowWidth, itemHeight, mouseX, mouseY, ScreenUtils.isMouseHover(rowLeft, rowTop, mouseX, mouseY, rowWidth, itemHeight));
+                    RenderSystem.popMatrix();
                 }
             }
         }
@@ -149,8 +153,6 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button)
     {
-        this.updateScrollingState(mouseX, mouseY, button);
-
         if(hovered)
         {
             this.setFocused(true);
@@ -159,6 +161,8 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
 
         if(isFocused())
         {
+            this.updateScrollingState(mouseX, mouseY, button);
+
             if(!ScreenUtils.isMouseHover(x0, y0 + height, (int) mouseX, (int) mouseY, x1 - x0, y1 - y0 - height))
             {
                 this.setFocused(false);

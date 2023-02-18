@@ -11,7 +11,6 @@ import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;
 import fr.eno.craftcreator.recipes.utils.CraftIngredients;
 import fr.eno.craftcreator.recipes.utils.DatapackHelper;
 import fr.eno.craftcreator.recipes.utils.RecipeEntry;
-import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
@@ -20,15 +19,17 @@ import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.IFormattableTextComponent;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 // TODO: improve code
 public abstract class ModRecipeSerializer
 {
-    private static final List<Character> TO_ESCAPE = Arrays.asList('$', '(', ')', '{', '}', '[', ']', '.');
+    private static final List<Character> TO_ESCAPE_PATTERN = Arrays.asList('$', '(', ')', '{', '}', '[', ']', '.');
+    private static final List<Character> TO_ESCAPE = Collections.singletonList('"');
+
     protected static final Gson GSON = new GsonBuilder().setLenient().create();
 
     protected final SupportedMods mod;
@@ -43,7 +44,7 @@ public abstract class ModRecipeSerializer
     {
         if(serializerType == SerializerType.KUBE_JS)
         {
-            String serializedRecipe = "event.remove(" + GSON.toJson(kubeJSModifiedRecipe.toJson()) + ")";
+            String serializedRecipe = String.format("event.%s(%s)", KubeJSModifiedRecipe.KubeJSModifiedRecipeType.REMOVED.getDescriptor(), GSON.toJson(kubeJSModifiedRecipe.toJson()));
 
             if(!KubeJSHelper.isModifiedRecipePresent(mod, kubeJSModifiedRecipe)) KubeJSHelper.addModifiedRecipe(mod, serializedRecipe);
         }
@@ -51,7 +52,7 @@ public abstract class ModRecipeSerializer
 
     public void addModifiedRecipe(KubeJSModifiedRecipe kubeJSModifiedRecipe)
     {
-        String serializedRecipe = String.format("event.%s(", kubeJSModifiedRecipe.getType().getDescriptor()) + GSON.toJson(kubeJSModifiedRecipe.toJson()) + ")";
+        String serializedRecipe = String.format("event.%s(%s)", kubeJSModifiedRecipe.getType().getDescriptor(), GSON.toJson(kubeJSModifiedRecipe.toJson()));
 
         if(!KubeJSHelper.isModifiedRecipePresent(mod, kubeJSModifiedRecipe)) KubeJSHelper.addModifiedRecipe(this.mod, serializedRecipe);
     }
@@ -76,7 +77,7 @@ public abstract class ModRecipeSerializer
         switch(currentSerializeType)
         {
             case KUBE_JS:
-                feedback = KubeJSHelper.addRecipeToFile(this.mod, recipeType, "event.custom(" + GSON.toJson(recipeJson) + ")");
+                feedback = KubeJSHelper.addRecipeToFile(this.mod, recipeType, String.format("event.custom(%s)", GSON.toJson(recipeJson)));
                 break;
             default:
             case MINECRAFT_DATAPACK:
@@ -136,7 +137,7 @@ public abstract class ModRecipeSerializer
     protected JsonArray getInputArray(RecipeEntry.MultiInput ingredients)
     {
         JsonArray array = new JsonArray();
-        ingredients.getInputs().forEach(recipeInput -> array.add(singletonItemJsonObject(recipeInput)));
+        ingredients.getInputs().forEach(recipeInput -> array.add(getInput(recipeInput)));
         return array;
     }
 
@@ -150,7 +151,7 @@ public abstract class ModRecipeSerializer
     protected JsonArray getInputArray(RecipeEntry.Input ingredient)
     {
         JsonArray array = new JsonArray();
-        array.add(singletonItemJsonObject(ingredient));
+        array.add(getInput(ingredient));
         return array;
     }
 
@@ -164,7 +165,7 @@ public abstract class ModRecipeSerializer
     protected void addNbtToResult(JsonObject result, String nbt)
     {
         result.addProperty("type", "forge:nbt");
-        result.addProperty("nbt", nbt.replace("\"", "\""));
+        result.addProperty("nbt", nbt.replace("\"", "\"")); // Escape double quotes, first is a regex, second is a string
     }
 
     /**
@@ -175,29 +176,20 @@ public abstract class ModRecipeSerializer
      */
     protected JsonObject getResult(RecipeEntry.Output result)
     {
-        Map<String, Object> map = new HashMap<>();
+        if(result instanceof RecipeEntry.FluidOutput)
+        {
+            JsonObject resultJson = new JsonObject();
+            resultJson.addProperty("fluid", result.getRegistryName().toString());
+            resultJson.addProperty("amount", ((RecipeEntry.FluidOutput) result).getAmount());
+            return resultJson;
+        }
 
-        map.put("item", result.registryName().toString());
-        if(result.count() > 1) map.put("count", result.count());
+        JsonObject resultJson = singletonItemJsonObject(result);
 
-        return mapToJsonObject(map);
-    }
+        if(result.count() > 1) resultJson.addProperty("count", result.count());
+        if(result instanceof RecipeEntry.LuckedOutput && ((RecipeEntry.LuckedOutput) result).getChance() != 1D) resultJson.addProperty("chance", ((RecipeEntry.LuckedOutput) result).getChance());
 
-    /**
-     * Get the JsonObject of the given lucked output
-     *
-     * @param result the lucked output
-     * @return the JsonObject of the given lucked output
-     */
-    private JsonObject getLuckedResult(RecipeEntry.LuckedOutput result)
-    {
-        Map<String, Object> map = new HashMap<>();
-
-        map.put("item", result.registryName().toString());
-        if(result.count() > 1) map.put("count", result.count());
-        if(result.getChance() != 1D) map.put("chance", result.getChance());
-
-        return mapToJsonObject(map);
+        return resultJson;
     }
 
     /**
@@ -210,11 +202,7 @@ public abstract class ModRecipeSerializer
     protected JsonArray getResultArray(RecipeEntry.MultiOutput results)
     {
         JsonArray array = new JsonArray();
-        results.getOutputs().forEach(recipeOutput ->
-        {
-            if(recipeOutput instanceof RecipeEntry.LuckedOutput) array.add(getLuckedResult(((RecipeEntry.LuckedOutput) recipeOutput)));
-            else array.add(getResult(recipeOutput));
-        });
+        results.getOutputs().forEach(recipeOutput -> array.add(getResult(recipeOutput)));
         return array;
     }
 
@@ -239,14 +227,19 @@ public abstract class ModRecipeSerializer
      */
     protected JsonObject getInput(RecipeEntry.Input input)
     {
-        Map<String, Object> map = new HashMap<>();
+        if(input instanceof RecipeEntry.FluidInput)
+        {
+            JsonObject inputJson = new JsonObject();
+            inputJson.addProperty("fluid", input.getRegistryName().toString());
+            inputJson.addProperty("amount", input.count());
+            return inputJson;
+        }
 
-        if(input.isTag()) map.put("tag", input.registryName().toString());
-        else map.put("item", input.registryName().toString());
+        JsonObject inputJson = singletonItemJsonObject(input);
 
-        if(input.count() > 1) map.put("count", input.count());
+        if(input.count() > 1) inputJson.addProperty("count", input.count());
 
-        return mapToJsonObject(map);
+        return inputJson;
     }
 
     /**
@@ -271,7 +264,7 @@ public abstract class ModRecipeSerializer
      */
     protected JsonObject singletonItemJsonObject(RecipeEntry recipeEntry)
     {
-        return singletonItemJsonObject(recipeEntry.isTag() ? "tag" : "item", recipeEntry.registryName().toString());
+        return singletonItemJsonObject(recipeEntry.isTag() ? "tag" : "item", recipeEntry.getRegistryName().toString());
     }
 
     /**
@@ -333,12 +326,9 @@ public abstract class ModRecipeSerializer
      */
     public static String escape(String toEscape, boolean isPattern)
     {
-        List<Character> list = Collections.singletonList('"');
-
-        for(Character c : isPattern ? TO_ESCAPE : list)
+        for(Character c : isPattern ? TO_ESCAPE_PATTERN : TO_ESCAPE)
             toEscape = toEscape.replace(String.valueOf(c), String.valueOf('\\') + c);
 
-        System.out.println(isPattern + " : " + toEscape);
         return toEscape;
     }
 
@@ -374,7 +364,6 @@ public abstract class ModRecipeSerializer
      * @param craftIngredients The craft ingredients
      * @param ingredients      The ingredients
      */
-    // TODO: Needs to be improved
     protected void putIfNotEmpty(CraftIngredients craftIngredients, List<Ingredient> ingredients)
     {
         for(Ingredient ingredient : ingredients)
@@ -398,9 +387,7 @@ public abstract class ModRecipeSerializer
                 {
                     JsonArray ingredientArray = ingredientJson.getAsJsonArray();
 
-                    String id = Utils.generateSHA256(GSON.toJson(ingredientArray)); // We generate an unique id by hashing the array to avoid duplicates (and to avoid to have to use a list)
-
-                    CraftIngredients.MultiItemIngredient multiItemIngredient = new CraftIngredients.MultiItemIngredient(id, count);
+                    CraftIngredients.MultiItemIngredient multiItemIngredient = new CraftIngredients.MultiItemIngredient("multi_ingredient", count);
 
                     for(JsonElement value : ingredientArray)
                     {

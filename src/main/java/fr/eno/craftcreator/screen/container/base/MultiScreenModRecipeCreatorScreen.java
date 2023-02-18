@@ -170,6 +170,8 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         List<Rectangle2d> areas = new ArrayList<>();
         areas.add(guiTagList.getArea());
         areas.add(buttonGrid.getArea());
+        areas.add(previousButton.getArea());
+        areas.add(nextButton.getArea());
         return areas;
     }
     
@@ -276,6 +278,17 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     {
         executeButton.x = x;
         executeButton.y = y;
+    }
+
+    protected void setExecuteButtonPosAndSize(int x, int y, int width)
+    {
+        setExecuteButtonPos(x, y);
+        setExecuteButtonWidth(width);
+    }
+
+    protected void setExecuteButtonWidth(int width)
+    {
+        executeButton.setWidth(width);
     }
     
     protected ModRecipeCreator getCurrentRecipe()
@@ -384,6 +397,15 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     {
         drawCenteredString(matrixStack, ClientUtils.getFontRenderer(), References.getTranslate("screen." + this.getMenu().getMod().getModId() + "_recipe_creator." + CommonUtils.getRecipeTypeName(getCurrentRecipe().getRecipeType()).getPath() + ".title"), this.imageWidth / 2, -15, 0xFFFFFF);
         if(Screen.hasShiftDown() || Screen.hasControlDown()) drawString(matrixStack, this.font, References.getTranslate("screen.crafting.info.msg").getString(), 0, this.imageHeight + (isVanillaScreen ? 15 : 0), 0x707370);
+    }
+
+    protected void renderSideTitles(MatrixStack matrixStack)
+    {
+        // Render Labels
+        IFormattableTextComponent inputLabel = References.getTranslate("screen.recipe_creator.label.input").copy().withStyle(TextFormatting.UNDERLINE);
+        ITextComponent ouputLabel = References.getTranslate("screen.recipe_creator.label.output");
+        Screen.drawString(matrixStack, this.font, inputLabel, this.imageWidth / 4 - font.width(inputLabel.getString()) / 2, 8, 0xFFFFFFFF);
+        Screen.drawString(matrixStack, this.font, ouputLabel, this.imageWidth / 4 * 3 - font.width(ouputLabel.getString()) / 2, 8, 0xFFFFFFFF);
     }
     
     /**

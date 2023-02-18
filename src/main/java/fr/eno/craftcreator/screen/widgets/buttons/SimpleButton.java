@@ -3,13 +3,15 @@ package fr.eno.craftcreator.screen.widgets.buttons;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.ScreenUtils;
+import fr.eno.craftcreator.screen.widgets.IOutsideWidget;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.util.text.ITextComponent;
 
 import java.util.Collections;
 import java.util.List;
 
-public class SimpleButton extends Button
+public class SimpleButton extends Button implements IOutsideWidget
 {
 	private final List<ITextComponent> tooltips;
 
@@ -40,5 +42,14 @@ public class SimpleButton extends Button
 	{
 		if(!this.tooltips.isEmpty())
 			ClientUtils.getCurrentScreen().renderComponentTooltip(pPoseStack, tooltips, mouseX, mouseY);
+	}
+
+	@Override
+	public Rectangle2d getArea()
+	{
+		if(this.visible)
+			return new Rectangle2d(x - 5, y - 5, width + 10, height + 10);
+		else
+			return new Rectangle2d(0, 0, 0, 0);
 	}
 }
