@@ -100,6 +100,9 @@ public class UpdateRecipeCreatorTileDataServerPacket
 
     public static class ServerHandler
     {
+        /**
+         * Handle the packet on the server side, update the data in the SERVER tile entity
+         */
         public static void handle(UpdateRecipeCreatorTileDataServerPacket msg, Supplier<NetworkEvent.Context> ctx)
         {
             TileEntity tile = ServerUtils.getBlockEntity(ctx, msg.pos);

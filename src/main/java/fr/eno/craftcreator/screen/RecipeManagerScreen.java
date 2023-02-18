@@ -3,7 +3,6 @@ package fr.eno.craftcreator.screen;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.base.ModRecipeCreatorDispatcher;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
@@ -15,7 +14,6 @@ import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import fr.eno.craftcreator.screen.widgets.SimpleTextFieldWidget;
 import fr.eno.craftcreator.screen.widgets.buttons.SimpleButton;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.StringTextComponent;
 
@@ -125,11 +123,6 @@ public class RecipeManagerScreen extends ListScreen
         return SupportedMods.getMod(this.modId);
     }
 
-    private IRecipeType<?> getCurrentRecipeType()
-    {
-        return CommonUtils.getRecipeTypeByName(this.recipeType);
-    }
-
     @Override
     public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
@@ -143,9 +136,14 @@ public class RecipeManagerScreen extends ListScreen
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button)
     {
-        this.getLists().forEach(list -> list.setCanDisplayTooltips(!modDropdown.mouseClicked(mouseX, mouseY, button) && !recipeTypeDropdown.mouseClicked(mouseX, mouseY, button)));
+        modDropdown.mouseClicked(mouseX, mouseY, button);
+        recipeTypeDropdown.mouseClicked(mouseX, mouseY, button);
+        this.getLists().forEach(list -> list.setCanDisplayTooltips(!modDropdown.isFocused() && !recipeTypeDropdown.isFocused()));
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        if(!modDropdown.isFocused() && !recipeTypeDropdown.isFocused())
+            return super.mouseClicked(mouseX, mouseY, button);
+
+        return true;
     }
 
     @Override
@@ -155,6 +153,14 @@ public class RecipeManagerScreen extends ListScreen
         recipeTypeDropdown.mouseScrolled(mouseX, mouseY, delta);
 
         return super.mouseScrolled(mouseX, mouseY, delta);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY)
+    {
+        modDropdown.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        recipeTypeDropdown.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 
     @Override

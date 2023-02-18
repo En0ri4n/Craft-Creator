@@ -256,11 +256,7 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     {
         super.renderLabels(matrixStack, pMouseX, pMouseY);
 
-        // Render Labels
-        IFormattableTextComponent inputLabel = References.getTranslate("screen.recipe_creator.label.input").copy().withStyle(TextFormatting.UNDERLINE);
-        ITextComponent ouputLabel = References.getTranslate("screen.recipe_creator.label.output");
-        Screen.drawString(matrixStack, this.font, inputLabel, this.imageWidth / 4 - font.width(inputLabel.getString()) / 2, 8, 0xFFFFFFFF);
-        Screen.drawString(matrixStack, this.font, ouputLabel, this.imageWidth / 4 * 3 - font.width(ouputLabel.getString()) / 2, 8, 0xFFFFFFFF);
+        renderSideTitles(matrixStack);
     }
 
     @Override

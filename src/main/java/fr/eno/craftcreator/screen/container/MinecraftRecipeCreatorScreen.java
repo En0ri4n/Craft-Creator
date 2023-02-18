@@ -72,23 +72,19 @@ public class MinecraftRecipeCreatorScreen extends MultiScreenModRecipeCreatorScr
         {
             case CRAFTING_TABLE:
                 this.craftTypeButton.visible = true;
-                setExecuteButtonPos(leftPos + 86, topPos + 33);
-                executeButton.setWidth(30);
+                setExecuteButtonPosAndSize(leftPos + 86, topPos + 33, 30);
                 break;
             case STONECUTTER:
-                setExecuteButtonPos(this.leftPos + this.imageWidth / 2 - 26, this.topPos + 31);
-                executeButton.setWidth(42);
+                setExecuteButtonPosAndSize(this.leftPos + this.imageWidth / 2 - 26, this.topPos + 31, 42);
                 break;
             case SMITHING_TABLE:
-                setExecuteButtonPos(this.leftPos + this.imageWidth / 2 + 7, this.topPos + 45);
-                executeButton.setWidth(36);
+                setExecuteButtonPosAndSize(this.leftPos + this.imageWidth / 2 + 7, this.topPos + 45, 36);
                 break;
             case FURNACE_BLASTING:
             case FURNACE_SMOKING:
             case FURNACE_SMELTING:
             case CAMPFIRE_COOKING:
-                setExecuteButtonPos(this.leftPos + this.imageWidth / 2 - 14, this.topPos + 33);
-                executeButton.setWidth(35);
+                setExecuteButtonPosAndSize(this.leftPos + this.imageWidth / 2 - 14, this.topPos + 33, 35);
                 showDataField(0, 1);
                 setDataFieldPos(0, leftPos + 8, topPos + 30);
                 setDataFieldPos(1, leftPos + 8, topPos + 60);

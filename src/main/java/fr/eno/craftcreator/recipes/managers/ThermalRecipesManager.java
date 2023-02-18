@@ -9,10 +9,8 @@ import fr.eno.craftcreator.recipes.utils.RecipeEntry;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.block.Block;
-import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.BucketItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -210,11 +208,11 @@ public class ThermalRecipesManager extends BaseRecipesManager
         
         ItemStack trunk = slots.get(0).getItem();
         ItemStack leaves = slots.get(1).getItem();
-        Fluid fluid = ((BucketItem) getValidOutput(slots, SlotHelper.TREE_EXTRACTOR_SLOTS_OUTPUT.size()).getItem()).getFluid();
+        RecipeEntry.FluidOutput fluidOutput = new RecipeEntry.FluidOutput(getFluid(slots.get(2)), resin_amount);
         
-        if(trunk.isEmpty() || leaves.isEmpty() || fluid == Fluids.EMPTY || resin_amount <= 0) return;
+        if(trunk.isEmpty() || leaves.isEmpty() || fluidOutput.getFluid() == Fluids.EMPTY || resin_amount <= 0) return;
         
-        ThermalRecipeSerializer.get().serializeTreeExtractorRecipe(Block.byItem(trunk.getItem()), Block.byItem(leaves.getItem()), fluid, resin_amount);
+        ThermalRecipeSerializer.get().serializeTreeExtractorRecipe(Block.byItem(trunk.getItem()), Block.byItem(leaves.getItem()), fluidOutput);
     }
     
     private void createPulverizerRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, double experience, RecipeInfos recipeInfos)
