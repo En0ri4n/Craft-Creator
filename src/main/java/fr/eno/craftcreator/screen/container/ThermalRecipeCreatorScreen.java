@@ -1,6 +1,5 @@
 package fr.eno.craftcreator.screen.container;
 
-
 import cofh.thermal.core.init.TCoreRecipeTypes;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
@@ -257,11 +256,7 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     {
         super.renderLabels(matrixStack, pMouseX, pMouseY);
 
-        // Render Labels
-        MutableComponent inputLabel = References.getTranslate("screen.recipe_creator.label.input").copy().withStyle(ChatFormatting.UNDERLINE);
-        Component ouputLabel = References.getTranslate("screen.recipe_creator.label.output");
-        Screen.drawString(matrixStack, this.font, inputLabel, this.imageWidth / 4 - font.width(inputLabel.getString()) / 2, 8, 0xFFFFFFFF);
-        Screen.drawString(matrixStack, this.font, ouputLabel, this.imageWidth / 4 * 3 - font.width(ouputLabel.getString()) / 2, 8, 0xFFFFFFFF);
+        renderSideTitles(matrixStack);
     }
 
     @Override

@@ -70,7 +70,13 @@ public class CraftIngredients
     {
         for(CraftIngredient ingre : ingredients)
         {
-            if(ingre.getType().equals(craftIngredient.getType()) && ingre.getId().equals(craftIngredient.getId()) && ingre.getDescription().equals(craftIngredient.getDescription()))
+            if(ingre instanceof MultiItemIngredient && craftIngredient instanceof MultiItemIngredient)
+            {
+                MultiItemIngredient multiItemIngredient = (MultiItemIngredient) ingre;
+                if(multiItemIngredient.getIds().equals(((MultiItemIngredient) craftIngredient).getIds()) && ingre.getDescription().equals(craftIngredient.getDescription()))
+                    return true;
+            }
+            else if(ingre.getType().equals(craftIngredient.getType()) && ingre.getId().equals(craftIngredient.getId()) && ingre.getDescription().equals(craftIngredient.getDescription()))
                 return true;
         }
 

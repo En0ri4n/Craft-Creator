@@ -4,13 +4,15 @@ package fr.eno.craftcreator.screen.widgets.buttons;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.ScreenUtils;
+import fr.eno.craftcreator.screen.widgets.IOutsideWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
 
 import java.util.Collections;
 import java.util.List;
 
-public class SimpleButton extends Button
+public class SimpleButton extends Button implements IOutsideWidget
 {
 	private final List<Component> tooltips;
 
@@ -41,5 +43,14 @@ public class SimpleButton extends Button
 	{
 		if(!this.tooltips.isEmpty())
 			ClientUtils.getCurrentScreen().renderComponentTooltip(pPoseStack, tooltips, mouseX, mouseY);
+	}
+
+	@Override
+	public Rect2i getArea()
+	{
+		if(this.visible)
+			return new Rect2i(x - 5, y - 5, width + 10, height + 10);
+		else
+			return new Rect2i(0, 0, 0, 0);
 	}
 }

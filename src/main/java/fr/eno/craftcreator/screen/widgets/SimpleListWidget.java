@@ -64,7 +64,7 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
         this.titleBoxHeight = titleBoxHeight;
         this.scrollBarWidth = scrollBarWidth;
         this.canHaveSelected = true;
-        this.hasTitleBox = true;
+        this.hasTitleBox = titleBoxHeight > 0;
         this.isVisible = true;
         this.onDelete = onDelete;
         this.canDisplayTooltips = true;

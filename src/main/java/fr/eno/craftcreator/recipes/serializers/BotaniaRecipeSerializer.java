@@ -30,12 +30,12 @@ public class BotaniaRecipeSerializer extends ModRecipeSerializer
         JsonObject obj = createBaseJson(ModRecipeTypes.MANA_INFUSION_TYPE);
         obj.addProperty("mana", mana);
         if(catalyst.getBlock() != Blocks.AIR)
-            obj.add("catalyst", mapToJsonObject(ImmutableMap.of("type", "block", "block", Objects.requireNonNull(catalyst.registryName()).toString())));
+            obj.add("catalyst", mapToJsonObject(ImmutableMap.of("type", "block", "block", Objects.requireNonNull(catalyst.getRegistryName()).toString())));
 
         obj.add("input", singletonItemJsonObject(ingredient));
         obj.add("output", getResult(result));
 
-        addRecipeTo(obj, ModRecipeTypes.MANA_INFUSION_TYPE, result.registryName());
+        addRecipeTo(obj, ModRecipeTypes.MANA_INFUSION_TYPE, result.getRegistryName());
     }
 
     public void serializeElvenTradeRecipe(RecipeEntry.MultiInput ingredients, RecipeEntry.MultiOutput results)
@@ -44,17 +44,17 @@ public class BotaniaRecipeSerializer extends ModRecipeSerializer
         obj.add("ingredients", listWithSingletonItems(ingredients));
         obj.add("output", listWithSingletonItems(results));
 
-        addRecipeTo(obj, ModRecipeTypes.ELVEN_TRADE_TYPE, results.getOneOutput().registryName());
+        addRecipeTo(obj, ModRecipeTypes.ELVEN_TRADE_TYPE, results.getOneOutput().getRegistryName());
     }
 
     public void serializePureDaisyRecipe(RecipeEntry.BlockInput input, RecipeEntry.BlockOutput output, int time)
     {
         JsonObject obj = createBaseJson(ModRecipeTypes.PURE_DAISY_TYPE);
         obj.addProperty("time", time);
-        obj.add("input", mapToJsonObject(ImmutableMap.of("type", "block", "block", input.registryName().toString())));
-        obj.add("output", singletonItemJsonObject("name", output.registryName().toString()));
+        obj.add("input", mapToJsonObject(ImmutableMap.of("type", "block", "block", input.getRegistryName().toString())));
+        obj.add("output", singletonItemJsonObject("name", output.getRegistryName().toString()));
 
-        addRecipeTo(obj, ModRecipeTypes.PURE_DAISY_TYPE, output.registryName());
+        addRecipeTo(obj, ModRecipeTypes.PURE_DAISY_TYPE, output.getRegistryName());
     }
 
     public void serializeBrewRecipe(RecipeEntry.MultiInput ingredients, Brew brew)
@@ -72,7 +72,7 @@ public class BotaniaRecipeSerializer extends ModRecipeSerializer
         obj.add("output", getResult(result));
         obj.add("ingredients", getInputArray(ingredients));
 
-        addRecipeTo(obj, ModRecipeTypes.PETAL_TYPE, result.registryName());
+        addRecipeTo(obj, ModRecipeTypes.PETAL_TYPE, result.getRegistryName());
     }
 
     public void serializeRuneRecipe(RecipeEntry.MultiInput ingredients, RecipeEntry.Output result, int mana)
@@ -82,7 +82,7 @@ public class BotaniaRecipeSerializer extends ModRecipeSerializer
         obj.addProperty("mana", mana);
         obj.add("ingredients", getInputArray(ingredients));
 
-        addRecipeTo(obj, ModRecipeTypes.RUNE_TYPE, result.registryName());
+        addRecipeTo(obj, ModRecipeTypes.RUNE_TYPE, result.getRegistryName());
     }
 
     public void serializeTerraPlateRecipe(RecipeEntry.MultiInput ingredients, RecipeEntry.Output result, int mana)
@@ -92,7 +92,7 @@ public class BotaniaRecipeSerializer extends ModRecipeSerializer
         obj.add("result", getResult(result));
         obj.add("ingredients", getInputArray(ingredients));
 
-        addRecipeTo(obj, ModRecipeTypes.TERRA_PLATE_TYPE, result.registryName());
+        addRecipeTo(obj, ModRecipeTypes.TERRA_PLATE_TYPE, result.getRegistryName());
     }
 
     @Override

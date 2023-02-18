@@ -40,7 +40,7 @@ public class RecipeEntry
         return false;
     }
 
-    public ResourceLocation registryName()
+    public ResourceLocation getRegistryName()
     {
         return registryName;
     }
@@ -61,7 +61,7 @@ public class RecipeEntry
 
         public Item getItem()
         {
-            return isTag() ? Items.AIR : ForgeRegistries.ITEMS.getValue(registryName());
+            return isTag() ? Items.AIR : ForgeRegistries.ITEMS.getValue(getRegistryName());
         }
     }
 
@@ -74,7 +74,7 @@ public class RecipeEntry
 
         public Fluid getFluid()
         {
-            return ForgeRegistries.FLUIDS.getValue(registryName());
+            return ForgeRegistries.FLUIDS.getValue(getRegistryName());
         }
 
         public int getAmount()
@@ -98,7 +98,7 @@ public class RecipeEntry
 
         public Block getBlock()
         {
-            return ForgeRegistries.BLOCKS.getValue(registryName());
+            return ForgeRegistries.BLOCKS.getValue(getRegistryName());
         }
     }
 
@@ -113,7 +113,7 @@ public class RecipeEntry
 
         public Item getItem()
         {
-            return ForgeRegistries.ITEMS.getValue(registryName());
+            return ForgeRegistries.ITEMS.getValue(getRegistryName());
         }
     }
 
@@ -126,7 +126,7 @@ public class RecipeEntry
 
         public Fluid getFluid()
         {
-            return ForgeRegistries.FLUIDS.getValue(registryName());
+            return ForgeRegistries.FLUIDS.getValue(getRegistryName());
         }
 
         public int getAmount()
@@ -144,7 +144,7 @@ public class RecipeEntry
 
         public Block getBlock()
         {
-            return ForgeRegistries.BLOCKS.getValue(registryName());
+            return ForgeRegistries.BLOCKS.getValue(getRegistryName());
         }
     }
 

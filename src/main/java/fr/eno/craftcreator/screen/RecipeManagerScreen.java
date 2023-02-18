@@ -144,9 +144,14 @@ public class RecipeManagerScreen extends ListScreen
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button)
     {
-        this.getLists().forEach(list -> list.setCanDisplayTooltips(!modDropdown.mouseClicked(mouseX, mouseY, button) && !recipeTypeDropdown.mouseClicked(mouseX, mouseY, button)));
+        modDropdown.mouseClicked(mouseX, mouseY, button);
+        recipeTypeDropdown.mouseClicked(mouseX, mouseY, button);
+        this.getLists().forEach(list -> list.setCanDisplayTooltips(!modDropdown.isFocused() && !recipeTypeDropdown.isFocused()));
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        if(!modDropdown.isFocused() && !recipeTypeDropdown.isFocused())
+            return super.mouseClicked(mouseX, mouseY, button);
+
+        return true;
     }
 
     @Override
@@ -156,6 +161,14 @@ public class RecipeManagerScreen extends ListScreen
         recipeTypeDropdown.mouseScrolled(mouseX, mouseY, delta);
 
         return super.mouseScrolled(mouseX, mouseY, delta);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY)
+    {
+        modDropdown.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        recipeTypeDropdown.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 
     @Override

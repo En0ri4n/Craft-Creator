@@ -1,6 +1,6 @@
 package fr.eno.craftcreator.screen.widgets;
 
-
+import cofh.lib.util.helpers.MathHelper;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.api.ClientUtils;
@@ -10,9 +10,9 @@ import fr.eno.craftcreator.utils.Callable;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.util.Mth;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
@@ -40,7 +40,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends A
 
     public DropdownListWidget(int x, int y, int width, int height, int itemHeight, List<T> entries, Callable<T> onSelected)
     {
-        super(x, y, width, height, new net.minecraft.network.chat.TextComponent(""));
+        super(x, y, width, height, new TextComponent(""));
         this.itemHeight = itemHeight;
         this.maxItems = 10;
         this.entries = entries;
@@ -65,7 +65,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends A
         Screen.fill(matrixStack, this.x, this.y, this.x + this.width, this.y + this.height, 0xf2c3a942);
         Screen.fill(matrixStack, this.x + 1, this.y + 1, this.x + this.width - 1, this.y + this.height - 1, Color.DARK_GRAY.getRGB());
         int color = 0xFFFFFFFF;
-        drawCenteredString(matrixStack, ClientUtils.getFontRenderer(), this.getMessage().copy().append(" ▼"), this.x + this.width / 2, this.y + height / 2 - ClientUtils.getFontRenderer().lineHeight / 2, color | Mth.ceil(this.alpha * 255.0F) << 24);
+        drawCenteredString(matrixStack, ClientUtils.getFontRenderer(), this.getMessage().copy().append(" ▼"), this.x + this.width / 2, this.y + height / 2 - ClientUtils.getFontRenderer().lineHeight / 2, color | MathHelper.ceil(this.alpha * 255.0F) << 24);
 
         if(this.isFocused())
         {
@@ -78,7 +78,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends A
                 RenderSystem.disableTexture();
                 int y0 = this.y0 + height;
                 int currentHeight = (int) ((float) ((this.y1 - y0) * (this.y1 - y0)) / (float) this.getMaxPosition());
-                currentHeight = Mth.clamp(currentHeight, 32, this.y1 - y0 - 8);
+                currentHeight = MathHelper.clamp(currentHeight, 32, this.y1 - y0 - 8);
                 int currentY = this.scrollAmount * (this.y1 - y0 - currentHeight) / getMaxScrollAmount() + y0;
                 if(currentY < y0)
                 {
@@ -99,10 +99,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends A
                     T entry = this.entries.get(i);
                     int rowWidth = this.getRowWidth();
                     int rowLeft = this.x0;
-                    matrixStack.pushPose();
-                    matrixStack.translate(0.0D, 0.0D, 100.0D);
                     entry.render(matrixStack, i, rowLeft, rowTop, rowWidth, itemHeight, mouseX, mouseY, ScreenUtils.isMouseHover(rowLeft, rowTop, mouseX, mouseY, rowWidth, itemHeight));
-                    matrixStack.popPose();
                 }
             }
         }
@@ -145,7 +142,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends A
 
     @Nonnull
     @Override
-    public MutableComponent getMessage()
+    public Component getMessage()
     {
         return this.getSelectedEntry().getDisplayName();
     }
@@ -221,7 +218,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends A
             {
                 double d0 = Math.max(1, this.getMaxScrollAmount());
                 int i = this.y1 - this.y0;
-                int j = Mth.clamp((int) ((float) (i * i) / (float) this.getMaxPosition()), 32, i - 8);
+                int j = MathHelper.clamp((int) ((float) (i * i) / (float) this.getMaxPosition()), 32, i - 8);
                 double d1 = Math.max(1.0D, d0 / (double) (i - j));
                 this.setScrollAmount(this.getScrollAmount() + p_231045_8_ * d1);
             }
@@ -284,7 +281,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends A
         public static List<StringEntry> getRecipeTypes(String modid)
         {
             SupportedMods mod = SupportedMods.getMod(modid);
-            return mod.getSupportedRecipeTypes().stream().map(recipeTypeLocation -> new StringEntry(recipeTypeLocation.toString(), new TextComponent(recipeTypeLocation.toString()))).collect(Collectors.toList());//Registry.RECIPE_TYPE.stream().filter(type -> CommonUtils.getRecipeTypeName(type).getNamespace().equals(modid)).map(recipeType -> new DropdownListWidget.StringEntry(CommonUtils.getRecipeTypeName(recipeType).toString(), new TextComponent(CommonUtils.getRecipeTypeName(recipeType).toString()))).collect(Collectors.toList());
+            return mod.getSupportedRecipeTypes().stream().map(recipeTypeLocation -> new StringEntry(recipeTypeLocation.toString(), new TextComponent(recipeTypeLocation.toString()))).collect(Collectors.toList());//Registry.RECIPE_TYPE.stream().filter(type -> CommonUtils.getRecipeTypeName(type).getNamespace().equals(modid)).map(recipeType -> new DropdownListWidget.StringEntry(CommonUtils.getRecipeTypeName(recipeType).toString(), new StringTextComponent(CommonUtils.getRecipeTypeName(recipeType).toString()))).collect(Collectors.toList());
         }
 
         public static List<StringEntry> getModIds()
