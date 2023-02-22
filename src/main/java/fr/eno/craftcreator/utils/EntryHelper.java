@@ -4,6 +4,7 @@ import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeType;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unchecked")
 public class EntryHelper
 {
     private static final List<ResourceLocation> items = new ArrayList<>();
@@ -76,5 +78,10 @@ public class EntryHelper
     public static List<ResourceLocation> getRecipeIds()
     {
         return recipeIds;
+    }
+
+    public static List<ResourceLocation> getTags()
+    {
+        return new ArrayList<>(ItemTags.getAllTags().getAvailableTags());
     }
 }

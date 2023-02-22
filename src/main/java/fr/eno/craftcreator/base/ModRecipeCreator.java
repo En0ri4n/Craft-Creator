@@ -49,7 +49,8 @@ public enum ModRecipeCreator
     PYROLYZER(SupportedMods.THERMAL, ClientUtils.parse("thermal:pyrolyzer"), "pyrolyzer_recipe_creator.png", SlotHelper.PYROLYZER_SLOTS),
 
     // Create
-    CRUSHING(SupportedMods.CREATE, ClientUtils.parse("create:crushing"), "crushing_recipe_creator.png", SlotHelper.CRUSHING_SLOTS),;
+    CRUSHING(SupportedMods.CREATE, ClientUtils.parse("create:crushing"), "crushing_recipe_creator.png", SlotHelper.CRUSHING_SLOTS),
+    CUTTING(SupportedMods.CREATE, ClientUtils.parse("create:cutting"), "cutting_recipe_creator.png", SlotHelper.CUTTING_SLOTS),;
 
     private final SupportedMods mod;
     private final ResourceLocation recipeTypeLocation;

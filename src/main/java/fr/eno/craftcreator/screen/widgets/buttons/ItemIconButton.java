@@ -13,17 +13,17 @@ import net.minecraft.util.text.StringTextComponent;
 import java.util.Collections;
 import java.util.List;
 
-public class IconButton extends Button
+public class ItemIconButton extends Button
 {
     private ItemStack icon;
 
-    public IconButton(int x, int y, ItemStack icon)
+    public ItemIconButton(int x, int y, ItemStack icon)
     {
         this(x, y, icon, b -> {});
         this.icon = icon;
     }
 
-    public IconButton(int x, int y, ItemStack icon, IPressable onPress)
+    public ItemIconButton(int x, int y, ItemStack icon, IPressable onPress)
     {
         super(x, y, 20, 20, new StringTextComponent(""), onPress);
         this.icon = icon;
@@ -48,12 +48,12 @@ public class IconButton extends Button
             ClientUtils.getCurrentScreen().renderComponentTooltip(matrixStack, Collections.singletonList(icon.getHoverName()), mouseX, mouseY);
     }
 
-    public static List<IconButton> getButtons(List<Item> items)
+    public static List<ItemIconButton> getButtons(List<Item> items)
     {
-        List<IconButton> buttons = Lists.newArrayList();
+        List<ItemIconButton> buttons = Lists.newArrayList();
         for(Item item : items)
         {
-            buttons.add(new IconButton(0, 0, new ItemStack(item)));
+            buttons.add(new ItemIconButton(0, 0, new ItemStack(item)));
         }
 
         return buttons;

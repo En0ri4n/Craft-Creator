@@ -1,8 +1,9 @@
 package fr.eno.craftcreator.recipes.kubejs;
 
 import com.google.gson.JsonObject;
-import fr.eno.craftcreator.recipes.base.IModifiedRecipe;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
+import fr.eno.craftcreator.recipes.base.ModifiedRecipe;
+import fr.eno.craftcreator.utils.FormattableString;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.text.IFormattableTextComponent;
@@ -12,8 +13,10 @@ import net.minecraft.util.text.TextFormatting;
 import java.util.HashMap;
 import java.util.Map;
 
-public class KubeJSModifiedRecipe implements IModifiedRecipe
+public class KubeJSModifiedRecipe extends ModifiedRecipe
 {
+    public static final FormattableString BASE_LINE = FormattableString.of("event.%s(%s)");
+
     private final KubeJSModifiedRecipeType type;
     private final Map<ModRecipeSerializer.RecipeDescriptors, String> recipeDescriptors;
 
@@ -86,9 +89,15 @@ public class KubeJSModifiedRecipe implements IModifiedRecipe
     {
         return type;
     }
-    
+
     @Override
-    public JsonObject toJson()
+    public FormattableString getBaseLine()
+    {
+        return BASE_LINE;
+    }
+
+    @Override
+    public String toJson()
     {
         JsonObject json = new JsonObject();
         for(Map.Entry<ModRecipeSerializer.RecipeDescriptors, String> entry : recipeDescriptors.entrySet())
@@ -96,7 +105,7 @@ public class KubeJSModifiedRecipe implements IModifiedRecipe
             json.addProperty(entry.getKey().getTag(), entry.getValue());
         }
 
-        return json;
+        return GSON.toJson(json);
     }
 
 
@@ -106,6 +115,7 @@ public class KubeJSModifiedRecipe implements IModifiedRecipe
         REPLACED_INPUT("replaceInput", new StringTextComponent("Input Replaced").withStyle(TextFormatting.GOLD)),
         REPLACED_OUTPUT("replaceOutput", new StringTextComponent("Output Replaced").withStyle(TextFormatting.YELLOW));
 
+        public static final String CUSTOM = "custom";
         private final String descriptor;
         private final IFormattableTextComponent title;
 

@@ -44,16 +44,16 @@ public class RecipeManagerScreen extends ListScreen
 
         int bottomHeight = 20;
 
-        addWidget(modDropdown = new DropdownListWidget<>(width / 2 - 200, 0, 200, 20, 20, DropdownListWidget.Entries.getModIds(), (entry) ->
+        addList(modDropdown = new DropdownListWidget<>(width / 2 - 200, 0, 200, 20, 20, DropdownListWidget.Entries.getModIds(), (entry) ->
         {
             this.modId = entry.getValue();
-            this.recipeTypeDropdown.setEntries(DropdownListWidget.Entries.getRecipeTypes(entry.getValue()));
-            this.recipeType = ClientUtils.parse(this.recipeTypeDropdown.getEntries().get(0).getValue());
+            this.recipeTypeDropdown.setEntries(DropdownListWidget.Entries.getRecipeTypes(this.modId));
+            this.recipeType = ClientUtils.parse(this.recipeTypeDropdown.getDropdownEntries().get(0).getValue());
             this.searchField.setValue("");
             updateLists(true);
         }));
 
-        addWidget(recipeTypeDropdown = new DropdownListWidget<>(width / 2, 0, 200, 20, 20, DropdownListWidget.Entries.getRecipeTypes(this.modId), (entry) ->
+        addList(recipeTypeDropdown = new DropdownListWidget<>(width / 2, 0, 200, 20, 20, DropdownListWidget.Entries.getRecipeTypes(this.modId), (entry) ->
         {
             this.recipeType = ClientUtils.parse(entry.getValue());
             updateLists(true);
@@ -67,11 +67,11 @@ public class RecipeManagerScreen extends ListScreen
             updateLists(false);
         }, SupportedMods.isKubeJSLoaded()));
         
-        this.addWidget(searchField = new SimpleTextFieldWidget(new StringTextComponent(""), ClientUtils.getFontRenderer(), 10, height - 30, this.width / 3 - 35, 20, textField ->
+        this.addWidget(searchField = new SimpleTextFieldWidget(10, height - 30, this.width / 3 - 35, 20, textField ->
         {
             if(!textField.getValue().isEmpty())
             {
-                this.setEntries(0, ListEntriesHelper.getFilteredRecipes(this.recipeType, textField.getValue()), true);
+                this.setEntries(2, ListEntriesHelper.getFilteredRecipes(this.recipeType, textField.getValue()), true);
             }
             else
                 updateLists(false);
@@ -113,9 +113,14 @@ public class RecipeManagerScreen extends ListScreen
 
     private void updateLists(boolean resetScroll)
     {
-        this.setEntries(0, ListEntriesHelper.getRecipes(this.recipeType), resetScroll);
-        this.setEntries(1, ListEntriesHelper.getAddedRecipesEntryList(getCurrentMod(), this.recipeType), resetScroll);
-        this.setEntries(2, ListEntriesHelper.getModifiedRecipesEntryList(getCurrentMod()), resetScroll);
+        // 0 = Mod Id Dropdown
+        // 1 = Recipe Type Dropdown
+        // 2 = Recipes List
+        // 3 = Added Recipes List
+        // 4 = Modified Recipes List
+        this.setEntries(2, ListEntriesHelper.getRecipes(this.recipeType), resetScroll);
+        this.setEntries(3, ListEntriesHelper.getAddedRecipesEntryList(getCurrentMod(), this.recipeType), resetScroll);
+        this.setEntries(4, ListEntriesHelper.getModifiedRecipesEntryList(getCurrentMod()), resetScroll);
     }
 
     private SupportedMods getCurrentMod()
