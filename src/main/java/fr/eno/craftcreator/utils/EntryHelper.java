@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unchecked")
 public class EntryHelper
 {
     private static final List<ResourceLocation> items = new ArrayList<>();
@@ -49,7 +50,7 @@ public class EntryHelper
 
         if(mods.isEmpty()) ModList.get().getMods().forEach(mod -> mods.add(mod.getModId()));
 
-        if(recipeIds.isEmpty()) Registry.RECIPE_TYPE.stream().collect(Collectors.toList()).forEach(recipeType ->
+        if(recipeIds.isEmpty()) Registry.RECIPE_TYPE.stream().toList().forEach(recipeType ->
         {
             RecipeType<T> recipeType1 = (RecipeType<T>) recipeType;
             world.getRecipeManager().getAllRecipesFor(recipeType1).forEach(recipe ->
@@ -77,5 +78,10 @@ public class EntryHelper
     public static List<ResourceLocation> getRecipeIds()
     {
         return recipeIds;
+    }
+
+    public static List<ResourceLocation> getTags()
+    {
+        return ForgeRegistries.ITEMS.tags().stream().map(itag -> itag.getKey().location()).collect(Collectors.toList());
     }
 }

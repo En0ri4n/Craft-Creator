@@ -6,6 +6,8 @@ import fr.eno.craftcreator.References;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.List;
+
 public class ScreenUtils
 {
     private static final ResourceLocation BUTTON_TEXTURE = References.getLoc("textures/gui/buttons/basic_button.png");
@@ -15,12 +17,12 @@ public class ScreenUtils
      * Calls {@link ScreenUtils#renderSizedTexture(com.mojang.blaze3d.vertex.PoseStack, int, int, int, int, int, int, int, int, int, int)} with a cut size of 4<br>
      *
      * @param matrixStack the matrix stack
-     * @param x the x position
-     * @param y the y position
-     * @param width the width
-     * @param height the height
-     * @param isActive if the button is active
-     * @param isHovered if the button is hovered
+     * @param x           the x position
+     * @param y           the y position
+     * @param width       the width
+     * @param height      the height
+     * @param isActive    if the button is active
+     * @param isHovered   if the button is hovered
      */
     public static void renderSizedButton(PoseStack matrixStack, int x, int y, int width, int height, boolean isActive, boolean isHovered)
     {
@@ -38,16 +40,16 @@ public class ScreenUtils
     /**
      * Render a sized texture (not stretched)
      *
-     * @param matrixStack the matrix stack
-     * @param cutSize the size of the cut (e.g. 4 for a 4x4 px texture for corners and sides)
-     * @param x the x position
-     * @param y the y position
-     * @param width the width
-     * @param height the height
-     * @param xTexture the x position in the texture
-     * @param yTexture the y position in the texture
-     * @param textureWidth the texture width
-     * @param textureHeight the texture height
+     * @param matrixStack         the matrix stack
+     * @param cutSize             the size of the cut (e.g. 4 for a 4x4 px texture for corners and sides)
+     * @param x                   the x position
+     * @param y                   the y position
+     * @param width               the width
+     * @param height              the height
+     * @param xTexture            the x position in the texture
+     * @param yTexture            the y position in the texture
+     * @param textureWidth        the texture width
+     * @param textureHeight       the texture height
      * @param buttonTextureHeight the button texture height (for multiple states like active, hovered, etc.) same as textureHeight if not a button
      */
     public static void renderSizedTexture(PoseStack matrixStack, int cutSize, int x, int y, int width, int height, int xTexture, int yTexture, int textureWidth, int textureHeight, int buttonTextureHeight)

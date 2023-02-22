@@ -13,6 +13,10 @@ public class CreateRecipeCreatorContainer extends CommonContainer
     public CreateRecipeCreatorContainer(int pContainerId, Inventory inventory, FriendlyByteBuf byteBuf)
     {
         super(InitContainers.CREATE_RECIPE_CREATOR.get(), pContainerId, inventory, byteBuf);
+
+        addSlots(SlotHelper.CREATE_SLOTS);
+
+        bindInventory(inventory, 40, 90);
     }
 
     @Override

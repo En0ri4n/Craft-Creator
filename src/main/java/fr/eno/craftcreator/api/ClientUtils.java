@@ -160,7 +160,7 @@ public class ClientUtils
         {
             for(SimpleListWidget.Entry s : inputs)
             {
-                if(s.toString().contains(token))
+                if(s.getEntryValue().contains(token))
                 {
                     list.add(s);
                 }
@@ -171,7 +171,9 @@ public class ClientUtils
     }
 
     /**
-     * Parse a string to a resource location
+     * Parse a string to a resource location<br>
+     * If the string can't be parsed, return the 'bug_empty' resource location
+     *
      * @param location the string to parse
      * @return the resource location
      *
@@ -179,7 +181,7 @@ public class ClientUtils
      */
     public static ResourceLocation parse(String location)
     {
-        return ResourceLocation.tryParse(location);
+        return ResourceLocation.tryParse(location) == null ? References.getLoc("bug_empty") : ResourceLocation.tryParse(location);
     }
 
     /**
@@ -249,5 +251,25 @@ public class ClientUtils
     public static void playSound(SoundEvent soundEvent, float pitch, float volume, SoundSource soundCategory, boolean attenuationLinear)
     {
         minecraftSupplier.get().getSoundManager().play(new SimpleSoundInstance(soundEvent.getLocation(), soundCategory, volume, pitch, false, 0, attenuationLinear ? SoundInstance.Attenuation.LINEAR : SoundInstance.Attenuation.NONE, 0.0D, 0.0D, 0.0D, true));
+    }
+
+    /**
+     * Get the biggest string width
+     *
+     * @param strings the strings
+     * @return the biggest string width
+     */
+    public static int getBiggestStringWidth(List<String> strings)
+    {
+        int biggest = 0;
+
+        for(String s : strings)
+        {
+            int width = ClientUtils.width(s);
+
+            if(width > biggest) biggest = width;
+        }
+
+        return biggest;
     }
 }

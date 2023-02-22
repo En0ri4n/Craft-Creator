@@ -5,7 +5,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.ScreenUtils;
-import fr.eno.craftcreator.utils.Callable;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -16,11 +15,14 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.function.Consumer;
 
 public class SimpleCheckBox extends Checkbox
 {
     private static final ResourceLocation TEXTURE = new ResourceLocation("textures/gui/checkbox.png");
-    private Callable<SimpleCheckBox> onPress;
+    @Nullable
+    private Consumer<SimpleCheckBox> onPress;
     private Component tooltip;
     private boolean selected;
 
@@ -31,11 +33,16 @@ public class SimpleCheckBox extends Checkbox
 
     public SimpleCheckBox(int x, int y, int width, int height, Component title, boolean checked, boolean drawTitle)
     {
+        this(x, y, width, height, title, new TextComponent(""), checked, drawTitle, null);
+    }
+
+    public SimpleCheckBox(int x, int y, int width, int height, Component title, Component tooltip, boolean checked, boolean drawTitle, @Nullable Consumer<SimpleCheckBox> onPress)
+    {
         super(x, y, width, height, title, checked, drawTitle);
         this.selected = checked;
     }
 
-    public SimpleCheckBox(int x, int y, int width, int height, Component tooltip, boolean checked, Callable<SimpleCheckBox> onPress)
+    public SimpleCheckBox(int x, int y, int width, int height, Component tooltip, boolean checked, Consumer<SimpleCheckBox> onPress)
     {
         this(x, y, width, height, new TextComponent(""), checked, false);
         this.tooltip = tooltip;
@@ -64,12 +71,7 @@ public class SimpleCheckBox extends Checkbox
     @Override
     public void onPress()
     {
-        this.selected = !this.selected;
-        if(onPress != null)
-        {
-            onPress.run(this);
-            ClientUtils.playSound(SoundEvents.UI_BUTTON_CLICK, 1F, 0.25F, SoundSource.MASTER, false);
-        }
+        this.setSelected(!this.selected);
     }
 
     @Override
@@ -95,5 +97,10 @@ public class SimpleCheckBox extends Checkbox
     public void setSelected(boolean selected)
     {
         this.selected = selected;
+        if(onPress != null)
+        {
+            onPress.accept(this);
+            ClientUtils.playSound(SoundEvents.UI_BUTTON_CLICK, 1F, 0.25F, SoundSource.MASTER, false);
+        }
     }
 }

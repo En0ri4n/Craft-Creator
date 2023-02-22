@@ -54,6 +54,10 @@
 	"craftcreator.screen.widget.simple_list.tooltip.input": "§6Input :",
 	"craftcreator.screen.widget.simple_list.tooltip.output": "§2Output :",
 
+	"craftcreator.screen.widget.dropdown_list.recipe_entry.entry.title": "Entry #%d",
+	"craftcreator.screen.widget.dropdown_list.recipe_entry.add": "Add Entry...",
+
+
 	"craftcreator.serializer.recipe.descriptor.input": "§5Input",
 	"craftcreator.serializer.recipe.descriptor.output": "§9Output",
 	"craftcreator.serializer.recipe.descriptor.mod": "§6Mod",
@@ -123,5 +127,6 @@
 	"craftcreator.screen.thermal_recipe_creator.slot.fluid": "Fluid",
 
 
-	"craftcreator.screen.create_recipe_creator.crushing.title": "Crushing Recipe Creator"
+	"craftcreator.screen.create_recipe_creator.crushing.title": "Crushing Recipe Creator",
+	"craftcreator.screen.create_recipe_creator.cutting.title": "Cutting Recipe Creator"
 }

@@ -113,6 +113,9 @@ public class SlotHelper
     public static final List<PositionnedSlot> CRUSHING_SLOTS;
     public static final List<PositionnedSlot> CRUSHING_SLOTS_INPUT;
     public static final List<PositionnedSlot> CRUSHING_SLOTS_OUTPUT;
+    public static final List<PositionnedSlot> CUTTING_SLOTS;
+    public static final List<PositionnedSlot> CUTTING_SLOTS_INPUT;
+    public static final List<PositionnedSlot> CUTTING_SLOTS_OUTPUT;
 
     static
     {
@@ -245,14 +248,18 @@ public class SlotHelper
 
         // Create
         int createSlots = 0;
-        // Crushing Wheels
+        // Crushing
         CRUSHING_SLOTS_INPUT = Collections.singletonList(new PositionnedSlot(createSlots++, 63, 98));
         CRUSHING_SLOTS_OUTPUT = Arrays.asList(new PositionnedSlot(createSlots++, 189, 33), new PositionnedSlot(createSlots++, 189, 59), new PositionnedSlot(createSlots++, 189, 85), new PositionnedSlot(createSlots++, 189, 111));
         CRUSHING_SLOTS = Stream.of(CRUSHING_SLOTS_INPUT, CRUSHING_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
+        // Cutting
+        CUTTING_SLOTS_INPUT = Collections.singletonList(new PositionnedSlot(createSlots++, 63, 98));
+        CUTTING_SLOTS_OUTPUT = Arrays.asList(new PositionnedSlot(createSlots++, 189, 33), new PositionnedSlot(createSlots++, 189, 59), new PositionnedSlot(createSlots++, 189, 85), new PositionnedSlot(createSlots++, 189, 111));
+        CUTTING_SLOTS = Stream.of(CUTTING_SLOTS_INPUT, CUTTING_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
 
-        CREATE_SLOTS_INPUT = Stream.of(CRUSHING_SLOTS_INPUT).flatMap(Collection::stream).collect(Collectors.toList());
-        CREATE_SLOTS_OUTPUT = Stream.of(CRUSHING_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
-        CREATE_SLOTS = Stream.of(CREATE_SLOTS_INPUT, CREATE_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
+        CREATE_SLOTS_INPUT = Stream.of(CRUSHING_SLOTS_INPUT, CUTTING_SLOTS_INPUT).flatMap(Collection::stream).collect(Collectors.toList());
+        CREATE_SLOTS_OUTPUT = Stream.of(CRUSHING_SLOTS_OUTPUT, CUTTING_SLOTS_OUTPUT).flatMap(Collection::stream).collect(Collectors.toList());
+        CREATE_SLOTS = Stream.of(CRUSHING_SLOTS, CUTTING_SLOTS).flatMap(Collection::stream).collect(Collectors.toList());
         CREATE_SLOTS_SIZE = createSlots;
     }
 }

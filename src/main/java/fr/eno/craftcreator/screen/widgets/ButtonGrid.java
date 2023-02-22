@@ -3,7 +3,6 @@ package fr.eno.craftcreator.screen.widgets;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.utils.Callable;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.Rect2i;
@@ -11,6 +10,7 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.sounds.SoundEvents;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class ButtonGrid<T extends Button> implements IOutsideWidget
 {
@@ -20,11 +20,11 @@ public class ButtonGrid<T extends Button> implements IOutsideWidget
     private final int buttonSpacing;
     private final int buttonPerLine;
     private final List<T> buttons;
-    private final Callable<T> onPress;
+    private final Consumer<T> onPress;
 
     private boolean isVisible;
 
-    public ButtonGrid(int x, int y, int buttonSize, int buttonSpacing, int buttonPerLine,List<T> buttons, Callable<T> onPress)
+    public ButtonGrid(int x, int y, int buttonSize, int buttonSpacing, int buttonPerLine,List<T> buttons, Consumer<T> onPress)
     {
         this.x = x;
         this.y = y;
@@ -82,7 +82,7 @@ public class ButtonGrid<T extends Button> implements IOutsideWidget
             for(T b : getButtons())
                 if(b.isMouseOver(mouseX, mouseY))
                 {
-                    onPress.run(b);
+                    onPress.accept(b);
                     ClientUtils.getMinecraft().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 }
         }

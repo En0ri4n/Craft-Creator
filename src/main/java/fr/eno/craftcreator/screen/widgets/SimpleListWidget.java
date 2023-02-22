@@ -13,7 +13,6 @@ import fr.eno.craftcreator.base.ModRecipeCreatorDispatcher;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;
 import fr.eno.craftcreator.recipes.utils.CraftIngredients;
-import fr.eno.craftcreator.utils.Callable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -23,37 +22,43 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.tags.ITag;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nonnull;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("deprecation")
 public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Entry>
 {
-    private static final ResourceLocation BACKGROUND_TILE = References.getLoc("textures/gui/background_tile.png");
+    private static final ResourceLocation BACKGROUND_TILE = References.getLoc("textures/gui/widgets/background_tile.png");
+    protected static final int MAX_ITEMS_DISPLAYED = 10;
+
     private final Component title;
     private final int titleBoxHeight;
     private final int scrollBarWidth;
     private final boolean canDelete;
     private boolean canHaveSelected;
     private final boolean hasTitleBox;
-    private Callable<Entry> onSelected;
+    private Consumer<Entry> onSelected;
     private boolean isVisible;
-    private final Callable<Entry> onDelete;
+    private final Consumer<Entry> onDelete;
     private Entry hoveredEntry;
     private boolean isListHovered;
     private boolean canDisplayTooltips;
 
-    public SimpleListWidget(int leftIn, int topIn, int widthIn, int heightIn, int slotHeightIn, int titleBoxHeight, int scrollBarWidth, Component titleIn, Callable<Entry> onDelete, boolean canDelete)
+    public SimpleListWidget(int leftIn, int topIn, int widthIn, int heightIn, int slotHeightIn, int titleBoxHeight, int scrollBarWidth, Component titleIn, Consumer<Entry> onDelete, boolean canDelete)
     {
         super(ClientUtils.getMinecraft(), widthIn - scrollBarWidth, heightIn - titleBoxHeight, 0, 0, slotHeightIn);
         this.x0 = leftIn;
@@ -70,7 +75,12 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
         this.canDisplayTooltips = true;
         this.canDelete = canDelete;
     }
-    
+
+    public List<Entry> getEntries()
+    {
+        return children();
+    }
+
     public int getSize()
     {
         return this.getItemCount();
@@ -89,7 +99,7 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
     @Override
     public int getRowWidth()
     {
-        return this.width - 4;
+        return this.width - this.scrollBarWidth;
     }
 
     @Override
@@ -133,7 +143,7 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
         this.renderList(pPoseStack, rowLeft, k, pMouseX, pMouseY, pPartialTick);
 
         int scrollbarPosition = this.getScrollbarPosition();
-        int j = scrollbarPosition + 6;
+        int scrollBarPosX1 = scrollbarPosition + scrollBarWidth;
         int maxScroll = this.getMaxScroll();
         int i = getScrollbarPosition();
         if(maxScroll > 0)
@@ -149,18 +159,9 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
             }
 
             bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-            bufferbuilder.vertex((double)i, (double)this.y1, 0.0D).color(0, 0, 0, 255).endVertex();
-            bufferbuilder.vertex((double)j, (double)this.y1, 0.0D).color(0, 0, 0, 255).endVertex();
-            bufferbuilder.vertex(j, (double)this.y0, 0.0D).color(0, 0, 0, 255).endVertex();
-            bufferbuilder.vertex((double)i, (double)this.y0, 0.0D).color(0, 0, 0, 255).endVertex();
-            bufferbuilder.vertex((double)i, (double)(i2 + l1), 0.0D).color(128, 128, 128, 255).endVertex();
-            bufferbuilder.vertex((double)j, (double)(i2 + l1), 0.0D).color(128, 128, 128, 255).endVertex();
-            bufferbuilder.vertex((double)j, (double)i2, 0.0D).color(128, 128, 128, 255).endVertex();
-            bufferbuilder.vertex((double)i, (double)i2, 0.0D).color(128, 128, 128, 255).endVertex();
-            bufferbuilder.vertex((double)i, (double)(i2 + l1 - 1), 0.0D).color(192, 192, 192, 255).endVertex();
-            bufferbuilder.vertex((double)(j - 1), (double)(i2 + l1 - 1), 0.0D).color(192, 192, 192, 255).endVertex();
-            bufferbuilder.vertex((double)(j - 1), (double)i2, 0.0D).color(192, 192, 192, 255).endVertex();
-            bufferbuilder.vertex((double)i, (double)i2, 0.0D).color(192, 192, 192, 255).endVertex();
+            ClientUtils.renderQuad(bufferbuilder, scrollbarPosition, this.y0, scrollBarPosX1, this.y1, 0, 0, 0, 255);
+            ClientUtils.renderQuad(bufferbuilder, scrollbarPosition, i2, scrollBarPosX1, i2 + l1, 128, 128, 128, 255);
+            ClientUtils.renderQuad(bufferbuilder, scrollbarPosition, i2, scrollBarPosX1, i2 + 1, 192, 192, 192, 255);
             tesselator.end();
         }
 
@@ -215,6 +216,21 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
         }
     }
 
+    /**
+     * Returns true if the mouse is over the list.<br>
+     * (Due to the way scrollbar width is not included in the list width, this override check if the mouse is over the scrollbar too)
+     */
+    @Override
+    public boolean isMouseOver(double pMouseX, double pMouseY)
+    {
+        return pMouseX >= this.x0 && pMouseX <= this.x1 + this.scrollBarWidth && pMouseY >= this.y0 && pMouseY <= this.y1;
+    }
+
+    protected ResourceLocation getBackgroundTile()
+    {
+        return BACKGROUND_TILE;
+    }
+
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers)
     {
@@ -222,7 +238,7 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
         {
             if(this.getSelected() != null && this.onDelete != null && canDelete)
             {
-                this.onDelete.run(this.getSelected());
+                this.onDelete.accept(this.getSelected());
                 this.setSelected(null);
             }
         }
@@ -238,8 +254,7 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
     @Override
     public boolean mouseScrolled(double p_93416_, double p_93417_, double p_93418_)
     {
-        if(this.isListHovered)
-            return super.mouseScrolled(p_93416_, p_93417_, p_93418_);
+        if(this.isListHovered) return super.mouseScrolled(p_93416_, p_93417_, p_93418_);
 
         return true;
     }
@@ -266,8 +281,8 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
     {
         this.clearEntries();
         entries.forEach(this::addEntry);
-        if(resetScroll)
-            this.setScrollAmount(0D);
+        if(resetScroll) this.setScrollAmount(0D);
+        this.height = Math.min(entries.size(), MAX_ITEMS_DISPLAYED) * itemHeight;
     }
 
     @Override
@@ -275,14 +290,13 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
     {
         if(this.onSelected != null)
         {
-            this.onSelected.run(entry);
-            this.onSelected = null;
+            this.onSelected.accept(entry);
         }
 
         super.setSelected(entry);
     }
 
-    public void setOnSelectedChange(Callable<Entry> onSelected)
+    public void setOnSelectedChange(Consumer<Entry> onSelected)
     {
         this.onSelected = onSelected;
     }
@@ -321,13 +335,17 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
         isVisible = visible;
     }
 
+    public void tick()
+    {
+    }
+
     @Override
     public void updateNarration(NarrationElementOutput p_169152_)
     {
-        // NO-OP
+
     }
 
-    public abstract static class Entry extends AbstractSelectionList.Entry<Entry>
+    public abstract static class Entry extends AbstractSelectionList.Entry<SimpleListWidget.Entry>
     {
         protected static final Gson gson = new GsonBuilder().setLenient().create();
         private static final Pattern numberPattern = Pattern.compile("[0-9]+");
@@ -339,15 +357,12 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
             this.tooltips = new ArrayList<>();
         }
 
-        public abstract String toString();
+        public abstract String getEntryValue();
 
         public abstract void renderTooltip(PoseStack matrixStack, int mouseX, int mouseY);
 
         protected void displayTruncatedString(PoseStack matrixStack, String stringToDisplay, int leftPos, int topPos, int width, int height, boolean hasItemDisplay, boolean isMouseOver)
         {
-            if(stringToDisplay.contains("/"))
-                stringToDisplay = stringToDisplay.substring(stringToDisplay.indexOf('/') + 1);
-
             stringToDisplay = getString(width, stringToDisplay);
 
             int color = isMouseOver ? 0xF1f115 : 0xFFFFFF;
@@ -445,7 +460,7 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
                     CraftIngredients.FluidIngredient fluidIngredient = (CraftIngredients.FluidIngredient) craftIngredient;
 
                     ingredientValue.append(new TextComponent(fluidIngredient.getId().toString()));
-                    ingredientValue.withStyle(ChatFormatting.BLUE);
+                    ingredientValue.withStyle(ChatFormatting.AQUA);
 
                     MutableComponent component = new TextComponent(" (");
                     component.append(String.valueOf(fluidIngredient.getAmount()));
@@ -500,10 +515,8 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
                                 Matcher matcher = numberPattern.matcher(str);
                                 TextComponent value = new TextComponent("");
 
-                                if(matcher.find())
-                                    value.append(matcher.group());
-                                else
-                                    value.append(je.getAsJsonPrimitive().getAsString());
+                                if(matcher.find()) value.append(matcher.group());
+                                else value.append(je.getAsJsonPrimitive().getAsString());
 
                                 itemEntryKey.append(value.withStyle(ChatFormatting.GOLD));
                             }
@@ -516,10 +529,8 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
                     Matcher matcher = numberPattern.matcher(str);
                     TextComponent value = new TextComponent("");
 
-                    if(matcher.find())
-                        value.append(matcher.group());
-                    else
-                        value.append(compoundTag.get(nbtKey).getAsJsonPrimitive().getAsString());
+                    if(matcher.find()) value.append(matcher.group());
+                    else value.append(compoundTag.get(nbtKey).getAsJsonPrimitive().getAsString());
 
                     itemEntryKey.append(value.withStyle(ChatFormatting.GOLD));
                 }
@@ -545,15 +556,12 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
 
             ItemStack item = ModRecipeCreatorDispatcher.getOutput(recipe).getIcon();
 
-            matrixStack.pushPose();
-            float scale = 1F;
             int yPos = height / 2 - 16 / 2;
-            ClientUtils.getItemRenderer().renderAndDecorateFakeItem(item, (int) ((left + 1) / scale), (int) ((top + yPos) / scale));
-            matrixStack.popPose();
+            ClientUtils.getItemRenderer().renderAndDecorateFakeItem(item, left + 1, top + yPos);
         }
 
         @Override
-        public String toString()
+        public String getEntryValue()
         {
             return recipe.getId().toString();
         }
@@ -622,7 +630,7 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
         }
 
         @Override
-        public String toString()
+        public String getEntryValue()
         {
             return null;
         }
@@ -662,7 +670,7 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
         }
 
         @Override
-        public String toString()
+        public String getEntryValue()
         {
             return this.resource;
         }
@@ -681,10 +689,15 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
     public static class ResourceLocationEntry extends Entry
     {
         private final ResourceLocation resourceLocation;
+        /**
+         * Used to display all items if resource location is a tag
+         */
+        private int counter;
 
         public ResourceLocationEntry(ResourceLocation resourceLocation)
         {
             this.resourceLocation = resourceLocation;
+            this.counter = 0;
         }
 
         public ResourceLocation getResourceLocation()
@@ -695,25 +708,30 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
         @Override
         public void render(@Nonnull PoseStack matrixStack, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean isMouseOver, float partialTicks)
         {
-            //Screen.fill(matrixStack, left, top, left + width, top + height, 0xFFFFFF);
+            Item item = ForgeRegistries.ITEMS.getValue(getResourceLocation());
+            ITag<Item> tag = ForgeRegistries.ITEMS.tags().getTag(ItemTags.create(getResourceLocation()));
+
+            if(item == Items.AIR && tag.size() > 0)
+            {
+                if(counter / 40 >= tag.size()) counter = 0;
+
+                item = tag.stream().toList().get(counter / 40);
+            }
 
             String displayStr = getString(width, resourceLocation.toString());
+            displayTruncatedString(matrixStack, displayStr, left, top, width, height, true, isMouseOver);
 
-            int color = isMouseOver ? 0xF1f115 : 0xFFFFFF;
-            matrixStack.pushPose();
-            float scale = 1.1F;
-            matrixStack.scale(scale, scale, scale);
-            Screen.drawCenteredString(matrixStack, ClientUtils.getFontRenderer(), displayStr, (int) ((left + width / 2) / scale), (int) ((top + height / 2 - (ClientUtils.getFontRenderer().lineHeight * scale) / 2) / scale), color);
-            matrixStack.popPose();
+            if(item != Items.AIR)
+            {
+                int yPos = height / 2 - 16 / 2;
+                ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(item), left + yPos, top + yPos);
+            }
 
-            Item item = ForgeRegistries.ITEMS.getValue(getResourceLocation());
-
-            int yPos = height / 2 - 16 / 2;
-            ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(item == null ? Items.BARRIER : item), left + yPos, top + yPos);
+            if(!Screen.hasShiftDown()) counter++;
         }
 
         @Override
-        public String toString()
+        public String getEntryValue()
         {
             return this.resourceLocation.toString();
         }

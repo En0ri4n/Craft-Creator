@@ -73,6 +73,7 @@ public class ListScreen extends Screen
     public boolean mouseScrolled(double mouseX, double mouseY, double delta)
     {
         this.lists.forEach(list -> list.mouseScrolled(mouseX, mouseY, delta));
+
         return super.mouseScrolled(mouseX, mouseY, delta);
     }
 
@@ -94,8 +95,23 @@ public class ListScreen extends Screen
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers)
     {
+        // if(keyCode == GLFW.GLFW_KEY_E) ClientUtils.openScreen(null); // Don't know if it's a good idea to do that, because of text fields
         this.lists.forEach(list -> list.keyPressed(keyCode, scanCode, modifiers));
         return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean charTyped(char pCodePoint, int pModifiers)
+    {
+        this.lists.forEach(list -> list.charTyped(pCodePoint, pModifiers));
+        return super.charTyped(pCodePoint, pModifiers);
+    }
+
+    @Override
+    public void tick()
+    {
+        this.lists.forEach(SimpleListWidget::tick);
+        super.tick();
     }
 
     @Override

@@ -8,6 +8,7 @@ import fr.eno.craftcreator.container.CreateRecipeCreatorContainer;
 import fr.eno.craftcreator.container.slot.utils.PositionnedSlot;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import fr.eno.craftcreator.screen.container.base.MultiScreenModRecipeCreatorScreen;
+import fr.eno.craftcreator.screen.widgets.RecipeEntryWidget;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -20,9 +21,14 @@ import java.util.List;
 
 public class CreateRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen<CreateRecipeCreatorContainer>
 {
+    private RecipeEntryWidget inputWidget;
+
     public CreateRecipeCreatorScreen(CreateRecipeCreatorContainer screenContainer, Inventory inv, Component titleIn)
     {
         super(screenContainer, inv, titleIn, screenContainer.getTile().getBlockPos());
+        this.guiTextureSize = 256;
+        this.imageWidth = 256;
+        this.imageHeight = 256;
     }
 
     @Override
@@ -34,7 +40,7 @@ public class CreateRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen
     @Override
     protected void initWidgets()
     {
-
+        inputWidget = new RecipeEntryWidget(leftPos + 10, topPos + 30, 100, 100);
     }
 
     @Override
@@ -52,13 +58,26 @@ public class CreateRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen
     @Override
     protected void updateGui()
     {
-
+        setExecuteButtonPos(this.leftPos + this.imageWidth / 2 - 21, this.topPos + this.imageHeight / 2 + 8);
     }
 
     @Override
     protected void renderGui(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
+        inputWidget.render(matrixStack, mouseX, mouseY, partialTicks);
+    }
 
+    @Override
+    protected void renderLabels(PoseStack matrixStack, int pMouseX, int pMouseY)
+    {
+        super.renderLabels(matrixStack, pMouseX, pMouseY);
+        renderSideTitles(matrixStack);
+    }
+
+    @Override
+    public int getArrowXPos(boolean right)
+    {
+        return right ? super.getArrowXPos(true) - 40 : super.getArrowXPos(false) + 40;
     }
 
     @Override
@@ -68,6 +87,8 @@ public class CreateRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen
         {
             case CRUSHING:
                 return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("create:crushing_wheel"));
+            case CUTTING:
+                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("create:cutting"));
             default:
                 return Items.COMMAND_BLOCK;
         }
@@ -83,5 +104,42 @@ public class CreateRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen
     protected List<PositionnedSlot> getNbtTaggableSlots()
     {
         return new ArrayList<>();
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button)
+    {
+        inputWidget.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseDragged(double pMouseX, double pMouseY, int pButton, double pDragX, double pDragY)
+    {
+        inputWidget.mouseDragged(pMouseX, pMouseY, pButton, pDragX, pDragY);
+        return super.mouseDragged(pMouseX, pMouseY, pButton, pDragX, pDragY);
+    }
+
+    @Override
+    public boolean mouseScrolled(double pMouseX, double pMouseY, double pDelta)
+    {
+        inputWidget.mouseScrolled(pMouseX, pMouseY, pDelta);
+        return super.mouseScrolled(pMouseX, pMouseY, pDelta);
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers)
+    {
+        inputWidget.keyPressed(keyCode, scanCode, modifiers);
+        if(!inputWidget.isFocused())
+            return super.keyPressed(keyCode, scanCode, modifiers);
+        return true;
+    }
+
+    @Override
+    public boolean charTyped(char codePoint, int modifiers)
+    {
+        inputWidget.charTyped(codePoint, modifiers);
+        return super.charTyped(codePoint, modifiers);
     }
 }
