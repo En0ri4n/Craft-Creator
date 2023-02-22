@@ -5,7 +5,6 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.ScreenUtils;
-import fr.eno.craftcreator.utils.Callable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.CheckboxButton;
 import net.minecraft.util.ResourceLocation;
@@ -16,11 +15,14 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.function.Consumer;
 
 public class SimpleCheckBox extends CheckboxButton
 {
     private static final ResourceLocation TEXTURE = new ResourceLocation("textures/gui/checkbox.png");
-    private Callable<SimpleCheckBox> onPress;
+    @Nullable
+    private Consumer<SimpleCheckBox> onPress;
     private ITextComponent tooltip;
     private boolean selected;
 
@@ -31,13 +33,18 @@ public class SimpleCheckBox extends CheckboxButton
 
     public SimpleCheckBox(int x, int y, int width, int height, ITextComponent title, boolean checked, boolean drawTitle)
     {
-        super(x, y, width, height, title, checked, drawTitle);
-        this.selected = checked;
+        this(x, y, width, height, title, new StringTextComponent(""), checked, drawTitle, null);
     }
 
-    public SimpleCheckBox(int x, int y, int width, int height, ITextComponent tooltip, boolean checked, Callable<SimpleCheckBox> onPress)
+    public SimpleCheckBox(int x, int y, int width, int height, ITextComponent tooltip, boolean checked, Consumer<SimpleCheckBox> onPress)
     {
-        this(x, y, width, height, new StringTextComponent(""), checked, false);
+        this(x, y, width, height, new StringTextComponent(""), tooltip, checked, false, onPress);
+    }
+
+    public SimpleCheckBox(int x, int y, int width, int height, ITextComponent title, ITextComponent tooltip, boolean checked, boolean drawTitle, @Nullable Consumer<SimpleCheckBox> onPress)
+    {
+        super(x, y, width, height, title, checked, drawTitle);
+        this.selected = checked;
         this.tooltip = tooltip;
         this.onPress = onPress;
     }
@@ -64,12 +71,7 @@ public class SimpleCheckBox extends CheckboxButton
     @Override
     public void onPress()
     {
-        this.selected = !this.selected;
-        if(onPress != null)
-        {
-            onPress.run(this);
-            ClientUtils.playSound(SoundEvents.UI_BUTTON_CLICK, 1F, 0.25F, SoundCategory.MASTER, false);
-        }
+        this.setSelected(!this.selected);
     }
 
     @Override
@@ -95,5 +97,10 @@ public class SimpleCheckBox extends CheckboxButton
     public void setSelected(boolean selected)
     {
         this.selected = selected;
+        if(onPress != null)
+        {
+            onPress.accept(this);
+            ClientUtils.playSound(SoundEvents.UI_BUTTON_CLICK, 1F, 0.25F, SoundCategory.MASTER, false);
+        }
     }
 }

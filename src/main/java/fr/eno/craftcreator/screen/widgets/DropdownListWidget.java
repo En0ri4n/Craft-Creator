@@ -5,149 +5,87 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.ScreenUtils;
 import fr.eno.craftcreator.base.SupportedMods;
-import fr.eno.craftcreator.utils.Callable;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 
-import javax.annotation.Nonnull;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-// TODO: Extend SimpleListWidget
-public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends Widget
+public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends SimpleListWidget
 {
-    private T selected;
-    private List<T> entries;
+    private static final ResourceLocation BACKGROUND = new ResourceLocation("textures/block/stone.png");
 
-    private final int x0;
-    private final int y0;
-    private final int x1;
-    private final int y1;
+    private T dropdownSelected;
 
-    private final int itemHeight;
-    private final int maxItems;
+    private final int dropdownFieldX;
+    private final int dropdownFieldY;
+    private final int dropdownFieldWidth;
+    private final int dropdownFieldHeight;
 
-    private int scrollAmount;
-
+    private final Consumer<T> onSelected;
+    private boolean focused;
     private boolean hovered;
-    private boolean scrolling;
-    private final Callable<T> onSelected;
 
-    public DropdownListWidget(int x, int y, int width, int height, int itemHeight, List<T> entries, Callable<T> onSelected)
+    public DropdownListWidget(int x, int y, int width, int height, int itemHeight, ArrayList<T> entries, Consumer<T> onSelected)
     {
-        super(x, y, width, height, new StringTextComponent(""));
-        this.itemHeight = itemHeight;
-        this.maxItems = 10;
-        this.entries = entries;
-        this.selected = entries.get(0);
-
-        this.x0 = x;
-        this.y0 = y;
-        this.x1 = x + width;
-        this.y1 = y + height + (Math.min(entries.size(), maxItems)) * itemHeight;
+        super(x, y + height, width, Math.min(entries.size(), MAX_ITEMS_DISPLAYED) * itemHeight, itemHeight, 0, 4, new StringTextComponent(""), null, false);
+        this.setEntries(entries);
+        this.dropdownSelected = entries.get(0);
+        this.dropdownFieldX = x;
+        this.dropdownFieldY = y;
+        this.dropdownFieldWidth = width;
+        this.dropdownFieldHeight = height;
         this.onSelected = onSelected;
     }
 
     @Override
-    public void renderButton(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        this.hovered = ScreenUtils.isMouseHover(x, y, mouseX, mouseY, width, height);
+        this.hovered = ScreenUtils.isMouseHover(dropdownFieldX, dropdownFieldY, mouseX, mouseY, dropdownFieldWidth, dropdownFieldHeight);
 
-        ClientUtils.color4f(1.0F, 1.0F, 1.0F, this.alpha);
+        ClientUtils.color4f(1.0F, 1.0F, 1.0F, 1F);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.enableDepthTest();
-        Screen.fill(matrixStack, this.x, this.y, this.x + this.width, this.y + this.height, 0xf2c3a942);
-        Screen.fill(matrixStack, this.x + 1, this.y + 1, this.x + this.width - 1, this.y + this.height - 1, Color.DARK_GRAY.getRGB());
+        Screen.fill(matrixStack, this.dropdownFieldX, this.dropdownFieldY, this.dropdownFieldX + this.dropdownFieldWidth, this.dropdownFieldY + this.dropdownFieldHeight, 0xf2c3a942);
+        Screen.fill(matrixStack, this.dropdownFieldX + 1, this.dropdownFieldY + 1, this.dropdownFieldX + this.dropdownFieldWidth - 1, this.dropdownFieldY + this.dropdownFieldHeight - 1, Color.DARK_GRAY.getRGB());
         int color = 0xFFFFFFFF;
-        drawCenteredString(matrixStack, ClientUtils.getFontRenderer(), this.getMessage().copy().append(" ▼"), this.x + this.width / 2, this.y + height / 2 - ClientUtils.getFontRenderer().lineHeight / 2, color | MathHelper.ceil(this.alpha * 255.0F) << 24);
+        drawCenteredString(matrixStack, ClientUtils.getFontRenderer(), this.getMessage().copy().append(" ▼"), this.dropdownFieldX + this.dropdownFieldWidth / 2, this.dropdownFieldY + dropdownFieldHeight / 2 - ClientUtils.getFontRenderer().lineHeight / 2, color);
 
-        if(this.isFocused())
+        if(isFocused())
         {
-            Screen.fill(matrixStack, x0, y0 + height, x1, y1, 0x88C0C0C0);
-            if(getMaxScrollAmount() > 0)
-            {
-                int scrollBarX0 = x + width - 4;
-                int scrollBarX1 = x + width;
-
-                RenderSystem.disableTexture();
-                int y0 = this.y0 + height;
-                int currentHeight = (int) ((float) ((this.y1 - y0) * (this.y1 - y0)) / (float) this.getMaxPosition());
-                currentHeight = MathHelper.clamp(currentHeight, 32, this.y1 - y0 - 8);
-                int currentY = this.scrollAmount * (this.y1 - y0 - currentHeight) / getMaxScrollAmount() + y0;
-                if(currentY < y0)
-                {
-                    currentY = y0;
-                }
-
-                Screen.fill(matrixStack, scrollBarX0, y0, scrollBarX1, this.y1, 0xFF101010);
-                Screen.fill(matrixStack, scrollBarX0, currentY, scrollBarX1, currentY + currentHeight, 0xFFA0A0A0);
-                Screen.fill(matrixStack, scrollBarX0, currentY, scrollBarX1 - 1, currentY + currentHeight - 1, 0xFF303030);
-            }
-
-            for(int i = 0; i < entries.size(); ++i)
-            {
-                int rowTop = getRowTop(i);
-                int rowBottom = this.getRowBottom(i);
-                if(rowTop >= this.y0 + height && rowBottom <= this.y1)
-                {
-                    T entry = this.entries.get(i);
-                    int rowWidth = this.getRowWidth();
-                    int rowLeft = this.x0;
-                    RenderSystem.pushMatrix();
-                    RenderSystem.translatef(0.0F, 0.0F, 100.0F);
-                    entry.render(matrixStack, i, rowLeft, rowTop, rowWidth, itemHeight, mouseX, mouseY, ScreenUtils.isMouseHover(rowLeft, rowTop, mouseX, mouseY, rowWidth, itemHeight));
-                    RenderSystem.popMatrix();
-                }
-            }
+            matrixStack.pushPose();
+            matrixStack.translate(0, 0, 200);
+            super.render(matrixStack, mouseX, mouseY, partialTicks);
+            matrixStack.popPose();
         }
     }
 
-    protected int getRowWidth()
-    {
-        return getScrollbarPosition();
-    }
-
-    protected int getRowTop(int index)
-    {
-        return this.y0 - this.getScrollAmount() + index * this.itemHeight + this.height;
-    }
-
-    private int getRowBottom(int index)
-    {
-        return this.getRowTop(index) + this.itemHeight;
-    }
-
-    private int getMaxScrollAmount()
-    {
-        return Math.max(0, this.getMaxPosition() - (maxItems * itemHeight - 4));
-    }
-
-    private int getScrollAmount()
-    {
-        return this.scrollAmount;
-    }
-
-    protected int getScrollbarPosition()
-    {
-        return getMaxScrollAmount() > 0 ? width - 4 : width;
-    }
-
-    protected int getMaxPosition()
-    {
-        return this.entries.size() * this.itemHeight + height + itemHeight * 2;
-    }
-
-    @Nonnull
     @Override
+    protected ResourceLocation getBackgroundTile()
+    {
+        return BACKGROUND;
+    }
+
+    protected int getIndex(T entry)
+    {
+        return this.getEntries().indexOf(entry);
+    }
+
+    public List<T> getDropdownEntries()
+    {
+        return this.children().stream().map(e -> (T) e).collect(Collectors.toList());
+    }
+
     public ITextComponent getMessage()
     {
-        return this.getSelectedEntry().getDisplayName();
+        return this.getDropdownSelected().getDisplayName(getIndex(getDropdownSelected()));
     }
 
     @Override
@@ -161,144 +99,90 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
 
         if(isFocused())
         {
-            this.updateScrollingState(mouseX, mouseY, button);
+            super.mouseClicked(mouseX, mouseY, button);
 
-            if(!ScreenUtils.isMouseHover(x0, y0 + height, (int) mouseX, (int) mouseY, x1 - x0, y1 - y0 - height))
+            if(!ScreenUtils.isMouseHover(dropdownFieldX, dropdownFieldY + dropdownFieldHeight, (int) mouseX, (int) mouseY, dropdownFieldWidth, height))
             {
                 this.setFocused(false);
-                return false;
+                return true;
             }
 
-            T entry = this.getEntryAtPosition(mouseX, mouseY);
-
-            if(entry != null)
+            if(this.getEntryAtPosition(mouseX, mouseY) != null && this.getSelected() != null)
             {
-                this.setSelected(entry);
+                this.setDropdownSelected((T) this.getSelected());
                 this.setFocused(false);
-                return false;
+                return true;
             }
         }
 
         return false;
     }
 
-    public List<T> getEntries()
+    private void setFocused(boolean isFocused)
     {
-        return entries;
-    }
-
-    public void setEntries(List<T> entries)
-    {
-        this.entries = entries;
-        this.scrollAmount = 0;
-        this.setSelected(entries.get(0));
-    }
-
-    public void setSelected(T entry)
-    {
-        this.selected = entry;
-        if(this.onSelected != null) this.onSelected.run(entry);
+        this.focused = isFocused;
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double p_231045_6_, double p_231045_8_)
+    public boolean isFocused()
     {
-        if(super.mouseDragged(mouseX, mouseY, button, p_231045_6_, p_231045_8_))
-        {
-            return true;
-        }
-        else if(button == 0 && this.scrolling)
-        {
-            if(mouseY < (double) this.y0)
-            {
-                this.setScrollAmount(0.0D);
-            }
-            else if(mouseY > (double) this.y1)
-            {
-                this.setScrollAmount(this.getMaxScrollAmount());
-            }
-            else
-            {
-                double d0 = Math.max(1, this.getMaxScrollAmount());
-                int i = this.y1 - this.y0;
-                int j = MathHelper.clamp((int) ((float) (i * i) / (float) this.getMaxPosition()), 32, i - 8);
-                double d1 = Math.max(1.0D, d0 / (double) (i - j));
-                this.setScrollAmount(this.getScrollAmount() + p_231045_8_ * d1);
-            }
-
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return focused;
     }
 
-    protected void updateScrollingState(double mouseX, double mouseY, int button)
+    public void setEntries(ArrayList<T> entries)
     {
-        this.scrolling = button == 0 && mouseX >= (double) this.getScrollbarPosition() && mouseX < (double) (this.getScrollbarPosition() + 6);
+        this.setEntries(entries, true);
+        this.setDropdownSelected(entries.get(0));
     }
 
-    @Override
-    public boolean mouseScrolled(double p_231043_1_, double p_231043_3_, double scroll)
+    public void setDropdownSelected(T entry)
     {
-        this.setScrollAmount(this.scrollAmount - scroll * (double) this.itemHeight / 2.0D);
-        return super.mouseScrolled(p_231043_1_, p_231043_3_, scroll);
+        this.setSelected(entry);
+        this.dropdownSelected = entry;
+        if(this.onSelected != null) this.onSelected.accept(entry);
     }
 
-    private void setScrollAmount(double scrollAmount)
+    public T getDropdownSelected()
     {
-        this.scrollAmount = (int) Math.max(0, Math.min(scrollAmount, this.getMaxScrollAmount()));
+        return this.dropdownSelected;
     }
 
-    private T getEntryAtPosition(double mouseX, double mouseY)
+    public void insertEntryBefore(T entry, T before)
     {
-        for(int i = 0; i < entries.size(); ++i)
-        {
-            int rowTop = getRowTop(i);
-            int rowBottom = this.getRowBottom(i);
-            if(rowTop >= this.y0 + height && rowBottom <= this.y1)
-            {
-                T entry = this.entries.get(i);
-                int rowWidth = this.getRowWidth();
-
-                if(ScreenUtils.isMouseHover(this.x0, rowTop, (int) mouseX, (int) mouseY, rowWidth, itemHeight)) return entry;
-            }
-        }
-        return null;
+        this.getEntries().add(this.getEntries().indexOf(before), entry);
     }
 
-    public T getSelectedEntry()
+    public void removeEntry(T entry)
     {
-        return this.selected;
+        if(entry == this.dropdownSelected)
+            setDropdownSelected(this.getDropdownEntries().get(0));
+        this.getEntries().remove(entry);
     }
 
     public static class Entries
     {
-        public static List<StringEntry> getRecipeTypes(String modid)
+        public static ArrayList<StringEntry> getRecipeTypes(String modid)
         {
             SupportedMods mod = SupportedMods.getMod(modid);
-            return mod.getSupportedRecipeTypes().stream().map(recipeTypeLocation -> new StringEntry(recipeTypeLocation.toString(), new StringTextComponent(recipeTypeLocation.toString()))).collect(Collectors.toList());//Registry.RECIPE_TYPE.stream().filter(type -> CommonUtils.getRecipeTypeName(type).getNamespace().equals(modid)).map(recipeType -> new DropdownListWidget.StringEntry(CommonUtils.getRecipeTypeName(recipeType).toString(), new StringTextComponent(CommonUtils.getRecipeTypeName(recipeType).toString()))).collect(Collectors.toList());
+            return mod.getSupportedRecipeTypes().stream().map(recipeTypeLocation -> new StringEntry(recipeTypeLocation.toString(), new StringTextComponent(recipeTypeLocation.toString()))).collect(Collectors.toCollection(ArrayList::new));//Registry.RECIPE_TYPE.stream().filter(type -> CommonUtils.getRecipeTypeName(type).getNamespace().equals(modid)).map(recipeType -> new DropdownListWidget.StringEntry(CommonUtils.getRecipeTypeName(recipeType).toString(), new StringTextComponent(CommonUtils.getRecipeTypeName(recipeType).toString()))).collect(Collectors.toList());
         }
 
-        public static List<StringEntry> getModIds()
+        public static ArrayList<StringEntry> getModIds()
         {
-            return SupportedMods.getSupportedLoadedMods().stream().map(mod -> new StringEntry(mod.getModId(), new StringTextComponent(mod.getModId()))).collect(Collectors.toList());
+            return SupportedMods.getSupportedLoadedMods().stream().map(mod -> new StringEntry(mod.getModId(), new StringTextComponent(mod.getModId()))).collect(Collectors.toCollection(ArrayList::new));
         }
     }
 
-    public static abstract class Entry<T>
+    public static abstract class Entry<T> extends SimpleListWidget.Entry
     {
-        private Entry() {}
+        protected Entry() {}
 
         public abstract T getValue();
 
-        public abstract IFormattableTextComponent getDisplayName();
-
-        public abstract void render(MatrixStack matrixStack, int index, int x, int y, int width, int itemHeight, int mouseX, int mouseY, boolean hovered);
+        public abstract IFormattableTextComponent getDisplayName(int index);
     }
 
-    public static class StringEntry extends Entry<String>
+    public static class StringEntry extends DropdownListWidget.Entry<String>
     {
         private final String value;
         private final IFormattableTextComponent displayName;
@@ -310,7 +194,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
         }
 
         @Override
-        public void render(MatrixStack matrixStack, int index, int x, int y, int width, int itemHeight, int mouseX, int mouseY, boolean hovered)
+        public void render(MatrixStack matrixStack, int index, int top, int left, int width, int itemHeight, int mouseX, int mouseY, boolean hovered, float partialTicks)
         {
             int color = 0xFFFFFF;
             if(hovered)
@@ -318,11 +202,13 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
                 color = 0xf2c3a942;
             }
 
-            Screen.fill(matrixStack, x, y, x + width, y + itemHeight, 0xFF000000);
-            Screen.fill(matrixStack, x + 1, y + 1, x + width - 1, y + itemHeight - 1, 0xFF585858);
+            Screen.fill(matrixStack, left, top, left + width - 3, top + itemHeight, 0xFF000000);
+            Screen.fill(matrixStack, left, top, left + width - 4, top + itemHeight, 0xFF585858);
 
+            matrixStack.pushPose();
             matrixStack.translate(0, 0, 100);
-            ClientUtils.getFontRenderer().draw(matrixStack, this.displayName.getString(), x + 2, y + Math.floorDiv(itemHeight - 8, 2), color);
+            ClientUtils.getFontRenderer().draw(matrixStack, this.displayName.getString(), left + 2, top + Math.floorDiv(itemHeight - 8, 2), color);
+            matrixStack.popPose();
         }
 
         @Override
@@ -332,9 +218,21 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends W
         }
 
         @Override
-        public IFormattableTextComponent getDisplayName()
+        public IFormattableTextComponent getDisplayName(int index)
         {
             return this.displayName;
+        }
+
+        @Override
+        public void renderTooltip(MatrixStack matrixStack, int mouseX, int mouseY)
+        {
+
+        }
+
+        @Override
+        public String getEntryValue()
+        {
+            return this.displayName.getString();
         }
     }
 }

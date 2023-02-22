@@ -2,7 +2,9 @@ package fr.eno.craftcreator.container.base;
 
 import fr.eno.craftcreator.base.ModRecipeCreator;
 import fr.eno.craftcreator.base.SupportedMods;
+import fr.eno.craftcreator.container.slot.DefinedSlot;
 import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
+import fr.eno.craftcreator.container.slot.utils.DefinedPositionnedSlot;
 import fr.eno.craftcreator.container.slot.utils.PositionnedSlot;
 import fr.eno.craftcreator.tileentity.base.MultiScreenRecipeCreatorTile;
 import net.minecraft.entity.player.PlayerEntity;
@@ -12,6 +14,8 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 
+import java.util.List;
+
 public abstract class CommonContainer extends VanillaCommonContainer
 {
     protected final MultiScreenRecipeCreatorTile tile;
@@ -20,6 +24,21 @@ public abstract class CommonContainer extends VanillaCommonContainer
     {
         super(pMenuType, pContainerId);
         this.tile = (MultiScreenRecipeCreatorTile) inventory.player.level.getBlockEntity(byteBuf.readBlockPos());
+    }
+
+    protected void addSlots(List<PositionnedSlot> slots)
+    {
+        for(PositionnedSlot positionnedSlot : slots)
+        {
+            int x = positionnedSlot.getxPos();
+            int y = positionnedSlot.getyPos();
+            int index = positionnedSlot.getIndex();
+
+            if(positionnedSlot instanceof DefinedPositionnedSlot)
+                this.addSlot(new DefinedSlot(tile, index, x, y, ((DefinedPositionnedSlot) positionnedSlot)::isItemValid));
+            else
+                this.addSlot(new SimpleSlotItemHandler(tile, index, x, y));
+        }
     }
     
     public abstract SupportedMods getMod();
@@ -169,46 +188,4 @@ public abstract class CommonContainer extends VanillaCommonContainer
         }
         return flag;
     }
-    
-    /*
-    @Override
-    public ItemStack quickMoveStack(PlayerEntity playerIn, int index)
-    {
-        ModRecipeCreator mod = ModRecipeCreator.byName(tile.getCurrentRecipeType());
-        
-        int playerInvSize = 4 * 9;
-        int slotIndexPlayerInventoryStart = this.slots.size() - playerInvSize;
-
-        ItemStack itemstack = ItemStack.EMPTY;
-        Slot slot = this.slots.get(index);
-
-        if(slot != null && slot.hasItem() && slot.isActive())
-        {
-            ItemStack slotItem = slot.getItem();
-            itemstack = slotItem.copy();
-
-            if(index > slotIndexPlayerInventoryStart)
-            {
-                if(!this.moveItemStackTo(slotItem, index, index + mod.getSlots().size(), false))
-                {
-                    return ItemStack.EMPTY;
-                }
-            }
-            else if(!this.moveItemStackTo(slotItem, slotIndexPlayerInventoryStart, slotIndexPlayerInventoryStart + playerInvSize, false))
-            {
-                return ItemStack.EMPTY;
-            }
-
-            if(slotItem.getCount() == 0)
-            {
-                slot.set(ItemStack.EMPTY);
-            }
-            else
-            {
-                slot.setChanged();
-            }
-        }
-
-        return itemstack;
-    }*/
 }

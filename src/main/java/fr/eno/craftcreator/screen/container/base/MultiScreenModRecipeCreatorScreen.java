@@ -18,7 +18,7 @@ import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import fr.eno.craftcreator.screen.widgets.ButtonGrid;
 import fr.eno.craftcreator.screen.widgets.NumberDataFieldWidget;
 import fr.eno.craftcreator.screen.widgets.buttons.ExecuteButton;
-import fr.eno.craftcreator.screen.widgets.buttons.IconButton;
+import fr.eno.craftcreator.screen.widgets.buttons.ItemIconButton;
 import fr.eno.craftcreator.screen.widgets.buttons.SimpleButton;
 import fr.eno.craftcreator.screen.widgets.buttons.SimpleCheckBox;
 import net.minecraft.client.gui.screen.Screen;
@@ -51,8 +51,8 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     protected SimpleButton nextButton;
     protected SimpleButton previousButton;
     
-    protected ButtonGrid<IconButton> buttonGrid;
-    protected IconButton recipeTypeButton;
+    protected ButtonGrid<ItemIconButton> buttonGrid;
+    protected ItemIconButton recipeTypeButton;
     
     protected final List<NumberDataFieldWidget> dataFields;
     
@@ -72,7 +72,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
 
         initFields();
         
-        this.buttonGrid = new ButtonGrid<>(this.leftPos + this.imageWidth, this.topPos, 20, 2, 4, IconButton.getButtons(getAvailableRecipesCreator().stream().map(this::getRecipeIcon).collect(Collectors.toList())), (button) ->
+        this.buttonGrid = new ButtonGrid<>(this.leftPos + this.imageWidth, this.topPos, 20, 2, 4, ItemIconButton.getButtons(getAvailableRecipesCreator().stream().map(this::getRecipeIcon).collect(Collectors.toList())), (button) ->
         {
             this.currentScreenIndex = this.buttonGrid.getButtons().indexOf(button);
             updateData();
@@ -81,7 +81,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
             this.recipeTypeButton.setItem(button.getItem());
         });
         
-        addButton(this.recipeTypeButton = new IconButton(this.leftPos + imageWidth - 20, this.topPos, ItemStack.EMPTY, button -> this.buttonGrid.setVisible(!this.buttonGrid.isVisible())));
+        addButton(this.recipeTypeButton = new ItemIconButton(this.leftPos + imageWidth - 20, this.topPos, ItemStack.EMPTY, button -> this.buttonGrid.setVisible(!this.buttonGrid.isVisible())));
         
         if(isVanillaScreen)
         {
@@ -460,7 +460,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     {
         for(int i = 0; i < count; i++)
         {
-            NumberDataFieldWidget numberDataFieldWidget = new NumberDataFieldWidget(this.font, x, y, width, 10, defaultValue, defaultValue instanceof Double);
+            NumberDataFieldWidget numberDataFieldWidget = new NumberDataFieldWidget(x, y, width, 10, defaultValue, defaultValue instanceof Double);
             numberDataFieldWidget.setValue(String.valueOf(defaultValue));
             this.dataFields.add(numberDataFieldWidget);
         }

@@ -4,7 +4,6 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.ScreenUtils;
-import fr.eno.craftcreator.utils.Callable;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.Rectangle2d;
@@ -12,6 +11,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class GuiList<T> implements IOutsideWidget
 {
@@ -96,7 +96,7 @@ public class GuiList<T> implements IOutsideWidget
         return max;
     }
 
-    public void mouseClicked(int mouseX, int mouseY, Callable<T> result)
+    public void mouseClicked(int mouseX, int mouseY, Consumer<T> result)
     {
         if(this.getKeys() == null) return;
 
@@ -113,13 +113,13 @@ public class GuiList<T> implements IOutsideWidget
                 if(i >= this.keys.size())
                 {
                     this.setSelectedKey(null);
-                    result.run(null);
+                    result.accept(null);
                     ClientUtils.getMinecraft().getSoundManager().play(SimpleSound.forUI(SoundEvents.UI_BUTTON_CLICK, 1F));
                     continue;
                 }
 
                 this.setSelectedKey(this.keys.get(i));
-                result.run(this.getSelectedKey());
+                result.accept(this.getSelectedKey());
                 ClientUtils.getMinecraft().getSoundManager().play(SimpleSound.forUI(SoundEvents.UI_BUTTON_CLICK, 1F));
             }
         }

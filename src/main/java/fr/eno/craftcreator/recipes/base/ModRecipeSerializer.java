@@ -44,7 +44,7 @@ public abstract class ModRecipeSerializer
     {
         if(serializerType == SerializerType.KUBE_JS)
         {
-            String serializedRecipe = String.format("event.%s(%s)", KubeJSModifiedRecipe.KubeJSModifiedRecipeType.REMOVED.getDescriptor(), GSON.toJson(kubeJSModifiedRecipe.toJson()));
+            String serializedRecipe = kubeJSModifiedRecipe.getBaseLine().format(KubeJSModifiedRecipe.KubeJSModifiedRecipeType.REMOVED.getDescriptor(), kubeJSModifiedRecipe.toJson());
 
             if(!KubeJSHelper.isModifiedRecipePresent(mod, kubeJSModifiedRecipe)) KubeJSHelper.addModifiedRecipe(mod, serializedRecipe);
         }
@@ -52,7 +52,7 @@ public abstract class ModRecipeSerializer
 
     public void addModifiedRecipe(KubeJSModifiedRecipe kubeJSModifiedRecipe)
     {
-        String serializedRecipe = String.format("event.%s(%s)", kubeJSModifiedRecipe.getType().getDescriptor(), GSON.toJson(kubeJSModifiedRecipe.toJson()));
+        String serializedRecipe = kubeJSModifiedRecipe.getBaseLine().format(kubeJSModifiedRecipe.getType().getDescriptor(), kubeJSModifiedRecipe.toJson());
 
         if(!KubeJSHelper.isModifiedRecipePresent(mod, kubeJSModifiedRecipe)) KubeJSHelper.addModifiedRecipe(this.mod, serializedRecipe);
     }
@@ -77,7 +77,7 @@ public abstract class ModRecipeSerializer
         switch(currentSerializeType)
         {
             case KUBE_JS:
-                feedback = KubeJSHelper.addRecipeToFile(this.mod, recipeType, String.format("event.custom(%s)", GSON.toJson(recipeJson)));
+                feedback = KubeJSHelper.addRecipeToFile(this.mod, recipeType, KubeJSModifiedRecipe.BASE_LINE.format(KubeJSModifiedRecipe.KubeJSModifiedRecipeType.CUSTOM, GSON.toJson(recipeJson)));
                 break;
             default:
             case MINECRAFT_DATAPACK:

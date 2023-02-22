@@ -13,7 +13,6 @@ import fr.eno.craftcreator.base.ModRecipeCreatorDispatcher;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;
 import fr.eno.craftcreator.recipes.utils.CraftIngredients;
-import fr.eno.craftcreator.utils.Callable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.list.AbstractList;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -23,6 +22,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.tags.ITag;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.IFormattableTextComponent;
@@ -36,27 +37,31 @@ import org.lwjgl.glfw.GLFW;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("deprecation")
 public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
 {
-    private static final ResourceLocation BACKGROUND_TILE = References.getLoc("textures/gui/background_tile.png");
+    private static final ResourceLocation BACKGROUND_TILE = References.getLoc("textures/gui/widgets/background_tile.png");
+    protected static final int MAX_ITEMS_DISPLAYED = 10;
+
     private final ITextComponent title;
     private final int titleBoxHeight;
     private final int scrollBarWidth;
     private final boolean canDelete;
     private boolean canHaveSelected;
     private final boolean hasTitleBox;
-    private Callable<Entry> onSelected;
+    private Consumer<Entry> onSelected;
     private boolean isVisible;
-    private final Callable<Entry> onDelete;
+    private final Consumer<Entry> onDelete;
     private Entry hoveredEntry;
     private boolean isListHovered;
     private boolean canDisplayTooltips;
 
-    public SimpleListWidget(int leftIn, int topIn, int widthIn, int heightIn, int slotHeightIn, int titleBoxHeight, int scrollBarWidth, ITextComponent titleIn, @Nullable Callable<Entry> onDelete, boolean canDelete)
+    public SimpleListWidget(int leftIn, int topIn, int widthIn, int heightIn, int slotHeightIn, int titleBoxHeight, int scrollBarWidth, ITextComponent titleIn, @Nullable Consumer<Entry> onDelete, boolean canDelete)
     {
         super(ClientUtils.getMinecraft(), widthIn - scrollBarWidth, heightIn - titleBoxHeight, 0, 0, slotHeightIn);
         this.x0 = leftIn;
@@ -72,6 +77,11 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         this.onDelete = onDelete;
         this.canDisplayTooltips = true;
         this.canDelete = canDelete;
+    }
+
+    public List<Entry> getEntries()
+    {
+        return children();
     }
     
     public int getSize()
@@ -92,7 +102,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
     @Override
     public int getRowWidth()
     {
-        return this.width - 4;
+        return this.width - this.scrollBarWidth;
     }
 
     @Override
@@ -114,12 +124,12 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         }
 
         this.hoveredEntry = this.isMouseOver(pMouseX, pMouseY) ? this.getEntryAtPosition(pMouseX, pMouseY) : null;
-        this.isListHovered = ScreenUtils.isMouseHover(x0, y0, pMouseX, pMouseY, width, height - itemHeight);
+        this.isListHovered = ScreenUtils.isMouseHover(x0, y0, pMouseX, pMouseY, x1 - x0, y1 - y0);
         Tessellator tesselator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tesselator.getBuilder();
 
         // Render background
-        ClientUtils.bindTexture(BACKGROUND_TILE);
+        ClientUtils.bindTexture(getBackgroundTile());
         ClientUtils.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         int alpha = 100;
         bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
@@ -135,7 +145,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         this.renderList(pPoseStack, rowLeft, k, pMouseX, pMouseY, pPartialTick);
 
         int scrollbarPosition = this.getScrollbarPosition();
-        int j = scrollbarPosition + 6;
+        int scrollBarPosX1 = scrollbarPosition + scrollBarWidth;
         int maxScroll = this.getMaxScroll();
         if(maxScroll > 0)
         {
@@ -149,9 +159,9 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
             }
 
             bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-            ClientUtils.renderQuad(bufferbuilder, scrollbarPosition, this.y0, j, this.y1, 0, 0, 0, 255);
-            ClientUtils.renderQuad(bufferbuilder, scrollbarPosition, i2, j, i2 + l1, 128, 128, 128, 255);
-            ClientUtils.renderQuad(bufferbuilder, scrollbarPosition, i2, j, i2 + 1, 192, 192, 192, 255);
+            ClientUtils.renderQuad(bufferbuilder, scrollbarPosition, this.y0, scrollBarPosX1, this.y1, 0, 0, 0, 255);
+            ClientUtils.renderQuad(bufferbuilder, scrollbarPosition, i2, scrollBarPosX1, i2 + l1, 128, 128, 128, 255);
+            ClientUtils.renderQuad(bufferbuilder, scrollbarPosition, i2, scrollBarPosX1, i2 + 1, 192, 192, 192, 255);
             tesselator.end();
         }
 
@@ -205,6 +215,21 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         }
     }
 
+    /**
+     * Returns true if the mouse is over the list.<br>
+     * (Due to the way scrollbar width is not included in the list width, this override check if the mouse is over the scrollbar too)
+     */
+    @Override
+    public boolean isMouseOver(double pMouseX, double pMouseY)
+    {
+        return pMouseX >= this.x0 && pMouseX <= this.x1 + this.scrollBarWidth && pMouseY >= this.y0 && pMouseY <= this.y1;
+    }
+
+    protected ResourceLocation getBackgroundTile()
+    {
+        return BACKGROUND_TILE;
+    }
+
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers)
     {
@@ -212,7 +237,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         {
             if(this.getSelected() != null && this.onDelete != null && canDelete)
             {
-                this.onDelete.run(this.getSelected());
+                this.onDelete.accept(this.getSelected());
                 this.setSelected(null);
             }
         }
@@ -258,6 +283,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         entries.forEach(this::addEntry);
         if(resetScroll)
             this.setScrollAmount(0D);
+        this.height = Math.min(entries.size(), MAX_ITEMS_DISPLAYED) * itemHeight;
     }
 
     @Override
@@ -265,14 +291,13 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
     {
         if(this.onSelected != null)
         {
-            this.onSelected.run(entry);
-            this.onSelected = null;
+            this.onSelected.accept(entry);
         }
 
         super.setSelected(entry);
     }
 
-    public void setOnSelectedChange(Callable<Entry> onSelected)
+    public void setOnSelectedChange(Consumer<Entry> onSelected)
     {
         this.onSelected = onSelected;
     }
@@ -311,6 +336,10 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         isVisible = visible;
     }
 
+    public void tick()
+    {
+    }
+
     public abstract static class Entry extends AbstractList.AbstractListEntry<SimpleListWidget.Entry>
     {
         protected static final Gson gson = new GsonBuilder().setLenient().create();
@@ -323,15 +352,12 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
             this.tooltips = new ArrayList<>();
         }
 
-        public abstract String toString();
+        public abstract String getEntryValue();
 
         public abstract void renderTooltip(MatrixStack matrixStack, int mouseX, int mouseY);
 
         protected void displayTruncatedString(MatrixStack matrixStack, String stringToDisplay, int leftPos, int topPos, int width, int height, boolean hasItemDisplay, boolean isMouseOver)
         {
-            if(stringToDisplay.contains("/"))
-                stringToDisplay = stringToDisplay.substring(stringToDisplay.indexOf('/') + 1);
-
             stringToDisplay = getString(width, stringToDisplay);
 
             int color = isMouseOver ? 0xF1f115 : 0xFFFFFF;
@@ -429,7 +455,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
                     CraftIngredients.FluidIngredient fluidIngredient = (CraftIngredients.FluidIngredient) craftIngredient;
 
                     ingredientValue.append(new StringTextComponent(fluidIngredient.getId().toString()));
-                    ingredientValue.withStyle(TextFormatting.BLUE);
+                    ingredientValue.withStyle(TextFormatting.AQUA);
 
                     IFormattableTextComponent component = new StringTextComponent(" (");
                     component.append(String.valueOf(fluidIngredient.getAmount()));
@@ -537,7 +563,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         }
 
         @Override
-        public String toString()
+        public String getEntryValue()
         {
             return recipe.getId().toString();
         }
@@ -606,7 +632,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         }
 
         @Override
-        public String toString()
+        public String getEntryValue()
         {
             return null;
         }
@@ -646,7 +672,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         }
 
         @Override
-        public String toString()
+        public String getEntryValue()
         {
             return this.resource;
         }
@@ -665,10 +691,13 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
     public static class ResourceLocationEntry extends Entry
     {
         private final ResourceLocation resourceLocation;
+        /** Used to display all items if resource location is a tag */
+        private int counter;
 
         public ResourceLocationEntry(ResourceLocation resourceLocation)
         {
             this.resourceLocation = resourceLocation;
+            this.counter = 0;
         }
 
         public ResourceLocation getResourceLocation()
@@ -679,25 +708,32 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         @Override
         public void render(@Nonnull MatrixStack matrixStack, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean isMouseOver, float partialTicks)
         {
-            //Screen.fill(matrixStack, left, top, left + width, top + height, 0xFFFFFF);
+            Item item = ForgeRegistries.ITEMS.getValue(getResourceLocation());
+            ITag<Item> tag = ItemTags.getAllTags().getTag(getResourceLocation());
+
+            if(item == Items.AIR && tag.getValues().size() > 0)
+            {
+                if(counter / 40 >= tag.getValues().size())
+                    counter = 0;
+
+                item = tag.getValues().get(counter / 40);
+            }
 
             String displayStr = getString(width, resourceLocation.toString());
+            displayTruncatedString(matrixStack, displayStr, left, top, width, height, true, isMouseOver);
 
-            int color = isMouseOver ? 0xF1f115 : 0xFFFFFF;
-            matrixStack.pushPose();
-            float scale = 1.1F;
-            matrixStack.scale(scale, scale, scale);
-            Screen.drawCenteredString(matrixStack, ClientUtils.getFontRenderer(), displayStr, (int) ((left + width / 2) / scale), (int) ((top + height / 2 - (ClientUtils.getFontRenderer().lineHeight * scale) / 2) / scale), color);
-            matrixStack.popPose();
+            if(item != Items.AIR)
+            {
+                int yPos = height / 2 - 16 / 2;
+                ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(item), left + yPos, top + yPos);
+            }
 
-            Item item = ForgeRegistries.ITEMS.getValue(getResourceLocation());
-
-            int yPos = height / 2 - 16 / 2;
-            ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(item == null ? Items.BARRIER : item), left + yPos, top + yPos);
+            if(!Screen.hasShiftDown())
+                counter++;
         }
 
         @Override
-        public String toString()
+        public String getEntryValue()
         {
             return this.resourceLocation.toString();
         }
