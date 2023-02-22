@@ -60,7 +60,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends S
         if(isFocused())
         {
             matrixStack.pushPose();
-            matrixStack.translate(0, 0, 100);
+            matrixStack.translate(0, 0, 200);
             super.render(matrixStack, mouseX, mouseY, partialTicks);
             matrixStack.popPose();
         }
@@ -204,7 +204,10 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends S
             Screen.fill(matrixStack, left, top, left + width - 3, top + itemHeight, 0xFF000000);
             Screen.fill(matrixStack, left, top, left + width - 4, top + itemHeight, 0xFF585858);
 
+            matrixStack.pushPose();
+            matrixStack.translate(0, 0, 100);
             ClientUtils.getFontRenderer().draw(matrixStack, this.displayName.getString(), left + 2, top + Math.floorDiv(itemHeight - 8, 2), color);
+            matrixStack.popPose();
         }
 
         @Override

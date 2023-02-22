@@ -689,9 +689,7 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
     public static class ResourceLocationEntry extends Entry
     {
         private final ResourceLocation resourceLocation;
-        /**
-         * Used to display all items if resource location is a tag
-         */
+        /** Used to display all items if resource location is a tag */
         private int counter;
 
         public ResourceLocationEntry(ResourceLocation resourceLocation)

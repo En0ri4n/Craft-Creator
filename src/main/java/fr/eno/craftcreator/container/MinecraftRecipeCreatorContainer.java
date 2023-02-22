@@ -1,6 +1,5 @@
 package fr.eno.craftcreator.container;
 
-
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.container.base.CommonContainer;
 import fr.eno.craftcreator.init.InitContainers;
