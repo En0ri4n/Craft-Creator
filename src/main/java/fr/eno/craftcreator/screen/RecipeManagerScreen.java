@@ -107,7 +107,7 @@ public class RecipeManagerScreen extends ListScreen
         updateLists(true);
         this.getLists().forEach(slw -> slw.setCanHaveSelected(true));
 
-        this.addButton(new SimpleButton(References.getTranslate("screen.recipe_manager.button.back"), this.width / 2 - 40, this.height - bottomHeight - 7, 80, 20, button -> ClientUtils.openScreen(null)));
+        this.addButton(new SimpleButton(References.getTranslate("screen.button.back"), this.width / 2 - 40, this.height - bottomHeight - 7, 80, 20, button -> ClientUtils.openScreen(null)));
         this.addButton(new SimpleButton(References.getTranslate("screen.recipe_manager.button.remove_recipe"), this.width - 130, this.height - bottomHeight - 7, 120, 20, button -> ClientUtils.openScreen(new RemoveRecipeManagerScreen())));
     }
 
