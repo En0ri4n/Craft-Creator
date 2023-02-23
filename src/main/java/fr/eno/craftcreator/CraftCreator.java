@@ -65,6 +65,7 @@ public class CraftCreator
         event.enqueueWork(() ->
         {
             ClientRegistry.registerKeyBinding(ClientUtils.KEY_OPEN_RECIPES_MENU);
+            ClientRegistry.registerKeyBinding(ClientUtils.KEY_OPEN_TUTORIAL);
 
             ClientUtils.registerScreen(InitContainers.MINECRAFT_RECIPE_CREATOR.get(), MinecraftRecipeCreatorScreen::new);
             ClientUtils.registerScreen(InitContainers.BOTANIA_RECIPE_CREATOR.get(), BotaniaRecipeCreatorScreen::new);

@@ -1,6 +1,5 @@
 package fr.eno.craftcreator.api;
 
-
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.VertexFormat;
@@ -16,6 +15,7 @@ import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -39,6 +39,7 @@ import java.util.function.Supplier;
 public class ClientUtils
 {
     public static final KeyMapping KEY_OPEN_RECIPES_MENU = new KeyMapping("key.craftcreator.open_recipes_menu", GLFW.GLFW_KEY_K, "key.categories.craft_creator");
+    public static final KeyMapping KEY_OPEN_TUTORIAL = new KeyMapping("key.craftcreator.open_tutorial", GLFW.GLFW_KEY_J, "key.categories.craft_creator");
 
     private static final Supplier<Minecraft> minecraftSupplier = Minecraft::getInstance;
 
