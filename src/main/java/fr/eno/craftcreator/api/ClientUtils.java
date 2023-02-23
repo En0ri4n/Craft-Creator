@@ -3,7 +3,6 @@ package fr.eno.craftcreator.api;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.base.SupportedMods;
-import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.SimpleSound;
@@ -37,6 +36,7 @@ import java.util.function.Supplier;
 public class ClientUtils
 {
     public static final KeyBinding KEY_OPEN_RECIPES_MENU = new KeyBinding("key.craftcreator.open_recipes_menu", GLFW.GLFW_KEY_K, "key.categories.craft_creator");
+    public static final KeyBinding KEY_OPEN_TUTORIAL = new KeyBinding("key.craftcreator.open_tutorial", GLFW.GLFW_KEY_J, "key.categories.craft_creator");
 
     private static final Supplier<Minecraft> minecraftSupplier = Minecraft::getInstance;
 
@@ -142,30 +142,6 @@ public class ClientUtils
     public static int width(String str)
     {
         return getFontRenderer().width(str);
-    }
-
-    /**
-     * Sort a list of entry with the specified token
-     *
-     * @param token  the string to found
-     * @param inputs a list of entries
-     * @return a non-null list with entries which match the token
-     */
-    public static List<SimpleListWidget.Entry> copyPartialMatches(String token, List<SimpleListWidget.Entry> inputs)
-    {
-        List<SimpleListWidget.Entry> list = new ArrayList<>();
-        if(!token.isEmpty())
-        {
-            for(SimpleListWidget.Entry s : inputs)
-            {
-                if(s.getEntryValue().contains(token))
-                {
-                    list.add(s);
-                }
-            }
-        }
-
-        return list;
     }
 
     /**

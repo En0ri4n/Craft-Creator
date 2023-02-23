@@ -4,6 +4,7 @@ import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.screen.RecipeManagerScreen;
+import fr.eno.craftcreator.screen.TutorialScreen;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.client.event.InputEvent;
@@ -18,6 +19,9 @@ public class EventHandler
     {
         if(ClientUtils.KEY_OPEN_RECIPES_MENU.isDown() && ClientUtils.getCurrentScreen() == null)
             ClientUtils.openScreen(new RecipeManagerScreen());
+
+        if(ClientUtils.KEY_OPEN_TUTORIAL.isDown() && ClientUtils.getCurrentScreen() == null)
+            ClientUtils.openScreen(new TutorialScreen());
     }
 
     @SubscribeEvent
@@ -25,7 +29,7 @@ public class EventHandler
     {
         ITextComponent issueMsg = CommonUtils.createComponentUrlOpener(References.getTranslate("message.join_issue"), "https://github.com/En0ri4n/Craft-Creator/issues");
 
-        ClientUtils.sendMessage(event.getPlayer(), References.getTranslate("message.join", new TranslationTextComponent(ClientUtils.KEY_OPEN_RECIPES_MENU.getKey().getDisplayName().getString()).getString()));
+        ClientUtils.sendMessage(event.getPlayer(), References.getTranslate("message.join", new TranslationTextComponent(ClientUtils.KEY_OPEN_RECIPES_MENU.getKey().getDisplayName().getString()).getString(), new TranslationTextComponent(ClientUtils.KEY_OPEN_TUTORIAL.getKey().getDisplayName().getString()).getString()));
         ClientUtils.sendMessage(event.getPlayer(), issueMsg);
     }
 }

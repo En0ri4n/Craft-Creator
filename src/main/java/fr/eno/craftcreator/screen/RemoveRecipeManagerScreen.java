@@ -70,7 +70,7 @@ public class RemoveRecipeManagerScreen extends ListScreen
         this.addList(recipeIdField = new SuggesterTextFieldWidget(default_x + spaceX, default_y + i * spaceY - heightGap, fieldWidth, fieldHeight, EntryHelper.getStringEntryListWith(EntryHelper.getRecipeIds()), entry -> recipeDescriptors.put(ModRecipeSerializer.RecipeDescriptors.RECIPE_ID, entry.getEntryValue())));
 
         this.addButton(new SimpleButton(References.getTranslate("screen.remove_manager.button.remove"), this.width / 2 - 80, this.height - 85, 160, 20, (button) -> sendRemovedRecipe()));
-        this.addButton(new SimpleButton(References.getTranslate("screen.remove_manager.button.back"), this.width - 97, this.height - 35, 80, 20, (button) -> ClientUtils.openScreen(new RecipeManagerScreen())));
+        this.addButton(new SimpleButton(References.getTranslate("screen.button.back"), this.width - 97, this.height - 35, 80, 20, (button) -> ClientUtils.openScreen(new RecipeManagerScreen())));
 
         checkBoxes();
     }
