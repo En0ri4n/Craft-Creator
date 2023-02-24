@@ -1,6 +1,5 @@
 package fr.eno.craftcreator.base;
 
-
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.managers.BotaniaRecipesManager;
 import fr.eno.craftcreator.recipes.managers.CreateRecipesManager;
@@ -20,22 +19,14 @@ public class RecipeManagerDispatcher
      * @param recipeInfos       The infos of the recipe (energy, experience, chance, etc...)
      * @param serializerType    The type of serializer (kubejs, etc)
      */
-    public static void createRecipe(SupportedMods mod, ModRecipeCreator recipe, List<Slot> slots, RecipeInfos recipeInfos, ModRecipeSerializer.SerializerType serializerType)
+    public static void createRecipe(SupportedMods mod, RecipeCreator recipe, List<Slot> slots, RecipeInfos recipeInfos, ModRecipeSerializer.SerializerType serializerType)
     {
         switch(mod)
         {
-            case BOTANIA:
-                BotaniaRecipesManager.get().createRecipe(recipe, slots, recipeInfos, serializerType);
-                break;
-            case THERMAL:
-                ThermalRecipesManager.get().createRecipe(recipe, slots, recipeInfos, serializerType);
-                break;
-            case CREATE:
-                CreateRecipesManager.get().createRecipe(recipe, slots, recipeInfos, serializerType);
-                break;
-            case MINECRAFT:
-                MinecraftRecipeManager.get().createRecipe(recipe, slots, recipeInfos, serializerType);
-                break;
+            case BOTANIA -> BotaniaRecipesManager.get().createRecipe(recipe, slots, recipeInfos, serializerType);
+            case THERMAL -> ThermalRecipesManager.get().createRecipe(recipe, slots, recipeInfos, serializerType);
+            case CREATE -> CreateRecipesManager.get().createRecipe(recipe, slots, recipeInfos, serializerType);
+            case MINECRAFT -> MinecraftRecipeManager.get().createRecipe(recipe, slots, recipeInfos, serializerType);
         }
     }
 }

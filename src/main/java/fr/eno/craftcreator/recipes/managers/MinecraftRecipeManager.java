@@ -1,7 +1,6 @@
 package fr.eno.craftcreator.recipes.managers;
 
-
-import fr.eno.craftcreator.base.ModRecipeCreator;
+import fr.eno.craftcreator.base.RecipeCreator;
 import fr.eno.craftcreator.container.slot.utils.PositionnedSlot;
 import fr.eno.craftcreator.recipes.base.BaseRecipesManager;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
@@ -17,36 +16,36 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static fr.eno.craftcreator.base.ModRecipeCreators.*;
+
 public class MinecraftRecipeManager extends BaseRecipesManager
 {
     private static final MinecraftRecipeManager INSTANCE = new MinecraftRecipeManager();
 
     @Override
-    public void createRecipe(ModRecipeCreator recipe, List<Slot> slots, RecipeInfos recipeInfos, ModRecipeSerializer.SerializerType serializerType)
+    public void createRecipe(RecipeCreator recipe, List<Slot> slots, RecipeInfos recipeInfos, ModRecipeSerializer.SerializerType serializerType)
     {
         MinecraftRecipeSerializer.get().setSerializerType(serializerType);
-        
-        switch(recipe)
+
+        if(recipe.is(CRAFTING_TABLE))
         {
-            case CRAFTING_TABLE:
-                createCraftingTableRecipe(PositionnedSlot.getSlotsFor(SlotHelper.CRAFTING_TABLE_SLOTS, slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getList(RecipeInfos.Parameters.NBT_SLOTS), recipeInfos.getBoolean(RecipeInfos.Parameters.SHAPED), recipeInfos.getBoolean(RecipeInfos.Parameters.KUBEJS_RECIPE));
-                break;
-            case FURNACE_SMELTING:
-            case FURNACE_BLASTING:
-            case FURNACE_SMOKING:
-            case CAMPFIRE_COOKING:
-                createFurnaceRecipe(recipe, PositionnedSlot.getSlotsFor(SlotHelper.FURNACE_SLOTS, slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.EXPERIENCE).doubleValue(), recipeInfos.getValue(RecipeInfos.Parameters.COOKING_TIME).intValue(), recipeInfos.getBoolean(RecipeInfos.Parameters.KUBEJS_RECIPE));
-                break;
-            case SMITHING_TABLE:
-                createSmithingTableRecipe(PositionnedSlot.getSlotsFor(SlotHelper.SMITHING_TABLE_SLOTS, slots), recipeInfos.getBoolean(RecipeInfos.Parameters.KUBEJS_RECIPE));
-                break;
-            case STONECUTTER:
-                createStoneCutterRecipe(PositionnedSlot.getSlotsFor(SlotHelper.STONECUTTER_SLOTS, slots), recipeInfos.getBoolean(RecipeInfos.Parameters.KUBEJS_RECIPE));
-                break;
+            createCraftingTableRecipe(PositionnedSlot.getSlotsFor(SlotHelper.CRAFTING_TABLE_SLOTS, slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getList(RecipeInfos.Parameters.NBT_SLOTS), recipeInfos.getBoolean(RecipeInfos.Parameters.SHAPED), recipeInfos.getBoolean(RecipeInfos.Parameters.KUBEJS_RECIPE));
+        }
+        else if(recipe.is(FURNACE_SMELTING, FURNACE_BLASTING, FURNACE_SMOKING, CAMPFIRE_COOKING))
+        {
+            createFurnaceRecipe(recipe, PositionnedSlot.getSlotsFor(SlotHelper.FURNACE_SLOTS, slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.EXPERIENCE).doubleValue(), recipeInfos.getValue(RecipeInfos.Parameters.COOKING_TIME).intValue(), recipeInfos.getBoolean(RecipeInfos.Parameters.KUBEJS_RECIPE));
+        }
+        else if(recipe.is(SMITHING))
+        {
+            createSmithingTableRecipe(PositionnedSlot.getSlotsFor(SlotHelper.SMITHING_SLOTS, slots), recipeInfos.getBoolean(RecipeInfos.Parameters.KUBEJS_RECIPE));
+        }
+        else if(recipe.is(STONECUTTING))
+        {
+            createStoneCutterRecipe(PositionnedSlot.getSlotsFor(SlotHelper.STONECUTTING_SLOTS, slots), recipeInfos.getBoolean(RecipeInfos.Parameters.KUBEJS_RECIPE));
         }
     }
 
-    private void createFurnaceRecipe(ModRecipeCreator recipe, List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, double experience, int cookingTime, boolean isKubeJSRecipe)
+    private void createFurnaceRecipe(RecipeCreator recipe, List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, double experience, int cookingTime, boolean isKubeJSRecipe)
     {
         if(isSlotsEmpty(slots, SlotHelper.FURNACE_SLOTS_INPUT.size(), SlotHelper.FURNACE_SLOTS_OUTPUT.size()))
             return;

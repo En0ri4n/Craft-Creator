@@ -2,6 +2,7 @@ package fr.eno.craftcreator.packets;
 
 
 import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.init.InitPackets;
 import fr.eno.craftcreator.screen.container.base.ModRecipeCreatorDataScreen;
 import fr.eno.craftcreator.tileentity.base.MultiScreenRecipeCreatorTile;
@@ -119,16 +120,19 @@ public class UpdateRecipeCreatorTileDataClientPacket
          */
         public static void handle(UpdateRecipeCreatorTileDataClientPacket msg, Supplier<NetworkEvent.Context> ctx)
         {
-            if(ClientUtils.getCurrentScreen() instanceof ModRecipeCreatorDataScreen<?>)
+            CommonUtils.clientTask(() ->
             {
-                ((ModRecipeCreatorDataScreen<?>) ClientUtils.getCurrentScreen()).setData(msg.dataName, msg.data);
-            }
+                if(ClientUtils.getCurrentScreen() instanceof ModRecipeCreatorDataScreen<?>)
+                {
+                    ((ModRecipeCreatorDataScreen<?>) ClientUtils.getCurrentScreen()).setData(msg.dataName, msg.data);
+                }
 
-            if(ClientUtils.getClientLevel().getBlockEntity(msg.pos) instanceof MultiScreenRecipeCreatorTile)
-            {
-                MultiScreenRecipeCreatorTile tileEntity = (MultiScreenRecipeCreatorTile) ClientUtils.getClientLevel().getBlockEntity(msg.pos);
-                Utils.notNull(tileEntity).setData(msg.dataName, msg.data);
-            }
+                if(ClientUtils.getClientLevel().getBlockEntity(msg.pos) instanceof MultiScreenRecipeCreatorTile)
+                {
+                    MultiScreenRecipeCreatorTile tileEntity = (MultiScreenRecipeCreatorTile) ClientUtils.getClientLevel().getBlockEntity(msg.pos);
+                    Utils.notNull(tileEntity).setData(msg.dataName, msg.data);
+                }
+            });
 
             ctx.get().setPacketHandled(true);
         }

@@ -3,6 +3,7 @@ package fr.eno.craftcreator.screen.widgets;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.screen.widgets.buttons.SimpleCheckBox;
 import fr.eno.craftcreator.utils.EntryHelper;
 import fr.eno.craftcreator.utils.NBTSerializable;
@@ -52,8 +53,8 @@ public class RecipeEntryWidget
         entries.add(new RecipeEntryEntry(false));
         entries.add(new RecipeEntryEntry(false));
         entries.add(new RecipeEntryEntry(true));
-        this.entriesDropdown = new DropdownListWidget<>(startX, startY + y * i++, width - 6, 16, 16, entries, (entry) -> {
-
+        this.entriesDropdown = new DropdownListWidget<>(startX, startY + y * i++, width - 6, 16, 16, entries, (entry) ->
+        {
             //TODO: Updates current displayed data
 
             if(entriesDropdown.getIndex(entry) == entriesDropdown.getEntries().size() - 1)
@@ -66,6 +67,7 @@ public class RecipeEntryWidget
                 this.countField.setNumberValue(newEntry.getCount(), false);
                 this.tagCheckBox.setSelected(newEntry.isTag());
                 this.chanceField.setNumberValue(newEntry.getChance(), true);
+                this.removeEntryButton.active = true;
                 return;
             }
 
@@ -76,7 +78,8 @@ public class RecipeEntryWidget
         });
 
         // Registry Name Text Field
-        this.registryNameField = new SuggesterTextFieldWidget(startX, startY + y * i++, width - 2 * gapX, 16, EntryHelper.getStringEntryListWith(EntryHelper.getItems()), null);
+        this.registryNameField = new SuggesterTextFieldWidget(startX, startY + y * i++, width - 2 * gapX, 16, EntryHelper.getStringEntryListWith(EntryHelper.getItems()), null, (newValue) ->
+                this.saveEntryButton.active = CommonUtils.parse(this.registryNameField.getValue()) != null && CommonUtils.getItem(CommonUtils.parse(this.registryNameField.getValue())) != null || CommonUtils.getTag(CommonUtils.parse(this.registryNameField.getValue())) != null);
         this.registryNameField.setVisible(true);
         this.registryNameField.setBlitOffset(100);
 
@@ -98,13 +101,19 @@ public class RecipeEntryWidget
         // Remove button
         this.removeEntryButton = new IconButton(x + width - 3 - 16, startY + height - 20, References.getLoc("textures/gui/icons/trash_can.png"), 16, 16, 16, 48, b -> {
             if(entriesDropdown.getEntries().size() > 2)
+            {
                 this.entriesDropdown.removeEntry(entriesDropdown.getDropdownSelected());
-            this.entriesDropdown.setScrollAmount(0D);
+                this.entriesDropdown.setScrollAmount(0D);
+            }
+            else
+            {
+                this.removeEntryButton.active = false;
+            }
         });
 
         // Save Button
         this.saveEntryButton = new IconButton(x + width - 3 - 16 - 3 - 16, startY + height - 20, References.getLoc("textures/gui/icons/save.png"), 16, 16, 16, 48, b -> {
-            this.entriesDropdown.getDropdownSelected().set(ClientUtils.parse(registryNameField.getValue()), countField.getIntValue(), tagCheckBox.selected(), chanceField.getDoubleValue());
+            this.entriesDropdown.getDropdownSelected().set(CommonUtils.parse(registryNameField.getValue()), countField.getIntValue(), tagCheckBox.selected(), chanceField.getDoubleValue());
             System.out.println("Save entry : Name=" + registryNameField.getValue() + " isTag=" + tagCheckBox.selected() + " count=" + countField.getValue() + " chance=" + chanceField.getValue());
         });
     }
@@ -181,7 +190,7 @@ public class RecipeEntryWidget
         public RecipeEntryEntry(boolean isLast)
         {
             this.isLast = isLast;
-            this.registryName = ClientUtils.parse("minecraft:air");
+            this.registryName = CommonUtils.parse("minecraft:air");
             this.count = 1;
             this.isTag = false;
             this.chance = 1D;
@@ -253,7 +262,7 @@ public class RecipeEntryWidget
         @Override
         public RecipeEntryEntry deserialize(CompoundTag compound)
         {
-            this.registryName = ClientUtils.parse(compound.getString("RegistryName"));
+            this.registryName = CommonUtils.parse(compound.getString("RegistryName"));
             this.count = compound.getInt("Count");
             this.isTag = compound.getBoolean("IsTag");
             this.chance = compound.getDouble("Chance");

@@ -8,6 +8,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.api.ScreenUtils;
 import fr.eno.craftcreator.base.ModRecipeCreatorDispatcher;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
@@ -611,7 +612,7 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
 
             if(recipe.getRecipeId() != null)
             {
-                ResourceLocation recipeId = ClientUtils.parse(recipe.getRecipeId());
+                ResourceLocation recipeId = CommonUtils.parse(recipe.getRecipeId());
                 item = ForgeRegistries.ITEMS.containsKey(recipeId) ? ForgeRegistries.ITEMS.getValue(recipeId) : Items.BARRIER;
             }
 

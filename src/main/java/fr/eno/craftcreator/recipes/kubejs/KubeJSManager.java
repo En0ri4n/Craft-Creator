@@ -1,8 +1,7 @@
 package fr.eno.craftcreator.recipes.kubejs;
 
-
-import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.base.SupportedMods;
+import net.minecraftforge.fml.loading.FMLLoader;
 
 import java.io.File;
 
@@ -35,7 +34,7 @@ public class KubeJSManager
     private File createKubeJSFolder()
     {
         check();
-        final File folder = new File(ClientUtils.getMinecraft().gameDirectory, "kubejs");
+        final File folder = new File(FMLLoader.getGamePath().toFile(), "kubejs");
 
         if(!folder.exists()) folder.mkdirs();
 

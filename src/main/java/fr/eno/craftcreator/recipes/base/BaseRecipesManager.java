@@ -1,7 +1,6 @@
 package fr.eno.craftcreator.recipes.base;
 
-
-import fr.eno.craftcreator.base.ModRecipeCreator;
+import fr.eno.craftcreator.base.RecipeCreator;
 import fr.eno.craftcreator.recipes.utils.RecipeEntry;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import net.minecraft.resources.ResourceLocation;
@@ -21,7 +20,7 @@ public abstract class BaseRecipesManager
 {
     protected BaseRecipesManager() {}
 
-    public abstract void createRecipe(ModRecipeCreator recipe, List<Slot> slots, RecipeInfos param, ModRecipeSerializer.SerializerType serializerType);
+    public abstract void createRecipe(RecipeCreator recipe, List<Slot> slots, RecipeInfos param, ModRecipeSerializer.SerializerType serializerType);
 
     protected RecipeEntry.Output getValidOutput(List<Slot> slots, int outputCount)
     {

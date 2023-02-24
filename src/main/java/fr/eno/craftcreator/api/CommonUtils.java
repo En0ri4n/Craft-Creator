@@ -1,43 +1,30 @@
 package fr.eno.craftcreator.api;
 
-
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
+import fr.eno.craftcreator.utils.CustomRunnable;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.level.block.Block;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
+import javax.annotation.Nullable;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.function.Predicate;
 
 public class CommonUtils
 {
-    public static final Predicate<RenderType> DEFAULT_BLOCK_RENDER = (r) -> r == RenderType.cutoutMipped();
-
-    public static void setBlockRender(Block block, Predicate<RenderType> render)
-    {
-        ItemBlockRenderTypes.setRenderLayer(block, render);
-    }
-
-    public static void setDefaultBlockRender(Block block)
-    {
-        setBlockRender(block, DEFAULT_BLOCK_RENDER);
-    }
-
-    public static <T extends Recipe<C>, C extends Container> RecipeType<T> getRecipeTypeByName(String resourceLocation)
-    {
-        return getRecipeTypeByName(ClientUtils.parse(resourceLocation));
-    }
-
     @SuppressWarnings("unchecked")
     public static <T extends Recipe<C>, C extends Container> RecipeType<T> getRecipeTypeByName(ResourceLocation resourceLocation)
     {
@@ -49,9 +36,17 @@ public class CommonUtils
         return Registry.RECIPE_TYPE.getKey(recipeType);
     }
 
-    public static Item getItemById(ResourceLocation resourceLocation)
+    @Nullable
+    public static Item getItem(ResourceLocation resourceLocation)
     {
         return ForgeRegistries.ITEMS.getValue(resourceLocation);
+    }
+
+    // TODO: check if method is suitable
+    @Nullable
+    public static TagKey<Item> getTag(ResourceLocation resourceLocation)
+    {
+        return ItemTags.create(resourceLocation);
     }
 
     /**
@@ -89,5 +84,66 @@ public class CommonUtils
     public static MutableComponent createComponentUrlOpener(MutableComponent component, String urlToOpen)
     {
         return component.copy().withStyle((msg) -> msg.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, urlToOpen)));
+    }
+
+    public static void sendMessage(Player player, MutableComponent message)
+    {
+        player.sendMessage(message, player.getUUID());
+    }
+
+    /**
+     * Execute a task on the client thread
+     *
+     * @param clientTask the task to execute
+     */
+    public static void clientTask(Runnable clientTask)
+    {
+        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> CustomRunnable.of(clientTask));
+    }
+
+    /**
+     * Execute a task on the server thread
+     *
+     * @param serverTask the task to execute
+     */
+    public static void serverTask(Runnable serverTask)
+    {
+        DistExecutor.safeRunWhenOn(Dist.DEDICATED_SERVER, () -> CustomRunnable.of(serverTask));
+    }
+
+    /**
+     * Parse a string to a resource location<br>
+     * If the string can't be parsed, return the 'bug_empty' resource location
+     *
+     * @param location the string to parse
+     * @return the resource location
+     *
+     * @see ResourceLocation#tryParse(String)
+     */
+    public static ResourceLocation parse(String location)
+    {
+        return ResourceLocation.tryParse(location);
+    }
+
+
+    /**
+     * Split a string with the specified size
+     *
+     * @param text the string to split
+     * @param size the size to split
+     * @return a non-null list with the split string
+     */
+    public static List<String> splitToListWithSize(String text, int size)
+    {
+        List<String> parts = new ArrayList<>();
+
+        int length = text.length();
+
+        for(int i = 0; i < length; i += size)
+        {
+            parts.add(text.substring(i, Math.min(length, i + size)));
+        }
+
+        return parts;
     }
 }

@@ -1,6 +1,5 @@
 package fr.eno.craftcreator.blocks;
 
-
 import fr.eno.craftcreator.api.BlockUtils;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.tileentity.ThermalRecipeCreatorTile;

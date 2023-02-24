@@ -3,15 +3,14 @@ package fr.eno.craftcreator.api;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.base.SupportedMods;
-import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
@@ -24,16 +23,15 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
- * @author En0ri4n <br>
- * <p>
  * class contains some useful methods for the client.
  */
 public class ClientUtils
@@ -41,6 +39,7 @@ public class ClientUtils
     public static final KeyMapping KEY_OPEN_RECIPES_MENU = new KeyMapping("key.craftcreator.open_recipes_menu", GLFW.GLFW_KEY_K, "key.categories.craft_creator");
     public static final KeyMapping KEY_OPEN_TUTORIAL = new KeyMapping("key.craftcreator.open_tutorial", GLFW.GLFW_KEY_J, "key.categories.craft_creator");
 
+    public static final Predicate<RenderType> DEFAULT_BLOCK_RENDER = (r) -> r == RenderType.cutoutMipped();
     private static final Supplier<Minecraft> minecraftSupplier = Minecraft::getInstance;
 
     /**
@@ -117,23 +116,23 @@ public class ClientUtils
 
     /**
      * Send to the client player a message in the chat
-     * @see Player#sendMessage(net.minecraft.network.chat.Component, UUID)
+     * @see Player#sendMessage(Component, UUID)
      */
     public static void sendClientPlayerMessage(MutableComponent message)
     {
         getClientPlayer().sendMessage(message, getClientPlayer().getUUID());
     }
 
-    public static void sendMessage(Player player, MutableComponent message)
-    {
-        player.sendMessage(message, player.getUUID());
-    }
-
+    /**
+     * Bind a texture in the texture manager
+     *
+     * @param texture the texture to bind
+     * @see RenderSystem#setShaderTexture(int, int)
+     */
     public static void bindTexture(ResourceLocation texture)
     {
         RenderSystem.setShaderTexture(0, texture);
     }
-
 
     /**
      * calls {@link net.minecraft.client.gui.Font#width(String)}
@@ -145,77 +144,6 @@ public class ClientUtils
     public static int width(String str)
     {
         return getFontRenderer().width(str);
-    }
-
-    /**
-     * Sort a list of entry with the specified token
-     *
-     * @param token  the string to found
-     * @param inputs a list of entries
-     * @return a non-null list with entries which match the token
-     */
-    public static List<SimpleListWidget.Entry> copyPartialMatches(String token, List<SimpleListWidget.Entry> inputs)
-    {
-        List<SimpleListWidget.Entry> list = new ArrayList<>();
-        if(!token.isEmpty())
-        {
-            for(SimpleListWidget.Entry s : inputs)
-            {
-                if(s.getEntryValue().contains(token))
-                {
-                    list.add(s);
-                }
-            }
-        }
-
-        return list;
-    }
-
-    /**
-     * Parse a string to a resource location<br>
-     * If the string can't be parsed, return the 'bug_empty' resource location
-     *
-     * @param location the string to parse
-     * @return the resource location
-     *
-     * @see ResourceLocation#tryParse(String)
-     */
-    public static ResourceLocation parse(String location)
-    {
-        return ResourceLocation.tryParse(location) == null ? References.getLoc("bug_empty") : ResourceLocation.tryParse(location);
-    }
-
-    /**
-     * Get the container's texture with the specified name
-     *
-     * @param mod The mod of the container
-     * @param path  The path of the texture
-     * @return the texture's resource location
-     */
-    public static ResourceLocation getGuiContainerTexture(SupportedMods mod, String path)
-    {
-        return References.getLoc("textures/gui/container/" + mod.getModId() + "/" + path);
-    }
-
-    /**
-     * Split a string with the specified size
-     *
-     * @param text the string to split
-     * @param size the size to split
-     * @return a non-null list with the split string
-     */
-    public static List<String> splitToListWithSize(String text, int size)
-    {
-        List<String> parts = new ArrayList<>();
-
-        int length = text.length();
-
-        for(int i = 0; i < length; i += size)
-        {
-            parts.add(text.substring(i, Math.min(length, i + size)));
-        }
-
-        return parts;
     }
     
     /**
@@ -272,5 +200,15 @@ public class ClientUtils
         }
 
         return biggest;
+    }
+
+    public static void setBlockRender(Block block, Predicate<RenderType> render)
+    {
+        ItemBlockRenderTypes.setRenderLayer(block, render);
+    }
+
+    public static void setDefaultBlockRender(Block block)
+    {
+        setBlockRender(block, DEFAULT_BLOCK_RENDER);
     }
 }

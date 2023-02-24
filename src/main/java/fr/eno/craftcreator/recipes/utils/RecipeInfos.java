@@ -1,6 +1,9 @@
 package fr.eno.craftcreator.recipes.utils;
 
-
+import fr.eno.craftcreator.api.CommonUtils;
+import fr.eno.craftcreator.utils.NBTSerializable;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
@@ -8,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RecipeInfos
+public class RecipeInfos implements NBTSerializable<RecipeInfos>
 {
     private final List<RecipeParameter> parameters;
 
@@ -49,23 +52,98 @@ public class RecipeInfos
         return parameter instanceof RecipeParameterBoolean && ((RecipeParameterBoolean) parameter).getBoolean();
     }
 
-    @SuppressWarnings("unchecked")
-    public <K, V> Map<K, V> getMap(String name)
+    public Map<Integer, ResourceLocation> getMap(String name)
     {
         RecipeParameter parameter = this.getRecipeParameter(name);
-        return parameter instanceof RecipeParameterMap ? ((RecipeParameterMap<K, V>) parameter).getMap() : new HashMap<>();
+        return parameter instanceof RecipeParameterMap ? ((RecipeParameterMap) parameter).getMap() : new HashMap<>();
     }
 
-    @SuppressWarnings("unchecked")
-    public <K> List<K> getList(String name)
+    public List<Integer> getList(String name)
     {
         RecipeParameter parameter = this.getRecipeParameter(name);
-        return parameter instanceof RecipeParameterList ? ((RecipeParameterList<K>) parameter).getList() : new ArrayList<>();
+        return parameter instanceof RecipeParameterIntList ? ((RecipeParameterIntList) parameter).getList() : new ArrayList<>();
     }
 
     public boolean contains(String name)
     {
         return this.getRecipeParameter(name) != null;
+    }
+
+    @Override
+    public CompoundTag serialize()
+    {
+        CompoundTag compound = new CompoundTag();
+        for(RecipeParameter parameter : this.parameters)
+        {
+            CompoundTag parameterCompound = new CompoundTag();
+            parameterCompound.putString("type", parameter.getType().name());
+
+            switch(parameter.getType())
+            {
+                case NUMBER:
+                    RecipeParameterNumber number = (RecipeParameterNumber) parameter;
+                    parameterCompound.putBoolean("is_double", number.isDouble());
+                    parameterCompound.putDouble("value", number.isDouble() ? number.getNumberValue().doubleValue() : number.getNumberValue().intValue());
+                    break;
+                case BOOLEAN:
+                    RecipeParameterBoolean bool = (RecipeParameterBoolean) parameter;
+                    parameterCompound.putBoolean("value", bool.getBoolean());
+                    break;
+                case INT_LIST:
+                    RecipeParameterIntList intList = (RecipeParameterIntList) parameter;
+                    IntArrayTag arrayNBT = new IntArrayTag(intList.getList());
+                    parameterCompound.put("value", arrayNBT);
+                    break;
+                case MAP:
+                    RecipeParameterMap map = (RecipeParameterMap) parameter;
+                    CompoundTag nbt = new CompoundTag();
+                    for(Map.Entry<Integer, ResourceLocation> entry : map.getMap().entrySet())
+                        nbt.putInt(entry.getValue().toString(), entry.getKey());
+                    parameterCompound.put("value", nbt);
+                    break;
+            }
+
+            compound.put(parameter.getName(), parameterCompound);
+        }
+        return compound;
+    }
+
+    @Override
+    public RecipeInfos deserialize(CompoundTag compound)
+    {
+        for(String keys : compound.getAllKeys())
+        {
+            CompoundTag parameterCompound = compound.getCompound(keys);
+            RecipeParameterType type = RecipeParameterType.valueOf(parameterCompound.getString("type"));
+
+            switch(type)
+            {
+                case NUMBER:
+                    boolean isDouble = parameterCompound.getBoolean("is_double");
+                    Number value = isDouble ? parameterCompound.getDouble("value") : parameterCompound.getInt("value");
+                    this.addParameter(new RecipeParameterNumber(keys, value, isDouble));
+                    break;
+                case BOOLEAN:
+                    this.addParameter(new RecipeParameterBoolean(keys, parameterCompound.getBoolean("value")));
+                    break;
+                case INT_LIST:
+                    IntArrayTag arrayNBT = (IntArrayTag) parameterCompound.get("value");
+                    List<Integer> list = new ArrayList<>();
+                    for(int i : arrayNBT.getAsIntArray())
+                        list.add(i);
+                    this.addParameter(new RecipeParameterIntList(keys, list));
+                    break;
+                case MAP:
+                    CompoundTag nbt = parameterCompound.getCompound("value");
+                    Map<Integer, ResourceLocation> map = new HashMap<>();
+                    for(String key : nbt.getAllKeys())
+                        map.put(nbt.getInt(key), CommonUtils.parse(key));
+                    this.addParameter(new RecipeParameterMap(keys, map));
+                    break;
+            }
+        }
+
+        return this;
     }
 
     public static class RecipeParameter
@@ -94,32 +172,23 @@ public class RecipeInfos
     public static class RecipeParameterNumber extends RecipeParameter
     {
         private final Number value;
+        private final boolean isDouble;
 
-        public RecipeParameterNumber(String name, Number value)
+        public RecipeParameterNumber(String name, Number value, boolean isDouble)
         {
             super(RecipeParameterType.NUMBER, name);
             this.value = value;
+            this.isDouble = isDouble;
         }
 
         public Number getNumberValue()
         {
             return value;
         }
-    }
 
-    public static class RecipeParameterString extends RecipeParameter
-    {
-        private final String value;
-
-        public RecipeParameterString(String name, String value)
+        public boolean isDouble()
         {
-            super(RecipeParameterType.STRING, name);
-            this.value = value;
-        }
-
-        public String getString()
-        {
-            return value;
+            return isDouble;
         }
     }
 
@@ -139,70 +208,33 @@ public class RecipeInfos
         }
     }
 
-    public static class RecipeParameterResourceLocation extends RecipeParameter
+    public static class RecipeParameterMap extends RecipeParameter
     {
-        private final ResourceLocation value;
+        private final Map<Integer, ResourceLocation> map;
 
-        public RecipeParameterResourceLocation(String name, ResourceLocation value)
-        {
-            super(RecipeParameterType.RESOURCE_LOCATION, name);
-            this.value = value;
-        }
-
-        public ResourceLocation getResourcelocation()
-        {
-            return value;
-        }
-    }
-
-    public static class RecipeParameterStringList extends RecipeParameter
-    {
-        private final List<String> value;
-
-        public RecipeParameterStringList(String name, List<String> value)
-        {
-            super(RecipeParameterType.STRING_LIST, name);
-            this.value = value;
-        }
-
-        public List<String> getStringList()
-        {
-            return value;
-        }
-    }
-
-    public static class RecipeParameterMap<K, V> extends RecipeParameter
-    {
-        private final Map<K, V> map;
-
-        public RecipeParameterMap(String name, Map<K, V> map)
+        public RecipeParameterMap(String name, Map<Integer, ResourceLocation> map)
         {
             super(RecipeParameterType.MAP, name);
             this.map = map;
         }
 
-        public RecipeParameterMap(String name)
-        {
-            this(name, new HashMap<>());
-        }
-
-        public Map<K, V> getMap()
+        public Map<Integer, ResourceLocation> getMap()
         {
             return this.map;
         }
     }
 
-    public static class RecipeParameterList<T> extends RecipeParameter
+    public static class RecipeParameterIntList extends RecipeParameter
     {
-        private final List<T> list;
+        private final List<Integer> list;
 
-        public RecipeParameterList(String name, List<T> list)
+        public RecipeParameterIntList(String name, List<Integer> list)
         {
             super(RecipeParameterType.INT_LIST, name);
             this.list = list;
         }
 
-        public List<T> getList()
+        public List<Integer> getList()
         {
             return list;
         }
@@ -240,8 +272,6 @@ public class RecipeInfos
         NUMBER,
         STRING,
         BOOLEAN,
-        RESOURCE_LOCATION,
-        STRING_LIST,
         INT_LIST,
         EMPTY,
         MAP

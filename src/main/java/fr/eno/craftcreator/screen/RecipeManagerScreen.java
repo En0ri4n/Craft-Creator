@@ -37,7 +37,7 @@ public class RecipeManagerScreen extends ListScreen
     {
         super(new TextComponent(""));
         this.modId = DropdownListWidget.Entries.getModIds().get(0).getValue();
-        this.recipeType = ClientUtils.parse(DropdownListWidget.Entries.getRecipeTypes(modId).get(0).getValue());
+        this.recipeType = CommonUtils.parse(DropdownListWidget.Entries.getRecipeTypes(modId).get(0).getValue());
     }
 
     @Override
@@ -51,14 +51,14 @@ public class RecipeManagerScreen extends ListScreen
         {
             this.modId = entry.getValue();
             this.recipeTypeDropdown.setEntries(DropdownListWidget.Entries.getRecipeTypes(this.modId));
-            this.recipeType = ClientUtils.parse(this.recipeTypeDropdown.getDropdownEntries().get(0).getValue());
+            this.recipeType = CommonUtils.parse(this.recipeTypeDropdown.getDropdownEntries().get(0).getValue());
             this.searchField.setValue("");
             updateLists(true);
         }));
 
         addList(recipeTypeDropdown = new DropdownListWidget<>(width / 2, 0, 200, 20, 20, DropdownListWidget.Entries.getRecipeTypes(this.modId), (entry) ->
         {
-            this.recipeType = ClientUtils.parse(entry.getValue());
+            this.recipeType = CommonUtils.parse(entry.getValue());
             updateLists(true);
         }));
 

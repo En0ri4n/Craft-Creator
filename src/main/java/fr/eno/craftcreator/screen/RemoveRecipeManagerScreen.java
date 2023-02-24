@@ -4,6 +4,7 @@ package fr.eno.craftcreator.screen;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.api.ScreenUtils;
 import fr.eno.craftcreator.base.ModRecipeCreatorDispatcher;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
@@ -93,7 +94,7 @@ public class RemoveRecipeManagerScreen extends ListScreen
         {
             try
             {
-                ResourceLocation location = ClientUtils.parse(entry.getValue());
+                ResourceLocation location = CommonUtils.parse(entry.getValue());
                 return Utils.notNull(location).getNamespace();
             }
             catch(Exception ignored)

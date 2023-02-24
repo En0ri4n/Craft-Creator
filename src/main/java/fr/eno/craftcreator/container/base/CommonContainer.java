@@ -1,6 +1,7 @@
 package fr.eno.craftcreator.container.base;
 
-import fr.eno.craftcreator.base.ModRecipeCreator;
+import fr.eno.craftcreator.base.ModRecipeCreators;
+import fr.eno.craftcreator.base.RecipeCreator;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.container.slot.DefinedSlot;
 import fr.eno.craftcreator.container.slot.SimpleSlotItemHandler;
@@ -15,6 +16,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class CommonContainer extends VanillaCommonContainer
 {
@@ -40,7 +42,7 @@ public abstract class CommonContainer extends VanillaCommonContainer
                 this.addSlot(new SimpleSlotItemHandler(tile, index, x, y));
         }
     }
-
+    
     public abstract SupportedMods getMod();
     
     public abstract int getContainerSize();
@@ -48,6 +50,11 @@ public abstract class CommonContainer extends VanillaCommonContainer
     public MultiScreenRecipeCreatorTile getTile()
     {
         return tile;
+    }
+
+    public List<Slot> getContainerSlots()
+    {
+        return slots.stream().filter(slot -> slot instanceof SimpleSlotItemHandler).collect(Collectors.toList());
     }
 
     @Override
@@ -73,7 +80,7 @@ public abstract class CommonContainer extends VanillaCommonContainer
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
         
-        ModRecipeCreator mod = ModRecipeCreator.byName(tile.getCurrentRecipeType());
+        RecipeCreator mod = ModRecipeCreators.byName(tile.getCurrentRecipeType());
         
         if(slot != null && slot.hasItem())
         {

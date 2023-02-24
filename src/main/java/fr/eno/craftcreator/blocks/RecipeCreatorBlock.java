@@ -69,7 +69,6 @@ public abstract class RecipeCreatorBlock extends Block implements EntityBlock
         return stateHolder;
     }
 
-
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state)
     {

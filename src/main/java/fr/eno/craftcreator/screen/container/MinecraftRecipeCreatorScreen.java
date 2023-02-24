@@ -1,9 +1,9 @@
 package fr.eno.craftcreator.screen.container;
 
-
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.base.ModRecipeCreator;
+import fr.eno.craftcreator.base.ModRecipeCreators;
+import fr.eno.craftcreator.base.RecipeCreator;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.container.MinecraftRecipeCreatorContainer;
 import fr.eno.craftcreator.container.slot.utils.PositionnedSlot;
@@ -21,6 +21,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 
 import java.util.List;
+
+import static fr.eno.craftcreator.base.ModRecipeCreators.*;
 
 public class MinecraftRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen<MinecraftRecipeCreatorContainer>
 {
@@ -52,9 +54,9 @@ public class MinecraftRecipeCreatorScreen extends MultiScreenModRecipeCreatorScr
     }
 
     @Override
-    protected List<ModRecipeCreator> getAvailableRecipesCreator()
+    protected List<RecipeCreator> getAvailableRecipesCreator()
     {
-        return ModRecipeCreator.getRecipeCreatorScreens(SupportedMods.MINECRAFT);
+        return ModRecipeCreators.getRecipeCreatorScreens(SupportedMods.MINECRAFT);
     }
 
     @Override
@@ -69,64 +71,61 @@ public class MinecraftRecipeCreatorScreen extends MultiScreenModRecipeCreatorScr
     {
         this.craftTypeButton.visible = false;
 
-        switch(getCurrentRecipe())
+        RecipeCreator currentRecipe = getCurrentRecipe();
+
+        if(currentRecipe.is(CRAFTING_TABLE))
         {
-            case CRAFTING_TABLE:
-                this.craftTypeButton.visible = true;
-                setExecuteButtonPosAndSize(leftPos + 86, topPos + 33, 30);
-                break;
-            case STONECUTTER:
-                setExecuteButtonPosAndSize(this.leftPos + this.imageWidth / 2 - 26, this.topPos + 31, 42);
-                break;
-            case SMITHING_TABLE:
-                setExecuteButtonPosAndSize(this.leftPos + this.imageWidth / 2 + 7, this.topPos + 45, 36);
-                break;
-            case FURNACE_BLASTING:
-            case FURNACE_SMOKING:
-            case FURNACE_SMELTING:
-            case CAMPFIRE_COOKING:
-                setExecuteButtonPosAndSize(this.leftPos + this.imageWidth / 2 - 14, this.topPos + 33, 35);
-                showDataField(0, 1);
-                setDataFieldPos(0, leftPos + 8, topPos + 30);
-                setDataFieldPos(1, leftPos + 8, topPos + 60);
-                break;
+            this.craftTypeButton.visible = true;
+            setExecuteButtonPosAndSize(leftPos + 86, topPos + 33, 30);
+        }
+        else if(currentRecipe.is(STONECUTTING))
+        {
+            setExecuteButtonPosAndSize(this.leftPos + this.imageWidth / 2 - 26, this.topPos + 31, 42);
+        }
+        else if(currentRecipe.is(SMITHING))
+        {
+            setExecuteButtonPosAndSize(this.leftPos + this.imageWidth / 2 + 7, this.topPos + 45, 36);
+        }
+        else if(currentRecipe.is(FURNACE_BLASTING, FURNACE_SMOKING, FURNACE_SMELTING, CAMPFIRE_COOKING))
+        {
+            setExecuteButtonPosAndSize(this.leftPos + this.imageWidth / 2 - 14, this.topPos + 33, 35);
+            showDataField(0, 1);
+            setDataFieldPos(0, leftPos + 8, topPos + 30);
+            setDataFieldPos(1, leftPos + 8, topPos + 60);
         }
     }
 
     @Override
     protected RecipeInfos getExtraRecipeInfos(RecipeInfos recipeInfos)
     {
-        switch(getCurrentRecipe())
+        RecipeCreator currentRecipe = getCurrentRecipe();
+
+        if(currentRecipe.is(CRAFTING_TABLE))
         {
-            case CRAFTING_TABLE:
-                recipeInfos.addParameter(new RecipeInfos.RecipeParameterBoolean(RecipeInfos.Parameters.SHAPED, this.craftTypeButton.isOn()));
-                break;
-            case FURNACE_BLASTING:
-            case FURNACE_SMELTING:
-            case FURNACE_SMOKING:
-            case CAMPFIRE_COOKING:
-                recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.EXPERIENCE, getDataField(0).getDoubleValue()));
-                recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.COOKING_TIME, getDataField(1).getIntValue()));
-                break;
+            recipeInfos.addParameter(new RecipeInfos.RecipeParameterBoolean(RecipeInfos.Parameters.SHAPED, this.craftTypeButton.isOn()));
         }
+        else if(currentRecipe.is(FURNACE_BLASTING, FURNACE_SMELTING, FURNACE_SMOKING, CAMPFIRE_COOKING))
+        {
+            recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.EXPERIENCE, getDataField(0).getDoubleValue(), true));
+            recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.COOKING_TIME, getDataField(1).getIntValue(), false));
+        }
+
         return recipeInfos;
     }
 
     @Override
     public void renderGui(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        switch(getCurrentRecipe())
+        RecipeCreator currentRecipe = getCurrentRecipe();
+
+        if(currentRecipe.is(CRAFTING_TABLE))
         {
-            case CRAFTING_TABLE:
-                craftTypeButton.render(matrixStack, mouseX, mouseY, partialTicks);
-                break;
-            case FURNACE_BLASTING:
-            case FURNACE_SMELTING:
-            case FURNACE_SMOKING:
-            case CAMPFIRE_COOKING:
-                renderDataFieldAndTitle(0, References.getTranslate("screen.minecraft_recipe_creator_screen.field.experience"), matrixStack, mouseX, mouseY, partialTicks);
-                renderDataFieldAndTitle(1, References.getTranslate("screen.minecraft_recipe_creator_screen.field.cooking_time"), matrixStack, mouseX, mouseY, partialTicks);
-                break;
+            craftTypeButton.render(matrixStack, mouseX, mouseY, partialTicks);
+        }
+        else if(currentRecipe.is(FURNACE_BLASTING, FURNACE_SMELTING, FURNACE_SMOKING, CAMPFIRE_COOKING))
+        {
+            renderDataFieldAndTitle(0, References.getTranslate("screen.minecraft_recipe_creator_screen.field.experience"), matrixStack, mouseX, mouseY, partialTicks);
+            renderDataFieldAndTitle(1, References.getTranslate("screen.minecraft_recipe_creator_screen.field.cooking_time"), matrixStack, mouseX, mouseY, partialTicks);
         }
     }
 
@@ -140,30 +139,6 @@ public class MinecraftRecipeCreatorScreen extends MultiScreenModRecipeCreatorScr
     protected List<PositionnedSlot> getNbtTaggableSlots()
     {
         return SlotHelper.CRAFTING_TABLE_SLOTS_OUTPUT;
-    }
-
-    @Override
-    protected Item getRecipeIcon(ModRecipeCreator modRecipeCreator)
-    {
-        switch(modRecipeCreator)
-        {
-            case CRAFTING_TABLE:
-                return Items.CRAFTING_TABLE;
-            case STONECUTTER:
-                return Items.STONECUTTER;
-            case SMITHING_TABLE:
-                return Items.SMITHING_TABLE;
-            case FURNACE_BLASTING:
-                return Items.BLAST_FURNACE;
-            case FURNACE_SMOKING:
-                return Items.SMOKER;
-            case FURNACE_SMELTING:
-                return Items.FURNACE;
-            case CAMPFIRE_COOKING:
-                return Items.CAMPFIRE;
-            default:
-                return Items.COMMAND_BLOCK;
-        }
     }
 
     public void setShaped(boolean isShaped)

@@ -1,7 +1,7 @@
 package fr.eno.craftcreator.tileentity.base;
 
-
 import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.api.CommonUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntArrayTag;
@@ -87,7 +87,7 @@ public abstract class TaggeableInventoryContainerTileEntity extends InventoryDat
                 {
                     CompoundTag compoundNBT = (CompoundTag) nbt;
 
-                    this.taggedSlots.put(compoundNBT.getInt("Slot"), ClientUtils.parse(compoundNBT.getString("Tag")));
+                    this.taggedSlots.put(compoundNBT.getInt("Slot"), CommonUtils.parse(compoundNBT.getString("Tag")));
                 }
             }
         }

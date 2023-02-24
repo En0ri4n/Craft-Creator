@@ -1,7 +1,7 @@
 package fr.eno.craftcreator.recipes.serializers;
 
 import com.google.gson.JsonObject;
-import fr.eno.craftcreator.base.ModRecipeCreator;
+import fr.eno.craftcreator.base.RecipeCreator;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.utils.CraftIngredients;
@@ -27,7 +27,7 @@ public class MinecraftRecipeSerializer extends ModRecipeSerializer
         super(SupportedMods.MINECRAFT);
     }
 
-    public void serializeFurnaceRecipe(ModRecipeCreator smeltType, RecipeEntry.Input input, RecipeEntry.Output output, double experience, int cookTime, boolean isKubeJSRecipe)
+    public void serializeFurnaceRecipe(RecipeCreator smeltType, RecipeEntry.Input input, RecipeEntry.Output output, double experience, int cookTime, boolean isKubeJSRecipe)
     {
         JsonObject obj = createBaseJson(smeltType.getRecipeType());
         obj.add("ingredient", singletonItemJsonObject(input));
