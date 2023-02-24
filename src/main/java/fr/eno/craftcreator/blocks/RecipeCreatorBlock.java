@@ -53,7 +53,7 @@ public abstract class RecipeCreatorBlock extends Block
         return getShape();
     }
 
-    protected abstract TileEntity getTileEntity(BlockPos pos, BlockState state);
+    protected abstract TileEntity getTileEntity(BlockState state);
 
     protected VoxelShape getShape()
     {
@@ -72,7 +72,7 @@ public abstract class RecipeCreatorBlock extends Block
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world)
     {
-        return getTileEntity(null, state);
+        return getTileEntity(state);
     }
 
     @Override

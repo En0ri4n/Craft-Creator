@@ -1,8 +1,7 @@
 package fr.eno.craftcreator.tileentity.base;
 
-import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.CommonUtils;
-import fr.eno.craftcreator.base.ModRecipeCreator;
+import fr.eno.craftcreator.base.ModRecipeCreators;
 import fr.eno.craftcreator.base.SupportedMods;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
@@ -21,7 +20,7 @@ public abstract class MultiScreenRecipeCreatorTile extends TaggeableInventoryCon
     public MultiScreenRecipeCreatorTile(SupportedMods mod, TileEntityType<?> blockEntityType, int slotsSize)
     {
         super(blockEntityType, slotsSize);
-        this.currentRecipeType = CommonUtils.getRecipeTypeName(ModRecipeCreator.getRecipeCreatorScreens(mod).get(0).getRecipeType());
+        this.currentRecipeType = ModRecipeCreators.getRecipeCreatorScreens(mod).get(0).getRecipeTypeLocation();
         this.screenIndex = 0;
         this.isKubeJSRecipe = true;
         this.fields = new double[1];
@@ -41,7 +40,7 @@ public abstract class MultiScreenRecipeCreatorTile extends TaggeableInventoryCon
                 this.setKubeJSRecipe((Boolean) data);
                 break;
             case "recipe_type":
-                this.setCurrentRecipeType(ClientUtils.parse((String) data));
+                this.setCurrentRecipeType(CommonUtils.parse((String) data));
                 break;
             case "fields":
                 this.setFields((double[]) data);
@@ -124,7 +123,7 @@ public abstract class MultiScreenRecipeCreatorTile extends TaggeableInventoryCon
         super.load(state, compound);
         this.screenIndex = compound.getInt("ScreenIndex");
         this.isKubeJSRecipe = compound.getBoolean("KubeJSRecipe");
-        this.currentRecipeType = ClientUtils.parse(compound.getString("RecipeType"));
+        this.currentRecipeType = CommonUtils.parse(compound.getString("RecipeType"));
         this.fields = Arrays.stream(compound.getLongArray("Fields")).mapToDouble(Double::longBitsToDouble).toArray();
     }
 }

@@ -2,7 +2,6 @@ package fr.eno.craftcreator.recipes.utils;
 
 import com.google.gson.*;
 import fr.eno.craftcreator.CraftCreator;
-import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.utils.PairValues;
@@ -11,6 +10,7 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.loading.FMLLoader;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -114,7 +114,7 @@ public class DatapackHelper
             pattern.append(patterns.get(slot.getItem().getItem().getRegistryName()).getSecondValue());
         }
 
-        List<String> patternList = ClientUtils.splitToListWithSize(pattern.toString(), 3);
+        List<String> patternList = CommonUtils.splitToListWithSize(pattern.toString(), 3);
 
         for(int i = 2; i >= 0; i -= 2)
         {
@@ -197,7 +197,7 @@ public class DatapackHelper
      */
     private static File getOutputFile(IRecipeType<?> type, ResourceLocation output)
     {
-        File directory = new File(ClientUtils.getMinecraft().gameDirectory, "Craft-Creator");
+        File directory = new File(FMLLoader.getGamePath().toFile(), "Craft-Creator");
         if(!directory.exists()) directory.mkdirs();
 
         return new File(directory, output.getPath() + "_from_" + CommonUtils.getRecipeTypeName(type).getPath() + ".json");
@@ -210,7 +210,7 @@ public class DatapackHelper
      */
     public static void deleteRecipe(IRecipe<?> recipe)
     {
-        File generatorFolder = new File(ClientUtils.getMinecraft().gameDirectory, "Craft-Creator");
+        File generatorFolder = new File(FMLLoader.getGamePath().toFile(), "Craft-Creator");
         if(!generatorFolder.exists()) return;
 
         for(File file : generatorFolder.listFiles())

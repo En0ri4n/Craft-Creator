@@ -378,8 +378,8 @@ public abstract class ModRecipeSerializer
 
             if(ingredientJson.isJsonObject())
             {
-                if(ingredientJson.getAsJsonObject().has("tag")) craftIngredients.addIngredient(new CraftIngredients.TagIngredient(ClientUtils.parse(ingredientJson.getAsJsonObject().get("tag").getAsString()), count));
-                else if(ingredientJson.getAsJsonObject().has("item")) craftIngredients.addIngredient(new CraftIngredients.ItemIngredient(ClientUtils.parse(ingredientJson.getAsJsonObject().get("item").getAsString()), count));
+                if(ingredientJson.getAsJsonObject().has("tag")) craftIngredients.addIngredient(new CraftIngredients.TagIngredient(CommonUtils.parse(ingredientJson.getAsJsonObject().get("tag").getAsString()), count));
+                else if(ingredientJson.getAsJsonObject().has("item")) craftIngredients.addIngredient(new CraftIngredients.ItemIngredient(CommonUtils.parse(ingredientJson.getAsJsonObject().get("item").getAsString()), count));
             }
             else
             {
@@ -393,8 +393,8 @@ public abstract class ModRecipeSerializer
                     {
                         if(value.isJsonObject())
                         {
-                            if(value.getAsJsonObject().has("tag")) multiItemIngredient.add(ClientUtils.parse(value.getAsJsonObject().get("tag").getAsString()), true);
-                            else if(value.getAsJsonObject().has("item")) multiItemIngredient.add(ClientUtils.parse(value.getAsJsonObject().get("item").getAsString()), false);
+                            if(value.getAsJsonObject().has("tag")) multiItemIngredient.add(CommonUtils.parse(value.getAsJsonObject().get("tag").getAsString()), true);
+                            else if(value.getAsJsonObject().has("item")) multiItemIngredient.add(CommonUtils.parse(value.getAsJsonObject().get("item").getAsString()), false);
                         }
                     }
 

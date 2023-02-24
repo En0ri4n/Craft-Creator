@@ -83,7 +83,7 @@ public enum SupportedMods
      */
     public List<ResourceLocation> getSupportedRecipeTypes()
     {
-        return Arrays.stream(ModRecipeCreator.values()).filter(recipeCreator -> recipeCreator.getMod().equals(this)).map(ModRecipeCreator::getRecipeTypeLocation).collect(Collectors.toList());
+        return ModRecipeCreators.RECIPE_CREATORS.stream().filter(recipeCreator -> recipeCreator.getMod().equals(this)).map(RecipeCreator::getRecipeTypeLocation).collect(Collectors.toList());
     }
 
     /**

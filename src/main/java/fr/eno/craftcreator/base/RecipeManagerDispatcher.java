@@ -7,6 +7,7 @@ import fr.eno.craftcreator.recipes.managers.MinecraftRecipeManager;
 import fr.eno.craftcreator.recipes.managers.ThermalRecipesManager;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import net.minecraft.inventory.container.Slot;
+import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class RecipeManagerDispatcher
      * @param recipeInfos       The infos of the recipe (energy, experience, chance, etc...)
      * @param serializerType    The type of serializer (kubejs, etc)
      */
-    public static void createRecipe(SupportedMods mod, ModRecipeCreator recipe, List<Slot> slots, RecipeInfos recipeInfos, ModRecipeSerializer.SerializerType serializerType)
+    public static void createRecipe(SupportedMods mod, RecipeCreator recipe, List<Slot> slots, RecipeInfos recipeInfos, ModRecipeSerializer.SerializerType serializerType)
     {
         switch(mod)
         {

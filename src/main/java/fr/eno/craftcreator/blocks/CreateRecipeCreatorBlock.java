@@ -45,7 +45,7 @@ public class CreateRecipeCreatorBlock extends RecipeCreatorBlock
     }
 
     @Override
-    protected TileEntity getTileEntity(BlockPos pos, BlockState state)
+    protected TileEntity getTileEntity(BlockState state)
     {
         return new CreateRecipeCreatorTile();
     }
