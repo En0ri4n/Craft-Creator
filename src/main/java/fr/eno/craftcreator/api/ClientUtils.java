@@ -1,8 +1,7 @@
 package fr.eno.craftcreator.api;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.base.SupportedMods;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.SimpleSound;
@@ -12,6 +11,8 @@ import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.PlayerEntity;
@@ -24,13 +25,11 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
- * @author En0ri4n <br>
- * <p>
  * class contains some useful methods for the client.
  */
 public class ClientUtils
@@ -38,6 +37,7 @@ public class ClientUtils
     public static final KeyBinding KEY_OPEN_RECIPES_MENU = new KeyBinding("key.craftcreator.open_recipes_menu", GLFW.GLFW_KEY_K, "key.categories.craft_creator");
     public static final KeyBinding KEY_OPEN_TUTORIAL = new KeyBinding("key.craftcreator.open_tutorial", GLFW.GLFW_KEY_J, "key.categories.craft_creator");
 
+    public static final Predicate<RenderType> DEFAULT_BLOCK_RENDER = (r) -> r == RenderType.cutoutMipped();
     private static final Supplier<Minecraft> minecraftSupplier = Minecraft::getInstance;
 
     /**
@@ -121,16 +121,16 @@ public class ClientUtils
         getClientPlayer().sendMessage(message, getClientPlayer().getUUID());
     }
 
-    public static void sendMessage(PlayerEntity player, ITextComponent message)
-    {
-        player.sendMessage(message, player.getUUID());
-    }
-
+    /**
+     * Bind a texture in the texture manager
+     *
+     * @param texture the texture to bind
+     * @see net.minecraft.client.renderer.texture.TextureManager#bind(ResourceLocation)
+     */
     public static void bindTexture(ResourceLocation texture)
     {
         minecraftSupplier.get().getTextureManager().bind(texture);
     }
-
 
     /**
      * calls {@link net.minecraft.client.gui.FontRenderer#width(String)}
@@ -142,53 +142,6 @@ public class ClientUtils
     public static int width(String str)
     {
         return getFontRenderer().width(str);
-    }
-
-    /**
-     * Parse a string to a resource location<br>
-     * If the string can't be parsed, return the 'bug_empty' resource location
-     *
-     * @param location the string to parse
-     * @return the resource location
-     *
-     * @see ResourceLocation#tryParse(String)
-     */
-    public static ResourceLocation parse(String location)
-    {
-        return ResourceLocation.tryParse(location) == null ? References.getLoc("bug_empty") : ResourceLocation.tryParse(location);
-    }
-
-    /**
-     * Get the container's texture with the specified name
-     *
-     * @param mod The mod of the container
-     * @param path  The path of the texture
-     * @return the texture's resource location
-     */
-    public static ResourceLocation getGuiContainerTexture(SupportedMods mod, String path)
-    {
-        return References.getLoc("textures/gui/container/" + mod.getModId() + "/" + path);
-    }
-
-    /**
-     * Split a string with the specified size
-     *
-     * @param text the string to split
-     * @param size the size to split
-     * @return a non-null list with the split string
-     */
-    public static List<String> splitToListWithSize(String text, int size)
-    {
-        List<String> parts = new ArrayList<>();
-
-        int length = text.length();
-
-        for(int i = 0; i < length; i += size)
-        {
-            parts.add(text.substring(i, Math.min(length, i + size)));
-        }
-
-        return parts;
     }
     
     /**
@@ -245,5 +198,15 @@ public class ClientUtils
         }
 
         return biggest;
+    }
+
+    public static void setBlockRender(Block block, Predicate<RenderType> render)
+    {
+        RenderTypeLookup.setRenderLayer(block, render);
+    }
+
+    public static void setDefaultBlockRender(Block block)
+    {
+        setBlockRender(block, DEFAULT_BLOCK_RENDER);
     }
 }

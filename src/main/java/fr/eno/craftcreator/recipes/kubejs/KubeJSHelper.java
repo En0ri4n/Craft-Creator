@@ -2,7 +2,6 @@ package fr.eno.craftcreator.recipes.kubejs;
 
 import com.google.gson.*;
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.base.ModRecipeCreatorDispatcher;
 import fr.eno.craftcreator.base.SupportedMods;
@@ -87,7 +86,7 @@ public class KubeJSHelper
             JsonObject jsonObject = GSON.fromJson(new StringReader(recipeJson), JsonObject.class);
             IRecipeSerializer<T> currentSerializer;
             
-            ResourceLocation recipeTypeLocation = ClientUtils.parse(jsonObject.get("type").getAsString());
+            ResourceLocation recipeTypeLocation = CommonUtils.parse(jsonObject.get("type").getAsString());
             
             if(recipeType == IRecipeType.CRAFTING && recipeTypeLocation.toString().contains(CommonUtils.getRecipeTypeName(recipeType).toString()))
                 currentSerializer = recipeTypeLocation.toString().contains("shaped") ? (IRecipeSerializer<T>) IRecipeSerializer.SHAPED_RECIPE : (IRecipeSerializer<T>) IRecipeSerializer.SHAPELESS_RECIPE;
@@ -108,7 +107,7 @@ public class KubeJSHelper
     @SuppressWarnings("unchecked")
     private static <C extends IInventory, T extends IRecipe<C>> T getRecipe(JsonObject recipeJson)
     {
-        return (T) ForgeRegistries.RECIPE_SERIALIZERS.getValue(ClientUtils.parse(recipeJson.get("type").getAsString())).fromJson(References.getLoc("temp"), recipeJson);
+        return (T) ForgeRegistries.RECIPE_SERIALIZERS.getValue(CommonUtils.parse(recipeJson.get("type").getAsString())).fromJson(References.getLoc("temp"), recipeJson);
     }
     
     @SuppressWarnings("unchecked")
@@ -140,7 +139,7 @@ public class KubeJSHelper
         while(recipeMatcher.find())
         {
             JsonObject jsonObject = GSON.fromJson(recipeMatcher.group(1), JsonObject.class);
-            IRecipeSerializer<T> currentSerializer = getSerializer(ClientUtils.parse(jsonObject.get("type").getAsString()));
+            IRecipeSerializer<T> currentSerializer = getSerializer(CommonUtils.parse(jsonObject.get("type").getAsString()));
             
             T tempRecipe = currentSerializer.fromJson(new ResourceLocation(mod.getModId(), "recipe"), jsonObject);
             T recipe = currentSerializer.fromJson(new ResourceLocation(mod.getModId(), ModRecipeCreatorDispatcher.getOutput(tempRecipe).getIngredientsWithCount().stream().findAny().orElse(CraftIngredients.CraftIngredient.EMPTY).getId().getPath()), jsonObject);

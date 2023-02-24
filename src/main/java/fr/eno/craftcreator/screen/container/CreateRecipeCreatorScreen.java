@@ -1,8 +1,6 @@
 package fr.eno.craftcreator.screen.container;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.base.ModRecipeCreator;
 import fr.eno.craftcreator.container.CreateRecipeCreatorContainer;
 import fr.eno.craftcreator.container.slot.utils.PositionnedSlot;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
@@ -10,10 +8,7 @@ import fr.eno.craftcreator.screen.container.base.MultiScreenModRecipeCreatorScre
 import fr.eno.craftcreator.screen.widgets.RecipeEntryWidget;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,20 +72,6 @@ public class CreateRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen
     public int getArrowXPos(boolean right)
     {
         return right ? super.getArrowXPos(true) - 40 : super.getArrowXPos(false) + 40;
-    }
-
-    @Override
-    protected Item getRecipeIcon(ModRecipeCreator modRecipeCreator)
-    {
-        switch(modRecipeCreator)
-        {
-            case CRUSHING:
-                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("create:crushing_wheel"));
-            case CUTTING:
-                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("create:cutting"));
-            default:
-                return Items.COMMAND_BLOCK;
-        }
     }
 
     @Override

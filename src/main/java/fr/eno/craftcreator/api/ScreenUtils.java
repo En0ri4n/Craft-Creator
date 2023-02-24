@@ -5,8 +5,6 @@ import fr.eno.craftcreator.References;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.ResourceLocation;
 
-import java.util.List;
-
 public class ScreenUtils
 {
     private static final ResourceLocation BUTTON_TEXTURE = References.getLoc("textures/gui/buttons/basic_button.png");

@@ -3,8 +3,7 @@ package fr.eno.craftcreator.screen.container;
 import cofh.thermal.core.init.TCoreRecipeTypes;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.base.ModRecipeCreator;
+import fr.eno.craftcreator.base.RecipeCreator;
 import fr.eno.craftcreator.container.ThermalRecipeCreatorContainer;
 import fr.eno.craftcreator.container.slot.utils.PositionnedSlot;
 import fr.eno.craftcreator.init.InitPackets;
@@ -15,15 +14,14 @@ import fr.eno.craftcreator.screen.container.base.MultiScreenModRecipeCreatorScre
 import fr.eno.craftcreator.screen.widgets.buttons.SimpleCheckBox;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
 import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static fr.eno.craftcreator.base.ModRecipeCreators.*;
 
 public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen<ThermalRecipeCreatorContainer>
 {
@@ -80,38 +78,40 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     @Override
     protected RecipeInfos getExtraRecipeInfos(RecipeInfos recipeInfos)
     {
-        recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.ENERGY, isEnergyModCheckBox.selected() ? getDataField(ENERGY_FIELD).getDoubleValue() : getDataField(ENERGY_FIELD).getIntValue()));
+        recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.ENERGY, isEnergyModCheckBox.selected() ? getDataField(ENERGY_FIELD).getDoubleValue() : getDataField(ENERGY_FIELD).getIntValue(), isEnergyModCheckBox.selected()));
         recipeInfos.addParameter(new RecipeInfos.RecipeParameterBoolean(RecipeInfos.Parameters.ENERGY_MOD, isEnergyModCheckBox.selected()));
-        recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.EXPERIENCE, getDataField(EXPERIENCE_FIELD).getDoubleValue()));
+        recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.EXPERIENCE, getDataField(EXPERIENCE_FIELD).getDoubleValue(), true));
 
-        switch(getCurrentRecipe())
+        RecipeCreator currentRecipe = getCurrentRecipe();
+        
+        if(currentRecipe.is(TREE_EXTRACTOR))
         {
-            case TREE_EXTRACTOR:
-                recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.RESIN_AMOUNT, getDataField(RESIN_FIELD).getIntValue()));
-            case PULVERIZER:
-            case SAWMILL:
-            case SMELTER:
-                addChancesParameters(recipeInfos);
-                break;
-            case INSOLATOR:
-                    recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.WATER_MOD, getDataField(WATER_MOD_FIELD).getDoubleValue()));
-                    addChancesParameters(recipeInfos);
-                break;
-            case CENTRIFUGE:
-            case CHILLER:
-            case BOTTLER:
-            case CRUCIBLE:
-                recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.FLUID_AMOUNT_0, getDataField(FLUID_FIELD_0).getIntValue()));
-                break;
-            case REFINERY:
-                recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.FLUID_AMOUNT_0, getDataField(FLUID_FIELD_0).getIntValue()));
-                recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.FLUID_AMOUNT_1, getDataField(FLUID_FIELD_1).getIntValue()));
-                recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.CHANCE, getDataField(CHANCES_FIELD).getDoubleValue()));
-                break;
-            case PYROLYZER:
-                addChancesParameters(recipeInfos);
-                recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.FLUID_AMOUNT_0, getDataField(FLUID_FIELD_0).getIntValue()));
-                break;
+            recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.RESIN_AMOUNT, getDataField(RESIN_FIELD).getIntValue(), false));
+            addChancesParameters(recipeInfos);
+        }
+        else if(currentRecipe.is(PULVERIZER, SAWMILL, SMELTER))
+        {
+            addChancesParameters(recipeInfos);
+        }
+        else if(currentRecipe.is(INSOLATOR))
+        {
+            recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.WATER_MOD, getDataField(WATER_MOD_FIELD).getDoubleValue(), true));
+            addChancesParameters(recipeInfos);
+        }
+        else if(currentRecipe.is(CENTRIFUGE, CHILLER, BOTTLER, CRUCIBLE))
+        {
+            recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.FLUID_AMOUNT_0, getDataField(FLUID_FIELD_0).getIntValue(), false));
+        }
+        else if(currentRecipe.is(REFINERY))
+        {
+            recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.FLUID_AMOUNT_0, getDataField(FLUID_FIELD_0).getIntValue(), false));
+            recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.FLUID_AMOUNT_1, getDataField(FLUID_FIELD_1).getIntValue(), false));
+            recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.CHANCE, getDataField(CHANCES_FIELD).getDoubleValue(), true));
+        }
+        else if(currentRecipe.is(PYROLYZER))
+        {
+            recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber(RecipeInfos.Parameters.FLUID_AMOUNT_0, getDataField(FLUID_FIELD_0).getIntValue(), false));
+            addChancesParameters(recipeInfos);
         }
 
         return recipeInfos;
@@ -120,7 +120,7 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     private void addChancesParameters(RecipeInfos recipeInfos)
     {
         for(int i = 0; i < 4; i++)
-            recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber("chance_" + i, getDataField(CHANCES_FIELD + i).getDoubleValue()));
+            recipeInfos.addParameter(new RecipeInfos.RecipeParameterNumber("chance_" + i, getDataField(CHANCES_FIELD + i).getDoubleValue(), true));
     }
 
     @Override
@@ -139,58 +139,61 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
 
         setExecuteButtonPos(this.leftPos + this.imageWidth / 2 - this.executeButton.getWidth() / 2, this.topPos + this.imageHeight / 2 - this.executeButton.getHeight() / 2 + 22);
 
-        switch(getCurrentRecipe())
+        RecipeCreator currentRecipe = getCurrentRecipe();
+        
+        if(currentRecipe.is(TREE_EXTRACTOR))
         {
-            case TREE_EXTRACTOR:
-                showDataField(RESIN_FIELD);
-                setDataField(RESIN_FIELD, leftPos + imageWidth / 4 * 3 - 12, topPos + imageHeight / 3 - 13, 55, 25, false);
-                setDataFieldTooltip(RESIN_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.resin.tooltip"));
-                break;
-            case INSOLATOR:
-                showDataField(WATER_MOD_FIELD);
-                setDataField(WATER_MOD_FIELD, this.leftPos + 48, this.topPos + this.imageHeight / 3 - 10, 45, 1D, true);
-                setDataFieldTooltip(WATER_MOD_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.mod_water.tooltip"));
-                setupChancesFields();
-                break;
-            case SAWMILL:
-            case PULVERIZER:
-            case SMELTER:
-                setupChancesFields();
-                break;
-            case CENTRIFUGE:
-                showDataField(FLUID_FIELD_0);
-                setDataField(FLUID_FIELD_0, leftPos + imageWidth / 4 * 3, topPos + imageHeight / 3 - 23, 55, 100, false);
-                setDataFieldTooltip(FLUID_FIELD_0, References.getTranslate("screen.thermal_recipe_creator.field.fluid.tooltip"));
-                break;
-            case BOTTLER:
-            case CHILLER:
-                showDataField(FLUID_FIELD_0);
-                setDataField(FLUID_FIELD_0, leftPos + 8, topPos + imageHeight / 3 - 9, 55, 100, false);
-                setDataFieldTooltip(FLUID_FIELD_0, References.getTranslate("screen.thermal_recipe_creator.field.fluid.tooltip"));
-                break;
-            case CRUCIBLE:
-                showDataField(FLUID_FIELD_0);
-                setDataField(FLUID_FIELD_0, leftPos + imageWidth / 4 * 3 - 12, topPos + imageHeight / 3 - 13, 55, 25, false);
-                setDataFieldTooltip(FLUID_FIELD_0, References.getTranslate("screen.thermal_recipe_creator.field.fluid.tooltip"));
-                break;
-            case REFINERY:
-                showDataField(FLUID_FIELD_0, FLUID_FIELD_1, FLUID_FIELD_2, CHANCES_FIELD);
-                setDataField(FLUID_FIELD_0, leftPos + imageWidth / 4 - 31, topPos + imageHeight / 3 - 9, 55, 100, false);
-                setDataField(CHANCES_FIELD, leftPos + imageWidth / 4 * 3 - 12, topPos + 33, 40, 1D, true);
-                setDataField(FLUID_FIELD_1, leftPos + imageWidth / 4 * 3 - 12, topPos + imageHeight / 3 - 13, 55, 100, false);
-                setDataField(FLUID_FIELD_2, leftPos + imageWidth / 4 * 3 - 12, topPos + imageHeight / 2 - 17, 55, 100, false);
-                setDataFieldTooltip(FLUID_FIELD_0, References.getTranslate("screen.thermal_recipe_creator.field.fluid.tooltip"));
-                setDataFieldTooltip(FLUID_FIELD_1, References.getTranslate("screen.thermal_recipe_creator.field.fluid.tooltip"));
-                setDataFieldTooltip(FLUID_FIELD_2, References.getTranslate("screen.thermal_recipe_creator.field.fluid.tooltip"));
-                setDataFieldTooltip(CHANCES_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.chances.tooltip"));
-                break;
-            case PYROLYZER:
-                setupChancesFields();
-                showDataField(FLUID_FIELD_0);
-                setDataField(FLUID_FIELD_0, leftPos + imageWidth - 49, topPos + imageHeight / 3 - 20, 40, 25, false);
-                setDataFieldTooltip(FLUID_FIELD_0, References.getTranslate("screen.thermal_recipe_creator.field.fluid.tooltip"));
-                break;
-
+            showDataField(RESIN_FIELD);
+            setDataField(RESIN_FIELD, leftPos + imageWidth / 4 * 3 - 12, topPos + imageHeight / 3 - 13, 55, 25, false);
+            setDataFieldTooltip(RESIN_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.resin.tooltip"));
+        }
+        else if(currentRecipe.is(INSOLATOR))
+        {
+            showDataField(WATER_MOD_FIELD);
+            setDataField(WATER_MOD_FIELD, this.leftPos + 48, this.topPos + this.imageHeight / 3 - 10, 45, 1D, true);
+            setDataFieldTooltip(WATER_MOD_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.mod_water.tooltip"));
+            setupChancesFields();
+        }
+        else if(currentRecipe.is(SAWMILL, PULVERIZER, SMELTER))
+        {
+            setupChancesFields();
+        }
+        else if(currentRecipe.is(CENTRIFUGE))
+        {
+            showDataField(FLUID_FIELD_0);
+            setDataField(FLUID_FIELD_0, leftPos + imageWidth / 4 * 3, topPos + imageHeight / 3 - 23, 55, 100, false);
+            setDataFieldTooltip(FLUID_FIELD_0, References.getTranslate("screen.thermal_recipe_creator.field.fluid.tooltip"));
+        }
+        else if(currentRecipe.is(BOTTLER, CHILLER))
+        {
+            showDataField(FLUID_FIELD_0);
+            setDataField(FLUID_FIELD_0, leftPos + 8, topPos + imageHeight / 3 - 9, 55, 100, false);
+            setDataFieldTooltip(FLUID_FIELD_0, References.getTranslate("screen.thermal_recipe_creator.field.fluid.tooltip"));
+        }
+        else if(currentRecipe.is(CRUCIBLE))
+        {
+            showDataField(FLUID_FIELD_0);
+            setDataField(FLUID_FIELD_0, leftPos + imageWidth / 4 * 3 - 12, topPos + imageHeight / 3 - 13, 55, 25, false);
+            setDataFieldTooltip(FLUID_FIELD_0, References.getTranslate("screen.thermal_recipe_creator.field.fluid.tooltip"));
+        }
+        else if(currentRecipe.is(REFINERY))
+        {
+            showDataField(FLUID_FIELD_0, FLUID_FIELD_1, FLUID_FIELD_2, CHANCES_FIELD);
+            setDataField(FLUID_FIELD_0, leftPos + imageWidth / 4 - 31, topPos + imageHeight / 3 - 9, 55, 100, false);
+            setDataField(CHANCES_FIELD, leftPos + imageWidth / 4 * 3 - 12, topPos + 33, 40, 1D, true);
+            setDataField(FLUID_FIELD_1, leftPos + imageWidth / 4 * 3 - 12, topPos + imageHeight / 3 - 13, 55, 100, false);
+            setDataField(FLUID_FIELD_2, leftPos + imageWidth / 4 * 3 - 12, topPos + imageHeight / 2 - 17, 55, 100, false);
+            setDataFieldTooltip(FLUID_FIELD_0, References.getTranslate("screen.thermal_recipe_creator.field.fluid.tooltip"));
+            setDataFieldTooltip(FLUID_FIELD_1, References.getTranslate("screen.thermal_recipe_creator.field.fluid.tooltip"));
+            setDataFieldTooltip(FLUID_FIELD_2, References.getTranslate("screen.thermal_recipe_creator.field.fluid.tooltip"));
+            setDataFieldTooltip(CHANCES_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.chances.tooltip"));
+        }
+        else if(currentRecipe.is(PYROLYZER))
+        {
+            setupChancesFields();
+            showDataField(FLUID_FIELD_0);
+            setDataField(FLUID_FIELD_0, leftPos + imageWidth - 49, topPos + imageHeight / 3 - 20, 40, 25, false);
+            setDataFieldTooltip(FLUID_FIELD_0, References.getTranslate("screen.thermal_recipe_creator.field.fluid.tooltip"));
         }
     }
 
@@ -211,40 +214,47 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
         renderDataFieldTitle(ENERGY_FIELD, References.getTranslate(isEnergyModCheckBox.selected() ? "screen.thermal_recipe_creator.field.mod_energy" : "screen.thermal_recipe_creator.field.energy"), matrixStack);
         renderDataFieldTitle(EXPERIENCE_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.experience"), matrixStack);
 
-        switch(getCurrentRecipe())
+        RecipeCreator currentRecipe = getCurrentRecipe();
+        
+        if(currentRecipe.is(TREE_EXTRACTOR))
         {
-            case TREE_EXTRACTOR:
-                renderSlotTitle(0, References.getTranslate("screen.thermal_recipe_creator.slot.trunk"), matrixStack);
-                renderSlotTitle(1, References.getTranslate("screen.thermal_recipe_creator.slot.leaves"), matrixStack);
-                renderDataFieldTitle(RESIN_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.resin_amount"), matrixStack);
-                break;
-            case INSOLATOR:
-                renderDataFieldTitle(WATER_MOD_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.mod_water"), matrixStack);
-            case PULVERIZER:
-            case SAWMILL:
-            case SMELTER:
-                renderDataFieldTitle(CHANCES_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.chances"), matrixStack);
-                break;
-            case PRESS:
-                renderSlotTitle(1, References.getTranslate("screen.thermal_recipe_creator.slot.die"), matrixStack);
-                break;
-            case CHILLER:
-                renderSlotTitle(1, References.getTranslate("screen.thermal_recipe_creator.slot.cast"), matrixStack);
-            case BOTTLER:
-            case CENTRIFUGE:
-            case CRUCIBLE:
-                renderDataFieldTitle(FLUID_FIELD_0, References.getTranslate("screen.thermal_recipe_creator.field.fluid"), matrixStack);
-                break;
-            case REFINERY:
-                renderDataFieldTitle(FLUID_FIELD_0, References.getTranslate("screen.thermal_recipe_creator.field.fluid"), matrixStack);
-                renderDataFieldTitle(FLUID_FIELD_1, References.getTranslate("screen.thermal_recipe_creator.field.fluid"), matrixStack);
-                renderDataFieldTitle(FLUID_FIELD_2, References.getTranslate("screen.thermal_recipe_creator.field.fluid"), matrixStack);
-                renderDataFieldTitle(CHANCES_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.chances"), matrixStack);
-                break;
-            case PYROLYZER:
-                renderDataFieldTitle(CHANCES_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.chances"), matrixStack);
-                renderDataFieldTitle(FLUID_FIELD_0, References.getTranslate("screen.thermal_recipe_creator.field.fluid"), matrixStack);
-                break;
+            renderSlotTitle(0, References.getTranslate("screen.thermal_recipe_creator.slot.trunk"), matrixStack);
+            renderSlotTitle(1, References.getTranslate("screen.thermal_recipe_creator.slot.leaves"), matrixStack);
+            renderDataFieldTitle(RESIN_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.resin_amount"), matrixStack);
+        }
+        else if(currentRecipe.is(INSOLATOR))
+        {
+            renderDataFieldTitle(WATER_MOD_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.mod_water"), matrixStack);
+            renderDataFieldTitle(CHANCES_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.chances"), matrixStack);
+        }
+        else if(currentRecipe.is(PULVERIZER, SAWMILL, SMELTER))
+        {
+            renderDataFieldTitle(CHANCES_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.chances"), matrixStack);
+        }
+        else if(currentRecipe.is(PRESS))
+        {
+            renderSlotTitle(1, References.getTranslate("screen.thermal_recipe_creator.slot.die"), matrixStack);
+        }
+        else if(currentRecipe.is(CHILLER))
+        {
+            renderSlotTitle(1, References.getTranslate("screen.thermal_recipe_creator.slot.cast"), matrixStack);
+            renderDataFieldTitle(FLUID_FIELD_0, References.getTranslate("screen.thermal_recipe_creator.field.fluid"), matrixStack);
+        }
+        else if(currentRecipe.is(BOTTLER, CENTRIFUGE, CRUCIBLE))
+        {
+            renderDataFieldTitle(FLUID_FIELD_0, References.getTranslate("screen.thermal_recipe_creator.field.fluid"), matrixStack);
+        }
+        else if(currentRecipe.is(REFINERY))
+        {
+            renderDataFieldTitle(FLUID_FIELD_0, References.getTranslate("screen.thermal_recipe_creator.field.fluid"), matrixStack);
+            renderDataFieldTitle(FLUID_FIELD_1, References.getTranslate("screen.thermal_recipe_creator.field.fluid"), matrixStack);
+            renderDataFieldTitle(FLUID_FIELD_2, References.getTranslate("screen.thermal_recipe_creator.field.fluid"), matrixStack);
+            renderDataFieldTitle(CHANCES_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.chances"), matrixStack);
+        }
+        else if(currentRecipe.is(PYROLYZER))
+        {
+            renderDataFieldTitle(CHANCES_FIELD, References.getTranslate("screen.thermal_recipe_creator.field.chances"), matrixStack);
+            renderDataFieldTitle(FLUID_FIELD_0, References.getTranslate("screen.thermal_recipe_creator.field.fluid"), matrixStack);
         }
     }
 
@@ -287,6 +297,12 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
     }
 
     @Override
+    protected int getMessagePosX()
+    {
+        return super.getMessagePosX() + 20;
+    }
+
+    @Override
     protected void updateExtraServerData()
     {
         InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket("is_energy_mod", getMenu().getTile().getBlockPos(), InitPackets.PacketDataType.BOOLEAN, isEnergyModCheckBox.selected()));
@@ -302,42 +318,6 @@ public class ThermalRecipeCreatorScreen extends MultiScreenModRecipeCreatorScree
             isEnergyModCheckBox.setSelected((boolean) data);
             setDataFieldValue(isEnergyModCheckBox.selected() ? getDataField(ENERGY_FIELD).getDoubleValue() : getDataField(ENERGY_FIELD).getIntValue(), isEnergyModCheckBox.selected(), ENERGY_FIELD);
             setDataFieldTooltip(ENERGY_FIELD, isEnergyModCheckBox.selected() ? References.getTranslate("screen.thermal_recipe_creator.field.mod_energy.tooltip") : References.getTranslate("screen.thermal_recipe_creator.field.energy.tooltip"));
-        }
-    }
-
-    @Override
-    protected Item getRecipeIcon(ModRecipeCreator modRecipeCreator)
-    {
-        switch(modRecipeCreator)
-        {
-            case TREE_EXTRACTOR:
-                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("thermal:device_tree_extractor"));
-            case PULVERIZER:
-                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("thermal:machine_pulverizer"));
-            case SAWMILL:
-                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("thermal:machine_sawmill"));
-            case SMELTER:
-                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("thermal:machine_smelter"));
-            case INSOLATOR:
-                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("thermal:machine_insolator"));
-            case PRESS:
-                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("thermal:machine_press"));
-            case FURNACE_THERMAL:
-                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("thermal:machine_furnace"));
-            case CENTRIFUGE:
-                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("thermal:machine_centrifuge"));
-            case CHILLER:
-                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("thermal:machine_chiller"));
-            case CRUCIBLE:
-                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("thermal:machine_crucible"));
-            case REFINERY:
-                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("thermal:machine_refinery"));
-            case BOTTLER:
-                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("thermal:machine_bottler"));
-            case PYROLYZER:
-                return ForgeRegistries.ITEMS.getValue(ClientUtils.parse("thermal:machine_pyrolyzer"));
-            default:
-                return Items.COMMAND_BLOCK;
         }
     }
 }

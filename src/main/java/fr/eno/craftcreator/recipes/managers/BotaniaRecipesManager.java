@@ -1,6 +1,6 @@
 package fr.eno.craftcreator.recipes.managers;
 
-import fr.eno.craftcreator.base.ModRecipeCreator;
+import fr.eno.craftcreator.base.RecipeCreator;
 import fr.eno.craftcreator.container.slot.utils.PositionnedSlot;
 import fr.eno.craftcreator.recipes.base.BaseRecipesManager;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
@@ -17,39 +17,31 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static fr.eno.craftcreator.base.ModRecipeCreators.*;
+
 public class BotaniaRecipesManager extends BaseRecipesManager
 {
     private static final BotaniaRecipesManager INSTANCE = new BotaniaRecipesManager();
 
     @Override
-    public void createRecipe(ModRecipeCreator recipe, List<Slot> slots, RecipeInfos recipeInfos, ModRecipeSerializer.SerializerType serializerType)
+    public void createRecipe(RecipeCreator recipe, List<Slot> slots, RecipeInfos recipeInfos, ModRecipeSerializer.SerializerType serializerType)
     {
         BotaniaRecipeSerializer.get().setSerializerType(serializerType);
 
-        switch(recipe)
-        {
-            case MANA_INFUSION:
-                createManaInfusionRecipe(PositionnedSlot.getSlotsFor(SlotHelper.MANA_INFUSION_SLOTS, slots), recipeInfos.getValue(RecipeInfos.Parameters.MANA).intValue());
-                break;
-            case ELVEN_TRADE:
-                createElvenTradeRecipe(PositionnedSlot.getSlotsFor(SlotHelper.ELVEN_TRADE_SLOTS, slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS));
-                break;
-            case PURE_DAISY:
-                createPureDaisyRecipe(PositionnedSlot.getSlotsFor(SlotHelper.PURE_DAISY_SLOTS, slots), recipeInfos.getValue(RecipeInfos.Parameters.TIME).intValue());
-                break;
-            case BREWERY:
-                createBreweryRecipe(PositionnedSlot.getSlotsFor(SlotHelper.BREWERY_SLOTS, slots));
-                break;
-            case PETAL_APOTHECARY:
-                createPetalRecipe(PositionnedSlot.getSlotsFor(SlotHelper.PETAL_APOTHECARY_SLOTS, slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS));
-                break;
-            case RUNIC_ALTAR:
-                createRuneRecipe(PositionnedSlot.getSlotsFor(SlotHelper.RUNIC_ALTAR_SLOTS, slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.MANA).intValue());
-                break;
-            case TERRA_PLATE:
-                createTerraPlateRecipe(PositionnedSlot.getSlotsFor(SlotHelper.TERRA_PLATE_SLOTS, slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.MANA).intValue());
-                break;
-        }
+        if(recipe.is(MANA_INFUSION))
+            createManaInfusionRecipe(PositionnedSlot.getSlotsFor(SlotHelper.MANA_INFUSION_SLOTS, slots), recipeInfos.getValue(RecipeInfos.Parameters.MANA).intValue());
+        else if(recipe.is(ELVEN_TRADE))
+            createElvenTradeRecipe(PositionnedSlot.getSlotsFor(SlotHelper.ELVEN_TRADE_SLOTS, slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS));
+        else if(recipe.is(PURE_DAISY))
+            createPureDaisyRecipe(PositionnedSlot.getSlotsFor(SlotHelper.PURE_DAISY_SLOTS, slots), recipeInfos.getValue(RecipeInfos.Parameters.TIME).intValue());
+        else if(recipe.is(BREWERY))
+            createBreweryRecipe(PositionnedSlot.getSlotsFor(SlotHelper.BREWERY_SLOTS, slots));
+        else if(recipe.is(PETAL_APOTHECARY))
+            createPetalRecipe(PositionnedSlot.getSlotsFor(SlotHelper.PETAL_APOTHECARY_SLOTS, slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS));
+        else if(recipe.is(RUNIC_ALTAR))
+            createRuneRecipe(PositionnedSlot.getSlotsFor(SlotHelper.RUNIC_ALTAR_SLOTS, slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.MANA).intValue());
+        else if(recipe.is(TERRA_PLATE))
+            createTerraPlateRecipe(PositionnedSlot.getSlotsFor(SlotHelper.TERRA_PLATE_SLOTS, slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.MANA).intValue());
     }
 
     private void createManaInfusionRecipe(List<Slot> slots, int mana)

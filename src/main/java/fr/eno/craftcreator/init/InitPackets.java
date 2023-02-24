@@ -1,6 +1,7 @@
 package fr.eno.craftcreator.init;
 
 import fr.eno.craftcreator.References;
+import fr.eno.craftcreator.packets.CreateRecipePacket;
 import fr.eno.craftcreator.packets.RetrieveRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataClientPacket;
 import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataServerPacket;
@@ -55,6 +56,7 @@ public class InitPackets
     public static void registerPackets()
     {
         registerServerMessage(RetrieveRecipeCreatorTileDataServerPacket.class, RetrieveRecipeCreatorTileDataServerPacket::encode, RetrieveRecipeCreatorTileDataServerPacket::decode, RetrieveRecipeCreatorTileDataServerPacket.ServerHandler::handle);
+        registerServerMessage(CreateRecipePacket.class, CreateRecipePacket::encode, CreateRecipePacket::decode, CreateRecipePacket.ServerHandler::handle);
 
         registerClientMessage(UpdateRecipeCreatorTileDataClientPacket.class, UpdateRecipeCreatorTileDataClientPacket::encode, UpdateRecipeCreatorTileDataClientPacket::decode, UpdateRecipeCreatorTileDataClientPacket.ClientHandler::handle);
         registerServerMessage(UpdateRecipeCreatorTileDataServerPacket.class, UpdateRecipeCreatorTileDataServerPacket::encode, UpdateRecipeCreatorTileDataServerPacket::decode, UpdateRecipeCreatorTileDataServerPacket.ServerHandler::handle);

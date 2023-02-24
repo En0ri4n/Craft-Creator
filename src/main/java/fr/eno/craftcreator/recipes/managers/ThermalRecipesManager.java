@@ -1,6 +1,6 @@
 package fr.eno.craftcreator.recipes.managers;
 
-import fr.eno.craftcreator.base.ModRecipeCreator;
+import fr.eno.craftcreator.base.RecipeCreator;
 import fr.eno.craftcreator.container.slot.utils.PositionnedSlot;
 import fr.eno.craftcreator.recipes.base.BaseRecipesManager;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
@@ -18,54 +18,44 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static fr.eno.craftcreator.base.ModRecipeCreators.*;
+
 public class ThermalRecipesManager extends BaseRecipesManager
 {
     private static final ThermalRecipesManager INSTANCE = new ThermalRecipesManager();
     
     @Override
-    public void createRecipe(ModRecipeCreator recipe, List<Slot> slots, RecipeInfos recipeInfos, ModRecipeSerializer.SerializerType serializerType)
+    public void createRecipe(RecipeCreator recipe, List<Slot> slots, RecipeInfos recipeInfos, ModRecipeSerializer.SerializerType serializerType)
     {
         ThermalRecipeSerializer.get().setSerializerType(serializerType);
         
-        switch(recipe)
-        {
-            case TREE_EXTRACTOR:
-                createTreeExtractorRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getValue(RecipeInfos.Parameters.RESIN_AMOUNT).intValue());
-                break;
-            case PULVERIZER:
-                createPulverizerRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.EXPERIENCE).doubleValue(), recipeInfos);
-                break;
-            case SAWMILL:
-                createSawmillRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos);
-                break;
-            case SMELTER:
-                createSmelterRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.EXPERIENCE).doubleValue(), recipeInfos);
-                break;
-            case INSOLATOR:
-                createInsolatorRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.WATER_MOD).doubleValue(), recipeInfos);
-                break;
-            case PRESS:
-                createPressRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos);
-                break;
-            case CENTRIFUGE:
-                createCentrifugeRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos);
-                break;
-            case CHILLER:
-                createChillerRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos);
-                break;
-            case CRUCIBLE:
-                createCrucibleRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos);
-                break;
-            case REFINERY:
-                createRefineryRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos);
-                break;
-            case BOTTLER:
-                createBottlerRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos);
-                break;
-            case PYROLYZER:
-                createPyrolyzerRecipe(PositionnedSlot.getSlotsFor(recipe.getSlots(), slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.EXPERIENCE).doubleValue(), recipeInfos);
-                break;
-        }
+        List<Slot> currentSlots = PositionnedSlot.getSlotsFor(recipe.getSlots(), slots);
+        Map<Integer, ResourceLocation> taggedSlots = recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS);
+        
+        if(recipe.is(TREE_EXTRACTOR))
+            createTreeExtractorRecipe(currentSlots, recipeInfos.getValue(RecipeInfos.Parameters.RESIN_AMOUNT).intValue());
+        else if(recipe.is(PULVERIZER))
+            createPulverizerRecipe(currentSlots, taggedSlots, recipeInfos.getValue(RecipeInfos.Parameters.EXPERIENCE).doubleValue(), recipeInfos);
+        else if(recipe.is(SAWMILL))
+            createSawmillRecipe(currentSlots, taggedSlots, recipeInfos);
+        else if(recipe.is(SMELTER))
+            createSmelterRecipe(currentSlots, taggedSlots, recipeInfos.getValue(RecipeInfos.Parameters.EXPERIENCE).doubleValue(), recipeInfos);
+        else if(recipe.is(INSOLATOR))
+            createInsolatorRecipe(currentSlots, taggedSlots, recipeInfos.getValue(RecipeInfos.Parameters.WATER_MOD).doubleValue(), recipeInfos);
+        else if(recipe.is(PRESS))
+            createPressRecipe(currentSlots, taggedSlots, recipeInfos);
+        else if(recipe.is(CENTRIFUGE))
+            createCentrifugeRecipe(currentSlots, taggedSlots, recipeInfos);
+        else if(recipe.is(CHILLER))
+            createChillerRecipe(currentSlots, taggedSlots, recipeInfos);
+        else if(recipe.is(CRUCIBLE))
+            createCrucibleRecipe(currentSlots, taggedSlots, recipeInfos);
+        else if(recipe.is(REFINERY))
+            createRefineryRecipe(currentSlots, recipeInfos);
+        else if(recipe.is(BOTTLER))
+            createBottlerRecipe(currentSlots, taggedSlots, recipeInfos);
+        else if(recipe.is(PYROLYZER))
+            createPyrolyzerRecipe(currentSlots, taggedSlots, recipeInfos.getValue(RecipeInfos.Parameters.WATER_MOD).doubleValue(), recipeInfos);
     }
 
     private void createPyrolyzerRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, double experience, RecipeInfos recipeInfos)

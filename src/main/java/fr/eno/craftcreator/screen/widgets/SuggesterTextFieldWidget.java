@@ -79,13 +79,20 @@ public class SuggesterTextFieldWidget extends SimpleListWidget
 
     private boolean focused;
     public boolean visible;
+    private Consumer<String> onTextChange;
 
     public SuggesterTextFieldWidget(int leftIn, int topIn, int widthIn, int height, List<Entry> entries, @Nullable Consumer<Entry> onSelect)
     {
-        this(leftIn, topIn, widthIn, height, 16, 4, entries, onSelect);
+        this(leftIn, topIn, widthIn, height, 16, 4, entries, onSelect, null);
     }
 
-    public SuggesterTextFieldWidget(int leftIn, int topIn, int widthIn, int height, int slotHeightIn, int scrollBarWidth, List<Entry> entries, @Nullable Consumer<Entry> onSelect)
+    public SuggesterTextFieldWidget(int leftIn, int topIn, int widthIn, int height, List<Entry> entries, @Nullable Consumer<Entry> onSelect, @Nullable Consumer<String> onTextChange)
+    {
+        this(leftIn, topIn, widthIn, height, 16, 4, entries, onSelect, onTextChange);
+    }
+
+
+    public SuggesterTextFieldWidget(int leftIn, int topIn, int widthIn, int height, int slotHeightIn, int scrollBarWidth, List<Entry> entries, @Nullable Consumer<Entry> onSelect, @Nullable Consumer<String> onTextChange)
     {
         super(leftIn, topIn + height, ClientUtils.getBiggestStringWidth(entries.stream().map(Entry::getEntryValue).collect(Collectors.toList())), Math.min(entries.size(), MAX_ITEMS_DISPLAYED) * slotHeightIn, slotHeightIn, 0, scrollBarWidth, new StringTextComponent(""), null, false);
         this.font = ClientUtils.getFontRenderer();
@@ -96,6 +103,12 @@ public class SuggesterTextFieldWidget extends SimpleListWidget
         this.rawEntries = entries;
         this.setEntries(entries, true);
         this.setOnSelectedChange(onSelect);
+        this.setOnTextChange(onTextChange);
+    }
+
+    private void setOnTextChange(Consumer<String> onTextChange)
+    {
+        this.onTextChange = onTextChange;
     }
 
     /**
@@ -141,11 +154,12 @@ public class SuggesterTextFieldWidget extends SimpleListWidget
         }
     }
 
-    protected void onValueChange(String str)
+    protected void onValueChange(String newValue)
     {
-        List<Entry> list = rawEntries.stream().filter(e -> e.getEntryValue().contains(str)).collect(Collectors.toList());
+        List<Entry> list = rawEntries.stream().filter(e -> e.getEntryValue().contains(newValue)).collect(Collectors.toList());
         super.setEntries(list, true);
-        if(!getValue().trim().isEmpty()) this.setSuggestion(!list.isEmpty() && list.get(0).getEntryValue().startsWith(str) ? list.get(0).getEntryValue().substring(str.length()) : "");
+        if(!getValue().trim().isEmpty()) this.setSuggestion(!list.isEmpty() && list.get(0).getEntryValue().startsWith(newValue) ? list.get(0).getEntryValue().substring(newValue.length()) : "");
+        if(onTextChange != null) onTextChange.accept(newValue);
     }
 
     /**
