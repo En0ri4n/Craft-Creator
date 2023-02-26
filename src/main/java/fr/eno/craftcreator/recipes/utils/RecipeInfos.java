@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RecipeInfos implements NBTSerializable<RecipeInfos>
+public class RecipeInfos implements NBTSerializable
 {
     private final List<RecipeParameter> parameters;
 
@@ -108,9 +108,10 @@ public class RecipeInfos implements NBTSerializable<RecipeInfos>
         return compound;
     }
 
-    @Override
-    public RecipeInfos deserialize(CompoundTag compound)
+    public static RecipeInfos deserialize(CompoundTag compound)
     {
+        RecipeInfos recipeInfos = RecipeInfos.create();
+
         for(String keys : compound.getAllKeys())
         {
             CompoundTag parameterCompound = compound.getCompound(keys);
@@ -121,29 +122,29 @@ public class RecipeInfos implements NBTSerializable<RecipeInfos>
                 case NUMBER:
                     boolean isDouble = parameterCompound.getBoolean("is_double");
                     Number value = isDouble ? parameterCompound.getDouble("value") : parameterCompound.getInt("value");
-                    this.addParameter(new RecipeParameterNumber(keys, value, isDouble));
+                    recipeInfos.addParameter(new RecipeParameterNumber(keys, value, isDouble));
                     break;
                 case BOOLEAN:
-                    this.addParameter(new RecipeParameterBoolean(keys, parameterCompound.getBoolean("value")));
+                    recipeInfos.addParameter(new RecipeParameterBoolean(keys, parameterCompound.getBoolean("value")));
                     break;
                 case INT_LIST:
                     IntArrayTag arrayNBT = (IntArrayTag) parameterCompound.get("value");
                     List<Integer> list = new ArrayList<>();
                     for(int i : arrayNBT.getAsIntArray())
                         list.add(i);
-                    this.addParameter(new RecipeParameterIntList(keys, list));
+                    recipeInfos.addParameter(new RecipeParameterIntList(keys, list));
                     break;
                 case MAP:
                     CompoundTag nbt = parameterCompound.getCompound("value");
                     Map<Integer, ResourceLocation> map = new HashMap<>();
                     for(String key : nbt.getAllKeys())
                         map.put(nbt.getInt(key), CommonUtils.parse(key));
-                    this.addParameter(new RecipeParameterMap(keys, map));
+                    recipeInfos.addParameter(new RecipeParameterMap(keys, map));
                     break;
             }
         }
 
-        return this;
+        return recipeInfos;
     }
 
     public static class RecipeParameter

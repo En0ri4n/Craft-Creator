@@ -110,7 +110,7 @@ public class CraftIngredients
 
     public ItemStack getIcon()
     {
-        for(CraftIngredient ingredient : this.ingredients)
+        for(CraftIngredient ingredient : this.getIngredientsWithCount())
         {
             if(ingredient instanceof ItemIngredient)
             {

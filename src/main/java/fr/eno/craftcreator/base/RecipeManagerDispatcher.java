@@ -23,10 +23,18 @@ public class RecipeManagerDispatcher
     {
         switch(mod)
         {
-            case BOTANIA -> BotaniaRecipesManager.get().createRecipe(recipe, slots, recipeInfos, serializerType);
-            case THERMAL -> ThermalRecipesManager.get().createRecipe(recipe, slots, recipeInfos, serializerType);
-            case CREATE -> CreateRecipesManager.get().createRecipe(recipe, slots, recipeInfos, serializerType);
-            case MINECRAFT -> MinecraftRecipeManager.get().createRecipe(recipe, slots, recipeInfos, serializerType);
+            case BOTANIA:
+                BotaniaRecipesManager.get().createRecipe(recipe, slots, recipeInfos, serializerType);
+                break;
+            case THERMAL:
+                ThermalRecipesManager.get().createRecipe(recipe, slots, recipeInfos, serializerType);
+                break;
+            case CREATE:
+                CreateRecipesManager.get().createRecipe(recipe, slots, recipeInfos, serializerType);
+                break;
+            case MINECRAFT:
+                MinecraftRecipeManager.get().createRecipe(recipe, slots, recipeInfos, serializerType);
+                break;
         }
     }
 }

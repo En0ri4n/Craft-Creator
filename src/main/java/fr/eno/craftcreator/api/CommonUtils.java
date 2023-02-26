@@ -6,7 +6,6 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -16,6 +15,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistryEntry;
+import net.minecraftforge.registries.tags.ITag;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -43,10 +44,9 @@ public class CommonUtils
     }
 
     // TODO: check if method is suitable
-    @Nullable
-    public static TagKey<Item> getTag(ResourceLocation resourceLocation)
+    public static ITag<Item> getTag(ResourceLocation resourceLocation)
     {
-        return ItemTags.create(resourceLocation);
+        return ForgeRegistries.ITEMS.tags().getTag(ItemTags.create(resourceLocation));
     }
 
     /**
@@ -96,9 +96,9 @@ public class CommonUtils
      *
      * @param clientTask the task to execute
      */
-    public static void clientTask(Runnable clientTask)
+    public static void clientTask(CustomRunnable clientTask)
     {
-        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> CustomRunnable.of(clientTask));
+        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> clientTask);
     }
 
     /**
@@ -113,7 +113,7 @@ public class CommonUtils
 
     /**
      * Parse a string to a resource location<br>
-     * If the string can't be parsed, return the 'bug_empty' resource location
+     * If the string can't be parsed, return null
      *
      * @param location the string to parse
      * @return the resource location

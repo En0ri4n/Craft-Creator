@@ -5,6 +5,7 @@ import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.base.ModifiedRecipe;
 import fr.eno.craftcreator.utils.FormattableString;
 import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.Container;
@@ -106,6 +107,34 @@ public class KubeJSModifiedRecipe extends ModifiedRecipe
         }
 
         return GSON.toJson(json);
+    }
+
+    @Override
+    public CompoundTag serialize()
+    {
+        CompoundTag compoundNBT = new CompoundTag();
+        compoundNBT.putString("type", type.getDescriptor());
+        for(Map.Entry<ModRecipeSerializer.RecipeDescriptors, String> entry : recipeDescriptors.entrySet())
+        {
+            compoundNBT.putString(entry.getKey().getTag(), entry.getValue());
+        }
+        return compoundNBT;
+    }
+
+    public static KubeJSModifiedRecipe deserialize(CompoundTag compound)
+    {
+        KubeJSModifiedRecipeType type = KubeJSModifiedRecipeType.byDescriptor(compound.getString("type"));
+        if(type != null)
+        {
+            KubeJSModifiedRecipe recipe = new KubeJSModifiedRecipe(type);
+            for(ModRecipeSerializer.RecipeDescriptors descriptor : ModRecipeSerializer.RecipeDescriptors.values())
+            {
+                if(compound.contains(descriptor.getTag()))
+                    recipe.setDescriptor(descriptor, compound.getString(descriptor.getTag()));
+            }
+            return recipe;
+        }
+        return null;
     }
 
 

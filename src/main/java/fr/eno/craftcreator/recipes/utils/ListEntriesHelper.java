@@ -1,6 +1,5 @@
 package fr.eno.craftcreator.recipes.utils;
 
-
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.CommonUtils;
@@ -21,15 +20,6 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unchecked")
 public class ListEntriesHelper
 {
-    public static <T extends SimpleListWidget.Entry> List<T> getStringEntryList(SupportedMods[] mods)
-    {
-        List<T> entries = new ArrayList<>();
-
-        SupportedMods.getSupportedLoadedMods().forEach(mod -> entries.add((T) new SimpleListWidget.StringEntry(mod.getModId())));
-
-        return entries;
-    }
-
     public static <C extends Container, R extends Recipe<C>, T extends SimpleListWidget.Entry> List<T> getAddedRecipesEntryList(SupportedMods mod, ResourceLocation recipeTypeLoc)
     {
         RecipeType<R> recipeType = CommonUtils.getRecipeTypeByName(recipeTypeLoc);
@@ -50,15 +40,6 @@ public class ListEntriesHelper
         if(!SupportedMods.isKubeJSLoaded()) return entries;
 
         KubeJSHelper.getModifiedRecipes(mod).forEach(modifiedRecipe -> entries.add((T) new SimpleListWidget.ModifiedRecipeEntry(modifiedRecipe)));
-
-        return entries;
-    }
-
-    public static <T extends SimpleListWidget.Entry> List<T> getRecipeTypes(String modId)
-    {
-        List<T> entries = new ArrayList<>();
-
-        Registry.RECIPE_TYPE.stream().filter(type -> CommonUtils.getRecipeTypeName(type).getNamespace().equals(modId)).forEach(type -> entries.add((T) new SimpleListWidget.StringEntry(CommonUtils.getRecipeTypeName(type).toString())));
 
         return entries;
     }
@@ -89,5 +70,11 @@ public class ListEntriesHelper
         });
 
         return entries.stream().sorted(Comparator.comparing(object -> ((SimpleListWidget.RecipeEntry) object).getRecipe().getId().toString())).collect(Collectors.toList());
+    }
+
+    public enum RecipeList
+    {
+        ADDED_RECIPES,
+        MODIFIED_RECIPES
     }
 }

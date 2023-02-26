@@ -6,6 +6,7 @@ import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.init.InitPackets;
 import fr.eno.craftcreator.screen.container.base.ModRecipeCreatorDataScreen;
 import fr.eno.craftcreator.tileentity.base.MultiScreenRecipeCreatorTile;
+import fr.eno.craftcreator.utils.CustomRunnable;
 import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -120,7 +121,7 @@ public class UpdateRecipeCreatorTileDataClientPacket
          */
         public static void handle(UpdateRecipeCreatorTileDataClientPacket msg, Supplier<NetworkEvent.Context> ctx)
         {
-            CommonUtils.clientTask(() ->
+            CommonUtils.clientTask(CustomRunnable.of(() ->
             {
                 if(ClientUtils.getCurrentScreen() instanceof ModRecipeCreatorDataScreen<?>)
                 {
@@ -132,7 +133,7 @@ public class UpdateRecipeCreatorTileDataClientPacket
                     MultiScreenRecipeCreatorTile tileEntity = (MultiScreenRecipeCreatorTile) ClientUtils.getClientLevel().getBlockEntity(msg.pos);
                     Utils.notNull(tileEntity).setData(msg.dataName, msg.data);
                 }
-            });
+            }));
 
             ctx.get().setPacketHandled(true);
         }

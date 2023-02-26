@@ -90,7 +90,7 @@ public class SuggesterTextFieldWidget extends SimpleListWidget
 
     public SuggesterTextFieldWidget(int leftIn, int topIn, int widthIn, int height, int slotHeightIn, int scrollBarWidth, List<Entry> entries, @Nullable Consumer<Entry> onSelect, @Nullable Consumer<String> onTextChange)
     {
-        super(leftIn, topIn + height, ClientUtils.getBiggestStringWidth(entries.stream().map(Entry::getEntryValue).collect(Collectors.toList())), Math.min(entries.size(), MAX_ITEMS_DISPLAYED) * slotHeightIn, slotHeightIn, 0, scrollBarWidth, new TextComponent(""), null, false);
+        super(leftIn, topIn + height, Math.min(ClientUtils.getCurrentScreen().width - leftIn, Math.max(widthIn, ClientUtils.getBiggestStringWidth(entries.stream().map(Entry::getEntryValue).collect(Collectors.toList())))), Math.min(ClientUtils.getCurrentScreen().height - topIn, Math.min(entries.size(), MAX_ITEMS_DISPLAYED) * slotHeightIn), slotHeightIn, 0, scrollBarWidth, new TextComponent(""), null, false);
         this.font = ClientUtils.getFontRenderer();
         this.textFieldX = leftIn;
         this.textFieldY = topIn;
@@ -147,6 +147,7 @@ public class SuggesterTextFieldWidget extends SimpleListWidget
             this.moveCursorToEnd();
             this.setHighlightPos(this.cursorPos);
             this.onValueChange(pText);
+            this.displayPos = 0;
         }
     }
 
@@ -154,6 +155,7 @@ public class SuggesterTextFieldWidget extends SimpleListWidget
     {
         List<Entry> list = rawEntries.stream().filter(e -> e.getEntryValue().contains(newValue)).collect(Collectors.toList());
         super.setEntries(list, true);
+        super.setSelected(null);
         if(!getValue().trim().isEmpty()) this.setSuggestion(!list.isEmpty() && list.get(0).getEntryValue().startsWith(newValue) ? list.get(0).getEntryValue().substring(newValue.length()) : "");
         if(onTextChange != null) onTextChange.accept(newValue);
     }
@@ -532,6 +534,7 @@ public class SuggesterTextFieldWidget extends SimpleListWidget
             }
 
             super.mouseClicked(pMouseX, pMouseY, pButton);
+
             if(super.isMouseOver(pMouseX, pMouseY))
             {
                 if(getSelected() != null)
@@ -540,6 +543,7 @@ public class SuggesterTextFieldWidget extends SimpleListWidget
                     this.setFocus(false);
                     return true;
                 }
+
                 return false;
             }
 
@@ -647,6 +651,9 @@ public class SuggesterTextFieldWidget extends SimpleListWidget
             {
                 pMatrixStack.pushPose();
                 pMatrixStack.translate(0, 0, 100); // Ensure that the list is rendered on top of all other elements
+                RenderSystem.disableDepthTest();
+                RenderSystem.disableBlend();
+                RenderSystem.disableCull();
                 super.render(pMatrixStack, pMouseX, pMouseY, pPartialTicks);
                 pMatrixStack.popPose();
             }
@@ -797,7 +804,7 @@ public class SuggesterTextFieldWidget extends SimpleListWidget
      */
     public int getInnerWidth()
     {
-        return this.isBordered() ? this.width - 8 : this.width;
+        return this.isBordered() ? this.textFieldWidth - 8 : this.textFieldWidth;
     }
 
     /**

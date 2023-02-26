@@ -92,7 +92,8 @@ public class KubeJSHelper
                 currentSerializer = recipeTypeLocation.toString().contains("shaped") ? (RecipeSerializer<T>) RecipeSerializer.SHAPED_RECIPE : (RecipeSerializer<T>) RecipeSerializer.SHAPELESS_RECIPE;
             else currentSerializer = getSerializer(recipeTypeLocation);
             
-            if(recipeTypeLocation.toString().contains(CommonUtils.getRecipeTypeName(recipeType).toString())) addRecipeTo(mod, recipes, jsonObject, Utils.notNull(currentSerializer));
+            if(recipeTypeLocation.toString().contains(CommonUtils.getRecipeTypeName(recipeType).toString()))
+                addRecipeTo(mod, recipes, jsonObject, Utils.notNull(currentSerializer));
         }
         
         return recipes;
@@ -121,7 +122,7 @@ public class KubeJSHelper
         try
         {
             T tempRecipe = recipeSerializer.fromJson(new ResourceLocation(mod.getModId(), "recipe"), jsonObject);
-            T recipe = recipeSerializer.fromJson(new ResourceLocation(mod.getModId(), ModRecipeCreatorDispatcher.getOutput(tempRecipe).getIngredientsWithCount().stream().findAny().orElse(CraftIngredients.CraftIngredient.EMPTY).getId().getPath()), jsonObject);
+            T recipe = recipeSerializer.fromJson(new ResourceLocation(mod.getModId(), ModRecipeCreatorDispatcher.getOutput(tempRecipe).getIcon().getItem().getRegistryName().getPath()), jsonObject);
             recipes.add(recipe);
         }
         catch(JsonSyntaxException | ResourceLocationException e)

@@ -124,7 +124,7 @@ public abstract class ModRecipeSerializer
     private void sendFeedback(Feedback feedback, Object... args)
     {
         MutableComponent message = feedback.args(args);
-        ClientUtils.sendClientPlayerMessage(message);
+        CommonUtils.sendMessage(ClientUtils.getClientPlayer(), message);
     }
 
     /**

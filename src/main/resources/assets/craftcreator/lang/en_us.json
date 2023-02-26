@@ -20,6 +20,13 @@
 	"craftcreator.button.boolean.craftType.on": "Shaped",
 	"craftcreator.button.boolean.craftType.off": "Shapeless",
 
+	"craftcreator.screen.widget.simple_list.tooltip.input": "§6Input :",
+	"craftcreator.screen.widget.simple_list.tooltip.output": "§2Output :",
+
+	"craftcreator.screen.widget.dropdown_list.recipe_entry.entry.title": "Entry #%d",
+	"craftcreator.screen.widget.dropdown_list.recipe_entry.add": "Add Entry...",
+	"craftcreator.screen.widget.dropdown_list.entry": "%s ▼",
+
 	"craftcreator.serializer.message.recipe.added": "§aRecipe %s §aby %s §asuccessfully generated",
 	"craftcreator.serializer.message.recipe.exists": "§cRecipe §4%s §cby §4%s §calready exists !",
 	"craftcreator.serializer.message.recipe.removed": "§aCustom recipe %s §asuccessfully removed",
@@ -41,8 +48,8 @@
 	"craftcreator.screen.minecraft_recipe_creator.campfire_cooking.title": "Campfire Recipe Creator",
 	"craftcreator.screen.minecraft_recipe_creator.smithing.title": "Smithing Recipe Creator",
 
-	"craftcreator.screen.button.next": ">",
-	"craftcreator.screen.button.previous": "<",
+	"craftcreator.screen.recipe_creator.button.next": ">",
+	"craftcreator.screen.recipe_creator.button.previous": "<",
 	"craftcreator.screen.button.back": "Back",
 
 	"craftcreator.screen.tutorial.page": "Page %d/%d",
@@ -55,12 +62,6 @@
 	"craftcreator.screen.recipe_manager.list.modified_recipes": "Modified Recipes",
 	"craftcreator.screen.recipe_manager.list.recipes": "Recipes",
 	"craftcreator.screen.recipe_manager.button.clear_search": "X",
-
-	"craftcreator.screen.widget.simple_list.tooltip.input": "§6Input :",
-	"craftcreator.screen.widget.simple_list.tooltip.output": "§2Output :",
-
-	"craftcreator.screen.widget.dropdown_list.recipe_entry.entry.title": "Entry #%d",
-	"craftcreator.screen.widget.dropdown_list.recipe_entry.add": "Add Entry...",
 
 
 	"craftcreator.serializer.recipe.descriptor.input": "§5Input",

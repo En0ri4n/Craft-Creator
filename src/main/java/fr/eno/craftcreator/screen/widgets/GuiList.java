@@ -97,9 +97,9 @@ public class GuiList<T> implements IOutsideWidget
         return max;
     }
 
-    public void mouseClicked(int mouseX, int mouseY, Consumer<T> result)
+    public boolean mouseClicked(int mouseX, int mouseY, Consumer<T> result)
     {
-        if(this.getKeys() == null) return;
+        if(!isActive()) return false;
 
         int width = getMaxWidth();
 
@@ -124,6 +124,8 @@ public class GuiList<T> implements IOutsideWidget
                 ClientUtils.playSound(SoundEvents.UI_BUTTON_CLICK, 1F, 0.25F, SoundSource.MASTER, false);
             }
         }
+
+        return false;
     }
 
     public List<T> getKeys()
@@ -134,6 +136,7 @@ public class GuiList<T> implements IOutsideWidget
     public void setKeys(List<T> keys)
     {
         this.keys = keys;
+        setSelectedKey(null);
     }
 
     public T getSelectedKey()
@@ -153,5 +156,10 @@ public class GuiList<T> implements IOutsideWidget
             return new Rect2i(getX(), getY(), getWidth(), getHeight());
         else
             return new Rect2i(getX(), getY(), 0, 0);
+    }
+
+    public boolean isActive()
+    {
+        return this.getKeys() != null;
     }
 }

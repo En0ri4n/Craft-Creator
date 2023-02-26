@@ -71,7 +71,14 @@ public class SimpleCheckBox extends Checkbox
     @Override
     public void onPress()
     {
-        this.setSelected(!this.selected);
+        if(visible && active)
+            this.setSelected(!this.selected);
+
+        if(onPress != null)
+        {
+            onPress.accept(this);
+            ClientUtils.playSound(SoundEvents.UI_BUTTON_CLICK, 1F, 0.25F, SoundSource.MASTER, false);
+        }
     }
 
     @Override
@@ -97,10 +104,5 @@ public class SimpleCheckBox extends Checkbox
     public void setSelected(boolean selected)
     {
         this.selected = selected;
-        if(onPress != null)
-        {
-            onPress.accept(this);
-            ClientUtils.playSound(SoundEvents.UI_BUTTON_CLICK, 1F, 0.25F, SoundSource.MASTER, false);
-        }
     }
 }

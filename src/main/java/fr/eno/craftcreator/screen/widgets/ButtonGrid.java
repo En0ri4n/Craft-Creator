@@ -1,6 +1,5 @@
 package fr.eno.craftcreator.screen.widgets;
 
-
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.api.ClientUtils;
 import net.minecraft.client.gui.components.Button;

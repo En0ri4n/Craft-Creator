@@ -115,15 +115,6 @@ public class ClientUtils
     }
 
     /**
-     * Send to the client player a message in the chat
-     * @see Player#sendMessage(Component, UUID)
-     */
-    public static void sendClientPlayerMessage(MutableComponent message)
-    {
-        getClientPlayer().sendMessage(message, getClientPlayer().getUUID());
-    }
-
-    /**
      * Bind a texture in the texture manager
      *
      * @param texture the texture to bind
