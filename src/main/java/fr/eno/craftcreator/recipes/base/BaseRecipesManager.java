@@ -12,6 +12,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.BucketItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.items.SlotItemHandler;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,7 @@ public abstract class BaseRecipesManager
 
     public abstract void createRecipe(RecipeCreator recipe, List<Slot> slots, RecipeInfos param, ModRecipeSerializer.SerializerType serializerType);
 
-    protected RecipeEntry.Output getValidOutput(List<Slot> slots, int outputCount)
+    protected RecipeEntry.Output getValidOutput(List<SlotItemHandler> slots, int outputCount)
     {
         for(int i = outputCount; i < slots.size(); i++)
         {
@@ -34,7 +35,7 @@ public abstract class BaseRecipesManager
         return RecipeEntry.Output.EMPTY;
     }
 
-    protected RecipeEntry.MultiInput getValidInputs(List<Slot> slots, Map<Integer ,ResourceLocation> taggedSlots, int start, int end)
+    protected RecipeEntry.MultiInput getValidInputs(List<SlotItemHandler> slots, Map<Integer ,ResourceLocation> taggedSlots, int start, int end)
     {
         RecipeEntry.MultiInput input = new RecipeEntry.MultiInput();
 
@@ -53,7 +54,7 @@ public abstract class BaseRecipesManager
         return input;
     }
 
-    protected RecipeEntry.MultiOutput getValidOutputs(List<Slot> slots, int start, int end)
+    protected RecipeEntry.MultiOutput getValidOutputs(List<SlotItemHandler> slots, int start, int end)
     {
         RecipeEntry.MultiOutput output = new RecipeEntry.MultiOutput();
 
@@ -72,7 +73,7 @@ public abstract class BaseRecipesManager
         return output;
     }
 
-    protected RecipeEntry.MultiInput getValidIngredients(List<Slot> slots)
+    protected RecipeEntry.MultiInput getValidIngredients(List<SlotItemHandler> slots)
     {
         RecipeEntry.MultiInput recipeMultiInput = new RecipeEntry.MultiInput();
 
@@ -86,7 +87,7 @@ public abstract class BaseRecipesManager
         return recipeMultiInput;
     }
 
-    protected boolean isSlotsEmpty(List<Slot> slots, int inputSlotsCount, int outputSlotsCount)
+    protected boolean isSlotsEmpty(List<SlotItemHandler> slots, int inputSlotsCount, int outputSlotsCount)
     {
         boolean hasNoInput = true;
         boolean hasNoOutput = true;
@@ -142,7 +143,7 @@ public abstract class BaseRecipesManager
         return stack != null && !stack.isEmpty();
     }
 
-    protected RecipeEntry.MultiInput getValidIngredients(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots)
+    protected RecipeEntry.MultiInput getValidIngredients(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots)
     {
         RecipeEntry.MultiInput recipeMultiInput = new RecipeEntry.MultiInput();
 

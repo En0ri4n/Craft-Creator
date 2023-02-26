@@ -171,6 +171,14 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         RenderSystem.disableBlend();
     }
 
+    protected void trimWidthToEntries()
+    {
+        int maxWidth = ClientUtils.getCurrentScreen().width - x0;
+        int maxEntryWidth = ClientUtils.getBiggestStringWidth(getEntries().stream().map(Entry::getEntryValue).collect(Collectors.toList()));
+        this.width = Math.min(maxWidth, Math.max(width, maxEntryWidth));
+        this.x1 = this.x0 + this.width;
+    }
+
     protected void renderList(@Nonnull MatrixStack matrixStack, int x, int y, int mouseX, int mouseY, float partialTicks)
     {
         int itemCount = this.getItemCount();
@@ -339,6 +347,10 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
 
     public void tick()
     {
+        for(Entry entry : getEntries())
+        {
+            entry.tick();
+        }
     }
 
     public abstract static class Entry extends AbstractList.AbstractListEntry<SimpleListWidget.Entry>
@@ -357,29 +369,15 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
 
         public abstract void renderTooltip(MatrixStack matrixStack, int mouseX, int mouseY);
 
+        protected void tick() {}
+
         protected void displayTruncatedString(MatrixStack matrixStack, String stringToDisplay, int leftPos, int topPos, int width, int height, boolean hasItemDisplay, boolean isMouseOver)
         {
-            stringToDisplay = getString(width, stringToDisplay);
+            stringToDisplay = ScreenUtils.truncateString(width, stringToDisplay);
 
             int color = isMouseOver ? 0xF1f115 : 0xFFFFFF;
 
             Screen.drawString(matrixStack, ClientUtils.getFontRenderer(), stringToDisplay, hasItemDisplay ? leftPos + 16 + 5 : leftPos + width / 2 - ClientUtils.width(stringToDisplay) / 2, (topPos + height / 2 - ClientUtils.getFontRenderer().lineHeight / 2), color);
-        }
-
-        protected String getString(int width, String displayStr)
-        {
-            int stringWidth = ClientUtils.width(displayStr);
-
-            if(stringWidth > width - (16 + 5))
-            {
-                int letters = displayStr.toCharArray().length;
-                int letterWidth = stringWidth / letters;
-                int def_width = width - (16 + 5);
-                int width_much = stringWidth - def_width;
-                int lettersToRemove = width_much / letterWidth;
-                displayStr = displayStr.substring(0, displayStr.length() - lettersToRemove - 3) + "...";
-            }
-            return displayStr;
         }
 
         static void addToTooltip(List<ITextComponent> tooltips, CraftIngredients input)
@@ -694,13 +692,15 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         private final ResourceLocation resourceLocation;
         private final Type type;
         /** Used to display all items if resource location is a tag */
-        private int counter;
+        private ItemStack displayStack;
+        private int displayCounter;
 
         public ResourceLocationEntry(ResourceLocation resourceLocation, Type type)
         {
             this.resourceLocation = resourceLocation;
             this.type = type;
-            this.counter = 0;
+            this.displayCounter = 0;
+            this.displayStack = ItemStack.EMPTY;
         }
 
         public ResourceLocation getResourceLocation()
@@ -711,42 +711,40 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         @Override
         public void render(@Nonnull MatrixStack matrixStack, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean isMouseOver, float partialTicks)
         {
-            Item item = Items.COMMAND_BLOCK;
+            int yPos = height / 2 - 16 / 2;
+            ClientUtils.getItemRenderer().renderAndDecorateFakeItem(displayStack, left + yPos, top + yPos);
 
-            switch(this.type)
-            {
-                case ITEM:
-                    item = ForgeRegistries.ITEMS.getValue(getResourceLocation());
-                    if(item != Items.AIR && item != null)
-                    {
-                        int yPos = height / 2 - 16 / 2;
-                        ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(item), left + yPos, top + yPos);
-                    }
-                    break;
-                case TAG:
-                    ITag<Item> tag = ItemTags.getAllTags().getTag(getResourceLocation());
-                    if(tag.getValues().size() > 0)
-                    {
-                        if(counter / 40 >= tag.getValues().size())
-                            counter = 0;
-
-                        item = tag.getValues().get(counter / 40);
-                    }
-                    if(item != Items.AIR && item != null)
-                    {
-                        int yPos = height / 2 - 16 / 2;
-                        ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(item), left + yPos, top + yPos);
-                    }
-                    break;
-                case OTHER:
-                    break;
-            }
-
-            String displayStr = getString(width, resourceLocation.toString());
+            String displayStr = ScreenUtils.truncateString(width, resourceLocation.toString());
             displayTruncatedString(matrixStack, displayStr, left, top, width, height, true, isMouseOver);
+        }
 
-            if(!Screen.hasShiftDown())
-                counter++;
+        @Override
+        public void tick()
+        {
+            if(this.type == Type.ITEM)
+            {
+                displayStack = new ItemStack(CommonUtils.getItem(getResourceLocation()));
+            }
+            else if(this.type == Type.TAG)
+            {
+                ITag<Item> tag = ItemTags.getAllTags().getTag(getResourceLocation());
+
+                if(tag.getValues().size() > 0)
+                {
+                    int displayTime = 20;
+                    if(displayCounter / displayTime >= tag.getValues().size())
+                        displayCounter = 0;
+
+                    displayStack = new ItemStack(tag.getValues().get(displayCounter / displayTime));
+
+                    if(!Screen.hasShiftDown())
+                        displayCounter++;
+                }
+            }
+            else
+            {
+                displayStack = ItemStack.EMPTY;
+            }
         }
 
         @Override

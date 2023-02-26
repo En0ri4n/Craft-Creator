@@ -50,8 +50,8 @@ public class SlotHelper
     public static final List<PositionnedSlot> PURE_DAISY_SLOTS_INPUT;
     public static final List<PositionnedSlot> PURE_DAISY_SLOTS_OUTPUT;
     public static final List<PositionnedSlot> BREWERY_SLOTS;
-    public static final List<PositionnedSlot> BREWERY_SLOTS_OUTPUT;
     public static final List<PositionnedSlot> BREWERY_SLOTS_INPUT;
+    public static final List<PositionnedSlot> BREWERY_SLOTS_OUTPUT;
     public static final List<PositionnedSlot> PETAL_APOTHECARY_SLOTS;
     public static final List<PositionnedSlot> PETAL_APOTHECARY_SLOTS_INPUT;
     public static final List<PositionnedSlot> PETAL_APOTHECARY_SLOTS_OUTPUT;
@@ -337,7 +337,7 @@ public class SlotHelper
         // Create
         int createSlots = 0;
         CRUSHING_SLOTS = list(
-                CRUSHING_SLOTS_INPUT = toList(new PositionnedSlot(createSlots++, 63, 98)),
+                CRUSHING_SLOTS_INPUT = toList(new PositionnedSlot(createSlots++, 45, 121)),
                 CRUSHING_SLOTS_OUTPUT = toList(new PositionnedSlot(createSlots++, 189, 33), new PositionnedSlot(createSlots++, 189, 59), new PositionnedSlot(createSlots++, 189, 85), new PositionnedSlot(createSlots++, 189, 111)));
         CUTTING_SLOTS = list(
                 CUTTING_SLOTS_INPUT = toList(new PositionnedSlot(createSlots++, 63, 98)),

@@ -94,7 +94,7 @@ public class SuggesterTextFieldWidget extends SimpleListWidget
 
     public SuggesterTextFieldWidget(int leftIn, int topIn, int widthIn, int height, int slotHeightIn, int scrollBarWidth, List<Entry> entries, @Nullable Consumer<Entry> onSelect, @Nullable Consumer<String> onTextChange)
     {
-        super(leftIn, topIn + height, Math.min(ClientUtils.getCurrentScreen().width - leftIn, Math.max(widthIn, ClientUtils.getBiggestStringWidth(entries.stream().map(Entry::getEntryValue).collect(Collectors.toList())))), Math.min(ClientUtils.getCurrentScreen().height - topIn, Math.min(entries.size(), MAX_ITEMS_DISPLAYED) * slotHeightIn), slotHeightIn, 0, scrollBarWidth, new StringTextComponent(""), null, false);
+        super(leftIn, topIn + height, widthIn, Math.min(ClientUtils.getCurrentScreen().height - topIn, Math.min(entries.size(), MAX_ITEMS_DISPLAYED) * slotHeightIn), slotHeightIn, 0, scrollBarWidth, new StringTextComponent(""), null, false);
         this.font = ClientUtils.getFontRenderer();
         this.textFieldX = leftIn;
         this.textFieldY = topIn;
@@ -116,6 +116,8 @@ public class SuggesterTextFieldWidget extends SimpleListWidget
      */
     public void tick()
     {
+        super.tick();
+
         ++this.frame;
     }
 
@@ -124,6 +126,7 @@ public class SuggesterTextFieldWidget extends SimpleListWidget
     {
         super.setEntries(entries, resetScroll);
         this.rawEntries = (List<Entry>) entries;
+        trimWidthToEntries();
     }
 
     @Override

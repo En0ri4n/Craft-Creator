@@ -99,7 +99,6 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         this.addButton(previousButton = new SimpleButton(References.getTranslate("screen.button.previous"), getArrowXPos(false), this.topPos + this.imageHeight - 66, 10, 20, (button) -> previousPage()));
 
         initWidgets();
-
         retrieveData();
     }
 
@@ -171,10 +170,10 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     public List<Rectangle2d> getExtraAreas()
     {
         List<Rectangle2d> areas = new ArrayList<>();
-        areas.add(guiTagList.getArea());
-        areas.add(buttonGrid.getArea());
-        areas.add(previousButton.getArea());
-        areas.add(nextButton.getArea());
+        if(guiTagList != null) areas.add(guiTagList.getArea());
+        if(buttonGrid != null) areas.add(buttonGrid.getArea());
+        if(previousButton != null) areas.add(previousButton.getArea());
+        if(nextButton != null) areas.add(nextButton.getArea());
         return areas;
     }
 

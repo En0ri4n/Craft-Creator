@@ -11,6 +11,7 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.loading.FMLLoader;
+import net.minecraftforge.items.SlotItemHandler;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -32,7 +33,7 @@ public class DatapackHelper
      * @param slots the slots of the crafting grid
      * @return the ingredients in a JsonArray
      */
-    public static JsonArray createShapelessIngredientsJsonArray(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots)
+    public static JsonArray createShapelessIngredientsJsonArray(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots)
     {
         JsonArray ingredients = new JsonArray();
 
@@ -57,10 +58,11 @@ public class DatapackHelper
 
     /**
      * Serialize the pattern for the shaped crafting recipe
+     *
      * @param slots the slots of the crafting grid
      * @return the pattern in a JsonArray
      */
-    public static JsonArray createPatternJson(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlot)
+    public static JsonArray createPatternJson(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlot)
     {
         Map<ResourceLocation, PairValues<Boolean, Character>> patterns = new HashMap<>();
         JsonArray array = new JsonArray();
@@ -70,7 +72,7 @@ public class DatapackHelper
         return array;
     }
 
-    private static Map<ResourceLocation, PairValues<Boolean, Character>> createPattern(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlot)
+    private static Map<ResourceLocation, PairValues<Boolean, Character>> createPattern(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlot)
     {
         Map<ResourceLocation, PairValues<Boolean, Character>> patterns = new HashMap<>();
 
@@ -79,7 +81,7 @@ public class DatapackHelper
         return patterns;
     }
 
-    private static List<String> pattern(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlot, Map<ResourceLocation, PairValues<Boolean, Character>> patterns)
+    private static List<String> pattern(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlot, Map<ResourceLocation, PairValues<Boolean, Character>> patterns)
     {
         StringBuilder pattern = new StringBuilder();
 
@@ -151,7 +153,7 @@ public class DatapackHelper
      * @param taggedSlot the tagged slots of the crafting grid
      * @return the keys in a JsonObject
      */
-    public static JsonObject createSymbolKeys(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlot)
+    public static JsonObject createSymbolKeys(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlot)
     {
         Map<ResourceLocation, PairValues<Boolean, Character>> patternSet = createPattern(slots, taggedSlot);
 

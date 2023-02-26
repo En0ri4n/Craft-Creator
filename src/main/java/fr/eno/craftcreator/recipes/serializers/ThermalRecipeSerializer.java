@@ -252,47 +252,6 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
             inputIngredients.addIngredient(new CraftIngredients.BlockIngredient(treeExtractorRecipe.getTrunk().getRegistryName(), 1, "Trunk"));
             inputIngredients.addIngredient(new CraftIngredients.BlockIngredient(treeExtractorRecipe.getLeaves().getRegistryName(), 1, "Leaves"));
         }
-        else if(recipe instanceof PulverizerRecipe)
-        {
-            PulverizerRecipe pulverizerRecipe = (PulverizerRecipe) recipe;
-            putIfNotEmpty(inputIngredients, pulverizerRecipe.getInputItems());
-        }
-        else if(recipe instanceof SawmillRecipe)
-        {
-            SawmillRecipe sawmillRecipe = (SawmillRecipe) recipe;
-            putIfNotEmpty(inputIngredients, sawmillRecipe.getInputItems());
-            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", CraftIngredients.DataIngredient.DataUnit.ENERGY, sawmillRecipe.getEnergy(), false));
-        }
-        else if(recipe instanceof SmelterRecipe)
-        {
-            SmelterRecipe smelterRecipe = (SmelterRecipe) recipe;
-            putIfNotEmpty(inputIngredients, smelterRecipe.getInputItems());
-            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", CraftIngredients.DataIngredient.DataUnit.ENERGY, smelterRecipe.getEnergy(), false));
-        }
-        else if(recipe instanceof InsolatorRecipe)
-        {
-            InsolatorRecipe insolatorRecipe = (InsolatorRecipe) recipe;
-            putIfNotEmpty(inputIngredients, insolatorRecipe.getInputItems());
-            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", CraftIngredients.DataIngredient.DataUnit.ENERGY, insolatorRecipe.getEnergy(), false));
-        }
-        else if(recipe instanceof PressRecipe)
-        {
-            PressRecipe pressRecipe = (PressRecipe) recipe;
-            putIfNotEmpty(inputIngredients, pressRecipe.getInputItems());
-            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", CraftIngredients.DataIngredient.DataUnit.ENERGY, pressRecipe.getEnergy(), false));
-        }
-        else if(recipe instanceof FurnaceRecipe)
-        {
-            FurnaceRecipe furnaceRecipe = (FurnaceRecipe) recipe;
-            putIfNotEmpty(inputIngredients, furnaceRecipe.getInputItems());
-            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", CraftIngredients.DataIngredient.DataUnit.ENERGY, furnaceRecipe.getEnergy(), false));
-        }
-        else if(recipe instanceof CentrifugeRecipe)
-        {
-            CentrifugeRecipe centrifugeRecipe = (CentrifugeRecipe) recipe;
-            putIfNotEmpty(inputIngredients, centrifugeRecipe.getInputItems());
-            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", CraftIngredients.DataIngredient.DataUnit.ENERGY, centrifugeRecipe.getEnergy(), false));
-        }
         else if(recipe instanceof ChillerRecipe)
         {
             ChillerRecipe chillerRecipe = (ChillerRecipe) recipe;
@@ -301,12 +260,6 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
                 for(FluidStack fluidIngredient : fi.getFluids())
                     inputIngredients.addIngredient(new CraftIngredients.FluidIngredient(fluidIngredient.getFluid().getRegistryName(), fluidIngredient.getAmount()));
             inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", CraftIngredients.DataIngredient.DataUnit.ENERGY, chillerRecipe.getEnergy(), false));
-        }
-        else if(recipe instanceof CrucibleRecipe)
-        {
-            CrucibleRecipe crucibleRecipe = (CrucibleRecipe) recipe;
-            putIfNotEmpty(inputIngredients, crucibleRecipe.getInputItems());
-            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", CraftIngredients.DataIngredient.DataUnit.ENERGY, crucibleRecipe.getEnergy(), false));
         }
         else if(recipe instanceof BottlerRecipe)
         {
@@ -317,17 +270,12 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
                     inputIngredients.addIngredient(new CraftIngredients.FluidIngredient(fluidIngredient.getFluid().getRegistryName(), fluidIngredient.getAmount()));
             inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", CraftIngredients.DataIngredient.DataUnit.ENERGY, bottlerRecipe.getEnergy(), false));
         }
-        else if(recipe instanceof PyrolyzerRecipe)
-        {
-            PyrolyzerRecipe pyrolyzerRecipe = (PyrolyzerRecipe) recipe;
-            putIfNotEmpty(inputIngredients, pyrolyzerRecipe.getInputItems());
-            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", CraftIngredients.DataIngredient.DataUnit.ENERGY, pyrolyzerRecipe.getEnergy(), false));
-        }
 
         if(inputIngredients.isEmpty() && recipe instanceof ThermalRecipe)
         {
             ThermalRecipe thermalRecipe = (ThermalRecipe) recipe;
             putIfNotEmpty(inputIngredients, thermalRecipe.getInputItems());
+            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Energy", CraftIngredients.DataIngredient.DataUnit.ENERGY, thermalRecipe.getEnergy(), false));
         }
 
         return inputIngredients;

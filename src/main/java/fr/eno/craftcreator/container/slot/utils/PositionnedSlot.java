@@ -1,6 +1,7 @@
 package fr.eno.craftcreator.container.slot.utils;
 
 import net.minecraft.inventory.container.Slot;
+import net.minecraftforge.items.SlotItemHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,15 +47,16 @@ public class PositionnedSlot
         return slots.stream().anyMatch(positionnedSlot -> positionnedSlot.getIndex() == index);
     }
 
-    public static List<Slot> getSlotsFor(List<PositionnedSlot> positionnedSlots, List<Slot> slots)
+    public static List<SlotItemHandler> getSlotsFor(List<PositionnedSlot> positionnedSlots, List<Slot> slots)
     {
-        List<Slot> finalSlots = new ArrayList<>();
+        List<SlotItemHandler> finalSlots = new ArrayList<>();
 
         for(Slot slot : slots)
         {
             Optional<PositionnedSlot> optionalPositionnedSlot = positionnedSlots.stream().filter(ps -> ps.getIndex() == slot.getSlotIndex()).findFirst();
 
-            if(optionalPositionnedSlot.isPresent()) finalSlots.add(slot);
+            if(optionalPositionnedSlot.isPresent() && slot instanceof SlotItemHandler)
+                finalSlots.add((SlotItemHandler) slot);
         }
 
         return finalSlots;

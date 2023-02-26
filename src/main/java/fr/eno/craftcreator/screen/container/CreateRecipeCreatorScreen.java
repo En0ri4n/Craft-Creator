@@ -35,10 +35,10 @@ public class CreateRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen
     protected void initWidgets()
     {
         int gapX = 10;
-        int gapY = 30;
+        int gapY = 22;
         int widgetHeight = 110;
 
-        inputWidget = new RecipeEntryWidget(leftPos + gapX, topPos + gapY, imageWidth / 2 - 2 * gapX, widgetHeight);
+        inputWidget = new RecipeEntryWidget(PositionnedSlot.getSlotsFor(SlotHelper.CUTTING_SLOTS_INPUT, getMenu().getContainerSlots()).get(0), leftPos + gapX, topPos + gapY, imageWidth / 2 - 2 * gapX, widgetHeight);
     }
 
     @Override
@@ -62,7 +62,8 @@ public class CreateRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen
     @Override
     protected void renderGui(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        inputWidget.render(matrixStack, mouseX, mouseY, partialTicks);
+        if(inputWidget != null)
+            inputWidget.render(matrixStack, mouseX, mouseY, partialTicks);
     }
 
     @Override
@@ -88,6 +89,22 @@ public class CreateRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen
     protected List<PositionnedSlot> getNbtTaggableSlots()
     {
         return new ArrayList<>();
+    }
+
+    @Override
+    public void tick()
+    {
+        super.tick();
+
+        if(inputWidget != null)
+            inputWidget.tick();
+    }
+
+    @Override
+    protected void renderTooltip(MatrixStack poseStack, int mouseX, int mouseY)
+    {
+        if(!inputWidget.isFocused())
+            super.renderTooltip(poseStack, mouseX, mouseY);
     }
 
     @Override
