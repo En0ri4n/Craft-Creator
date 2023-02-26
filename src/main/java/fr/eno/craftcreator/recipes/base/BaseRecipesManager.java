@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.items.SlotItemHandler;
+import net.minecraftforge.items.SlotItemHandler;
 
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,7 @@ public abstract class BaseRecipesManager
         return RecipeEntry.Output.EMPTY;
     }
 
-    protected RecipeEntry.MultiInput getValidInputs(List<SlotItemHandler> slots, Map<Integer , ResourceLocation> taggedSlots, int start, int end)
+    protected RecipeEntry.MultiInput getValidInputs(List<SlotItemHandler> slots, Map<Integer ,ResourceLocation> taggedSlots, int start, int end)
     {
         RecipeEntry.MultiInput input = new RecipeEntry.MultiInput();
 
