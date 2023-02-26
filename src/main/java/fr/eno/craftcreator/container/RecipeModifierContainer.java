@@ -1,6 +1,5 @@
 package fr.eno.craftcreator.container;
 
-import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.container.base.VanillaCommonContainer;
 import fr.eno.craftcreator.init.InitContainers;
 import net.minecraft.entity.player.PlayerEntity;
@@ -16,9 +15,9 @@ public class RecipeModifierContainer extends VanillaCommonContainer
         this.bindPlayerInventory(inventory, 61, 36);
     }
 
-    public static RecipeModifierContainer create()
+    public static RecipeModifierContainer create(PlayerEntity player)
     {
-        return new RecipeModifierContainer(111, ClientUtils.getClientPlayer().inventory, null);
+        return new RecipeModifierContainer(111, player.inventory, null);
     }
 
     @Override

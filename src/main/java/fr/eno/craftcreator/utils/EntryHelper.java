@@ -32,11 +32,11 @@ public class EntryHelper
         return entries;
     }
 
-    public static <T extends SimpleListWidget.Entry> List<T> getStringEntryListWith(List<ResourceLocation> list)
+    public static <T extends SimpleListWidget.Entry> List<T> getStringEntryListWith(List<ResourceLocation> list, SimpleListWidget.ResourceLocationEntry.Type type)
     {
         List<T> entries = new ArrayList<>();
 
-        list.forEach(rl -> entries.add((T) new SimpleListWidget.ResourceLocationEntry(rl)));
+        list.forEach(rl -> entries.add((T) new SimpleListWidget.ResourceLocationEntry(rl, type)));
 
         return entries;
     }

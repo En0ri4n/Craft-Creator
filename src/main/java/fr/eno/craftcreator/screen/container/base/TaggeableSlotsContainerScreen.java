@@ -11,7 +11,6 @@ import fr.eno.craftcreator.packets.RetrieveRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.screen.widgets.GuiList;
 import fr.eno.craftcreator.screen.widgets.buttons.SimpleCheckBox;
-import fr.eno.craftcreator.tileentity.base.TaggeableInventoryContainerTileEntity;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
@@ -61,14 +60,14 @@ public abstract class TaggeableSlotsContainerScreen<T extends Container> extends
             InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket("nbt_slots", this.pos, InitPackets.PacketDataType.INT_ARRAY));
         }
 
-        addWidget(this.nbtCheckBox = new SimpleCheckBox(this.leftPos + 5, this.topPos + 5, 10, 10, References.getTranslate("screen.crafting.info.nbt"), false, checkBox ->
+        this.nbtCheckBox = new SimpleCheckBox(this.leftPos + 5, this.topPos + 5, 10, 10, References.getTranslate("screen.crafting.info.nbt"), false, checkBox ->
         {
             if(this.selectedSlot != null)
             {
                 if(this.nbtSlots.contains(this.selectedSlot.getSlotIndex())) this.nbtSlots.removeIf(slotIndex -> slotIndex == this.selectedSlot.getSlotIndex());
                 else if(!this.nbtSlots.contains(this.selectedSlot.getSlotIndex())) this.nbtSlots.add(this.selectedSlot.getSlotIndex());
             }
-        }));
+        });
         this.guiTagList = new GuiList<>(this.leftPos, this.topPos + 1, 18);
         this.selectedSlot = null;
     }
@@ -101,7 +100,9 @@ public abstract class TaggeableSlotsContainerScreen<T extends Container> extends
     }
 
     @Override
-    protected void renderLabels(MatrixStack matrixStack, int pMouseX, int pMouseY) {}
+    protected void renderLabels(MatrixStack matrixStack, int pMouseX, int pMouseY)
+    {
+    }
 
     protected abstract List<PositionnedSlot> getTaggableSlots();
 
@@ -131,72 +132,106 @@ public abstract class TaggeableSlotsContainerScreen<T extends Container> extends
     {
         Slot slot = this.getSelectedSlot(mouseX, mouseY);
 
-        if(slot instanceof CustomSlotItemHandler)
+        if(!(slot instanceof CustomSlotItemHandler))
         {
-            boolean checkInventory = ((SlotItemHandler) slot).getItemHandler() instanceof TaggeableInventoryContainerTileEntity;
+            boolean flag = this.nbtCheckBox.mouseClicked(mouseX, mouseY, button);
 
-            if(checkInventory && !Screen.hasControlDown())
+            flag = flag || this.guiTagList.mouseClicked((int) mouseX, (int) mouseY, resourceLocation ->
+            {
+                if(resourceLocation == null)
+                {
+                    this.taggedSlots.remove(this.selectedSlot);
+                    return;
+                }
+
+                this.taggedSlots.put(this.selectedSlot, resourceLocation);
+            });
+
+            if(!flag)
             {
                 this.guiTagList.setKeys(null);
                 this.selectedSlot = null;
-                this.taggedSlots.remove(slot);
-                if(this.nbtSlots.contains(slot.getSlotIndex())) this.nbtSlots.removeIf(slotIndex -> slotIndex == slot.getSlotIndex());
-                return super.mouseClicked(mouseX, mouseY, button);
+                this.nbtCheckBox.visible = false;
             }
 
-            if(PositionnedSlot.contains(this.getTaggableSlots(), slot.getSlotIndex()))
-            {
-                this.guiTagList.setKeys(null);
-                this.guiTagList.setSelectedKey(null);
-                this.selectedSlot = null;
+            return checkSlots(super.mouseClicked(mouseX, mouseY, button));
+        }
 
-                if(checkInventory && Screen.hasControlDown() && slot.getItem().getItem().getTags().stream().findFirst().isPresent())
+        if(!canTag())
+        {
+            this.guiTagList.setKeys(null);
+            this.selectedSlot = null;
+            this.taggedSlots.remove(slot);
+            this.nbtSlots.removeIf(slotIndex -> slotIndex == slot.getSlotIndex());
+            return checkSlots(super.mouseClicked(mouseX, mouseY, button));
+        }
+
+        boolean isTaggable = PositionnedSlot.contains(this.getTaggableSlots(), slot.getSlotIndex()) && slot.hasItem();
+
+        if(canTag())
+        {
+            if(isTaggable)
+            {
+                boolean hasTag = slot.getItem().getItem().getTags().size() > 0;
+
+                if(hasTag)
                 {
                     this.selectedSlot = (SlotItemHandler) slot;
                     this.guiTagList.setKeys(new ArrayList<>(slot.getItem().getItem().getTags()));
-                    this.nbtCheckBox.setSelected(this.nbtSlots.contains(slot.getSlotIndex()));
-
-                    if(this.taggedSlots.containsKey(this.selectedSlot)) this.guiTagList.setSelectedKey(this.taggedSlots.get(this.selectedSlot));
-
-                    return true;
+                    if(taggedSlots.containsKey(slot)) guiTagList.setSelectedKey(taggedSlots.get(slot));
+                    return checkSlots(true);
                 }
-                else if(checkInventory && Screen.hasControlDown() && slot.hasItem())
+                else
                 {
-                    this.selectedSlot = (SlotItemHandler) slot;
-                    this.nbtCheckBox.setSelected(this.nbtSlots.contains(slot.getSlotIndex()));
-                    return true;
+                    this.selectedSlot = null;
+                    this.guiTagList.setKeys(null);
                 }
             }
-
-            if(checkInventory && Screen.hasControlDown() && slot.hasItem())
+            else
             {
-                this.selectedSlot = (SlotItemHandler) slot;
-                this.nbtCheckBox.setSelected(this.nbtSlots.contains(slot.getSlotIndex()));
-                return true;
+                this.selectedSlot = null;
+                this.guiTagList.setKeys(null);
             }
         }
 
-        if(nbtCheckBox.isMouseOver(mouseX, mouseY) && this.selectedSlot != null && PositionnedSlot.contains(getNbtTaggableSlots(), this.selectedSlot.getSlotIndex()))
+        boolean isNBTTaggable = PositionnedSlot.contains(getNbtTaggableSlots(), slot.getSlotIndex()) && slot.hasItem();
+
+        if(canTag() && isNBTTaggable && slot.hasItem())
         {
-            nbtCheckBox.onClick(mouseX, mouseY);
-            return true;
+            this.selectedSlot = (SlotItemHandler) slot;
+            this.nbtCheckBox.setSelected(this.nbtSlots.contains(slot.getSlotIndex()));
+            this.nbtCheckBox.visible = true;
+            return checkSlots(true);
         }
 
-        this.guiTagList.mouseClicked((int) mouseX, (int) mouseY, resourceLocation ->
-        {
-            if(resourceLocation == null)
-            {
-                this.taggedSlots.remove(this.selectedSlot);
-                return;
-            }
+        return checkSlots(super.mouseClicked(mouseX, mouseY, button));
+    }
 
-            this.taggedSlots.put(this.selectedSlot, resourceLocation);
+    /**
+     * Check all slots to make sure that they are not empty
+     *
+     * @param mouseClicked result of mouse clicked
+     * @return same as parameter
+     */
+    private boolean checkSlots(boolean mouseClicked)
+    {
+        getMenu().slots.stream().filter(s -> s instanceof SlotItemHandler).map(s -> ((SlotItemHandler) s)).forEach(slot ->
+        {
+            if(taggedSlots.containsKey(slot) && !slot.hasItem())
+                taggedSlots.remove(slot);
+
+            if(nbtSlots.contains(slot.getSlotIndex()) && !slot.hasItem())
+                nbtSlots.removeIf(i -> i == slot.getSlotIndex());
         });
+        return mouseClicked;
+    }
 
-        this.guiTagList.setKeys(null);
-        this.guiTagList.setSelectedKey(null);
-        this.selectedSlot = null;
-        return this.nbtCheckBox.isMouseOver(mouseX, mouseY) ? true : super.mouseClicked(mouseX, mouseY, button);
+    /**
+     * return True if player can tag a slot (only check if ctrl key is down)
+     */
+    private boolean canTag()
+    {
+        return Screen.hasControlDown();
     }
 
     private Slot getSelectedSlot(double mouseX, double mouseY)
@@ -287,6 +322,7 @@ public abstract class TaggeableSlotsContainerScreen<T extends Container> extends
     @Override
     public void onClose()
     {
+        checkSlots(true);
         updateServerTileData();
         super.onClose();
     }

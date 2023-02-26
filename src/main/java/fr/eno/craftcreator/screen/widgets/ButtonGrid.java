@@ -2,6 +2,7 @@ package fr.eno.craftcreator.screen.widgets;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.screen.widgets.IOutsideWidget;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
