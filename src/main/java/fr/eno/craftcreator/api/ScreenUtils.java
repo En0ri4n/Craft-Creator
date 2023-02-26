@@ -83,4 +83,27 @@ public class ScreenUtils
     {
         return mouseX > x && mouseX < (x + width) && mouseY > y && mouseY < (y + height);
     }
+
+    /**
+     * Truncate a string to fit in a specified width (with "..." at the end)
+     *
+     * @param width the width
+     * @param displayStr the string to truncate
+     * @return the truncated string
+     */
+    public static String truncateString(int width, String displayStr)
+    {
+        int stringWidth = ClientUtils.width(displayStr);
+
+        if(stringWidth > width - (16 + 5))
+        {
+            int letters = displayStr.toCharArray().length;
+            int letterWidth = stringWidth / letters;
+            int def_width = width - (16 + 5);
+            int width_much = stringWidth - def_width;
+            int lettersToRemove = width_much / letterWidth;
+            displayStr = displayStr.substring(0, displayStr.length() - lettersToRemove - 3) + "...";
+        }
+        return displayStr;
+    }
 }
