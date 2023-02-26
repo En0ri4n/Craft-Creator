@@ -48,9 +48,19 @@ public class NumberDataFieldWidget extends TextFieldWidget
     @Override
     public boolean charTyped(char codePoint, int modifiers)
     {
-        if(Character.isDigit(codePoint) || (codePoint == '.' && isDouble() && !getValue().contains("."))) return super.charTyped(codePoint, modifiers);
+        if(Character.isDigit(codePoint) || (codePoint == '.' && isDouble() && !getValue().contains(".")))
+            return super.charTyped(codePoint, modifiers);
 
         return false;
+    }
+
+    @Override
+    public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers)
+    {
+        boolean flag = super.keyPressed(pKeyCode, pScanCode, pModifiers);
+        if(getValue().trim().isEmpty())
+            setValue("0");
+        return flag;
     }
 
     public void setNumberValue(Number number, boolean isDouble)

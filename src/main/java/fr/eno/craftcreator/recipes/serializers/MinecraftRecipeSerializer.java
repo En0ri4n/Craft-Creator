@@ -8,12 +8,12 @@ import fr.eno.craftcreator.recipes.utils.CraftIngredients;
 import fr.eno.craftcreator.recipes.utils.DatapackHelper;
 import fr.eno.craftcreator.recipes.utils.RecipeEntry;
 import io.netty.buffer.Unpooled;
-import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.items.SlotItemHandler;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +27,7 @@ public class MinecraftRecipeSerializer extends ModRecipeSerializer
         super(SupportedMods.MINECRAFT);
     }
 
-    public void serializeFurnaceRecipe(RecipeCreator smeltType, RecipeEntry.Input input, RecipeEntry.Output output, double experience, int cookTime, boolean isKubeJSRecipe)
+    public void serializeFurnaceRecipe(RecipeCreator smeltType, RecipeEntry.Input input, RecipeEntry.Output output, double experience, int cookTime)
     {
         JsonObject obj = createBaseJson(smeltType.getRecipeType());
         obj.add("ingredient", singletonItemJsonObject(input));
@@ -38,7 +38,7 @@ public class MinecraftRecipeSerializer extends ModRecipeSerializer
         addRecipeTo(obj, smeltType.getRecipeType(), output.getRegistryName());
     }
 
-    public void serializeStoneCutterRecipe(RecipeEntry.Input input, RecipeEntry.Output output, boolean isKubeJSRecipe)
+    public void serializeStoneCutterRecipe(RecipeEntry.Input input, RecipeEntry.Output output)
     {
         JsonObject obj = createBaseJson(IRecipeType.STONECUTTING);
         obj.add("ingredient", singletonItemJsonObject(input));
@@ -48,7 +48,7 @@ public class MinecraftRecipeSerializer extends ModRecipeSerializer
         addRecipeTo(obj, IRecipeType.STONECUTTING, output.getRegistryName());
     }
 
-    public void serializeSmithingRecipe(RecipeEntry.Input base, RecipeEntry.Input addition, RecipeEntry.Output output, boolean isKubeJSRecipe)
+    public void serializeSmithingRecipe(RecipeEntry.Input base, RecipeEntry.Input addition, RecipeEntry.Output output)
     {
         JsonObject obj = createBaseJson(IRecipeType.SMITHING);
         obj.add("base", singletonItemJsonObject(base));
@@ -58,7 +58,7 @@ public class MinecraftRecipeSerializer extends ModRecipeSerializer
         addRecipeTo(obj, IRecipeType.SMITHING, output.getRegistryName());
     }
 
-    public void serializeCraftingTableRecipe(ItemStack output, List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, List<Integer> nbtSlots, boolean shaped, boolean isKubeJSRecipe)
+    public void serializeCraftingTableRecipe(ItemStack output, List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots, List<Integer> nbtSlots, boolean shaped)
     {
         JsonObject obj = createBaseJson(IRecipeType.CRAFTING);
 
