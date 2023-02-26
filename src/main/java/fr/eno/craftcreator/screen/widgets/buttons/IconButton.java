@@ -1,4 +1,4 @@
-package fr.eno.craftcreator.screen.widgets;
+package fr.eno.craftcreator.screen.widgets.buttons;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -12,16 +12,13 @@ import net.minecraft.util.text.StringTextComponent;
 
 public class IconButton extends Button
 {
+    private static final ResourceLocation BUTTON = References.getLoc("textures/gui/buttons/gui_button.png");
+
     private final ResourceLocation icon;
     private final int widthCut;
     private final int heightCut;
     private final int textureWidth;
     private final int textureHeight;
-
-    public IconButton(int x, int y, ResourceLocation icon, int widthCut, int heightCut,  int textureWidth, int textureHeight)
-    {
-        this(x, y, icon, widthCut, heightCut, textureWidth, textureHeight, b -> {});
-    }
 
     public IconButton(int x, int y, ResourceLocation icon, int widthCut, int heightCut, int textureWidth, int textureHeight, IPressable onPress)
     {
@@ -37,8 +34,8 @@ public class IconButton extends Button
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         RenderSystem.enableBlend();
-        ClientUtils.bindTexture(References.getLoc("textures/gui/container/gui_button.png"));
-        ScreenUtils.renderSizedTexture(matrixStack, 2, x, y, width, height, 0, 0, 20, 20, 20);
+        ClientUtils.bindTexture(BUTTON);
+        ScreenUtils.renderSizedTexture(matrixStack, 3, x, y, width, height, 0, !active ? 0 : !isMouseOver(mouseX, mouseY) ? 20 : 40, 20, 60, 20);
         ClientUtils.bindTexture(icon);
         int offset = 2;
 

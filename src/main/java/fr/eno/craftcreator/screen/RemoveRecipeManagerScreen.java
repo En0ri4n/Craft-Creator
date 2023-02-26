@@ -8,6 +8,7 @@ import fr.eno.craftcreator.api.ScreenUtils;
 import fr.eno.craftcreator.base.ModRecipeCreatorDispatcher;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;
+import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import fr.eno.craftcreator.screen.widgets.SuggesterTextFieldWidget;
 import fr.eno.craftcreator.screen.widgets.buttons.SimpleButton;
 import fr.eno.craftcreator.screen.widgets.buttons.SimpleCheckBox;
@@ -48,12 +49,12 @@ public class RemoveRecipeManagerScreen extends ListScreen
     {
         this.lists.clear();
         int i = 0;
-        int default_x = 110;
-        int default_y = 90;
-        int spaceY = 30;
+        int default_x = width / 8 + 20;
+        int default_y = height / 9 + 35;
+        int spaceY = height / 10;
         int spaceX = 87;
         int size = 10;
-        int fieldWidth = 250;
+        int fieldWidth = width / 10 * 4;
         int fieldHeight = 15;
         int heightGap = 2;
 
@@ -64,14 +65,14 @@ public class RemoveRecipeManagerScreen extends ListScreen
         this.addButton(hasRecipeIdBox = new SimpleCheckBox(default_x, default_y + i * spaceY, size, size, References.getTranslate("screen.remove_manager.button.has_id"), false));
 
         i = 0;
-        this.addList(itemInputField = new SuggesterTextFieldWidget( default_x + spaceX, default_y + i++ * spaceY - heightGap, fieldWidth, fieldHeight,  EntryHelper.getStringEntryListWith(EntryHelper.getItems()), entry -> recipeDescriptors.put(ModRecipeSerializer.RecipeDescriptors.INPUT_ITEM, entry.getEntryValue())));
-        this.addList(itemOutputField = new SuggesterTextFieldWidget(default_x + spaceX, default_y + i++ * spaceY - heightGap, fieldWidth, fieldHeight, EntryHelper.getStringEntryListWith(EntryHelper.getItems()), entry -> recipeDescriptors.put(ModRecipeSerializer.RecipeDescriptors.OUTPUT_ITEM, entry.getEntryValue())));
+        this.addList(itemInputField = new SuggesterTextFieldWidget( default_x + spaceX, default_y + i++ * spaceY - heightGap, fieldWidth, fieldHeight,  EntryHelper.getStringEntryListWith(EntryHelper.getItems(), SimpleListWidget.ResourceLocationEntry.Type.ITEM), entry -> recipeDescriptors.put(ModRecipeSerializer.RecipeDescriptors.INPUT_ITEM, entry.getEntryValue())));
+        this.addList(itemOutputField = new SuggesterTextFieldWidget(default_x + spaceX, default_y + i++ * spaceY - heightGap, fieldWidth, fieldHeight, EntryHelper.getStringEntryListWith(EntryHelper.getItems(), SimpleListWidget.ResourceLocationEntry.Type.ITEM), entry -> recipeDescriptors.put(ModRecipeSerializer.RecipeDescriptors.OUTPUT_ITEM, entry.getEntryValue())));
         this.addList(modIdField = new SuggesterTextFieldWidget(default_x + spaceX, default_y + i++ * spaceY - heightGap, fieldWidth, fieldHeight, EntryHelper.getStringEntryList(EntryHelper.getMods()), entry -> recipeDescriptors.put(ModRecipeSerializer.RecipeDescriptors.MOD_ID, entry.getEntryValue())));
-        this.addList(recipeTypeField = new SuggesterTextFieldWidget(default_x + spaceX, default_y + i++ * spaceY - heightGap, fieldWidth, fieldHeight, EntryHelper.getStringEntryListWith(EntryHelper.getRecipeTypes()), entry -> recipeDescriptors.put(ModRecipeSerializer.RecipeDescriptors.RECIPE_TYPE, entry.getEntryValue())));
-        this.addList(recipeIdField = new SuggesterTextFieldWidget(default_x + spaceX, default_y + i * spaceY - heightGap, fieldWidth, fieldHeight, EntryHelper.getStringEntryListWith(EntryHelper.getRecipeIds()), entry -> recipeDescriptors.put(ModRecipeSerializer.RecipeDescriptors.RECIPE_ID, entry.getEntryValue())));
+        this.addList(recipeTypeField = new SuggesterTextFieldWidget(default_x + spaceX, default_y + i++ * spaceY - heightGap, fieldWidth, fieldHeight, EntryHelper.getStringEntryListWith(EntryHelper.getRecipeTypes(), SimpleListWidget.ResourceLocationEntry.Type.OTHER), entry -> recipeDescriptors.put(ModRecipeSerializer.RecipeDescriptors.RECIPE_TYPE, entry.getEntryValue())));
+        this.addList(recipeIdField = new SuggesterTextFieldWidget(default_x + spaceX, default_y + i * spaceY - heightGap, fieldWidth, fieldHeight, EntryHelper.getStringEntryListWith(EntryHelper.getRecipeIds(), SimpleListWidget.ResourceLocationEntry.Type.OTHER), entry -> recipeDescriptors.put(ModRecipeSerializer.RecipeDescriptors.RECIPE_ID, entry.getEntryValue())));
 
-        this.addButton(new SimpleButton(References.getTranslate("screen.remove_manager.button.remove"), this.width / 2 - 80, this.height - 85, 160, 20, (button) -> sendRemovedRecipe()));
-        this.addButton(new SimpleButton(References.getTranslate("screen.button.back"), this.width - 97, this.height - 35, 80, 20, (button) -> ClientUtils.openScreen(new RecipeManagerScreen())));
+        this.addButton(new SimpleButton(References.getTranslate("screen.remove_manager.button.remove"), this.width / 2 - 80, this.height / 9 * 7, 160, 20, (button) -> sendRemovedRecipe()));
+        this.addButton(new SimpleButton(References.getTranslate("screen.button.back"), this.width / 2 + 80 + 5, this.height / 9 * 7, 50, 20, (button) -> ClientUtils.openScreen(new RecipeManagerScreen())));
 
         checkBoxes();
     }
@@ -110,11 +111,13 @@ public class RemoveRecipeManagerScreen extends ListScreen
     {
         renderBackground(matrixStack);
         ClientUtils.bindTexture(GUI_TEXTURE);
-        ScreenUtils.renderSizedTexture(matrixStack, 4, 100, 50, width - 200, height - 100, 0, 0, 16, 16, 16);
+        int x = width / 8;
+        int y = height / 9;
+        ScreenUtils.renderSizedTexture(matrixStack, 4, x, y, width - 2 * x, height - 2 * y, 0, 0, 16, 16, 16);
 
         super.render(matrixStack, mouseX, mouseY, partialTicks);
 
-        Screen.drawCenteredString(matrixStack, this.font, this.title.getString(), this.width / 2, 60, 0xB3b3af);
+        Screen.drawCenteredString(matrixStack, this.font, this.title.getString(), this.width / 2, y + 10, 0xB3b3af);
     }
 
     @Override

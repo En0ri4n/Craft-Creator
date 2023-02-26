@@ -10,7 +10,6 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -20,15 +19,6 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unchecked")
 public class ListEntriesHelper
 {
-    public static <T extends SimpleListWidget.Entry> List<T> getStringEntryList(SupportedMods[] mods)
-    {
-        List<T> entries = new ArrayList<>();
-
-        SupportedMods.getSupportedLoadedMods().forEach(mod -> entries.add((T) new SimpleListWidget.StringEntry(mod.getModId())));
-
-        return entries;
-    }
-
     public static <C extends IInventory, R extends IRecipe<C>, T extends SimpleListWidget.Entry> List<T> getAddedRecipesEntryList(SupportedMods mod, ResourceLocation recipeTypeLoc)
     {
         IRecipeType<R> recipeType = CommonUtils.getRecipeTypeByName(recipeTypeLoc);
@@ -49,15 +39,6 @@ public class ListEntriesHelper
         if(!SupportedMods.isKubeJSLoaded()) return entries;
 
         KubeJSHelper.getModifiedRecipes(mod).forEach(modifiedRecipe -> entries.add((T) new SimpleListWidget.ModifiedRecipeEntry(modifiedRecipe)));
-
-        return entries;
-    }
-
-    public static <T extends SimpleListWidget.Entry> List<T> getRecipeTypes(String modId)
-    {
-        List<T> entries = new ArrayList<>();
-
-        Registry.RECIPE_TYPE.stream().filter(type -> CommonUtils.getRecipeTypeName(type).getNamespace().equals(modId)).forEach(type -> entries.add((T) new SimpleListWidget.StringEntry(CommonUtils.getRecipeTypeName(type).toString())));
 
         return entries;
     }
@@ -88,5 +69,11 @@ public class ListEntriesHelper
         });
 
         return entries.stream().sorted(Comparator.comparing(object -> ((SimpleListWidget.RecipeEntry) object).getRecipe().getId().toString())).collect(Collectors.toList());
+    }
+
+    public enum RecipeList
+    {
+        ADDED_RECIPES,
+        MODIFIED_RECIPES
     }
 }

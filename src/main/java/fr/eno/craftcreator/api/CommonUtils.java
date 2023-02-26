@@ -96,9 +96,9 @@ public class CommonUtils
      *
      * @param clientTask the task to execute
      */
-    public static void clientTask(Runnable clientTask)
+    public static void clientTask(CustomRunnable clientTask)
     {
-        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> CustomRunnable.of(clientTask));
+        DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> clientTask);
     }
 
     /**
@@ -113,7 +113,7 @@ public class CommonUtils
 
     /**
      * Parse a string to a resource location<br>
-     * If the string can't be parsed, return the 'bug_empty' resource location
+     * If the string can't be parsed, return null
      *
      * @param location the string to parse
      * @return the resource location

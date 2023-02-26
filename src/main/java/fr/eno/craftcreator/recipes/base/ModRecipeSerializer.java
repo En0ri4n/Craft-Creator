@@ -123,7 +123,7 @@ public abstract class ModRecipeSerializer
     private void sendFeedback(Feedback feedback, Object... args)
     {
         IFormattableTextComponent message = feedback.args(args);
-        ClientUtils.sendClientPlayerMessage(message);
+        CommonUtils.sendMessage(ClientUtils.getClientPlayer(), message);
     }
 
     /**

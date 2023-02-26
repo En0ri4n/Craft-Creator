@@ -692,12 +692,14 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
     public static class ResourceLocationEntry extends Entry
     {
         private final ResourceLocation resourceLocation;
+        private final Type type;
         /** Used to display all items if resource location is a tag */
         private int counter;
 
-        public ResourceLocationEntry(ResourceLocation resourceLocation)
+        public ResourceLocationEntry(ResourceLocation resourceLocation, Type type)
         {
             this.resourceLocation = resourceLocation;
+            this.type = type;
             this.counter = 0;
         }
 
@@ -709,25 +711,39 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         @Override
         public void render(@Nonnull MatrixStack matrixStack, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean isMouseOver, float partialTicks)
         {
-            Item item = ForgeRegistries.ITEMS.getValue(getResourceLocation());
-            ITag<Item> tag = ItemTags.getAllTags().getTag(getResourceLocation());
+            Item item = Items.COMMAND_BLOCK;
 
-            if(item == Items.AIR && tag.getValues().size() > 0)
+            switch(this.type)
             {
-                if(counter / 40 >= tag.getValues().size())
-                    counter = 0;
+                case ITEM:
+                    item = ForgeRegistries.ITEMS.getValue(getResourceLocation());
+                    if(item != Items.AIR && item != null)
+                    {
+                        int yPos = height / 2 - 16 / 2;
+                        ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(item), left + yPos, top + yPos);
+                    }
+                    break;
+                case TAG:
+                    ITag<Item> tag = ItemTags.getAllTags().getTag(getResourceLocation());
+                    if(tag.getValues().size() > 0)
+                    {
+                        if(counter / 40 >= tag.getValues().size())
+                            counter = 0;
 
-                item = tag.getValues().get(counter / 40);
+                        item = tag.getValues().get(counter / 40);
+                    }
+                    if(item != Items.AIR && item != null)
+                    {
+                        int yPos = height / 2 - 16 / 2;
+                        ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(item), left + yPos, top + yPos);
+                    }
+                    break;
+                case OTHER:
+                    break;
             }
 
             String displayStr = getString(width, resourceLocation.toString());
             displayTruncatedString(matrixStack, displayStr, left, top, width, height, true, isMouseOver);
-
-            if(item != Items.AIR)
-            {
-                int yPos = height / 2 - 16 / 2;
-                ClientUtils.getItemRenderer().renderAndDecorateFakeItem(new ItemStack(item), left + yPos, top + yPos);
-            }
 
             if(!Screen.hasShiftDown())
                 counter++;
@@ -747,6 +763,13 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
                 tooltips.clear();
                 ClientUtils.getCurrentScreen().renderComponentTooltip(matrixStack, tooltips, mouseX, mouseY);
             }
+        }
+
+        public enum Type
+        {
+            ITEM,
+            TAG,
+            OTHER
         }
     }
 }

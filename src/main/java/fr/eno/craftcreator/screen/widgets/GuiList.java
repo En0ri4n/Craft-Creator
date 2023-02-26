@@ -96,9 +96,9 @@ public class GuiList<T> implements IOutsideWidget
         return max;
     }
 
-    public void mouseClicked(int mouseX, int mouseY, Consumer<T> result)
+    public boolean mouseClicked(int mouseX, int mouseY, Consumer<T> result)
     {
-        if(this.getKeys() == null) return;
+        if(!isActive()) return false;
 
         int width = getMaxWidth();
 
@@ -115,14 +115,17 @@ public class GuiList<T> implements IOutsideWidget
                     this.setSelectedKey(null);
                     result.accept(null);
                     ClientUtils.getMinecraft().getSoundManager().play(SimpleSound.forUI(SoundEvents.UI_BUTTON_CLICK, 1F));
-                    continue;
+                    return true;
                 }
 
                 this.setSelectedKey(this.keys.get(i));
                 result.accept(this.getSelectedKey());
                 ClientUtils.getMinecraft().getSoundManager().play(SimpleSound.forUI(SoundEvents.UI_BUTTON_CLICK, 1F));
+                return true;
             }
         }
+
+        return false;
     }
 
     public List<T> getKeys()
@@ -133,6 +136,7 @@ public class GuiList<T> implements IOutsideWidget
     public void setKeys(List<T> keys)
     {
         this.keys = keys;
+        setSelectedKey(null);
     }
 
     public T getSelectedKey()
@@ -152,5 +156,10 @@ public class GuiList<T> implements IOutsideWidget
             return new Rectangle2d(getX(), getY(), getWidth(), getHeight());
         else
             return new Rectangle2d(getX(), getY(), 0, 0);
+    }
+
+    public boolean isActive()
+    {
+        return this.getKeys() != null;
     }
 }

@@ -1,10 +1,7 @@
 package fr.eno.craftcreator.init;
 
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.packets.CreateRecipePacket;
-import fr.eno.craftcreator.packets.RetrieveRecipeCreatorTileDataServerPacket;
-import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataClientPacket;
-import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataServerPacket;
+import fr.eno.craftcreator.packets.*;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkDirection;
@@ -31,8 +28,7 @@ public class InitPackets
             throw new RuntimeException("Network has been already initialized !");
         }
 
-        network = NetworkRegistry.ChannelBuilder
-                .named(References.getLoc("main_channel"))
+        network = NetworkRegistry.ChannelBuilder.named(References.getLoc("main_channel"))
                 .clientAcceptedVersions(PROTOCOL_VERSION::equals)
                 .serverAcceptedVersions(PROTOCOL_VERSION::equals)
                 .networkProtocolVersion(() -> PROTOCOL_VERSION)
@@ -60,10 +56,20 @@ public class InitPackets
 
         registerClientMessage(UpdateRecipeCreatorTileDataClientPacket.class, UpdateRecipeCreatorTileDataClientPacket::encode, UpdateRecipeCreatorTileDataClientPacket::decode, UpdateRecipeCreatorTileDataClientPacket.ClientHandler::handle);
         registerServerMessage(UpdateRecipeCreatorTileDataServerPacket.class, UpdateRecipeCreatorTileDataServerPacket::encode, UpdateRecipeCreatorTileDataServerPacket::decode, UpdateRecipeCreatorTileDataServerPacket.ServerHandler::handle);
+
+        registerClientMessage(UpdateRecipeListClientPacket.class, UpdateRecipeListClientPacket::encode, UpdateRecipeListClientPacket::decode, UpdateRecipeListClientPacket.ClientHandler::handle);
+        registerServerMessage(RetrieveServerRecipesPacket.class, RetrieveServerRecipesPacket::encode, RetrieveServerRecipesPacket::decode, RetrieveServerRecipesPacket.ServerHandler::handle);
     }
 
-    private static Optional<NetworkDirection> distClient() { return Optional.of(NetworkDirection.PLAY_TO_CLIENT); }
-    private static Optional<NetworkDirection> distServer() { return Optional.of(NetworkDirection.PLAY_TO_SERVER); }
+    private static Optional<NetworkDirection> distClient()
+    {
+        return Optional.of(NetworkDirection.PLAY_TO_CLIENT);
+    }
+
+    private static Optional<NetworkDirection> distServer()
+    {
+        return Optional.of(NetworkDirection.PLAY_TO_SERVER);
+    }
 
     private static <MSG> void registerClientMessage(Class<MSG> messageType, BiConsumer<MSG, PacketBuffer> encoder, Function<PacketBuffer, MSG> decoder, BiConsumer<MSG, Supplier<NetworkEvent.Context>> messageConsumer)
     {
@@ -88,15 +94,20 @@ public class InitPackets
         }
     }
 
+    public enum RecipeList
+    {
+        ADDED_RECIPES,
+        MODIFIED_RECIPES
+    }
+
     public enum PacketDataType
     {
         INT,
         INT_ARRAY,
         STRING,
         BOOLEAN,
-        FLOAT,
-        DOUBLE,
         DOUBLE_ARRAY,
-        MAP_INT_RESOURCELOCATION
+        MAP_INT_RESOURCELOCATION,
+        RECIPES
     }
 }

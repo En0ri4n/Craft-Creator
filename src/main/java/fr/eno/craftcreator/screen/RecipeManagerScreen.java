@@ -6,6 +6,8 @@ import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.base.ModRecipeCreatorDispatcher;
 import fr.eno.craftcreator.base.SupportedMods;
+import fr.eno.craftcreator.init.InitPackets;
+import fr.eno.craftcreator.packets.RetrieveServerRecipesPacket;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;
 import fr.eno.craftcreator.recipes.utils.DatapackHelper;
@@ -54,21 +56,21 @@ public class RecipeManagerScreen extends ListScreen
             updateLists(true);
         }));
 
-        addList(recipeTypeDropdown = new DropdownListWidget<>(width / 2, 0, 200, 20, 20, DropdownListWidget.Entries.getRecipeTypes(this.modId), (entry) ->
+        addList(recipeTypeDropdown = new DropdownListWidget<>(width / 2, 0, 200, 20, 20, DropdownListWidget.Entries.getRecipeTypes(getCurrentMod().getModId()), (entry) ->
         {
             this.recipeType = CommonUtils.parse(entry.getValue());
             updateLists(true);
         }));
 
 
-        this.addList(new SimpleListWidget(10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.recipes"), (entry) ->
+        addList(new SimpleListWidget(10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.recipes"), (entry) ->
         {
             IRecipe<?> recipeToRemove = ((SimpleListWidget.RecipeEntry) entry).getRecipe();
-            ModRecipeCreatorDispatcher.getSeralizer(this.modId).removeRecipe(new KubeJSModifiedRecipe(KubeJSModifiedRecipe.KubeJSModifiedRecipeType.REMOVED, Collections.singletonMap(ModRecipeSerializer.RecipeDescriptors.RECIPE_ID, recipeToRemove.getId().toString())), ModRecipeSerializer.SerializerType.KUBE_JS);
+            ModRecipeCreatorDispatcher.getSeralizer(getCurrentMod().getModId()).removeRecipe(new KubeJSModifiedRecipe(KubeJSModifiedRecipe.KubeJSModifiedRecipeType.REMOVED, Collections.singletonMap(ModRecipeSerializer.RecipeDescriptors.RECIPE_ID, recipeToRemove.getId().toString())), ModRecipeSerializer.SerializerType.KUBE_JS);
             updateLists(false);
         }, SupportedMods.isKubeJSLoaded()));
         
-        this.addWidget(searchField = new SimpleTextFieldWidget(10, height - 30, this.width / 3 - 35, 20, textField ->
+        addWidget(searchField = new SimpleTextFieldWidget(10, height - 30, this.width / 3 - 35, 20, textField ->
         {
             if(!textField.getValue().isEmpty())
             {
@@ -78,38 +80,62 @@ public class RecipeManagerScreen extends ListScreen
                 updateLists(false);
         }));
 
-        this.addButton(new SimpleButton(References.getTranslate("screen.recipe_manager.button.clear_search"), 10 + this.width / 3 - 35 + 2, height - 30, 20, 20, button ->
+        addButton(new SimpleButton(References.getTranslate("screen.recipe_manager.button.clear_search"), 10 + this.width / 3 - 35 + 2, height - 30, 20, 20, button ->
         {
             updateLists(true);
             this.searchField.setValue("");
         }));
 
-        this.addList(new SimpleListWidget(this.width / 3 + 10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.added_recipes"), (entry) ->
+        addList(new SimpleListWidget(this.width / 3 + 10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.added_recipes"), (entry) ->
         {
             SimpleListWidget.RecipeEntry recipeEntry = (SimpleListWidget.RecipeEntry) entry;
 
-            if(SupportedMods.getSupportedLoadedMods().stream().map(SupportedMods::getModId).noneMatch(modId -> modId.equals(recipeEntry.getRecipe().getId().getPath())))
+            if(recipeEntry.getRecipe().getId().getNamespace().equals(References.MOD_ID))
             {
                 DatapackHelper.deleteRecipe(recipeEntry.getRecipe());
             }
             else if(SupportedMods.isKubeJSLoaded())
             {
-                ModRecipeCreatorDispatcher.getSeralizer(this.modId).removeAddedRecipeFrom(getCurrentMod(), recipeEntry.getRecipe(), ModRecipeSerializer.SerializerType.KUBE_JS);
+                ModRecipeCreatorDispatcher.getSeralizer(getCurrentMod().getModId()).removeAddedRecipeFrom(getCurrentMod(), recipeEntry.getRecipe(), ModRecipeSerializer.SerializerType.KUBE_JS);
                 updateLists(false);
             }
         }, true));
 
-        this.addList(new SimpleListWidget(this.width / 3 * 2 + 10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.modified_recipes"), (entry) ->
+        addList(new SimpleListWidget(this.width / 3 * 2 + 10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.modified_recipes"), (entry) ->
         {
             ModRecipeSerializer.removeModifiedRecipe(getCurrentMod(), ((SimpleListWidget.ModifiedRecipeEntry) entry).getRecipe());
             updateLists(false);
         }, SupportedMods.isKubeJSLoaded()));
 
         updateLists(true);
-        this.getLists().forEach(slw -> slw.setCanHaveSelected(true));
+        getLists().forEach(slw -> slw.setCanHaveSelected(true));
 
-        this.addButton(new SimpleButton(References.getTranslate("screen.button.back"), this.width / 2 - 40, this.height - bottomHeight - 7, 80, 20, button -> ClientUtils.openScreen(null)));
-        this.addButton(new SimpleButton(References.getTranslate("screen.recipe_manager.button.remove_recipe"), this.width - 130, this.height - bottomHeight - 7, 120, 20, button -> ClientUtils.openScreen(new RemoveRecipeManagerScreen())));
+        addButton(new SimpleButton(References.getTranslate("screen.button.back"), this.width / 2 - 40, this.height - bottomHeight - 7, 80, 20, button -> ClientUtils.openScreen(null)));
+        addButton(new SimpleButton(References.getTranslate("screen.recipe_manager.button.remove_recipe"), this.width - 130, this.height - bottomHeight - 7, 120, 20, button -> ClientUtils.openScreen(new RemoveRecipeManagerScreen())));
+
+        // retrieveData();
+    }
+
+    /**
+     * Retrieve recipes from server
+     */
+    private void retrieveData()
+    {
+        if(SupportedMods.isKubeJSLoaded())
+            InitPackets.NetworkHelper.sendToServer(new RetrieveServerRecipesPacket(getCurrentMod(), InitPackets.RecipeList.MODIFIED_RECIPES, ModRecipeSerializer.SerializerType.KUBE_JS));
+    }
+
+    public <T extends SimpleListWidget.Entry> void addToList(InitPackets.RecipeList list, T entry)
+    {
+        switch(list)
+        {
+            case ADDED_RECIPES:
+                getList(3).getEntries().add(entry);
+                break;
+            case MODIFIED_RECIPES:
+                getList(4).getEntries().add(entry);
+                break;
+        }
     }
 
     private void updateLists(boolean resetScroll)

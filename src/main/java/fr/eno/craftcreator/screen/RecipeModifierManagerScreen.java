@@ -32,7 +32,7 @@ public class RecipeModifierManagerScreen extends TaggeableSlotsContainerScreen<R
 
     public RecipeModifierManagerScreen(Screen parent)
     {
-        super(RecipeModifierContainer.create(), ClientUtils.getClientPlayer().inventory, new StringTextComponent("Recipe Modifier Manager"));
+        super(RecipeModifierContainer.create(ClientUtils.getClientPlayer()), ClientUtils.getClientPlayer().inventory, new StringTextComponent("Recipe Modifier Manager"));
         this.leftPos = (this.width - (this.width / 4 + 5)) / 2 + (this.width / 4 + 5) - 256 / 2;
         this.topPos = 5 + (this.height - 20 - 5) / 2 - 256 / 2;
         this.lists = new ArrayList<>();
@@ -123,6 +123,6 @@ public class RecipeModifierManagerScreen extends TaggeableSlotsContainerScreen<R
     @Override
     public Container createMenu(int containerId, PlayerInventory inventory, PlayerEntity player)
     {
-        return RecipeModifierContainer.create();
+        return RecipeModifierContainer.create(player);
     }
 }

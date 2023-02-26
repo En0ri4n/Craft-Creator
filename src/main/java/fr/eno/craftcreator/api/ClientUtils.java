@@ -21,7 +21,6 @@ import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import org.lwjgl.glfw.GLFW;
 
@@ -110,15 +109,6 @@ public class ClientUtils
     public static <M extends Container, U extends Screen & IHasContainer<M>> void registerScreen(ContainerType<? extends M> container, ScreenManager.IScreenFactory<M, U> screenConstructor)
     {
         ScreenManager.register(container, screenConstructor);
-    }
-
-    /**
-     * Send to the client player a message in the chat
-     * @see PlayerEntity#sendMessage(net.minecraft.util.text.ITextComponent, java.util.UUID)
-     */
-    public static void sendClientPlayerMessage(ITextComponent message)
-    {
-        getClientPlayer().sendMessage(message, getClientPlayer().getUUID());
     }
 
     /**

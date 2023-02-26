@@ -7,7 +7,6 @@ import fr.eno.craftcreator.recipes.managers.MinecraftRecipeManager;
 import fr.eno.craftcreator.recipes.managers.ThermalRecipesManager;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import net.minecraft.inventory.container.Slot;
-import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.util.List;
 
