@@ -59,6 +59,10 @@ public class InitPackets
 
         registerClientMessage(UpdateRecipeListClientPacket.class, UpdateRecipeListClientPacket::encode, UpdateRecipeListClientPacket::decode, UpdateRecipeListClientPacket.ClientHandler::handle);
         registerServerMessage(RetrieveServerRecipesPacket.class, RetrieveServerRecipesPacket::encode, RetrieveServerRecipesPacket::decode, RetrieveServerRecipesPacket.ServerHandler::handle);
+
+        registerServerMessage(RemoveAddedRecipePacket.class, RemoveAddedRecipePacket::encode, RemoveAddedRecipePacket::decode, RemoveAddedRecipePacket.ServerHandler::handle);
+        registerServerMessage(RemoveModifiedRecipe.class, RemoveModifiedRecipe::encode, RemoveModifiedRecipe::decode, RemoveModifiedRecipe.ServerHandler::handle);
+        registerServerMessage(RemoveRecipePacket.class, RemoveRecipePacket::encode, RemoveRecipePacket::decode, RemoveRecipePacket.ServerHandler::handle);
     }
 
     private static Optional<NetworkDirection> distClient()

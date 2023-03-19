@@ -1,27 +1,25 @@
 package fr.eno.craftcreator.utils;
 
+import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 public class EntryHelper
 {
-    private static final List<ResourceLocation> items = new ArrayList<>();
-    private static final List<String> mods = new ArrayList<>();
-    private static final List<ResourceLocation> recipeTypes = new ArrayList<>();
-    private static final List<ResourceLocation> recipeIds = new ArrayList<>();
 
     public static <T extends SimpleListWidget.Entry> List<T> getStringEntryList(List<String> list)
     {
@@ -41,43 +39,35 @@ public class EntryHelper
         return entries;
     }
 
-    public static <T extends IRecipe<C>, C extends IInventory> void init(World world)
-    {
-        if(items.isEmpty()) ForgeRegistries.ITEMS.getValues().forEach(item -> items.add(item.getRegistryName()));
-
-        if(recipeTypes.isEmpty())
-            Registry.RECIPE_TYPE.forEach(irecipetype -> recipeTypes.add(Registry.RECIPE_TYPE.getKey(irecipetype)));
-
-        if(mods.isEmpty()) ModList.get().getMods().forEach(mod -> mods.add(mod.getModId()));
-
-        if(recipeIds.isEmpty()) Registry.RECIPE_TYPE.stream().collect(Collectors.toList()).forEach(recipeType ->
-        {
-            IRecipeType<T> recipeType1 = (IRecipeType<T>) recipeType;
-            world.getRecipeManager().getAllRecipesFor(recipeType1).forEach(recipe ->
-            {
-                if(!recipe.getId().toString().contains("kjs")) recipeIds.add(recipe.getId());
-            });
-        });
-    }
-
     public static List<ResourceLocation> getItems()
     {
-        return items;
+        return ForgeRegistries.ITEMS.getValues().stream().map(ForgeRegistryEntry::getRegistryName).collect(Collectors.toList());
     }
 
     public static List<String> getMods()
     {
-        return mods;
+        return ModList.get().getMods().stream().map(ModInfo::getModId).collect(Collectors.toList());
     }
 
     public static List<ResourceLocation> getRecipeTypes()
     {
-        return recipeTypes;
+        return Registry.RECIPE_TYPE.stream().map(Registry.RECIPE_TYPE::getKey).collect(Collectors.toList());
     }
 
-    public static List<ResourceLocation> getRecipeIds()
+    public static <C extends net.minecraft.inventory.IInventory,
+            T extends net.minecraft.item.crafting.IRecipe<C>> List<ResourceLocation> getRecipeIds()
     {
-        return recipeIds;
+        return Registry.RECIPE_TYPE.stream()
+                .map(rt ->
+                        {
+                            IRecipeType<T> recipeType = (IRecipeType<T>) rt;
+                            return ClientUtils.getClientLevel().getRecipeManager().getAllRecipesFor(recipeType).stream()
+                                    .filter(recipe -> !recipe.getId().toString().contains("kjs"))
+                                    .collect(Collectors.toList());
+                        })
+                .flatMap(Collection::stream)
+                .map(IRecipe::getId)
+                .collect(Collectors.toList());
     }
 
     public static List<ResourceLocation> getTags()

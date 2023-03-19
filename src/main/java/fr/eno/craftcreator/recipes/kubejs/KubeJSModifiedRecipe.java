@@ -1,12 +1,13 @@
 package fr.eno.craftcreator.recipes.kubejs;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.base.ModifiedRecipe;
 import fr.eno.craftcreator.utils.FormattableString;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -58,11 +59,6 @@ public class KubeJSModifiedRecipe extends ModifiedRecipe
         return recipeDescriptors.get(ModRecipeSerializer.RecipeDescriptors.RECIPE_ID);
     }
 
-    public <C extends IInventory> IRecipe<C> getRecipeIfExists()
-    {
-        return null;
-    }
-
     public void setDescriptor(ModRecipeSerializer.RecipeDescriptors descriptor, String value)
     {
         recipeDescriptors.put(descriptor, value);
@@ -110,27 +106,30 @@ public class KubeJSModifiedRecipe extends ModifiedRecipe
     }
 
     @Override
-    public CompoundNBT serialize()
+    public JsonObject serialize()
     {
-        CompoundNBT compoundNBT = new CompoundNBT();
-        compoundNBT.putString("type", type.getDescriptor());
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("type", type.getDescriptor());
         for(Map.Entry<ModRecipeSerializer.RecipeDescriptors, String> entry : recipeDescriptors.entrySet())
         {
-            compoundNBT.putString(entry.getKey().getTag(), entry.getValue());
+            jsonObject.addProperty(entry.getKey().getTag(), entry.getValue());
         }
-        return compoundNBT;
+        return jsonObject;
     }
 
-    public static KubeJSModifiedRecipe deserialize(CompoundNBT compound)
+    public static KubeJSModifiedRecipe deserialize(String jsonStr)
     {
-        KubeJSModifiedRecipeType type = KubeJSModifiedRecipeType.byDescriptor(compound.getString("type"));
+        final Gson gson = new GsonBuilder().setLenient().create();
+        JsonObject jsonObject = gson.fromJson(jsonStr, JsonObject.class);
+
+        KubeJSModifiedRecipeType type = KubeJSModifiedRecipeType.byDescriptor(jsonObject.get("type").getAsString());
         if(type != null)
         {
             KubeJSModifiedRecipe recipe = new KubeJSModifiedRecipe(type);
             for(ModRecipeSerializer.RecipeDescriptors descriptor : ModRecipeSerializer.RecipeDescriptors.values())
             {
-                if(compound.contains(descriptor.getTag()))
-                    recipe.setDescriptor(descriptor, compound.getString(descriptor.getTag()));
+                if(jsonObject.has(descriptor.getTag()))
+                    recipe.setDescriptor(descriptor, jsonObject.get(descriptor.getTag()).getAsString());
             }
             return recipe;
         }

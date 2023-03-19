@@ -311,7 +311,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         this.onSelected = onSelected;
     }
 
-    public void setCoordinates(int x, int y)
+    public void setPos(int x, int y)
     {
         this.x0 = x;
         this.y0 = y;
