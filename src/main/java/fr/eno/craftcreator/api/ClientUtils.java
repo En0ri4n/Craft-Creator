@@ -1,8 +1,16 @@
 package fr.eno.craftcreator.api;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import fr.eno.craftcreator.init.InitPackets;
+import fr.eno.craftcreator.recipes.kubejs.KubeJSHelper;
+import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;
+import fr.eno.craftcreator.screen.RecipeManagerScreen;
+import fr.eno.craftcreator.utils.CustomRunnable;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -14,20 +22,20 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -78,28 +86,28 @@ public class ClientUtils
         return minecraftSupplier.get().getItemRenderer();
     }
 
-	/**
-	 * @return the client minecraft player
-	 * @see Minecraft#player
-	 */
+    /**
+     * @return the client minecraft player
+     * @see Minecraft#player
+     */
     public static Player getClientPlayer()
     {
         return minecraftSupplier.get().player;
     }
 
-	/**
-	 * @param screen the screen to open
-	 * @see Minecraft#setScreen(Screen)
+    /**
+     * @param screen the screen to open
+     * @see Minecraft#setScreen(Screen)
      */
     public static void openScreen(Screen screen)
     {
         minecraftSupplier.get().setScreen(screen);
     }
 
-	/**
-	 * @return the current displayed screen (can be null)
-	 * @see Minecraft#screen
-	 */
+    /**
+     * @return the current displayed screen (can be null)
+     * @see Minecraft#screen
+     */
     public static Screen getCurrentScreen()
     {
         return minecraftSupplier.get().screen;
@@ -136,7 +144,7 @@ public class ClientUtils
     {
         return getFontRenderer().width(str);
     }
-    
+
     /**
      * Calls {@link RenderSystem#setShaderColor(float, float, float, float)}
      */
@@ -161,10 +169,10 @@ public class ClientUtils
     /**
      * Play a sound with given pitch and volume
      *
-     * @param soundEvent the sound event
-     * @param pitch the pitch
-     * @param volume the volume
-     * @param soundCategory the sound category
+     * @param soundEvent        the sound event
+     * @param pitch             the pitch
+     * @param volume            the volume
+     * @param soundCategory     the sound category
      * @param attenuationLinear if the sound attenuation is linear
      * @see SimpleSoundInstance
      */
@@ -176,21 +184,12 @@ public class ClientUtils
     /**
      * Get the biggest string width
      *
-     * @param strings the strings
+     * @param strings list of string
      * @return the biggest string width
      */
     public static int getBiggestStringWidth(List<String> strings)
     {
-        int biggest = 0;
-
-        for(String s : strings)
-        {
-            int width = ClientUtils.width(s);
-
-            if(width > biggest) biggest = width;
-        }
-
-        return biggest;
+        return strings.stream().mapToInt(ClientUtils::width).max().orElse(0);
     }
 
     public static void setBlockRender(Block block, Predicate<RenderType> render)
@@ -201,5 +200,31 @@ public class ClientUtils
     public static void setDefaultBlockRender(Block block)
     {
         setBlockRender(block, DEFAULT_BLOCK_RENDER);
+    }
+
+    public static void addToList(InitPackets.RecipeList recipeList, String recipeId, String serializedRecipe)
+    {
+        CommonUtils.clientTask(CustomRunnable.of(() ->
+        {
+            if(ClientUtils.getCurrentScreen() instanceof RecipeManagerScreen)
+            {
+                RecipeManagerScreen screen = (RecipeManagerScreen) ClientUtils.getCurrentScreen();
+                switch(recipeList)
+                {
+                    case ADDED_RECIPES:
+                        final Gson gson = new GsonBuilder().setLenient().create();
+                        JsonObject jsonObject = gson.fromJson(serializedRecipe, JsonObject.class);
+                        RecipeSerializer<Recipe<Container>> serializer = KubeJSHelper.getSerializer(CommonUtils.parse(jsonObject.get("type").getAsString()));
+                        ResourceLocation id = CommonUtils.parse(recipeId);
+                        if(id == null)
+                            id = new ResourceLocation("lalal", "recipe");
+                        screen.addToList(recipeList, new fr.eno.craftcreator.screen.widgets.SimpleListWidget.RecipeEntry(serializer.fromJson(id, jsonObject)));
+                        break;
+                    case MODIFIED_RECIPES:
+                        screen.addToList(recipeList, new fr.eno.craftcreator.screen.widgets.SimpleListWidget.ModifiedRecipeEntry(KubeJSModifiedRecipe.deserialize(serializedRecipe)));
+                        break;
+                }
+            }
+        }));
     }
 }
