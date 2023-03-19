@@ -1,6 +1,14 @@
 package fr.eno.craftcreator.api;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.mojang.blaze3d.systems.RenderSystem;
+import fr.eno.craftcreator.init.InitPackets;
+import fr.eno.craftcreator.recipes.kubejs.KubeJSHelper;
+import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;
+import fr.eno.craftcreator.screen.RecipeManagerScreen;
+import fr.eno.craftcreator.utils.CustomRunnable;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
@@ -16,8 +24,11 @@ import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
@@ -66,7 +77,7 @@ public class ClientUtils
         return minecraftSupplier.get().font;
     }
 
-	/**
+    /**
      * @return the minecraft item renderer
      * @see Minecraft#getItemRenderer()
      */
@@ -75,35 +86,36 @@ public class ClientUtils
         return minecraftSupplier.get().getItemRenderer();
     }
 
-	/**
-	 * @return the client minecraft player
-	 * @see Minecraft#player
-	 */
+    /**
+     * @return the client minecraft player
+     * @see Minecraft#player
+     */
     public static PlayerEntity getClientPlayer()
     {
         return minecraftSupplier.get().player;
     }
 
-	/**
-	 * @param screen the screen to open
-	 * @see Minecraft#setScreen(Screen)
+    /**
+     * @param screen the screen to open
+     * @see Minecraft#setScreen(Screen)
      */
     public static void openScreen(Screen screen)
     {
         minecraftSupplier.get().setScreen(screen);
     }
 
-	/**
-	 * @return the current displayed screen (can be null)
-	 * @see Minecraft#screen
-	 */
+    /**
+     * @return the current displayed screen (can be null)
+     * @see Minecraft#screen
+     */
     public static Screen getCurrentScreen()
     {
         return minecraftSupplier.get().screen;
     }
 
-	/**
+    /**
      * Register the given container with the given screen
+     *
      * @see net.minecraft.client.gui.ScreenManager#register(ContainerType, ScreenManager.IScreenFactory)
      */
     public static <M extends Container, U extends Screen & IHasContainer<M>> void registerScreen(ContainerType<? extends M> container, ScreenManager.IScreenFactory<M, U> screenConstructor)
@@ -133,7 +145,7 @@ public class ClientUtils
     {
         return getFontRenderer().width(str);
     }
-    
+
     /**
      * Calls {@link RenderSystem#color4f(float, float, float, float)}
      */
@@ -158,10 +170,10 @@ public class ClientUtils
     /**
      * Play a sound with given pitch and volume
      *
-     * @param soundEvent the sound event
-     * @param pitch the pitch
-     * @param volume the volume
-     * @param soundCategory the sound category
+     * @param soundEvent        the sound event
+     * @param pitch             the pitch
+     * @param volume            the volume
+     * @param soundCategory     the sound category
      * @param attenuationLinear if the sound attenuation is linear
      * @see net.minecraft.client.audio.SimpleSound
      */
@@ -173,21 +185,12 @@ public class ClientUtils
     /**
      * Get the biggest string width
      *
-     * @param strings the strings
+     * @param strings list of string
      * @return the biggest string width
      */
     public static int getBiggestStringWidth(List<String> strings)
     {
-        int biggest = 0;
-
-        for(String s : strings)
-        {
-            int width = ClientUtils.width(s);
-
-            if(width > biggest) biggest = width;
-        }
-
-        return biggest;
+        return strings.stream().mapToInt(ClientUtils::width).max().orElse(0);
     }
 
     public static void setBlockRender(Block block, Predicate<RenderType> render)
@@ -198,5 +201,31 @@ public class ClientUtils
     public static void setDefaultBlockRender(Block block)
     {
         setBlockRender(block, DEFAULT_BLOCK_RENDER);
+    }
+
+    public static void addToList(InitPackets.RecipeList recipeList, String recipeId, String serializedRecipe)
+    {
+        CommonUtils.clientTask(CustomRunnable.of(() ->
+        {
+            if(ClientUtils.getCurrentScreen() instanceof RecipeManagerScreen)
+            {
+                RecipeManagerScreen screen = (RecipeManagerScreen) ClientUtils.getCurrentScreen();
+                switch(recipeList)
+                {
+                    case ADDED_RECIPES:
+                        final Gson gson = new GsonBuilder().setLenient().create();
+                        JsonObject jsonObject = gson.fromJson(serializedRecipe, JsonObject.class);
+                        IRecipeSerializer<IRecipe<IInventory>> serializer = KubeJSHelper.getSerializer(CommonUtils.parse(jsonObject.get("type").getAsString()));
+                        ResourceLocation id = CommonUtils.parse(recipeId);
+                        if(id == null)
+                            id = new ResourceLocation("lalal", "recipe");
+                        screen.addToList(recipeList, new fr.eno.craftcreator.screen.widgets.SimpleListWidget.RecipeEntry(serializer.fromJson(id, jsonObject)));
+                        break;
+                    case MODIFIED_RECIPES:
+                        screen.addToList(recipeList, new fr.eno.craftcreator.screen.widgets.SimpleListWidget.ModifiedRecipeEntry(KubeJSModifiedRecipe.deserialize(serializedRecipe)));
+                        break;
+                }
+            }
+        }));
     }
 }

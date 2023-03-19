@@ -46,6 +46,16 @@ public class ListScreen extends Screen
         this.lists.clear();
     }
 
+    protected void clearListsContents(boolean resetScroll)
+    {
+        this.lists.forEach(list ->
+        {
+            list.getEntries().clear();
+            if(resetScroll)
+                list.setScrollAmount(0D);
+        });
+    }
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button)
     {

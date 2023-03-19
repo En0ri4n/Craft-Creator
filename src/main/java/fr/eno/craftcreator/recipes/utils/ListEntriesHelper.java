@@ -70,10 +70,4 @@ public class ListEntriesHelper
 
         return entries.stream().sorted(Comparator.comparing(object -> ((SimpleListWidget.RecipeEntry) object).getRecipe().getId().toString())).collect(Collectors.toList());
     }
-
-    public enum RecipeList
-    {
-        ADDED_RECIPES,
-        MODIFIED_RECIPES
-    }
 }

@@ -1,5 +1,6 @@
 package fr.eno.craftcreator.screen.widgets;
 
+import com.google.gson.JsonObject;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fr.eno.craftcreator.References;
@@ -407,23 +408,23 @@ public class RecipeEntryWidget
         }
 
         @Override
-        public CompoundNBT serialize()
+        public JsonObject serialize()
         {
-            CompoundNBT compound = new CompoundNBT();
-            compound.putString("RegistryName", registryName.toString());
-            compound.putInt("Count", count);
-            compound.putBoolean("IsTag", isTag);
-            compound.putDouble("Chance", chance);
-            return compound;
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("RegistryName", registryName.toString());
+            jsonObject.addProperty("Count", count);
+            jsonObject.addProperty("IsTag", isTag);
+            jsonObject.addProperty("Chance", chance);
+            return jsonObject;
         }
 
-        public static RecipeEntryEntry deserialize(CompoundNBT compound)
+        public static RecipeEntryEntry deserialize(JsonObject jsonObject)
         {
             RecipeEntryEntry recipeEntryEntry = new RecipeEntryEntry(false);
-            recipeEntryEntry.registryName = CommonUtils.parse(compound.getString("RegistryName"));
-            recipeEntryEntry.count = compound.getInt("Count");
-            recipeEntryEntry.isTag = compound.getBoolean("IsTag");
-            recipeEntryEntry.chance = compound.getDouble("Chance");
+            recipeEntryEntry.registryName = CommonUtils.parse(jsonObject.get("RegistryName").getAsString());
+            recipeEntryEntry.count = jsonObject.get("Count").getAsInt();
+            recipeEntryEntry.isTag = jsonObject.get("IsTag").getAsBoolean();
+            recipeEntryEntry.chance = jsonObject.get("Chance").getAsDouble();
             return recipeEntryEntry;
         }
 

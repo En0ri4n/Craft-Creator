@@ -209,14 +209,17 @@ public class DatapackHelper
      * Delete the recipe in the Craft-Creator Datapack
      *
      * @param recipe the recipe to delete
+     * @return the feedback
      */
-    public static void deleteRecipe(IRecipe<?> recipe)
+    public static ModRecipeSerializer.Feedback deleteRecipe(IRecipe<?> recipe)
     {
         File generatorFolder = new File(FMLLoader.getGamePath().toFile(), "Craft-Creator");
-        if(!generatorFolder.exists()) return;
+        if(!generatorFolder.exists()) return ModRecipeSerializer.Feedback.DONT_EXISTS;
 
         for(File file : generatorFolder.listFiles())
             if(file.getName().contains(recipe.getId().getPath() + ".json"))
                 file.delete();
+
+        return ModRecipeSerializer.Feedback.REMOVED;
     }
 }

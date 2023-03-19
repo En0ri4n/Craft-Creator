@@ -3,7 +3,6 @@ package fr.eno.craftcreator.recipes.base;
 import com.google.gson.*;
 import fr.eno.craftcreator.CraftCreator;
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.recipes.kubejs.KubeJSHelper;
@@ -107,7 +106,7 @@ public abstract class ModRecipeSerializer
                 break;
             default:
             case MINECRAFT_DATAPACK:
-                feedback = Feedback.FILE_ERROR;
+                feedback = DatapackHelper.deleteRecipe(recipe);
                 break;
         }
 
@@ -123,7 +122,7 @@ public abstract class ModRecipeSerializer
     private void sendFeedback(Feedback feedback, Object... args)
     {
         IFormattableTextComponent message = feedback.args(args);
-        CommonUtils.sendMessage(ClientUtils.getClientPlayer(), message);
+        CommonUtils.sendMessageToServer(message);
     }
 
     /**

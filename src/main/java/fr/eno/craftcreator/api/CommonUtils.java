@@ -1,5 +1,6 @@
 package fr.eno.craftcreator.api;
 
+import fr.eno.craftcreator.CraftCreator;
 import fr.eno.craftcreator.utils.CustomRunnable;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
@@ -89,6 +90,11 @@ public class CommonUtils
     public static void sendMessage(PlayerEntity player, ITextComponent message)
     {
         player.sendMessage(message, player.getUUID());
+    }
+
+    public static void sendMessageToServer(ITextComponent message)
+    {
+        CraftCreator.SERVER.getPlayerList().getPlayers().forEach(player -> player.sendMessage(message, player.getUUID()));
     }
 
     /**

@@ -6,7 +6,6 @@ import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.base.ModRecipeCreatorDispatcher;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
-import fr.eno.craftcreator.recipes.utils.CraftIngredients;
 import fr.eno.craftcreator.utils.Utils;
 import io.netty.buffer.Unpooled;
 import net.minecraft.inventory.IInventory;
@@ -88,9 +87,7 @@ public class KubeJSHelper
             
             ResourceLocation recipeTypeLocation = CommonUtils.parse(jsonObject.get("type").getAsString());
             
-            if(recipeType == IRecipeType.CRAFTING && recipeTypeLocation.toString().contains(CommonUtils.getRecipeTypeName(recipeType).toString()))
-                currentSerializer = recipeTypeLocation.toString().contains("shaped") ? (IRecipeSerializer<T>) IRecipeSerializer.SHAPED_RECIPE : (IRecipeSerializer<T>) IRecipeSerializer.SHAPELESS_RECIPE;
-            else currentSerializer = getSerializer(recipeTypeLocation);
+            currentSerializer = getSerializer(recipeTypeLocation);
             
             if(recipeTypeLocation.toString().contains(CommonUtils.getRecipeTypeName(recipeType).toString()))
                 addRecipeTo(mod, recipes, jsonObject, Utils.notNull(currentSerializer));
@@ -98,10 +95,37 @@ public class KubeJSHelper
         
         return recipes;
     }
+
+    public static <C extends IInventory, T extends IRecipe<C>> List<JsonObject> getSerializedAddedRecipesFor(SupportedMods mod, IRecipeType<T> recipeType)
+    {
+        List<JsonObject> recipes = new ArrayList<>();
+
+        String recipeFileContent = checkTypeGroup(readFile(getRecipeFile(mod)), recipeType);
+
+        Matcher customRecipeMatcher = RECIPE_PATTERN.matcher(recipeFileContent);
+
+        while(customRecipeMatcher.find())
+        {
+            String recipeJson = customRecipeMatcher.group(1);
+            JsonObject jsonObject = GSON.fromJson(new StringReader(recipeJson), JsonObject.class);
+
+            ResourceLocation recipeTypeLocation = CommonUtils.parse(jsonObject.get("type").getAsString());
+
+            if(recipeTypeLocation.toString().contains(CommonUtils.getRecipeTypeName(recipeType).toString()))
+                recipes.add(jsonObject);
+        }
+
+        return recipes;
+    }
     
     @SuppressWarnings("unchecked")
-    private static <C extends IInventory, T extends IRecipe<C>> IRecipeSerializer<T> getSerializer(ResourceLocation resourceLocation)
+    public static <C extends IInventory, T extends IRecipe<C>> IRecipeSerializer<T> getSerializer(ResourceLocation resourceLocation)
     {
+        if(resourceLocation.toString().equals("minecraft:crafting_shaped"))
+            return (IRecipeSerializer<T>) IRecipeSerializer.SHAPED_RECIPE;
+        else if(resourceLocation.toString().equals("minecraft:crafting_shapeless"))
+            return (IRecipeSerializer<T>) IRecipeSerializer.SHAPELESS_RECIPE;
+
         return (IRecipeSerializer<T>) ForgeRegistries.RECIPE_SERIALIZERS.getValue(resourceLocation);
     }
     
@@ -121,14 +145,30 @@ public class KubeJSHelper
     {
         try
         {
-            T tempRecipe = recipeSerializer.fromJson(new ResourceLocation(mod.getModId(), "recipe"), jsonObject);
-            T recipe = recipeSerializer.fromJson(new ResourceLocation(mod.getModId(), ModRecipeCreatorDispatcher.getOutput(tempRecipe).getIcon().getItem().getRegistryName().getPath()), jsonObject);
+            T recipe = recipeSerializer.fromJson(getRecipeId(mod, jsonObject), jsonObject);
             recipes.add(recipe);
         }
         catch(JsonSyntaxException | ResourceLocationException e)
         {
             e.printStackTrace();
         }
+    }
+
+    public static <E extends IInventory, T extends IRecipe<E>> ResourceLocation getRecipeId(SupportedMods mod, JsonObject recipeJson)
+    {
+        try
+        {
+            IRecipeSerializer<T> recipeSerializer = getSerializer(CommonUtils.parse(recipeJson.get("type").getAsString()));
+            T tempRecipe = recipeSerializer.fromJson(new ResourceLocation(mod.getModId(), "recipe"), recipeJson);
+            ResourceLocation rl = new ResourceLocation(mod.getModId(), ModRecipeCreatorDispatcher.getOutput(tempRecipe).getIcon().getItem().getRegistryName().getPath());
+            return rl;
+        }
+        catch(JsonSyntaxException | ResourceLocationException e)
+        {
+            e.printStackTrace();
+        }
+
+        return new ResourceLocation(mod.getModId(), "recipe");
     }
     
     public static <C extends IInventory, T extends IRecipe<C>> ModRecipeSerializer.Feedback removeAddedRecipe(SupportedMods mod, T addedRecipe)
@@ -141,9 +181,8 @@ public class KubeJSHelper
         {
             JsonObject jsonObject = GSON.fromJson(recipeMatcher.group(1), JsonObject.class);
             IRecipeSerializer<T> currentSerializer = getSerializer(CommonUtils.parse(jsonObject.get("type").getAsString()));
-            
-            T tempRecipe = currentSerializer.fromJson(new ResourceLocation(mod.getModId(), "recipe"), jsonObject);
-            T recipe = currentSerializer.fromJson(new ResourceLocation(mod.getModId(), ModRecipeCreatorDispatcher.getOutput(tempRecipe).getIngredientsWithCount().stream().findAny().orElse(CraftIngredients.CraftIngredient.EMPTY).getId().getPath()), jsonObject);
+
+            T recipe = currentSerializer.fromJson(getRecipeId(mod, jsonObject), jsonObject);
             
             if(!CommonUtils.equals(recipe.getSerializer(), addedRecipe.getSerializer())) continue;
             
