@@ -6,7 +6,11 @@ import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.api.ScreenUtils;
 import fr.eno.craftcreator.base.ModRecipeCreatorDispatcher;
+import fr.eno.craftcreator.base.SupportedMods;
+import fr.eno.craftcreator.init.InitPackets;
+import fr.eno.craftcreator.packets.RemoveRecipePacket;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
+import fr.eno.craftcreator.recipes.base.ModifiedRecipe;
 import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import fr.eno.craftcreator.screen.widgets.SuggesterTextFieldWidget;
@@ -36,12 +40,11 @@ public class RemoveRecipeManagerScreen extends ListScreen
     private SuggesterTextFieldWidget recipeTypeField;
     private SuggesterTextFieldWidget recipeIdField;
 
-    private final Map<ModRecipeSerializer.RecipeDescriptors, String> recipeDescriptors;
+    private final Map<ModRecipeSerializer.RecipeDescriptors, String> recipeDescriptors = new HashMap<>();
 
     public RemoveRecipeManagerScreen()
     {
         super(References.getTranslate("screen.remove_manager.title"));
-        this.recipeDescriptors = new HashMap<>();
     }
 
     @Override
@@ -86,7 +89,12 @@ public class RemoveRecipeManagerScreen extends ListScreen
         if(!hasRecipeTypeBox.selected()) this.recipeDescriptors.remove(ModRecipeSerializer.RecipeDescriptors.RECIPE_TYPE);
         if(!hasRecipeIdBox.selected()) this.recipeDescriptors.remove(ModRecipeSerializer.RecipeDescriptors.RECIPE_ID);
 
-        if(!this.recipeDescriptors.isEmpty()) ModRecipeCreatorDispatcher.getSeralizer(getModId()).addModifiedRecipe(new KubeJSModifiedRecipe(KubeJSModifiedRecipe.KubeJSModifiedRecipeType.REMOVED, recipeDescriptors));
+        if(!this.recipeDescriptors.isEmpty())
+        {
+            SupportedMods mod = this.recipeDescriptors.values().stream().findFirst().filter(SupportedMods::isModLoaded).map(SupportedMods::getMod).orElse(SupportedMods.MINECRAFT);
+            InitPackets.NetworkHelper.sendToServer(new RemoveRecipePacket(mod, new KubeJSModifiedRecipe(KubeJSModifiedRecipe.KubeJSModifiedRecipeType.REMOVED, recipeDescriptors), ModRecipeSerializer.SerializerType.KUBE_JS));
+        }
+        //ModRecipeCreatorDispatcher.getSeralizer(getModId()).addModifiedRecipe(new KubeJSModifiedRecipe(KubeJSModifiedRecipe.KubeJSModifiedRecipeType.REMOVED, recipeDescriptors));
     }
 
     private String getModId()

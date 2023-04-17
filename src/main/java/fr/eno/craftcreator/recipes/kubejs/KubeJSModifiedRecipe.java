@@ -79,7 +79,7 @@ public class KubeJSModifiedRecipe extends ModifiedRecipe
             return new StringTextComponent(recipeDescriptors.get(ModRecipeSerializer.RecipeDescriptors.OUTPUT_ITEM));
         else if(recipeDescriptors.containsKey(ModRecipeSerializer.RecipeDescriptors.RECIPE_TYPE))
             return new StringTextComponent(recipeDescriptors.get(ModRecipeSerializer.RecipeDescriptors.RECIPE_TYPE));
-        else return new StringTextComponent(recipeDescriptors.getOrDefault(ModRecipeSerializer.RecipeDescriptors.MOD_ID, "Unknown"));
+        else return new StringTextComponent(recipeDescriptors.getOrDefault(ModRecipeSerializer.RecipeDescriptors.MOD_ID, "unknown"));
     }
 
     public KubeJSModifiedRecipeType getType()
@@ -109,7 +109,7 @@ public class KubeJSModifiedRecipe extends ModifiedRecipe
     public JsonObject serialize()
     {
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("type", type.getDescriptor());
+        jsonObject.addProperty("modified_type", type.getDescriptor());
         for(Map.Entry<ModRecipeSerializer.RecipeDescriptors, String> entry : recipeDescriptors.entrySet())
         {
             jsonObject.addProperty(entry.getKey().getTag(), entry.getValue());
@@ -122,7 +122,7 @@ public class KubeJSModifiedRecipe extends ModifiedRecipe
         final Gson gson = new GsonBuilder().setLenient().create();
         JsonObject jsonObject = gson.fromJson(jsonStr, JsonObject.class);
 
-        KubeJSModifiedRecipeType type = KubeJSModifiedRecipeType.byDescriptor(jsonObject.get("type").getAsString());
+        KubeJSModifiedRecipeType type = KubeJSModifiedRecipeType.byDescriptor(jsonObject.get("modified_type").getAsString());
         if(type != null)
         {
             KubeJSModifiedRecipe recipe = new KubeJSModifiedRecipe(type);
