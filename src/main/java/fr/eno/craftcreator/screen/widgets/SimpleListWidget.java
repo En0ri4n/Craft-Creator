@@ -298,7 +298,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
     @Override
     public void setSelected(@Nullable Entry entry)
     {
-        if(this.onSelected != null)
+        if(this.onSelected != null && entry != null)
         {
             this.onSelected.accept(entry);
         }

@@ -1,6 +1,5 @@
 package fr.eno.craftcreator.packets;
 
-import fr.eno.craftcreator.CraftCreator;
 import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.api.ServerUtils;
 import fr.eno.craftcreator.base.SupportedMods;
@@ -8,7 +7,6 @@ import fr.eno.craftcreator.init.InitPackets;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.kubejs.KubeJSHelper;
 import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;
-import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeType;
