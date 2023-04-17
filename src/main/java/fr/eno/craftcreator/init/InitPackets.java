@@ -102,7 +102,7 @@ public class InitPackets
     public enum RecipeList
     {
         ADDED_RECIPES,
-        MODIFIED_RECIPES
+        MODIFIED_RECIPES,
     }
 
     public enum PacketDataType

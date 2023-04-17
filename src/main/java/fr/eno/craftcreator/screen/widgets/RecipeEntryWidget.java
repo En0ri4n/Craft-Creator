@@ -9,7 +9,7 @@ import fr.eno.craftcreator.api.ScreenUtils;
 import fr.eno.craftcreator.screen.widgets.buttons.IconButton;
 import fr.eno.craftcreator.screen.widgets.buttons.SimpleCheckBox;
 import fr.eno.craftcreator.utils.EntryHelper;
-import fr.eno.craftcreator.utils.NBTSerializable;
+import fr.eno.craftcreator.utils.JsonSerializable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.MutableComponent;
@@ -301,7 +301,7 @@ public class RecipeEntryWidget
         this.linkedSlot = linkedSlot;
     }
 
-    public static class RecipeEntryEntry extends DropdownListWidget.Entry<ResourceLocation> implements NBTSerializable
+    public static class RecipeEntryEntry extends DropdownListWidget.Entry<ResourceLocation> implements JsonSerializable
     {
         private final boolean isLast;
         private ResourceLocation registryName;

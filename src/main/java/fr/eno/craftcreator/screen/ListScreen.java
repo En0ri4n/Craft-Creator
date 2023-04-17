@@ -47,14 +47,14 @@ public class ListScreen extends Screen
         this.lists.clear();
     }
 
-    protected void clearListsContents(boolean resetScroll)
+    protected void clearListsContents(boolean resetScroll, int... indexes)
     {
-        this.lists.forEach(list ->
+        for(int index : indexes)
         {
-            list.getEntries().clear();
+            this.getList(index).getEntries().clear();;
             if(resetScroll)
-                list.setScrollAmount(0D);
-        });
+                this.getList(index).setScrollAmount(0D);
+        }
     }
 
     @Override

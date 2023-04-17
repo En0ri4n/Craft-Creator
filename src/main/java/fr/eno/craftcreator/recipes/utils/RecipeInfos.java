@@ -2,7 +2,7 @@ package fr.eno.craftcreator.recipes.utils;
 
 import com.google.gson.*;
 import fr.eno.craftcreator.api.CommonUtils;
-import fr.eno.craftcreator.utils.NBTSerializable;
+import fr.eno.craftcreator.utils.JsonSerializable;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class RecipeInfos implements NBTSerializable
+public class RecipeInfos implements JsonSerializable
 {
     private final List<RecipeParameter> parameters;
 
@@ -73,6 +73,7 @@ public class RecipeInfos implements NBTSerializable
     public JsonObject serialize()
     {
         JsonObject jsonObject = new JsonObject();
+
         for(RecipeParameter parameter : this.parameters)
         {
             JsonObject parameterObj = new JsonObject();
@@ -99,7 +100,7 @@ public class RecipeInfos implements NBTSerializable
                     RecipeParameterMap map = (RecipeParameterMap) parameter;
                     JsonObject obj = new JsonObject();
                     for(Map.Entry<Integer, ResourceLocation> entry : map.getMap().entrySet())
-                        obj.addProperty(entry.getValue().toString(), entry.getKey());
+                        obj.addProperty(entry.getKey().toString(), entry.getValue().toString());
                     parameterObj.add("value", obj);
                     break;
             }
@@ -142,7 +143,7 @@ public class RecipeInfos implements NBTSerializable
                     JsonObject obj = parameterCompound.get("value").getAsJsonObject();
                     Map<Integer, ResourceLocation> map = new HashMap<>();
                     for(String key : obj.entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList()))
-                        map.put(obj.get(key).getAsInt(), CommonUtils.parse(key));
+                        map.put(Integer.valueOf(key), CommonUtils.parse(obj.get(key).getAsString()));
                     recipeInfos.addParameter(new RecipeParameterMap(keys, map));
                     break;
             }

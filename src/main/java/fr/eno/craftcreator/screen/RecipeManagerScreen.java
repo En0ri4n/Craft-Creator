@@ -92,7 +92,7 @@ public class RecipeManagerScreen extends ListScreen
         {
             SimpleListWidget.RecipeEntry recipeEntry = (SimpleListWidget.RecipeEntry) entry;
             ModRecipeSerializer.SerializerType serializerType = recipeEntry.getRecipe().getId().getNamespace().equals(References.MOD_ID) ? ModRecipeSerializer.SerializerType.MINECRAFT_DATAPACK : ModRecipeSerializer.SerializerType.KUBE_JS;
-            InitPackets.NetworkHelper.sendToServer(new RemoveAddedRecipePacket(getCurrentMod(), recipeEntry.getRecipe().getId(), serializerType));
+            InitPackets.NetworkHelper.sendToServer(new RemoveAddedRecipePacket(getCurrentMod(), recipeEntry.getRecipe(), serializerType));
             updateLists(false);
 
         }, true));
@@ -136,17 +136,16 @@ public class RecipeManagerScreen extends ListScreen
 
     private void updateLists(boolean resetScroll)
     {
-        clearListsContents(resetScroll);
+        clearListsContents(resetScroll, 2, 3, 4);
         // 0 = Mod Id Dropdown
         // 1 = Recipe Type Dropdown
         // 2 = Recipes List
         // 3 = Added Recipes List
         // 4 = Modified Recipes List
         this.setEntries(2, ListEntriesHelper.getRecipes(this.recipeType), resetScroll);
-        InitPackets.NetworkHelper.sendToServer(new RetrieveServerRecipesPacket(getCurrentMod(), InitPackets.RecipeList.ADDED_RECIPES, this.recipeType, ModRecipeSerializer.SerializerType.KUBE_JS));
-        InitPackets.NetworkHelper.sendToServer(new RetrieveServerRecipesPacket(getCurrentMod(), InitPackets.RecipeList.MODIFIED_RECIPES, this.recipeType, ModRecipeSerializer.SerializerType.KUBE_JS));
-        // this.setEntries(3, ListEntriesHelper.getAddedRecipesEntryList(getCurrentMod(), this.recipeType), resetScroll);
-        // this.setEntries(4, ListEntriesHelper.getModifiedRecipesEntryList(getCurrentMod()), resetScroll);
+        InitPackets.NetworkHelper.sendToServer(new RetrieveServerRecipesPacket(getCurrentMod(), InitPackets.RecipeList.ADDED_RECIPES, this.recipeType, SupportedMods.isKubeJSLoaded() ? ModRecipeSerializer.SerializerType.KUBE_JS : ModRecipeSerializer.SerializerType.MINECRAFT_DATAPACK));
+        if(SupportedMods.isKubeJSLoaded())
+            InitPackets.NetworkHelper.sendToServer(new RetrieveServerRecipesPacket(getCurrentMod(), InitPackets.RecipeList.MODIFIED_RECIPES, this.recipeType, ModRecipeSerializer.SerializerType.KUBE_JS));
     }
 
     private SupportedMods getCurrentMod()
