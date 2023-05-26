@@ -350,6 +350,10 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
         {
             entry.tick();
         }
+        for(Entry entry : getEntries())
+        {
+            entry.tick();
+        }
     }
 
     @Override
@@ -374,9 +378,7 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
 
         public abstract void renderTooltip(PoseStack matrixStack, int mouseX, int mouseY);
 
-        protected void tick()
-        {
-        }
+        protected void tick() {}
 
         protected void displayTruncatedString(PoseStack matrixStack, String stringToDisplay, int leftPos, int topPos, int width, int height, boolean hasItemDisplay, boolean isMouseOver)
         {

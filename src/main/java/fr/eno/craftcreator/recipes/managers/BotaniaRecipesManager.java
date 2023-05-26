@@ -11,6 +11,7 @@ import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.Slot;
 import net.minecraftforge.items.SlotItemHandler;
+import net.minecraftforge.items.SlotItemHandler;
 import vazkii.botania.api.brew.Brew;
 import vazkii.botania.api.brew.IBrewItem;
 

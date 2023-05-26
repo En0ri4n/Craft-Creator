@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.items.SlotItemHandler;
+import net.minecraftforge.items.SlotItemHandler;
 
 import java.util.Arrays;
 import java.util.List;
