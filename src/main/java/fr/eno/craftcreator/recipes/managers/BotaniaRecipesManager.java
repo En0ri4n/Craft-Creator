@@ -10,6 +10,7 @@ import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.Slot;
+import net.minecraftforge.items.SlotItemHandler;
 import vazkii.botania.api.brew.Brew;
 import vazkii.botania.api.brew.IBrewItem;
 
@@ -28,23 +29,26 @@ public class BotaniaRecipesManager extends BaseRecipesManager
     {
         BotaniaRecipeSerializer.get().setSerializerType(serializerType);
 
+        List<SlotItemHandler> currentSlots = PositionnedSlot.getSlotsFor(recipe.getSlots(), slots);
+        Map<Integer, ResourceLocation> taggedSlots = recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS);
+
         if(recipe.is(MANA_INFUSION))
-            createManaInfusionRecipe(PositionnedSlot.getSlotsFor(SlotHelper.MANA_INFUSION_SLOTS, slots), recipeInfos.getValue(RecipeInfos.Parameters.MANA).intValue());
+            createManaInfusionRecipe(currentSlots, recipeInfos.getValue(RecipeInfos.Parameters.MANA).intValue());
         else if(recipe.is(ELVEN_TRADE))
-            createElvenTradeRecipe(PositionnedSlot.getSlotsFor(SlotHelper.ELVEN_TRADE_SLOTS, slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS));
+            createElvenTradeRecipe(currentSlots, taggedSlots);
         else if(recipe.is(PURE_DAISY))
-            createPureDaisyRecipe(PositionnedSlot.getSlotsFor(SlotHelper.PURE_DAISY_SLOTS, slots), recipeInfos.getValue(RecipeInfos.Parameters.TIME).intValue());
+            createPureDaisyRecipe(currentSlots, recipeInfos.getValue(RecipeInfos.Parameters.TIME).intValue());
         else if(recipe.is(BREWERY))
-            createBreweryRecipe(PositionnedSlot.getSlotsFor(SlotHelper.BREWERY_SLOTS, slots));
+            createBreweryRecipe(currentSlots);
         else if(recipe.is(PETAL_APOTHECARY))
-            createPetalRecipe(PositionnedSlot.getSlotsFor(SlotHelper.PETAL_APOTHECARY_SLOTS, slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS));
+            createPetalRecipe(currentSlots, taggedSlots);
         else if(recipe.is(RUNIC_ALTAR))
-            createRuneRecipe(PositionnedSlot.getSlotsFor(SlotHelper.RUNIC_ALTAR_SLOTS, slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.MANA).intValue());
+            createRuneRecipe(currentSlots, taggedSlots, recipeInfos.getValue(RecipeInfos.Parameters.MANA).intValue());
         else if(recipe.is(TERRA_PLATE))
-            createTerraPlateRecipe(PositionnedSlot.getSlotsFor(SlotHelper.TERRA_PLATE_SLOTS, slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.MANA).intValue());
+            createTerraPlateRecipe(currentSlots, taggedSlots, recipeInfos.getValue(RecipeInfos.Parameters.MANA).intValue());
     }
 
-    private void createManaInfusionRecipe(List<Slot> slots, int mana)
+    private void createManaInfusionRecipe(List<SlotItemHandler> slots, int mana)
     {
         if(isSlotsEmpty(slots, SlotHelper.MANA_INFUSION_SLOTS_INPUT.size(), SlotHelper.MANA_INFUSION_SLOTS_OUTPUT.size())) return;
 
@@ -55,7 +59,7 @@ public class BotaniaRecipesManager extends BaseRecipesManager
         BotaniaRecipeSerializer.get().serializeInfusionRecipe(input, catalystItem, output, mana);
     }
 
-    private void createElvenTradeRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots)
+    private void createElvenTradeRecipe(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots)
     {
         if(isSlotsEmpty(slots, SlotHelper.ELVEN_TRADE_SLOTS_INPUT.size(), SlotHelper.ELVEN_TRADE_SLOTS_OUTPUT.size())) return;
 
@@ -65,7 +69,7 @@ public class BotaniaRecipesManager extends BaseRecipesManager
         BotaniaRecipeSerializer.get().serializeElvenTradeRecipe(input, output);
     }
 
-    private void createPureDaisyRecipe(List<Slot> slots, int time)
+    private void createPureDaisyRecipe(List<SlotItemHandler> slots, int time)
     {
         if(isSlotsEmpty(slots, SlotHelper.PURE_DAISY_SLOTS_INPUT.size(), SlotHelper.PURE_DAISY_SLOTS_OUTPUT.size())) return;
 
@@ -75,7 +79,7 @@ public class BotaniaRecipesManager extends BaseRecipesManager
         BotaniaRecipeSerializer.get().serializePureDaisyRecipe(input, output, time);
     }
 
-    private void createBreweryRecipe(List<Slot> slots)
+    private void createBreweryRecipe(List<SlotItemHandler> slots)
     {
         if(isSlotsEmpty(slots, SlotHelper.BREWERY_SLOTS_INPUT.size(), SlotHelper.BREWERY_SLOTS_OUTPUT.size())) return;
 
@@ -87,7 +91,7 @@ public class BotaniaRecipesManager extends BaseRecipesManager
         BotaniaRecipeSerializer.get().serializeBrewRecipe(ingredients, brew);
     }
 
-    private void createPetalRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots)
+    private void createPetalRecipe(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots)
     {
         if(isSlotsEmpty(slots, SlotHelper.PETAL_APOTHECARY_SLOTS_INPUT.size(), SlotHelper.PETAL_APOTHECARY_SLOTS_OUTPUT.size())) return;
 
@@ -97,7 +101,7 @@ public class BotaniaRecipesManager extends BaseRecipesManager
         BotaniaRecipeSerializer.get().serializePetalRecipe(input, output);
     }
 
-    private void createRuneRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, int mana)
+    private void createRuneRecipe(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots, int mana)
     {
         if(isSlotsEmpty(slots, SlotHelper.RUNIC_ALTAR_SLOTS_INPUT.size(), SlotHelper.RUNIC_ALTAR_SLOTS_OUTPUT.size())) return;
 
@@ -107,7 +111,7 @@ public class BotaniaRecipesManager extends BaseRecipesManager
         BotaniaRecipeSerializer.get().serializeRuneRecipe(input, output, mana);
     }
 
-    private void createTerraPlateRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, int mana)
+    private void createTerraPlateRecipe(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots, int mana)
     {
         if(isSlotsEmpty(slots, SlotHelper.TERRA_PLATE_SLOTS_INPUT.size(), SlotHelper.TERRA_PLATE_SLOTS_OUTPUT.size())) return;
 

@@ -25,7 +25,7 @@
 
 	"craftcreator.screen.widget.dropdown_list.recipe_entry.entry.title": "Entry #%d",
 	"craftcreator.screen.widget.dropdown_list.recipe_entry.add": "Add Entry...",
-	"craftcreator.screen.widget.dropdown_list.entry": "%s ▼",
+	"craftcreator.screen.widget.dropdown_list.entry.saved": "Saved!",
 
 	"craftcreator.serializer.message.recipe.added": "§aRecipe %s §aby %s §asuccessfully generated",
 	"craftcreator.serializer.message.recipe.exists": "§cRecipe §4%s §cby §4%s §calready exists !",

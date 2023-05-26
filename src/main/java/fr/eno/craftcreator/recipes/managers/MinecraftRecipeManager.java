@@ -11,6 +11,7 @@ import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.items.SlotItemHandler;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,25 +28,20 @@ public class MinecraftRecipeManager extends BaseRecipesManager
     {
         MinecraftRecipeSerializer.get().setSerializerType(serializerType);
 
+        List<SlotItemHandler> currentSlots = PositionnedSlot.getSlotsFor(recipe.getSlots(), slots);
+        Map<Integer, ResourceLocation> taggedSlots = recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS);
+
         if(recipe.is(CRAFTING_TABLE))
-        {
-            createCraftingTableRecipe(PositionnedSlot.getSlotsFor(SlotHelper.CRAFTING_TABLE_SLOTS, slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getList(RecipeInfos.Parameters.NBT_SLOTS), recipeInfos.getBoolean(RecipeInfos.Parameters.SHAPED), recipeInfos.getBoolean(RecipeInfos.Parameters.KUBEJS_RECIPE));
-        }
+            createCraftingTableRecipe(currentSlots, taggedSlots, recipeInfos.getList(RecipeInfos.Parameters.NBT_SLOTS), recipeInfos.getBoolean(RecipeInfos.Parameters.SHAPED));
         else if(recipe.is(FURNACE_SMELTING, FURNACE_BLASTING, FURNACE_SMOKING, CAMPFIRE_COOKING))
-        {
-            createFurnaceRecipe(recipe, PositionnedSlot.getSlotsFor(SlotHelper.FURNACE_SLOTS, slots), recipeInfos.getMap(RecipeInfos.Parameters.TAGGED_SLOTS), recipeInfos.getValue(RecipeInfos.Parameters.EXPERIENCE).doubleValue(), recipeInfos.getValue(RecipeInfos.Parameters.COOKING_TIME).intValue(), recipeInfos.getBoolean(RecipeInfos.Parameters.KUBEJS_RECIPE));
-        }
+            createFurnaceRecipe(recipe, currentSlots, taggedSlots, recipeInfos.getValue(RecipeInfos.Parameters.EXPERIENCE).doubleValue(), recipeInfos.getValue(RecipeInfos.Parameters.COOKING_TIME).intValue());
         else if(recipe.is(SMITHING))
-        {
-            createSmithingTableRecipe(PositionnedSlot.getSlotsFor(SlotHelper.SMITHING_SLOTS, slots), recipeInfos.getBoolean(RecipeInfos.Parameters.KUBEJS_RECIPE));
-        }
+            createSmithingTableRecipe(currentSlots);
         else if(recipe.is(STONECUTTING))
-        {
-            createStoneCutterRecipe(PositionnedSlot.getSlotsFor(SlotHelper.STONECUTTING_SLOTS, slots), recipeInfos.getBoolean(RecipeInfos.Parameters.KUBEJS_RECIPE));
-        }
+            createStoneCutterRecipe(currentSlots);
     }
 
-    private void createFurnaceRecipe(RecipeCreator recipe, List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, double experience, int cookingTime, boolean isKubeJSRecipe)
+    private void createFurnaceRecipe(RecipeCreator recipe, List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots, double experience, int cookingTime)
     {
         if(isSlotsEmpty(slots, SlotHelper.FURNACE_SLOTS_INPUT.size(), SlotHelper.FURNACE_SLOTS_OUTPUT.size()))
             return;
@@ -53,10 +49,10 @@ public class MinecraftRecipeManager extends BaseRecipesManager
         RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));
         RecipeEntry.Output output = getSingleOutput(slots.get(1));
 
-        MinecraftRecipeSerializer.get().serializeFurnaceRecipe(recipe, input, output, experience, cookingTime, isKubeJSRecipe);
+        MinecraftRecipeSerializer.get().serializeFurnaceRecipe(recipe, input, output, experience, cookingTime);
     }
 
-    public void createSmithingTableRecipe(List<Slot> slots, boolean isKubeJSRecipe)
+    public void createSmithingTableRecipe(List<SlotItemHandler> slots)
     {
         if(isSlotsEmpty(slots, 2, 1))
             return;
@@ -66,10 +62,10 @@ public class MinecraftRecipeManager extends BaseRecipesManager
 
         RecipeEntry.Output output = getSingleOutput(slots.get(2));
 
-        MinecraftRecipeSerializer.get().serializeSmithingRecipe(base, addition, output, isKubeJSRecipe);
+        MinecraftRecipeSerializer.get().serializeSmithingRecipe(base, addition, output);
     }
 
-    public void createStoneCutterRecipe(List<Slot> slots, boolean isKubeJSRecipe)
+    public void createStoneCutterRecipe(List<SlotItemHandler> slots)
     {
         if(isSlotsEmpty(slots, 1, 1))
             return;
@@ -77,17 +73,17 @@ public class MinecraftRecipeManager extends BaseRecipesManager
         RecipeEntry.Input input = getSingleInput(Collections.emptyMap(), slots.get(0));
         RecipeEntry.Output output = getSingleOutput(slots.get(1));
 
-        MinecraftRecipeSerializer.get().serializeStoneCutterRecipe(input, output, isKubeJSRecipe);
+        MinecraftRecipeSerializer.get().serializeStoneCutterRecipe(input, output);
     }
 
-    public void createCraftingTableRecipe(List<Slot> slots, Map<Integer, ResourceLocation> taggedSlots, List<Integer> nbtSlots, boolean shaped, boolean isKubeJSRecipe)
+    public void createCraftingTableRecipe(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots, List<Integer> nbtSlots, boolean shaped)
     {
         if(isSlotsEmpty(slots, 9, 1))
             return;
 
         ItemStack output = slots.get(9).getItem();
 
-        MinecraftRecipeSerializer.get().serializeCraftingTableRecipe(output, slots, taggedSlots, nbtSlots, shaped, isKubeJSRecipe);
+        MinecraftRecipeSerializer.get().serializeCraftingTableRecipe(output, slots, taggedSlots, nbtSlots, shaped);
     }
 
     public static MinecraftRecipeManager get()
