@@ -1,5 +1,6 @@
 package fr.eno.craftcreator.api;
 
+import fr.eno.craftcreator.CraftCreator;
 import fr.eno.craftcreator.utils.CustomRunnable;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.ClickEvent;
@@ -16,7 +17,6 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.minecraftforge.registries.tags.ITag;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -89,6 +89,11 @@ public class CommonUtils
     public static void sendMessage(Player player, MutableComponent message)
     {
         player.sendMessage(message, player.getUUID());
+    }
+
+    public static void sendMessageToServer(MutableComponent message)
+    {
+        CraftCreator.SERVER.getPlayerList().getPlayers().forEach(player -> player.sendMessage(message, player.getUUID()));
     }
 
     /**

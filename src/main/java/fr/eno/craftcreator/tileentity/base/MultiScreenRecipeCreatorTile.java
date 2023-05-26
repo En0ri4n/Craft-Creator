@@ -1,6 +1,5 @@
 package fr.eno.craftcreator.tileentity.base;
 
-import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.base.ModRecipeCreators;
 import fr.eno.craftcreator.base.SupportedMods;

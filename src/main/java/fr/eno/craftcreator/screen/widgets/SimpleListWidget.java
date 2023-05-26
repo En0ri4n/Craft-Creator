@@ -23,7 +23,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -310,7 +309,7 @@ public class SimpleListWidget extends AbstractSelectionList<SimpleListWidget.Ent
         this.onSelected = onSelected;
     }
 
-    public void setCoordinates(int x, int y)
+    public void setPos(int x, int y)
     {
         this.x0 = x;
         this.y0 = y;

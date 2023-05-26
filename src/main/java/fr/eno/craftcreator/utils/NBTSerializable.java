@@ -1,8 +1,8 @@
 package fr.eno.craftcreator.utils;
 
-import net.minecraft.nbt.CompoundTag;
+import com.google.gson.JsonObject;
 
 public interface NBTSerializable
 {
-    CompoundTag serialize();
+    JsonObject serialize();
 }

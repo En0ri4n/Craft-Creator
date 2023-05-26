@@ -1,5 +1,6 @@
 package fr.eno.craftcreator.screen.widgets;
 
+import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
@@ -11,7 +12,6 @@ import fr.eno.craftcreator.utils.EntryHelper;
 import fr.eno.craftcreator.utils.NBTSerializable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -405,24 +405,23 @@ public class RecipeEntryWidget
         }
 
         @Override
-        public CompoundTag serialize()
+        public JsonObject serialize()
         {
-            CompoundTag compound = new CompoundTag();
-            compound.putString("RegistryName", registryName.toString());
-            compound.putInt("Count", count);
-            compound.putBoolean("IsTag", isTag);
-            compound.putDouble("Chance", chance);
-            return compound;
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("RegistryName", registryName.toString());
+            jsonObject.addProperty("Count", count);
+            jsonObject.addProperty("IsTag", isTag);
+            jsonObject.addProperty("Chance", chance);
+            return jsonObject;
         }
 
-
-        public static RecipeEntryEntry deserialize(CompoundTag compound)
+        public static RecipeEntryEntry deserialize(JsonObject jsonObject)
         {
             RecipeEntryEntry recipeEntryEntry = new RecipeEntryEntry(false);
-            recipeEntryEntry.registryName = CommonUtils.parse(compound.getString("RegistryName"));
-            recipeEntryEntry.count = compound.getInt("Count");
-            recipeEntryEntry.isTag = compound.getBoolean("IsTag");
-            recipeEntryEntry.chance = compound.getDouble("Chance");
+            recipeEntryEntry.registryName = CommonUtils.parse(jsonObject.get("RegistryName").getAsString());
+            recipeEntryEntry.count = jsonObject.get("Count").getAsInt();
+            recipeEntryEntry.isTag = jsonObject.get("IsTag").getAsBoolean();
+            recipeEntryEntry.chance = jsonObject.get("Chance").getAsDouble();
             return recipeEntryEntry;
         }
 

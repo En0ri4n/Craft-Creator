@@ -17,8 +17,6 @@ import fr.eno.craftcreator.screen.widgets.buttons.pressable.NullPressable;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 
 import java.util.List;
 

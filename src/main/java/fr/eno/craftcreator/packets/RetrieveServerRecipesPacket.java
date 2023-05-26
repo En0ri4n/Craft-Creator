@@ -8,6 +8,10 @@ import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.kubejs.KubeJSHelper;
 import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.List;
@@ -17,12 +21,14 @@ public class RetrieveServerRecipesPacket
 {
     private final SupportedMods mod;
     private final InitPackets.RecipeList recipeList;
+    private final ResourceLocation recipeType;
     private final ModRecipeSerializer.SerializerType serializerType;
 
-    public RetrieveServerRecipesPacket(SupportedMods mod, InitPackets.RecipeList recipeList, ModRecipeSerializer.SerializerType serializerType)
+    public RetrieveServerRecipesPacket(SupportedMods mod, InitPackets.RecipeList recipeList, ResourceLocation recipeType, ModRecipeSerializer.SerializerType serializerType)
     {
         this.mod = mod;
         this.recipeList = recipeList;
+        this.recipeType = recipeType;
         this.serializerType = serializerType;
     }
 
@@ -30,6 +36,7 @@ public class RetrieveServerRecipesPacket
     {
         packetBuffer.writeEnum(msg.mod);
         packetBuffer.writeEnum(msg.recipeList);
+        packetBuffer.writeResourceLocation(msg.recipeType);
         packetBuffer.writeEnum(msg.serializerType);
     }
 
@@ -37,8 +44,9 @@ public class RetrieveServerRecipesPacket
     {
         SupportedMods mod = packetBuffer.readEnum(SupportedMods.class);
         InitPackets.RecipeList recipeList = packetBuffer.readEnum(InitPackets.RecipeList.class);
+        ResourceLocation recipeType = packetBuffer.readResourceLocation();
         ModRecipeSerializer.SerializerType serializerType = packetBuffer.readEnum(ModRecipeSerializer.SerializerType.class);
-        return new RetrieveServerRecipesPacket(mod, recipeList, serializerType);
+        return new RetrieveServerRecipesPacket(mod, recipeList, recipeType, serializerType);
     }
 
     public static class ServerHandler
@@ -52,13 +60,27 @@ public class RetrieveServerRecipesPacket
             {
                 if(msg.serializerType == ModRecipeSerializer.SerializerType.KUBE_JS)
                 {
-                    List<KubeJSModifiedRecipe> recipes = KubeJSHelper.getModifiedRecipes(msg.mod);
-                    for(KubeJSModifiedRecipe recipe : recipes)
+                    switch(msg.recipeList)
                     {
-                        InitPackets.NetworkHelper.sendToPlayer(ServerUtils.getServerPlayer(ctx), new UpdateRecipeListClientPacket(msg.mod, msg.recipeList, recipe.serialize()));
+                        case ADDED_RECIPES:
+                            RecipeType<Recipe<Container>> recipeType = CommonUtils.getRecipeTypeByName(msg.recipeType);
+                            KubeJSHelper.getSerializedAddedRecipesFor(msg.mod, recipeType).forEach(recipe ->
+                            {
+                                InitPackets.NetworkHelper.sendToPlayer(ServerUtils.getServerPlayer(ctx), new UpdateRecipeListClientPacket(msg.mod, msg.recipeList, KubeJSHelper.getRecipeId(msg.mod, recipe).toString(), recipe.toString()));
+                            });
+                            break;
+                        case MODIFIED_RECIPES:
+                            List<KubeJSModifiedRecipe> recipes = KubeJSHelper.getModifiedRecipes(msg.mod);
+                            for(KubeJSModifiedRecipe recipe : recipes)
+                            {
+                                InitPackets.NetworkHelper.sendToPlayer(ServerUtils.getServerPlayer(ctx), new UpdateRecipeListClientPacket(msg.mod, msg.recipeList, recipe.toString(), recipe.serialize().toString()));
+                            }
+                            break;
                     }
                 }
             });
+
+            ctx.get().setPacketHandled(true);
         }
     }
 }

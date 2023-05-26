@@ -10,12 +10,9 @@ import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
 import java.util.Arrays;

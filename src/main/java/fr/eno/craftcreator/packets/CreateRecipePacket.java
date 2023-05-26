@@ -34,7 +34,7 @@ public class CreateRecipePacket
     {
         buf.writeEnum(msg.mod);
         buf.writeUtf(msg.recipeCreator.getRecipeTypeLocation().toString());
-        buf.writeNbt(msg.recipeInfos.serialize());
+        buf.writeUtf(msg.recipeInfos.serialize().toString());
         buf.writeEnum(msg.serializerType);
     }
 
@@ -43,7 +43,7 @@ public class CreateRecipePacket
         SupportedMods mod = buf.readEnum(SupportedMods.class);
         ResourceLocation recipeTypeLocation = CommonUtils.parse(buf.readUtf());
         RecipeCreator recipeCreator = ModRecipeCreators.byName(recipeTypeLocation);
-        RecipeInfos recipeInfos = RecipeInfos.deserialize(buf.readNbt());
+        RecipeInfos recipeInfos = RecipeInfos.deserialize(buf.readUtf());
         ModRecipeSerializer.SerializerType serializerType = buf.readEnum(ModRecipeSerializer.SerializerType.class);
 
         return new CreateRecipePacket(mod, recipeCreator, recipeInfos, serializerType);

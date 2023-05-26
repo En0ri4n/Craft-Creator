@@ -1,15 +1,15 @@
 package fr.eno.craftcreator.recipes.utils;
 
+import com.google.gson.*;
 import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.utils.NBTSerializable;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class RecipeInfos implements NBTSerializable
 {
@@ -70,75 +70,79 @@ public class RecipeInfos implements NBTSerializable
     }
 
     @Override
-    public CompoundTag serialize()
+    public JsonObject serialize()
     {
-        CompoundTag compound = new CompoundTag();
+        JsonObject jsonObject = new JsonObject();
         for(RecipeParameter parameter : this.parameters)
         {
-            CompoundTag parameterCompound = new CompoundTag();
-            parameterCompound.putString("type", parameter.getType().name());
+            JsonObject parameterObj = new JsonObject();
+            parameterObj.addProperty("type", parameter.getType().name());
 
             switch(parameter.getType())
             {
                 case NUMBER:
                     RecipeParameterNumber number = (RecipeParameterNumber) parameter;
-                    parameterCompound.putBoolean("is_double", number.isDouble());
-                    parameterCompound.putDouble("value", number.isDouble() ? number.getNumberValue().doubleValue() : number.getNumberValue().intValue());
+                    parameterObj.addProperty("is_double", number.isDouble());
+                    parameterObj.addProperty("value", number.isDouble() ? number.getNumberValue().doubleValue() : number.getNumberValue().intValue());
                     break;
                 case BOOLEAN:
                     RecipeParameterBoolean bool = (RecipeParameterBoolean) parameter;
-                    parameterCompound.putBoolean("value", bool.getBoolean());
+                    parameterObj.addProperty("value", bool.getBoolean());
                     break;
                 case INT_LIST:
                     RecipeParameterIntList intList = (RecipeParameterIntList) parameter;
-                    IntArrayTag arrayNBT = new IntArrayTag(intList.getList());
-                    parameterCompound.put("value", arrayNBT);
+                    JsonArray jsonArray = new JsonArray();
+                    intList.getList().forEach(jsonArray::add);
+                    parameterObj.add("value", jsonArray);
                     break;
                 case MAP:
                     RecipeParameterMap map = (RecipeParameterMap) parameter;
-                    CompoundTag nbt = new CompoundTag();
+                    JsonObject obj = new JsonObject();
                     for(Map.Entry<Integer, ResourceLocation> entry : map.getMap().entrySet())
-                        nbt.putInt(entry.getValue().toString(), entry.getKey());
-                    parameterCompound.put("value", nbt);
+                        obj.addProperty(entry.getValue().toString(), entry.getKey());
+                    parameterObj.add("value", obj);
                     break;
             }
 
-            compound.put(parameter.getName(), parameterCompound);
+            jsonObject.add(parameter.getName(), parameterObj);
         }
-        return compound;
+        return jsonObject;
     }
 
-    public static RecipeInfos deserialize(CompoundTag compound)
+    public static RecipeInfos deserialize(String json)
     {
         RecipeInfos recipeInfos = RecipeInfos.create();
 
-        for(String keys : compound.getAllKeys())
+        final Gson gson = new GsonBuilder().setLenient().create();
+        JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
+
+        for(String keys : jsonObject.entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList()))
         {
-            CompoundTag parameterCompound = compound.getCompound(keys);
-            RecipeParameterType type = RecipeParameterType.valueOf(parameterCompound.getString("type"));
+            JsonObject parameterCompound = jsonObject.get(keys).getAsJsonObject();
+            RecipeParameterType type = RecipeParameterType.valueOf(parameterCompound.get("type").getAsString());
 
             switch(type)
             {
                 case NUMBER:
-                    boolean isDouble = parameterCompound.getBoolean("is_double");
-                    Number value = isDouble ? parameterCompound.getDouble("value") : parameterCompound.getInt("value");
+                    boolean isDouble = parameterCompound.get("is_double").getAsBoolean();
+                    Number value = isDouble ? parameterCompound.get("value").getAsDouble() : parameterCompound.get("value").getAsInt();
                     recipeInfos.addParameter(new RecipeParameterNumber(keys, value, isDouble));
                     break;
                 case BOOLEAN:
-                    recipeInfos.addParameter(new RecipeParameterBoolean(keys, parameterCompound.getBoolean("value")));
+                    recipeInfos.addParameter(new RecipeParameterBoolean(keys, parameterCompound.get("value").getAsBoolean()));
                     break;
                 case INT_LIST:
-                    IntArrayTag arrayNBT = (IntArrayTag) parameterCompound.get("value");
+                    JsonArray arrayNBT = parameterCompound.get("value").getAsJsonArray();
                     List<Integer> list = new ArrayList<>();
-                    for(int i : arrayNBT.getAsIntArray())
-                        list.add(i);
+                    for(JsonElement i : arrayNBT)
+                        list.add(i.getAsInt());
                     recipeInfos.addParameter(new RecipeParameterIntList(keys, list));
                     break;
                 case MAP:
-                    CompoundTag nbt = parameterCompound.getCompound("value");
+                    JsonObject obj = parameterCompound.get("value").getAsJsonObject();
                     Map<Integer, ResourceLocation> map = new HashMap<>();
-                    for(String key : nbt.getAllKeys())
-                        map.put(nbt.getInt(key), CommonUtils.parse(key));
+                    for(String key : obj.entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList()))
+                        map.put(obj.get(key).getAsInt(), CommonUtils.parse(key));
                     recipeInfos.addParameter(new RecipeParameterMap(keys, map));
                     break;
             }

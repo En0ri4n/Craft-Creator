@@ -48,7 +48,8 @@ public class RemoveRecipeManagerScreen extends ListScreen
     @Override
     protected void init()
     {
-        this.lists.clear();
+        clearLists();
+
         int i = 0;
         int default_x = width / 8 + 20;
         int default_y = height / 9 + 35;

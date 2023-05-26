@@ -9,7 +9,7 @@ import fr.eno.craftcreator.screen.container.CreateRecipeCreatorScreen;
 import fr.eno.craftcreator.screen.container.MinecraftRecipeCreatorScreen;
 import fr.eno.craftcreator.screen.container.ThermalRecipeCreatorScreen;
 import fr.eno.craftcreator.utils.ClientDispatcher;
-import fr.eno.craftcreator.utils.EntryHelper;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
@@ -30,6 +30,8 @@ import org.apache.logging.log4j.Logger;
 public class CraftCreator
 {
     public static final Logger LOGGER = LogManager.getLogger();
+
+    public static MinecraftServer SERVER;
 
     public CraftCreator()
     {
@@ -72,7 +74,7 @@ public class CraftCreator
     @SubscribeEvent
     public void onServerStart(ServerStartedEvent event)
     {
-        event.getServer().getAllLevels().forEach(EntryHelper::init);
+        SERVER = event.getServer();
     }
 
     @SubscribeEvent

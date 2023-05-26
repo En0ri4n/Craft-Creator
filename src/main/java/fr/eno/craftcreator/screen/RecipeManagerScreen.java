@@ -1,17 +1,17 @@
 package fr.eno.craftcreator.screen;
 
-
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.CommonUtils;
-import fr.eno.craftcreator.base.ModRecipeCreatorDispatcher;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.init.InitPackets;
+import fr.eno.craftcreator.packets.RemoveAddedRecipePacket;
+import fr.eno.craftcreator.packets.RemoveModifiedRecipe;
+import fr.eno.craftcreator.packets.RemoveRecipePacket;
 import fr.eno.craftcreator.packets.RetrieveServerRecipesPacket;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;
-import fr.eno.craftcreator.recipes.utils.DatapackHelper;
 import fr.eno.craftcreator.recipes.utils.ListEntriesHelper;
 import fr.eno.craftcreator.screen.widgets.DropdownListWidget;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
@@ -68,7 +68,7 @@ public class RecipeManagerScreen extends ListScreen
         addList(new SimpleListWidget(10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.recipes"), (entry) ->
         {
             Recipe<?> recipeToRemove = ((SimpleListWidget.RecipeEntry) entry).getRecipe();
-            ModRecipeCreatorDispatcher.getSeralizer(getCurrentMod().getModId()).removeRecipe(new KubeJSModifiedRecipe(KubeJSModifiedRecipe.KubeJSModifiedRecipeType.REMOVED, Collections.singletonMap(ModRecipeSerializer.RecipeDescriptors.RECIPE_ID, recipeToRemove.getId().toString())), ModRecipeSerializer.SerializerType.KUBE_JS);
+            InitPackets.NetworkHelper.sendToServer(new RemoveRecipePacket(getCurrentMod(), new KubeJSModifiedRecipe(KubeJSModifiedRecipe.KubeJSModifiedRecipeType.REMOVED, Collections.singletonMap(ModRecipeSerializer.RecipeDescriptors.RECIPE_ID, recipeToRemove.getId().toString())), ModRecipeSerializer.SerializerType.KUBE_JS));
             updateLists(false);
         }, SupportedMods.isKubeJSLoaded()));
         
@@ -91,21 +91,15 @@ public class RecipeManagerScreen extends ListScreen
         addList(new SimpleListWidget(this.width / 3 + 10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.added_recipes"), (entry) ->
         {
             SimpleListWidget.RecipeEntry recipeEntry = (SimpleListWidget.RecipeEntry) entry;
+            ModRecipeSerializer.SerializerType serializerType = recipeEntry.getRecipe().getId().getNamespace().equals(References.MOD_ID) ? ModRecipeSerializer.SerializerType.MINECRAFT_DATAPACK : ModRecipeSerializer.SerializerType.KUBE_JS;
+            InitPackets.NetworkHelper.sendToServer(new RemoveAddedRecipePacket(getCurrentMod(), recipeEntry.getRecipe().getId(), serializerType));
+            updateLists(false);
 
-            if(recipeEntry.getRecipe().getId().getNamespace().equals(References.MOD_ID))
-            {
-                DatapackHelper.deleteRecipe(recipeEntry.getRecipe());
-            }
-            else
-            {
-                ModRecipeCreatorDispatcher.getSeralizer(getCurrentMod().getModId()).removeAddedRecipeFrom(getCurrentMod(), recipeEntry.getRecipe(), ModRecipeSerializer.SerializerType.KUBE_JS);
-                updateLists(false);
-            }
         }, true));
 
         addList(new SimpleListWidget(this.width / 3 * 2 + 10, 30, this.width / 3 - 15, this.height - 30 - bottomHeight, 20, 14, 5, References.getTranslate("screen.recipe_manager.list.modified_recipes"), (entry) ->
         {
-            ModRecipeSerializer.removeModifiedRecipe(getCurrentMod(), ((SimpleListWidget.ModifiedRecipeEntry) entry).getRecipe());
+            InitPackets.NetworkHelper.sendToServer(new RemoveModifiedRecipe(getCurrentMod(), ((SimpleListWidget.ModifiedRecipeEntry) entry).getRecipe()));
             updateLists(false);
         }, SupportedMods.isKubeJSLoaded()));
 
@@ -124,7 +118,7 @@ public class RecipeManagerScreen extends ListScreen
     private void retrieveData()
     {
         if(SupportedMods.isKubeJSLoaded())
-            InitPackets.NetworkHelper.sendToServer(new RetrieveServerRecipesPacket(getCurrentMod(), InitPackets.RecipeList.MODIFIED_RECIPES, ModRecipeSerializer.SerializerType.KUBE_JS));
+            InitPackets.NetworkHelper.sendToServer(new RetrieveServerRecipesPacket(getCurrentMod(), InitPackets.RecipeList.MODIFIED_RECIPES, this.recipeType, ModRecipeSerializer.SerializerType.KUBE_JS));
     }
 
     public <T extends SimpleListWidget.Entry> void addToList(InitPackets.RecipeList list, T entry)
@@ -142,14 +136,17 @@ public class RecipeManagerScreen extends ListScreen
 
     private void updateLists(boolean resetScroll)
     {
+        clearListsContents(resetScroll);
         // 0 = Mod Id Dropdown
         // 1 = Recipe Type Dropdown
         // 2 = Recipes List
         // 3 = Added Recipes List
         // 4 = Modified Recipes List
         this.setEntries(2, ListEntriesHelper.getRecipes(this.recipeType), resetScroll);
-        this.setEntries(3, ListEntriesHelper.getAddedRecipesEntryList(getCurrentMod(), this.recipeType), resetScroll);
-        this.setEntries(4, ListEntriesHelper.getModifiedRecipesEntryList(getCurrentMod()), resetScroll);
+        InitPackets.NetworkHelper.sendToServer(new RetrieveServerRecipesPacket(getCurrentMod(), InitPackets.RecipeList.ADDED_RECIPES, this.recipeType, ModRecipeSerializer.SerializerType.KUBE_JS));
+        InitPackets.NetworkHelper.sendToServer(new RetrieveServerRecipesPacket(getCurrentMod(), InitPackets.RecipeList.MODIFIED_RECIPES, this.recipeType, ModRecipeSerializer.SerializerType.KUBE_JS));
+        // this.setEntries(3, ListEntriesHelper.getAddedRecipesEntryList(getCurrentMod(), this.recipeType), resetScroll);
+        // this.setEntries(4, ListEntriesHelper.getModifiedRecipesEntryList(getCurrentMod()), resetScroll);
     }
 
     private SupportedMods getCurrentMod()

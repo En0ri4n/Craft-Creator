@@ -6,7 +6,6 @@ import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.recipes.kubejs.KubeJSHelper;
 import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.crafting.Recipe;
@@ -70,11 +69,5 @@ public class ListEntriesHelper
         });
 
         return entries.stream().sorted(Comparator.comparing(object -> ((SimpleListWidget.RecipeEntry) object).getRecipe().getId().toString())).collect(Collectors.toList());
-    }
-
-    public enum RecipeList
-    {
-        ADDED_RECIPES,
-        MODIFIED_RECIPES
     }
 }
