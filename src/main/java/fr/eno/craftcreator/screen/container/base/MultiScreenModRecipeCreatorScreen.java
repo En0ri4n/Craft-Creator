@@ -100,6 +100,8 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
 
         initWidgets();
         retrieveData();
+
+        updateScreen();
     }
 
     private void sendRecipe()
@@ -118,7 +120,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     protected abstract void initWidgets();
 
     /**
-     * Called to retrieve extra data from server<br>
+     * Called to retrieve data from server<br>
      * Override {@link #retrieveExtraData()} to retrieve other datas
      */
     private void retrieveData()

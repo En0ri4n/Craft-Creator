@@ -104,7 +104,7 @@ public class RecipeEntry
 
     public static class Output extends RecipeEntry
     {
-        public static final Output EMPTY = new Output(References.getLoc("empty_output_bug"), 0);
+        public static final Output EMPTY = new Output(References.getLoc("empty_output"), 0);
 
         public Output(ResourceLocation registryName, int count)
         {

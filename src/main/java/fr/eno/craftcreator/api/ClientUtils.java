@@ -217,7 +217,7 @@ public class ClientUtils
                         RecipeSerializer<Recipe<Container>> serializer = KubeJSHelper.getSerializer(CommonUtils.parse(jsonObject.get("type").getAsString()));
                         ResourceLocation id = CommonUtils.parse(recipeId);
                         if(id == null)
-                            id = new ResourceLocation("lalal", "recipe");
+                            id = new ResourceLocation("lalal", "recipe"); // Not supposed to happen
                         screen.addToList(recipeList, new fr.eno.craftcreator.screen.widgets.SimpleListWidget.RecipeEntry(serializer.fromJson(id, jsonObject)));
                         break;
                     case MODIFIED_RECIPES:

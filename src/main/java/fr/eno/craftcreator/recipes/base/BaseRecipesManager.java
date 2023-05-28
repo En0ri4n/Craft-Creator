@@ -21,11 +21,26 @@ public abstract class BaseRecipesManager
 {
     protected BaseRecipesManager() {}
 
+    /**
+     * Main method to create a recipe called by the {@link fr.eno.craftcreator.base.RecipeManagerDispatcher}
+     * 
+     * @param recipe the recipe creator
+     * @param slots the slots of the recipe creator
+     * @param param the recipe infos
+     * @param serializerType the serializer type
+     */
     public abstract void createRecipe(RecipeCreator recipe, List<Slot> slots, RecipeInfos param, ModRecipeSerializer.SerializerType serializerType);
 
+    /**
+     * Get content of the first non-empty slot as a {@link RecipeEntry.Output}<br>
+     * 
+     * @param slots the slots of the recipe creator
+     * @param outputCount the output slots count
+     * @return the output or {@link RecipeEntry.Output#EMPTY} if no output found
+     */
     protected RecipeEntry.Output getValidOutput(List<SlotItemHandler> slots, int outputCount)
     {
-        for(int i = outputCount; i < slots.size(); i++)
+        for(int i = slots.size() - outputCount; i < slots.size(); i++)
         {
             Slot slot = slots.get(i);
             if(slot.hasItem())
@@ -35,6 +50,15 @@ public abstract class BaseRecipesManager
         return RecipeEntry.Output.EMPTY;
     }
 
+    /**
+     * Get the content of all non-empty slots between the specified indexes as a {@link RecipeEntry.MultiInput}<br>
+     * 
+     * @param slots the slots of the recipe creator
+     * @param taggedSlots the tagged slots
+     * @param start the start index
+     * @param end the end index
+     * @return the input or an empty {@link RecipeEntry.MultiInput} if no input found
+     */
     protected RecipeEntry.MultiInput getValidInputs(List<SlotItemHandler> slots, Map<Integer ,ResourceLocation> taggedSlots, int start, int end)
     {
         RecipeEntry.MultiInput input = new RecipeEntry.MultiInput();
@@ -54,6 +78,14 @@ public abstract class BaseRecipesManager
         return input;
     }
 
+    /**
+     * Get the content of all non-empty slots as a {@link RecipeEntry.MultiOutput}<br>
+     * 
+     * @param slots the slots of the recipe creator
+     * @param start the start index
+     * @param end the end index
+     * @return the output or an empty {@link RecipeEntry.MultiOutput} if no output found
+     */
     protected RecipeEntry.MultiOutput getValidOutputs(List<SlotItemHandler> slots, int start, int end)
     {
         RecipeEntry.MultiOutput output = new RecipeEntry.MultiOutput();
@@ -73,6 +105,12 @@ public abstract class BaseRecipesManager
         return output;
     }
 
+    /**
+     * Get the content of all non-empty slots as a {@link RecipeEntry.MultiInput}<br>
+     * 
+     * @param slots the slots of the recipe creator
+     * @return the input or an empty {@link RecipeEntry.MultiInput} if no input found
+     */
     protected RecipeEntry.MultiInput getValidIngredients(List<SlotItemHandler> slots)
     {
         RecipeEntry.MultiInput recipeMultiInput = new RecipeEntry.MultiInput();
@@ -87,7 +125,15 @@ public abstract class BaseRecipesManager
         return recipeMultiInput;
     }
 
-    protected boolean isSlotsEmpty(List<SlotItemHandler> slots, int inputSlotsCount, int outputSlotsCount)
+    /**
+     * Utility method to check if the specified slots are empty<br>
+     *
+     * @param slots the slots of the recipe creator
+     * @param inputSlotsCount the input slots count
+     * @param outputSlotsCount the output slots count
+     * @return false if one input and one output are not empty, true otherwise
+     */
+    protected boolean areSlotsEmpty(List<SlotItemHandler> slots, int inputSlotsCount, int outputSlotsCount)
     {
         boolean hasNoInput = true;
         boolean hasNoOutput = true;
@@ -109,6 +155,13 @@ public abstract class BaseRecipesManager
         return hasNoInput || hasNoOutput;
     }
 
+    /**
+     * Get the content of the specified input slot as a {@link RecipeEntry.Input}<br>
+     *
+     * @param taggedSlots the tagged slots
+     * @param slot the slot
+     * @return the input (can be a tag or an item)
+     */
     protected RecipeEntry.Input getSingleInput(Map<Integer, ResourceLocation> taggedSlots, Slot slot)
     {
         if(taggedSlots.containsKey(slot.getSlotIndex()))
@@ -117,6 +170,12 @@ public abstract class BaseRecipesManager
             return new RecipeEntry.Input(false, slot.getItem().getItem().getRegistryName(), slot.getItem().getCount());
     }
 
+    /**
+     * Get the content of the specified input slot as a {@link RecipeEntry.BlockInput}<br>
+     *
+     * @param slot the slot
+     * @return the input block or a {@link RecipeEntry.BlockInput} with {@link Blocks#AIR} if the slot is empty
+     */
     protected RecipeEntry.BlockInput getBlockInput(Slot slot)
     {
         if(slot.hasItem() && slot.getItem().getItem() instanceof BlockItem)
@@ -125,11 +184,24 @@ public abstract class BaseRecipesManager
         return new RecipeEntry.BlockInput(Blocks.AIR.getRegistryName());
     }
 
+    /**
+     * Get the content of the specified output slot as a {@link RecipeEntry.Output}<br>
+     * Ensure that the slot is not empty before calling this method<br>
+     *
+     * @param slot the slot
+     * @return the output or an empty {@link RecipeEntry.Output} if the slot is empty
+     */
     protected RecipeEntry.Output getSingleOutput(Slot slot)
     {
         return new RecipeEntry.Output(slot.getItem().getItem().getRegistryName(), slot.getItem().getCount());
     }
 
+    /**
+     * Get the content of the specified output slot as a {@link RecipeEntry.BlockOutput}<br>
+     *
+     * @param slot the slot
+     * @return the output block or a {@link RecipeEntry.BlockOutput} with {@link Blocks#AIR} if the slot is empty
+     */
     protected RecipeEntry.BlockOutput getBlockOutput(Slot slot)
     {
         if(slot.hasItem() && slot.getItem().getItem() instanceof BlockItem)
@@ -138,11 +210,22 @@ public abstract class BaseRecipesManager
         return new RecipeEntry.BlockOutput(Blocks.AIR.getRegistryName());
     }
 
+    /**
+     * Check if the specified stack is not null and not empty<br>
+     * @param stack the stack to check
+     * @return true if the stack is not null and not empty, false otherwise
+     */
     protected boolean isValid(ItemStack stack)
     {
         return stack != null && !stack.isEmpty();
     }
 
+    /**
+     * Get the content of all non-empty input slots as a {@link RecipeEntry.MultiInput}<br>
+     * @param slots
+     * @param taggedSlots
+     * @return
+     */
     protected RecipeEntry.MultiInput getValidIngredients(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots)
     {
         RecipeEntry.MultiInput recipeMultiInput = new RecipeEntry.MultiInput();

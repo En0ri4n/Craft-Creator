@@ -108,17 +108,6 @@ public class RecipeManagerScreen extends ListScreen
 
         addRenderableWidget(new SimpleButton(References.getTranslate("screen.button.back"), this.width / 2 - 40, this.height - bottomHeight - 7, 80, 20, button -> ClientUtils.openScreen(null)));
         addRenderableWidget(new SimpleButton(References.getTranslate("screen.recipe_manager.button.remove_recipe"), this.width - 130, this.height - bottomHeight - 7, 120, 20, button -> ClientUtils.openScreen(new RemoveRecipeManagerScreen())));
-
-        // retrieveData();
-    }
-
-    /**
-     * Retrieve recipes from server
-     */
-    private void retrieveData()
-    {
-        if(SupportedMods.isKubeJSLoaded())
-            InitPackets.NetworkHelper.sendToServer(new RetrieveServerRecipesPacket(getCurrentMod(), InitPackets.RecipeList.MODIFIED_RECIPES, this.recipeType, ModRecipeSerializer.SerializerType.KUBE_JS));
     }
 
     public <T extends SimpleListWidget.Entry> void addToList(InitPackets.RecipeList list, T entry)
@@ -196,11 +185,5 @@ public class RecipeManagerScreen extends ListScreen
         modDropdown.mouseDragged(mouseX, mouseY, button, dragX, dragY);
         recipeTypeDropdown.mouseDragged(mouseX, mouseY, button, dragX, dragY);
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
-    }
-
-    @Override
-    public boolean isPauseScreen()
-    {
-        return false;
     }
 }

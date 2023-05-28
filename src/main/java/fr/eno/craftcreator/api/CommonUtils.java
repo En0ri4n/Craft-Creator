@@ -26,12 +26,23 @@ import java.util.Objects;
 
 public class CommonUtils
 {
+    /**
+     * Return the recipe type with the given resource location
+     *
+     * @param resourceLocation the resource location
+     * @return the recipe type
+     */
     @SuppressWarnings("unchecked")
     public static <T extends Recipe<C>, C extends Container> RecipeType<T> getRecipeTypeByName(ResourceLocation resourceLocation)
     {
         return (RecipeType<T>) Registry.RECIPE_TYPE.getOptional(resourceLocation).orElse(null);
     }
 
+    /**
+     * Return the ID of the recipe type
+     * @param recipeType the recipe type
+     * @return the ID of the recipe type
+     */
     public static ResourceLocation getRecipeTypeName(RecipeType<?> recipeType)
     {
         return Registry.RECIPE_TYPE.getKey(recipeType);
@@ -104,16 +115,6 @@ public class CommonUtils
     public static void clientTask(CustomRunnable clientTask)
     {
         DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> clientTask);
-    }
-
-    /**
-     * Execute a task on the server thread
-     *
-     * @param serverTask the task to execute
-     */
-    public static void serverTask(Runnable serverTask)
-    {
-        DistExecutor.safeRunWhenOn(Dist.DEDICATED_SERVER, () -> CustomRunnable.of(serverTask));
     }
 
     /**

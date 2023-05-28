@@ -5,9 +5,6 @@ import java.util.Random;
 
 public class Utils
 {
-    private static final Random RANDOM = new Random();
-    private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz";
-
     /**
      * Verify that the object is not null.<br>
      * Calls {@link Objects#requireNonNull(Object)} with the object

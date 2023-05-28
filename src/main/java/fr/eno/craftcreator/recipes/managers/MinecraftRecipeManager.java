@@ -43,7 +43,7 @@ public class MinecraftRecipeManager extends BaseRecipesManager
 
     private void createFurnaceRecipe(RecipeCreator recipe, List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots, double experience, int cookingTime)
     {
-        if(isSlotsEmpty(slots, SlotHelper.FURNACE_SLOTS_INPUT.size(), SlotHelper.FURNACE_SLOTS_OUTPUT.size()))
+        if(areSlotsEmpty(slots, SlotHelper.FURNACE_SLOTS_INPUT.size(), SlotHelper.FURNACE_SLOTS_OUTPUT.size()))
             return;
 
         RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));
@@ -54,7 +54,7 @@ public class MinecraftRecipeManager extends BaseRecipesManager
 
     public void createSmithingTableRecipe(List<SlotItemHandler> slots)
     {
-        if(isSlotsEmpty(slots, 2, 1))
+        if(areSlotsEmpty(slots, 2, 1))
             return;
 
         RecipeEntry.Input base = getSingleInput(Collections.emptyMap(), slots.get(0));
@@ -67,7 +67,7 @@ public class MinecraftRecipeManager extends BaseRecipesManager
 
     public void createStoneCutterRecipe(List<SlotItemHandler> slots)
     {
-        if(isSlotsEmpty(slots, 1, 1))
+        if(areSlotsEmpty(slots, 1, 1))
             return;
 
         RecipeEntry.Input input = getSingleInput(Collections.emptyMap(), slots.get(0));
@@ -78,7 +78,7 @@ public class MinecraftRecipeManager extends BaseRecipesManager
 
     public void createCraftingTableRecipe(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots, List<Integer> nbtSlots, boolean shaped)
     {
-        if(isSlotsEmpty(slots, 9, 1))
+        if(areSlotsEmpty(slots, 9, 1))
             return;
 
         ItemStack output = slots.get(9).getItem();

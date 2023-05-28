@@ -50,7 +50,7 @@ public class BotaniaRecipesManager extends BaseRecipesManager
 
     private void createManaInfusionRecipe(List<SlotItemHandler> slots, int mana)
     {
-        if(isSlotsEmpty(slots, SlotHelper.MANA_INFUSION_SLOTS_INPUT.size(), SlotHelper.MANA_INFUSION_SLOTS_OUTPUT.size())) return;
+        if(areSlotsEmpty(slots, SlotHelper.MANA_INFUSION_SLOTS_INPUT.size(), SlotHelper.MANA_INFUSION_SLOTS_OUTPUT.size())) return;
 
         RecipeEntry.Input input = getSingleInput(Collections.emptyMap(), slots.get(0));
         RecipeEntry.BlockInput catalystItem = getBlockInput(slots.get(1));
@@ -61,7 +61,7 @@ public class BotaniaRecipesManager extends BaseRecipesManager
 
     private void createElvenTradeRecipe(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots)
     {
-        if(isSlotsEmpty(slots, SlotHelper.ELVEN_TRADE_SLOTS_INPUT.size(), SlotHelper.ELVEN_TRADE_SLOTS_OUTPUT.size())) return;
+        if(areSlotsEmpty(slots, SlotHelper.ELVEN_TRADE_SLOTS_INPUT.size(), SlotHelper.ELVEN_TRADE_SLOTS_OUTPUT.size())) return;
 
         RecipeEntry.MultiInput input = getValidInputs(slots, taggedSlots, 0, 5);
         RecipeEntry.MultiOutput output = getValidOutputs(slots, 5, 10);
@@ -71,7 +71,7 @@ public class BotaniaRecipesManager extends BaseRecipesManager
 
     private void createPureDaisyRecipe(List<SlotItemHandler> slots, int time)
     {
-        if(isSlotsEmpty(slots, SlotHelper.PURE_DAISY_SLOTS_INPUT.size(), SlotHelper.PURE_DAISY_SLOTS_OUTPUT.size())) return;
+        if(areSlotsEmpty(slots, SlotHelper.PURE_DAISY_SLOTS_INPUT.size(), SlotHelper.PURE_DAISY_SLOTS_OUTPUT.size())) return;
 
         RecipeEntry.BlockInput input = getBlockInput(slots.get(0));
         RecipeEntry.BlockOutput output = getBlockOutput(slots.get(1));
@@ -81,7 +81,7 @@ public class BotaniaRecipesManager extends BaseRecipesManager
 
     private void createBreweryRecipe(List<SlotItemHandler> slots)
     {
-        if(isSlotsEmpty(slots, SlotHelper.BREWERY_SLOTS_INPUT.size(), SlotHelper.BREWERY_SLOTS_OUTPUT.size())) return;
+        if(areSlotsEmpty(slots, SlotHelper.BREWERY_SLOTS_INPUT.size(), SlotHelper.BREWERY_SLOTS_OUTPUT.size())) return;
 
         RecipeEntry.MultiInput ingredients = getValidIngredients(slots);
 
@@ -93,7 +93,7 @@ public class BotaniaRecipesManager extends BaseRecipesManager
 
     private void createPetalRecipe(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots)
     {
-        if(isSlotsEmpty(slots, SlotHelper.PETAL_APOTHECARY_SLOTS_INPUT.size(), SlotHelper.PETAL_APOTHECARY_SLOTS_OUTPUT.size())) return;
+        if(areSlotsEmpty(slots, SlotHelper.PETAL_APOTHECARY_SLOTS_INPUT.size(), SlotHelper.PETAL_APOTHECARY_SLOTS_OUTPUT.size())) return;
 
         RecipeEntry.MultiInput input = getValidIngredients(slots, taggedSlots);
         RecipeEntry.Output output = getValidOutput(slots, SlotHelper.PETAL_APOTHECARY_SLOTS_OUTPUT.size());
@@ -103,7 +103,7 @@ public class BotaniaRecipesManager extends BaseRecipesManager
 
     private void createRuneRecipe(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots, int mana)
     {
-        if(isSlotsEmpty(slots, SlotHelper.RUNIC_ALTAR_SLOTS_INPUT.size(), SlotHelper.RUNIC_ALTAR_SLOTS_OUTPUT.size())) return;
+        if(areSlotsEmpty(slots, SlotHelper.RUNIC_ALTAR_SLOTS_INPUT.size(), SlotHelper.RUNIC_ALTAR_SLOTS_OUTPUT.size())) return;
 
         RecipeEntry.MultiInput input = getValidIngredients(slots, taggedSlots);
         RecipeEntry.Output output = getValidOutput(slots, SlotHelper.RUNIC_ALTAR_SLOTS_OUTPUT.size());
@@ -113,7 +113,7 @@ public class BotaniaRecipesManager extends BaseRecipesManager
 
     private void createTerraPlateRecipe(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots, int mana)
     {
-        if(isSlotsEmpty(slots, SlotHelper.TERRA_PLATE_SLOTS_INPUT.size(), SlotHelper.TERRA_PLATE_SLOTS_OUTPUT.size())) return;
+        if(areSlotsEmpty(slots, SlotHelper.TERRA_PLATE_SLOTS_INPUT.size(), SlotHelper.TERRA_PLATE_SLOTS_OUTPUT.size())) return;
 
         RecipeEntry.Output output = getValidOutput(slots, SlotHelper.TERRA_PLATE_SLOTS_OUTPUT.size());
         RecipeEntry.MultiInput input = getValidIngredients(slots, taggedSlots);
