@@ -727,7 +727,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
             }
             else if(this.type == Type.TAG)
             {
-                ITag<Item> tag = ItemTags.getAllTags().getTag(getResourceLocation());
+                ITag<Item> tag = CommonUtils.getTag(getResourceLocation());
 
                 if(tag.getValues().size() > 0)
                 {

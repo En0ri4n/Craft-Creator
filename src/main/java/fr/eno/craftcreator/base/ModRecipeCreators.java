@@ -80,7 +80,7 @@ public class ModRecipeCreators
         ELVEN_TRADE = register(RecipeCreator.Builder.of(SupportedMods.BOTANIA).withRecipeType("elven_trade").withIcon("glimmering_livingwood").withSlots(SlotHelper.ELVEN_TRADE_SLOTS));
         PURE_DAISY = register(RecipeCreator.Builder.of(SupportedMods.BOTANIA).withRecipeType("pure_daisy").withIcon("pure_daisy").withSlots(SlotHelper.PURE_DAISY_SLOTS));
         BREWERY = register(RecipeCreator.Builder.of(SupportedMods.BOTANIA).withRecipeType("brewery").withIcon("brewery").withSlots(SlotHelper.BREWERY_SLOTS));
-        PETAL_APOTHECARY = register(RecipeCreator.Builder.of(SupportedMods.BOTANIA).withRecipeType("petal_apothecary").withIcon("petal_apothecary_default").withSlots(SlotHelper.PETAL_APOTHECARY_SLOTS));
+        PETAL_APOTHECARY = register(RecipeCreator.Builder.of(SupportedMods.BOTANIA).withRecipeType("petal_apothecary").withIcon("apothecary_default").withSlots(SlotHelper.PETAL_APOTHECARY_SLOTS));
         RUNIC_ALTAR = register(RecipeCreator.Builder.of(SupportedMods.BOTANIA).withRecipeType("rune_altar").withIcon("runic_altar").withSlots(SlotHelper.RUNIC_ALTAR_SLOTS));
         TERRA_PLATE = register(RecipeCreator.Builder.of(SupportedMods.BOTANIA).withRecipeType("terra_plate").withIcon("terra_plate").withSlots(SlotHelper.TERRA_PLATE_SLOTS));
 

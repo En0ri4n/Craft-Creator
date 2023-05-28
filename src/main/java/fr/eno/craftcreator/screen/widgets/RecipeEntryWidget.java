@@ -358,7 +358,7 @@ public class RecipeEntryWidget
             }
             else
             {
-                ITag<Item> tag = ItemTags.getAllTags().getTag(registryName);
+                ITag<Item> tag = CommonUtils.getTag(registryName);
 
                 if(tag.getValues().size() > 0)
                 {
