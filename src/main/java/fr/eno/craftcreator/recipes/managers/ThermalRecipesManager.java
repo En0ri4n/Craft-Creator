@@ -61,7 +61,7 @@ public class ThermalRecipesManager extends BaseRecipesManager
 
     private void createPyrolyzerRecipe(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots, double experience, RecipeInfos recipeInfos)
     {
-        if(isSlotsEmpty(slots, SlotHelper.PYROLYZER_SLOTS_INPUT.size(), SlotHelper.PYROLYZER_SLOTS_OUTPUT.size())) return;
+        if(areSlotsEmpty(slots, SlotHelper.PYROLYZER_SLOTS_INPUT.size(), SlotHelper.PYROLYZER_SLOTS_OUTPUT.size())) return;
 
         RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));
 
@@ -74,7 +74,7 @@ public class ThermalRecipesManager extends BaseRecipesManager
 
     private void createBottlerRecipe(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots, RecipeInfos recipeInfos)
     {
-        if(isSlotsEmpty(slots, SlotHelper.BOTTLER_SLOTS_INPUT.size(), SlotHelper.BOTTLER_SLOTS_OUTPUT.size())) return;
+        if(areSlotsEmpty(slots, SlotHelper.BOTTLER_SLOTS_INPUT.size(), SlotHelper.BOTTLER_SLOTS_OUTPUT.size())) return;
 
         RecipeEntry.FluidInput inputFluid = new RecipeEntry.FluidInput(getFluid(slots.get(0)), recipeInfos.getValue(RecipeInfos.Parameters.FLUID_AMOUNT_0).intValue());
 
@@ -87,7 +87,7 @@ public class ThermalRecipesManager extends BaseRecipesManager
 
     private void createRefineryRecipe(List<SlotItemHandler> slots, RecipeInfos recipeInfos)
     {
-        if(isSlotsEmpty(slots, SlotHelper.REFINERY_SLOTS_INPUT.size(), SlotHelper.REFINERY_SLOTS_OUTPUT.size())) return;
+        if(areSlotsEmpty(slots, SlotHelper.REFINERY_SLOTS_INPUT.size(), SlotHelper.REFINERY_SLOTS_OUTPUT.size())) return;
 
         RecipeEntry.FluidInput inputFluid = new RecipeEntry.FluidInput(getFluid(slots.get(0)), recipeInfos.getValue(RecipeInfos.Parameters.FLUID_AMOUNT_0).intValue());
 
@@ -101,7 +101,7 @@ public class ThermalRecipesManager extends BaseRecipesManager
 
     private void createCrucibleRecipe(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots, RecipeInfos recipeInfos)
     {
-        if(isSlotsEmpty(slots, SlotHelper.CRUCIBLE_SLOTS_INPUT.size(), SlotHelper.CRUCIBLE_SLOTS_OUTPUT.size())) return;
+        if(areSlotsEmpty(slots, SlotHelper.CRUCIBLE_SLOTS_INPUT.size(), SlotHelper.CRUCIBLE_SLOTS_OUTPUT.size())) return;
 
         RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));
 
@@ -112,7 +112,7 @@ public class ThermalRecipesManager extends BaseRecipesManager
 
     private void createChillerRecipe(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots, RecipeInfos recipeInfos)
     {
-        if(isSlotsEmpty(slots, SlotHelper.CHILLER_SLOTS_INPUT.size() - 1, SlotHelper.CHILLER_SLOTS_OUTPUT.size())) return;
+        if(areSlotsEmpty(slots, SlotHelper.CHILLER_SLOTS_INPUT.size() - 1, SlotHelper.CHILLER_SLOTS_OUTPUT.size())) return;
 
         RecipeEntry.FluidInput inputFluid = new RecipeEntry.FluidInput(getFluid(slots.get(0)), recipeInfos.getValue(RecipeInfos.Parameters.FLUID_AMOUNT_0).intValue());
         RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(1));
@@ -124,7 +124,7 @@ public class ThermalRecipesManager extends BaseRecipesManager
 
     private void createCentrifugeRecipe(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots, RecipeInfos recipeInfos)
     {
-        if(isSlotsEmpty(slots, SlotHelper.CENTRIFUGE_SLOTS_INPUT.size(), SlotHelper.CENTRIFUGE_SLOTS_OUTPUT.size())) return;
+        if(areSlotsEmpty(slots, SlotHelper.CENTRIFUGE_SLOTS_INPUT.size(), SlotHelper.CENTRIFUGE_SLOTS_OUTPUT.size())) return;
 
         RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));
 
@@ -136,7 +136,7 @@ public class ThermalRecipesManager extends BaseRecipesManager
 
     private void createPressRecipe(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots, RecipeInfos recipeInfos)
     {
-        if(isSlotsEmpty(slots, SlotHelper.PRESS_SLOTS_INPUT.size(), SlotHelper.PRESS_SLOTS_OUTPUT.size())) return;
+        if(areSlotsEmpty(slots, SlotHelper.PRESS_SLOTS_INPUT.size(), SlotHelper.PRESS_SLOTS_OUTPUT.size())) return;
 
         RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));
         RecipeEntry.Input inputDie = getSingleInput(taggedSlots, slots.get(1));
@@ -148,7 +148,7 @@ public class ThermalRecipesManager extends BaseRecipesManager
     
     private void createInsolatorRecipe(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots, double waterMod, RecipeInfos recipeInfos)
     {
-        if(isSlotsEmpty(slots, SlotHelper.INSOLATOR_SLOTS_INPUT.size(), SlotHelper.INSOLATOR_SLOTS_OUTPUT.size())) return;
+        if(areSlotsEmpty(slots, SlotHelper.INSOLATOR_SLOTS_INPUT.size(), SlotHelper.INSOLATOR_SLOTS_OUTPUT.size())) return;
         
         RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));
         RecipeEntry.MultiOutput output = getLuckedOutputs(slots, recipeInfos);
@@ -158,7 +158,7 @@ public class ThermalRecipesManager extends BaseRecipesManager
     
     private void createSmelterRecipe(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots, double experience, RecipeInfos recipeInfos)
     {
-        if(isSlotsEmpty(slots, SlotHelper.SMELTER_SLOTS_INPUT.size(), SlotHelper.SMELTER_SLOTS_OUTPUT.size())) return;
+        if(areSlotsEmpty(slots, SlotHelper.SMELTER_SLOTS_INPUT.size(), SlotHelper.SMELTER_SLOTS_OUTPUT.size())) return;
         
         List<RecipeEntry.MultiInput> input = Arrays.asList(new RecipeEntry.MultiInput(), new RecipeEntry.MultiInput(), new RecipeEntry.MultiInput());
         
@@ -195,7 +195,7 @@ public class ThermalRecipesManager extends BaseRecipesManager
     
     private void createTreeExtractorRecipe(List<SlotItemHandler> slots, int resin_amount)
     {
-        if(isSlotsEmpty(slots, SlotHelper.TREE_EXTRACTOR_SLOTS_INPUT.size(), SlotHelper.TREE_EXTRACTOR_SLOTS_OUTPUT.size())) return;
+        if(areSlotsEmpty(slots, SlotHelper.TREE_EXTRACTOR_SLOTS_INPUT.size(), SlotHelper.TREE_EXTRACTOR_SLOTS_OUTPUT.size())) return;
         
         ItemStack trunk = slots.get(0).getItem();
         ItemStack leaves = slots.get(1).getItem();
@@ -208,7 +208,7 @@ public class ThermalRecipesManager extends BaseRecipesManager
     
     private void createPulverizerRecipe(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots, double experience, RecipeInfos recipeInfos)
     {
-        if(isSlotsEmpty(slots, SlotHelper.PULVERIZER_SLOTS_INPUT.size(), SlotHelper.PULVERIZER_SLOTS_OUTPUT.size())) return;
+        if(areSlotsEmpty(slots, SlotHelper.PULVERIZER_SLOTS_INPUT.size(), SlotHelper.PULVERIZER_SLOTS_OUTPUT.size())) return;
         
         RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));
         RecipeEntry.MultiOutput output = getLuckedOutputs(slots, recipeInfos);
@@ -218,7 +218,7 @@ public class ThermalRecipesManager extends BaseRecipesManager
     
     private void createSawmillRecipe(List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots, RecipeInfos recipeInfos)
     {
-        if(isSlotsEmpty(slots, SlotHelper.SAWMILL_SLOTS_INPUT.size(), SlotHelper.SAWMILL_SLOTS_OUTPUT.size())) return;
+        if(areSlotsEmpty(slots, SlotHelper.SAWMILL_SLOTS_INPUT.size(), SlotHelper.SAWMILL_SLOTS_OUTPUT.size())) return;
         
         RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));
         RecipeEntry.MultiOutput output = getLuckedOutputs(slots, recipeInfos);

@@ -1,8 +1,10 @@
 package fr.eno.craftcreator.api;
 
 import com.mojang.brigadier.context.CommandContext;
+import fr.eno.craftcreator.container.base.CommonContainer;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.container.Container;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.server.ServerWorld;
@@ -17,6 +19,19 @@ import java.util.function.Supplier;
  */
 public class ServerUtils
 {
+
+    /**
+     * Get the container from the context (server)<br>
+     * This method must be called after checking that the container is an instance of {@link CommonContainer}
+     *
+     * @param ctx The context
+     * @return The container casted to {@link CommonContainer}
+     */
+    public static CommonContainer getContainer(Supplier<NetworkEvent.Context> ctx)
+    {
+        return (CommonContainer) ServerUtils.getServerPlayer(ctx).containerMenu;
+    }
+
     /**
      * Get the server player from the context
      *

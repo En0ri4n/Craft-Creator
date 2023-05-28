@@ -9,6 +9,7 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.tags.ITag;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.IFormattableTextComponent;
@@ -27,12 +28,34 @@ import java.util.Objects;
 
 public class CommonUtils
 {
+    /**
+     * Check if the tile entity is an instance of the tile entity class
+     * @param tileEntity The tile entity
+     * @param tileEntityClass The tile entity class
+     * @return True if the tile entity is an instance of the tile entity class, false otherwise
+     */
+    public static boolean isBlockEntity(TileEntity tileEntity, Class<? extends TileEntity> tileEntityClass)
+    {
+        return tileEntity.getClass().equals(tileEntityClass);
+    }
+
+    /**
+     * Return the recipe type with the given resource location
+     *
+     * @param resourceLocation the resource location
+     * @return the recipe type
+     */
     @SuppressWarnings("unchecked")
     public static <T extends IRecipe<C>, C extends IInventory> IRecipeType<T> getRecipeTypeByName(ResourceLocation resourceLocation)
     {
         return (IRecipeType<T>) Registry.RECIPE_TYPE.getOptional(resourceLocation).orElse(null);
     }
 
+    /**
+     * Return the ID of the recipe type
+     * @param recipeType the recipe type
+     * @return the ID of the recipe type
+     */
     public static ResourceLocation getRecipeTypeName(IRecipeType<?> recipeType)
     {
         return Registry.RECIPE_TYPE.getKey(recipeType);
@@ -105,16 +128,6 @@ public class CommonUtils
     public static void clientTask(CustomRunnable clientTask)
     {
         DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> clientTask);
-    }
-
-    /**
-     * Execute a task on the server thread
-     *
-     * @param serverTask the task to execute
-     */
-    public static void serverTask(Runnable serverTask)
-    {
-        DistExecutor.safeRunWhenOn(Dist.DEDICATED_SERVER, () -> CustomRunnable.of(serverTask));
     }
 
     /**

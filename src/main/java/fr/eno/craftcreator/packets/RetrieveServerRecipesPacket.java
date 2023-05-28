@@ -56,29 +56,30 @@ public class RetrieveServerRecipesPacket
          */
         public static void handle(RetrieveServerRecipesPacket msg, Supplier<NetworkEvent.Context> ctx)
         {
-            CommonUtils.serverTask(() ->
+            if(msg.serializerType == ModRecipeSerializer.SerializerType.KUBE_JS)
             {
-                if(msg.serializerType == ModRecipeSerializer.SerializerType.KUBE_JS)
+                switch(msg.recipeList)
                 {
-                    switch(msg.recipeList)
-                    {
-                        case ADDED_RECIPES:
-                            IRecipeType<IRecipe<IInventory>> recipeType = CommonUtils.getRecipeTypeByName(msg.recipeType);
-                            KubeJSHelper.getSerializedAddedRecipesFor(msg.mod, recipeType).forEach(recipe ->
-                            {
-                                InitPackets.NetworkHelper.sendToPlayer(ServerUtils.getServerPlayer(ctx), new UpdateRecipeListClientPacket(msg.mod, msg.recipeList, KubeJSHelper.getRecipeId(msg.mod, recipe).toString(), recipe.toString()));
-                            });
-                            break;
-                        case MODIFIED_RECIPES:
-                            List<KubeJSModifiedRecipe> recipes = KubeJSHelper.getModifiedRecipes(msg.mod);
-                            for(KubeJSModifiedRecipe recipe : recipes)
-                            {
-                                InitPackets.NetworkHelper.sendToPlayer(ServerUtils.getServerPlayer(ctx), new UpdateRecipeListClientPacket(msg.mod, msg.recipeList, recipe.toString(), recipe.serialize().toString()));
-                            }
-                            break;
-                    }
+                    case ADDED_RECIPES:
+                        IRecipeType<IRecipe<IInventory>> recipeType = CommonUtils.getRecipeTypeByName(msg.recipeType);
+                        KubeJSHelper.getSerializedAddedRecipesFor(msg.mod, recipeType)
+                                .forEach(recipe ->
+                                        InitPackets.NetworkHelper.sendToPlayer(
+                                                ServerUtils.getServerPlayer(ctx),
+                                                new UpdateRecipeListClientPacket(
+                                                        msg.mod, msg.recipeList,
+                                                        KubeJSHelper.getRecipeId(msg.mod, recipe).toString(),
+                                                        recipe.toString())));
+                        break;
+                    case MODIFIED_RECIPES:
+                        List<KubeJSModifiedRecipe> recipes = KubeJSHelper.getModifiedRecipes(msg.mod);
+                        for(KubeJSModifiedRecipe recipe : recipes)
+                        {
+                            InitPackets.NetworkHelper.sendToPlayer(ServerUtils.getServerPlayer(ctx), new UpdateRecipeListClientPacket(msg.mod, msg.recipeList, recipe.toString(), recipe.serialize().toString()));
+                        }
+                        break;
                 }
-            });
+            }
 
             ctx.get().setPacketHandled(true);
         }

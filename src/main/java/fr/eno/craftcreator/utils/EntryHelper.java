@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
+/*
+ * This class is ONLY for the client side, it's used to help the screen to get the entries
+ */
 public class EntryHelper
 {
 
