@@ -1,10 +1,15 @@
 package fr.eno.craftcreator.utils;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.util.Objects;
 import java.util.Random;
 
 public class Utils
 {
+    public static final Gson GSON = new GsonBuilder().serializeNulls().create();
+
     /**
      * Verify that the object is not null.<br>
      * Calls {@link Objects#requireNonNull(Object)} with the object

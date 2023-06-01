@@ -1,13 +1,16 @@
 package fr.eno.craftcreator.screen.container;
 
+import com.google.gson.JsonObject;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import fr.eno.craftcreator.container.CreateRecipeCreatorContainer;
 import fr.eno.craftcreator.container.slot.utils.PositionnedSlot;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import fr.eno.craftcreator.screen.container.base.MultiScreenModRecipeCreatorScreen;
 import fr.eno.craftcreator.screen.widgets.RecipeEntryWidget;
+import fr.eno.craftcreator.utils.PairValues;
 import fr.eno.craftcreator.utils.SlotHelper;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 
 import java.util.ArrayList;
@@ -16,10 +19,12 @@ import java.util.List;
 public class CreateRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen<CreateRecipeCreatorContainer>
 {
     private RecipeEntryWidget inputWidget;
+    private BlockPos tilePos;
 
     public CreateRecipeCreatorScreen(CreateRecipeCreatorContainer screenContainer, PlayerInventory inv, ITextComponent titleIn)
     {
         super(screenContainer, inv, titleIn, screenContainer.getTile().getBlockPos());
+        this.tilePos = screenContainer.getTile().getBlockPos();
         this.guiTextureSize = 256;
         this.imageWidth = 256;
         this.imageHeight = 256;
@@ -38,7 +43,7 @@ public class CreateRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen
         int gapY = 22;
         int widgetHeight = 110;
 
-        inputWidget = new RecipeEntryWidget(PositionnedSlot.getSlotsFor(SlotHelper.CUTTING_SLOTS_INPUT, getMenu().getContainerSlots()).get(0), leftPos + gapX, topPos + gapY, imageWidth / 2 - 2 * gapX, widgetHeight);
+        inputWidget = new RecipeEntryWidget(getCurrentRecipe(), tilePos, PositionnedSlot.getSlotsFor(SlotHelper.CUTTING_SLOTS_INPUT, getMenu().getContainerSlots()).get(0), leftPos + gapX, topPos + gapY, imageWidth / 2 - 2 * gapX, widgetHeight);
     }
 
     @Override
@@ -54,8 +59,21 @@ public class CreateRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen
     }
 
     @Override
+    public void setData(String dataName, Object data)
+    {
+        super.setData(dataName, data);
+
+        if(dataName.startsWith("inputs"))
+        {
+            PairValues<String, List<JsonObject>> inputs = (PairValues<String, List<JsonObject>>) data;
+            inputWidget.setEntries(inputs.getSecondValue());
+        }
+    }
+
+    @Override
     protected void updateGui()
     {
+        this.inputWidget.refresh(getCurrentRecipe());
         setExecuteButtonPos(this.leftPos + this.imageWidth / 2 - 21, this.topPos + this.imageHeight / 2 + 8);
     }
 

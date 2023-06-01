@@ -1,18 +1,22 @@
 package fr.eno.craftcreator.packets;
 
+import com.google.gson.JsonObject;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.init.InitPackets;
 import fr.eno.craftcreator.screen.container.base.ModRecipeCreatorDataScreen;
 import fr.eno.craftcreator.tileentity.base.MultiScreenRecipeCreatorTile;
 import fr.eno.craftcreator.utils.CustomRunnable;
+import fr.eno.craftcreator.utils.PairValues;
 import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -78,6 +82,12 @@ public class UpdateRecipeCreatorTileDataClientPacket
                     packetBuffer.writeResourceLocation(loc);
                 });
                 break;
+            case PAIR_VALUE_STRING_JSON_OBJECT_LIST:
+                PairValues<String, List<JsonObject>> recipeTypePair = (PairValues<String, List<JsonObject>>) msg.data;
+                packetBuffer.writeUtf(recipeTypePair.getFirstValue());
+                packetBuffer.writeInt(recipeTypePair.getSecondValue().size());
+                recipeTypePair.getSecondValue().forEach(js -> packetBuffer.writeUtf(js.toString()));
+                break;
         }
     }
 
@@ -91,23 +101,38 @@ public class UpdateRecipeCreatorTileDataClientPacket
         {
             case INT:
                 return new UpdateRecipeCreatorTileDataClientPacket(dataName, pos, dataType, packetBuffer.readInt());
+
             case INT_ARRAY:
                 return new UpdateRecipeCreatorTileDataClientPacket(dataName, pos, dataType, packetBuffer.readVarIntArray());
+
             case DOUBLE_ARRAY:
                 double[] doubleArray = new double[packetBuffer.readInt()];
                 for(int i = 0; i < doubleArray.length; i++)
                     doubleArray[i] = packetBuffer.readDouble();
                 return new UpdateRecipeCreatorTileDataClientPacket(dataName, pos, dataType, doubleArray);
+
             case STRING:
                 return new UpdateRecipeCreatorTileDataClientPacket(dataName, pos, dataType, packetBuffer.readUtf());
+
             case BOOLEAN:
                 return new UpdateRecipeCreatorTileDataClientPacket(dataName, pos, dataType, packetBuffer.readBoolean());
+
             case MAP_INT_RESOURCELOCATION:
                 Map<Integer, ResourceLocation> map = new HashMap<>();
                 int size = packetBuffer.readInt();
                 for(int i = 0; i < size; i++)
                     map.put(packetBuffer.readInt(), packetBuffer.readResourceLocation());
                 return new UpdateRecipeCreatorTileDataClientPacket(dataName, pos, dataType, map);
+
+            case PAIR_VALUE_STRING_JSON_OBJECT_LIST:
+                String recipeType = packetBuffer.readUtf();
+                int listSize = packetBuffer.readInt();
+                List<JsonObject> jsonList = new ArrayList<>();
+                for(int k = 0; k < listSize; k++)
+                    jsonList.add(Utils.GSON.fromJson(packetBuffer.readUtf(), JsonObject.class));
+
+                return new UpdateRecipeCreatorTileDataClientPacket(dataName, pos, dataType, PairValues.create(recipeType, jsonList));
+
             default:
                 return new UpdateRecipeCreatorTileDataClientPacket(dataName, pos, dataType, -1);
         }
