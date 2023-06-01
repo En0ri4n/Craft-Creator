@@ -113,6 +113,7 @@ public class InitPackets
         BOOLEAN,
         DOUBLE_ARRAY,
         MAP_INT_RESOURCELOCATION,
+        PAIR_VALUE_STRING_JSON_OBJECT_LIST,
         RECIPES
     }
 }

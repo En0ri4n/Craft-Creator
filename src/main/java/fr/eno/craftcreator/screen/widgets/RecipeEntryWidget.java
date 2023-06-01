@@ -2,16 +2,23 @@ package fr.eno.craftcreator.screen.widgets;
 
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
+import fr.eno.craftcreator.CraftCreator;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.api.ScreenUtils;
+import fr.eno.craftcreator.base.RecipeCreator;
+import fr.eno.craftcreator.init.InitPackets;
+import fr.eno.craftcreator.packets.RetrieveRecipeCreatorTileDataServerPacket;
+import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.screen.widgets.buttons.IconButton;
 import fr.eno.craftcreator.screen.widgets.buttons.SimpleCheckBox;
 import fr.eno.craftcreator.utils.EntryHelper;
 import fr.eno.craftcreator.utils.JsonSerializable;
+import fr.eno.craftcreator.utils.PairValues;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -23,6 +30,7 @@ import net.minecraftforge.registries.tags.ITag;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RecipeEntryWidget
 {
@@ -31,6 +39,8 @@ public class RecipeEntryWidget
     private final int width;
     private final int height;
 
+    private RecipeCreator recipeCreator;
+    private final BlockPos tilePos;
     private SlotItemHandler linkedSlot;
     private ItemStack lastStack = ItemStack.EMPTY;
 
@@ -50,8 +60,10 @@ public class RecipeEntryWidget
     private MutableComponent message;
     private int messageCounter;
 
-    public RecipeEntryWidget(SlotItemHandler linkedSlot, int x, int y, int width, int height)
+    public RecipeEntryWidget(RecipeCreator recipeCreator, BlockPos pos, SlotItemHandler linkedSlot, int x, int y, int width, int height)
     {
+        this.recipeCreator = recipeCreator;
+        this.tilePos = pos;
         this.linkedSlot = linkedSlot;
         this.x = x;
         this.y = y;
@@ -135,8 +147,35 @@ public class RecipeEntryWidget
             this.entriesDropdown.getDropdownSelected().set(CommonUtils.parse(registryNameField.getValue()), countField.getIntValue(), isTag(), chanceField.getDoubleValue());
             this.entriesDropdown.trimWidthToEntries();
             showMessage(References.getTranslate("screen.widget.dropdown_list.entry.saved").withStyle(ChatFormatting.GREEN), 2);
-            System.out.println("Save entry : Name=" + registryNameField.getValue() + " isTag=" + isTag() + " count=" + countField.getValue() + " chance=" + chanceField.getValue());
+            CraftCreator.LOGGER.debug("Save entry : Name=" + registryNameField.getValue() + " isTag=" + isTag() + " count=" + countField.getValue() + " chance=" + chanceField.getValue());
+            InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket(
+                    "inputs",
+                    tilePos,
+                    InitPackets.PacketDataType.PAIR_VALUE_STRING_JSON_OBJECT_LIST,
+                    PairValues.create(
+                            recipeCreator.getRecipeTypeLocation().getPath(),
+                            this.entriesDropdown.getDropdownEntries()
+                                    .stream()
+                                    .map(RecipeEntryEntry::serialize)
+                                    .collect(Collectors.toList()))));
         });
+    }
+
+    public void refresh(RecipeCreator recipeCreator)
+    {
+        this.recipeCreator = recipeCreator;
+        InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket(
+                "inputs-" + recipeCreator.getRecipeTypeLocation().getPath(),
+                tilePos,
+                InitPackets.PacketDataType.PAIR_VALUE_STRING_JSON_OBJECT_LIST));
+    }
+
+    public void setEntries(List<JsonObject> jsonList)
+    {
+        if(jsonList.isEmpty()) return;
+
+        this.entriesDropdown.getDropdownEntries().clear();
+        this.entriesDropdown.setEntries(new ArrayList<>(jsonList.stream().map(RecipeEntryEntry::deserialize).collect(Collectors.toList())));
     }
 
     public void tick()
@@ -217,7 +256,7 @@ public class RecipeEntryWidget
         Screen.fill(matrixStack, x, y, x + width, y + height, 0x88000000);
 
         // Render the current entry item
-        int itemSlotSize = 17;
+        int itemSlotSize = 16;
         int itemSlotX = x + 3;
         int itemSlotY = y + height - 3 - itemSlotSize;
         Screen.fill(matrixStack, itemSlotX, itemSlotY, itemSlotX + itemSlotSize, itemSlotY + itemSlotSize, 0x68000000);
@@ -301,6 +340,11 @@ public class RecipeEntryWidget
         this.linkedSlot = linkedSlot;
     }
 
+    public void setRecipeCreator(RecipeCreator recipeCreator)
+    {
+        this.recipeCreator = recipeCreator;
+    }
+
     public static class RecipeEntryEntry extends DropdownListWidget.Entry<ResourceLocation> implements JsonSerializable
     {
         private final boolean isLast;
@@ -344,7 +388,7 @@ public class RecipeEntryWidget
             int yPos = 10 / 2 - 16 / 2;
             ClientUtils.getItemRenderer().renderAndDecorateFakeItem(displayStack, yPos, yPos);
             Screen.fill(pMatrixStack, pLeft, pTop, pLeft + pWidth - 4, pTop + pHeight, 0x88FFFFFF);
-            ClientUtils.getFontRenderer().draw(pMatrixStack, getDisplayName(pIndex), pLeft + 3, pTop + 3, 0x000000);
+            Screen.drawCenteredString(pMatrixStack, ClientUtils.getFontRenderer(), getDisplayName(pIndex), pLeft + pWidth / 2, pTop + 3, 0x000000);
         }
 
         @Override
