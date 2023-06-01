@@ -62,7 +62,7 @@ public class BlockUtils
         {
             BlockEntity tileentity = level.getBlockEntity(pos);
 
-            if(tileentity != null && tileentity.getClass().equals(tileEntityClass))
+            if(CommonUtils.isBlockEntity(tileentity, tileEntityClass))
             {
                 NetworkHooks.openGui((ServerPlayer) player, (MultiScreenRecipeCreatorTile) tileentity, pos);
                 return InteractionResult.SUCCESS;

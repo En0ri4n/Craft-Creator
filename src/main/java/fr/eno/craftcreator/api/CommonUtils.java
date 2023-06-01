@@ -12,6 +12,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -26,6 +27,17 @@ import java.util.Objects;
 
 public class CommonUtils
 {
+    /**
+     * Check if the tile entity is an instance of the tile entity class
+     * @param tileEntity The tile entity
+     * @param tileEntityClass The tile entity class
+     * @return True if the tile entity is an instance of the tile entity class, false otherwise
+     */
+    public static boolean isBlockEntity(BlockEntity tileEntity, Class<? extends BlockEntity> tileEntityClass)
+    {
+        return tileEntity.getClass().equals(tileEntityClass);
+    }
+
     /**
      * Return the recipe type with the given resource location
      *
@@ -131,6 +143,16 @@ public class CommonUtils
         return ResourceLocation.tryParse(location);
     }
 
+    /**
+     * Create a resource location with the specified namespace and path
+     * @param namespace the namespace
+     * @param path the path
+     * @return the resource location created
+     */
+    public static ResourceLocation parse(String namespace, String path)
+    {
+        return new ResourceLocation(namespace, path);
+    }
 
     /**
      * Split a string with the specified size
