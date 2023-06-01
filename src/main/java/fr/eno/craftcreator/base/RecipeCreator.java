@@ -108,7 +108,7 @@ public class RecipeCreator
          */
         public Builder withRecipeType(String recipeType)
         {
-            this.recipeTypeLocation = CommonUtils.parse(mod.getModId() + ":" + recipeType);
+            this.recipeTypeLocation = CommonUtils.parse(mod.getModId(), recipeType);
             this.withGuiTexture(GUI_TEXTURE_NAME.format(recipeType));
             return this;
         }

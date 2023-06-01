@@ -36,7 +36,7 @@ public class CommonUtils
      */
     public static boolean isBlockEntity(TileEntity tileEntity, Class<? extends TileEntity> tileEntityClass)
     {
-        return tileEntity.getClass().equals(tileEntityClass);
+        return tileEntity != null && tileEntity.getClass().equals(tileEntityClass);
     }
 
     /**
@@ -144,6 +144,16 @@ public class CommonUtils
         return ResourceLocation.tryParse(location);
     }
 
+    /**
+     * Create a resource location with the specified namespace and path
+     * @param namespace the namespace
+     * @param path the path
+     * @return the resource location created
+     */
+    public static ResourceLocation parse(String namespace, String path)
+    {
+        return new ResourceLocation(namespace, path);
+    }
 
     /**
      * Split a string with the specified size

@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
  */
 public class EntryHelper
 {
-
     public static <T extends SimpleListWidget.Entry> List<T> getStringEntryList(List<String> list)
     {
         List<T> entries = new ArrayList<>();

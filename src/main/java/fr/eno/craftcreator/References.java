@@ -22,7 +22,7 @@ public class References
     /**
      * The mod version
      */
-    public static final String VERSION = "0.0.1";
+    public static final String VERSION = "2.0.0";
 
     /**
      * Translate the given key to the current language.
