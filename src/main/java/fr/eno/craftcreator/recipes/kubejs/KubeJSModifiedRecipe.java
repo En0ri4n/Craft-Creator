@@ -6,8 +6,6 @@ import com.google.gson.JsonObject;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.base.ModifiedRecipe;
 import fr.eno.craftcreator.utils.FormattableString;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;

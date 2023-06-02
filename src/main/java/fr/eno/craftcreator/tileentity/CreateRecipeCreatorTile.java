@@ -24,16 +24,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class CreateRecipeCreatorTile extends MultiScreenRecipeCreatorTile
 {
-    private Map<String, List<JsonObject>> inputs;
+    private final Map<String, List<JsonObject>> inputs;
+    private final Map<String, List<JsonObject>> outputs;
 
     public CreateRecipeCreatorTile()
     {
         super(SupportedMods.CREATE, InitTileEntities.CREATE_RECIPE_CREATOR.get(), SlotHelper.CREATE_SLOTS_SIZE);
         this.inputs = new HashMap<>();
+        this.outputs = new HashMap<>();
         SupportedMods.CREATE.getSupportedRecipeTypes().forEach(rl -> inputs.put(rl.getPath(), new ArrayList<>()));
+        SupportedMods.CREATE.getSupportedRecipeTypes().forEach(rl -> outputs.put(rl.getPath(), new ArrayList<>()));
     }
 
     @Override
@@ -43,6 +47,11 @@ public class CreateRecipeCreatorTile extends MultiScreenRecipeCreatorTile
         {
             String recipeType = dataName.split("-")[1];
             return PairValues.create(recipeType, this.inputs.get(recipeType));
+        }
+        else if(dataName.startsWith("outputs"))
+        {
+            String recipeType = dataName.split("-")[1];
+            return PairValues.create(recipeType, this.outputs.get(recipeType));
         }
 
         return super.getData(dataName);
@@ -58,12 +67,19 @@ public class CreateRecipeCreatorTile extends MultiScreenRecipeCreatorTile
             PairValues<String, List<JsonObject>> value = (PairValues<String, List<JsonObject>>) data;
             inputs.put(value.getFirstValue(), value.getSecondValue());
         }
+        else if(dataName.equals("outputs"))
+        {
+            PairValues<String, List<JsonObject>> value = (PairValues<String, List<JsonObject>>) data;
+            outputs.put(value.getFirstValue(), value.getSecondValue());
+        }
     }
 
     @Override
     public CompoundNBT save(CompoundNBT compoundTag)
     {
-        CompoundNBT storage = new CompoundNBT();
+        super.save(compoundTag);
+
+        CompoundNBT inputStorage = new CompoundNBT();
 
         for(ResourceLocation recipeType : SupportedMods.CREATE.getSupportedRecipeTypes())
         {
@@ -76,11 +92,30 @@ public class CreateRecipeCreatorTile extends MultiScreenRecipeCreatorTile
                 recipeTypeNbt.putString(recipeType.getPath() + "-" + i++, inputJson.toString());
             }
 
-            storage.put(recipeType.getPath(), recipeTypeNbt);
+            inputStorage.put(recipeType.getPath(), recipeTypeNbt);
         }
 
-        compoundTag.put("Storage", storage);
-        return super.save(compoundTag);
+        compoundTag.put("InputStorage", inputStorage);
+
+        CompoundNBT outputStorage = new CompoundNBT();
+
+        for(ResourceLocation recipeType : SupportedMods.CREATE.getSupportedRecipeTypes())
+        {
+            CompoundNBT recipeTypeNbt = new CompoundNBT();
+            recipeTypeNbt.putInt("Count", outputs.get(recipeType.getPath()).size());
+
+            int i = 0;
+            for(JsonObject outputJson : outputs.get(recipeType.getPath()))
+            {
+                recipeTypeNbt.putString(recipeType.getPath() + "-" + i++, outputJson.toString());
+            }
+
+            outputStorage.put(recipeType.getPath(), recipeTypeNbt);
+        }
+
+        compoundTag.put("OutputStorage", outputStorage);
+
+        return compoundTag;
     }
 
     @Override
@@ -88,26 +123,49 @@ public class CreateRecipeCreatorTile extends MultiScreenRecipeCreatorTile
     {
         super.load(state, compound);
 
-        Map<String, List<JsonObject>> map = new HashMap<>();
-
-        CompoundNBT storage = compound.getCompound("Storage");
+        CompoundNBT inputStorage = compound.getCompound("InputStorage");
 
         for(ResourceLocation recipeType : SupportedMods.CREATE.getSupportedRecipeTypes())
         {
-            CompoundNBT recipeTypeNbt = storage.getCompound(recipeType.getPath());
+            CompoundNBT recipeTypeNbt = inputStorage.getCompound(recipeType.getPath());
+            int count = recipeTypeNbt.getInt("Count");
+
+            List<JsonObject> jsonList = new ArrayList<>();
+
+            for(String name : recipeTypeNbt.getAllKeys().stream().filter(s -> s.contains(recipeType.getPath())).collect(Collectors.toList()))
+            {
+                jsonList.add(Utils.GSON.fromJson(recipeTypeNbt.getString(name), JsonObject.class));
+            }
+
+            inputs.put(recipeType.getPath(), jsonList);
+        }
+
+        CompoundNBT outputStorage = compound.getCompound("OutputStorage");
+
+        for(ResourceLocation recipeType : SupportedMods.CREATE.getSupportedRecipeTypes())
+        {
+            CompoundNBT recipeTypeNbt = outputStorage.getCompound(recipeType.getPath());
             int count = recipeTypeNbt.getInt("Count");
 
             List<JsonObject> jsonList = new ArrayList<>();
 
             for(int i = 0; i < count; i++)
             {
-                jsonList.add(Utils.GSON.fromJson(compound.getString(recipeType.getPath() + "-" + i), JsonObject.class));
+                jsonList.add(Utils.GSON.fromJson(recipeTypeNbt.getString(recipeType.getPath() + "-" + i), JsonObject.class));
             }
 
-            map.put(recipeType.getPath(), jsonList);
+            outputs.put(recipeType.getPath(), jsonList);
         }
+    }
 
-        inputs = map;
+    public Map<String, List<JsonObject>> getInputs()
+    {
+        return inputs;
+    }
+
+    public Map<String, List<JsonObject>> getOutputs()
+    {
+        return outputs;
     }
 
     @Override

@@ -42,6 +42,8 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
 {
     protected int guiTextureSize = 256;
 
+    private final BlockPos tilePos;
+
     // Only to check if it's a vanilla machine
     protected boolean isVanillaScreen;
     private SimpleCheckBox isKubeJSRecipeButton;
@@ -60,6 +62,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     public MultiScreenModRecipeCreatorScreen(T screenContainer, PlayerInventory inv, ITextComponent titleIn, BlockPos pos)
     {
         super(screenContainer, inv, titleIn, pos);
+        this.tilePos = screenContainer.getTile().getBlockPos();
         this.dataFields = new ArrayList<>();
         this.currentScreenIndex = 0;
     }
@@ -106,7 +109,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
 
     private void sendRecipe()
     {
-        InitPackets.NetworkHelper.sendToServer(new CreateRecipePacket(this.getMenu().getMod(), getCurrentRecipe(), getRecipeInfos(RecipeInfos.create()), getCurrentSerializerType()));
+        InitPackets.NetworkHelper.sendToServer(new CreateRecipePacket(this.getMenu().getMod(), getCurrentRecipe(), this.tilePos, getRecipeInfos(RecipeInfos.create()), getCurrentSerializerType()));
     }
 
     /**

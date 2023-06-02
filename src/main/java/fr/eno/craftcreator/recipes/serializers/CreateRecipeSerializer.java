@@ -1,11 +1,14 @@
 package fr.eno.craftcreator.recipes.serializers;
 
+import com.google.gson.JsonObject;
+import com.simibubi.create.AllRecipeTypes;
 import com.simibubi.create.content.contraptions.components.crusher.CrushingRecipe;
 import com.simibubi.create.content.contraptions.components.saw.CuttingRecipe;
 import com.simibubi.create.content.contraptions.processing.ProcessingOutput;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.utils.CraftIngredients;
+import fr.eno.craftcreator.recipes.utils.RecipeEntry;
 import net.minecraft.item.crafting.IRecipe;
 
 public class CreateRecipeSerializer extends ModRecipeSerializer
@@ -15,6 +18,18 @@ public class CreateRecipeSerializer extends ModRecipeSerializer
     private CreateRecipeSerializer()
     {
         super(SupportedMods.CREATE);
+    }
+
+    public void serializeCrushingRecipe(RecipeEntry.MultiInput input, RecipeEntry.MultiOutput output, int processingTime, SerializerType serializerType)
+    {
+        JsonObject obj = createBaseJson(AllRecipeTypes.CRUSHING.getType());
+
+        // TODO: add support for fixed size ingredients
+        obj.add("ingredients", getInputArray(input.get(0))); // Only one ingredient is allowed
+        obj.add("results", getResultArray(output));
+        obj.addProperty("processingTime", processingTime);
+
+        addRecipeTo(obj, AllRecipeTypes.CRUSHING.getType(), output.getOneOutput().getRegistryName());
     }
 
     @Override
