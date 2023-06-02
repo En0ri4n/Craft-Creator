@@ -3,19 +3,66 @@ package fr.eno.craftcreator.recipes.managers;
 import fr.eno.craftcreator.base.RecipeCreator;
 import fr.eno.craftcreator.recipes.base.BaseRecipesManager;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
+import fr.eno.craftcreator.recipes.serializers.CreateRecipeSerializer;
+import fr.eno.craftcreator.recipes.utils.RecipeEntry;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
+import fr.eno.craftcreator.screen.widgets.RecipeEntryWidget;
+import fr.eno.craftcreator.tileentity.CreateRecipeCreatorTile;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static fr.eno.craftcreator.base.ModRecipeCreators.CRUSHING;
 
 public class CreateRecipesManager extends BaseRecipesManager
 {
     private static final CreateRecipesManager INSTANCE = new CreateRecipesManager();
 
+     //We don't use this method because Create recipes are created not with slots but with another way
     @Override
-    public void createRecipe(RecipeCreator recipe, List<Slot> slots, RecipeInfos recipeInfos, ModRecipeSerializer.SerializerType serializerType)
+    public void createRecipe(RecipeCreator recipe, List<Slot> slots, RecipeInfos recipeInfos, ModRecipeSerializer.SerializerType serializerType) {}
+
+    public void createRecipe(RecipeCreator recipe, BlockEntity tileEntity, RecipeInfos recipeInfos, ModRecipeSerializer.SerializerType serializerType)
     {
-        // recipe.doIfIs(CRUSHING, v -> serializeCrushingRecipe(slots, recipeInfos, serializerType));
+        CreateRecipeSerializer.get().setSerializerType(serializerType);
+
+        if(!(tileEntity instanceof CreateRecipeCreatorTile)) return;
+
+        CreateRecipeCreatorTile createRecipeCreatorTile = (CreateRecipeCreatorTile) tileEntity;
+        List<RecipeEntryWidget.RecipeEntryEntry> inputs = createRecipeCreatorTile.getInputs().get(recipe.getRecipeTypeLocation().getPath()).stream().map(RecipeEntryWidget.RecipeEntryEntry::deserialize).collect(Collectors.toList());
+        List<RecipeEntryWidget.RecipeEntryEntry> outputs = createRecipeCreatorTile.getOutputs().get(recipe.getRecipeTypeLocation().getPath()).stream().map(RecipeEntryWidget.RecipeEntryEntry::deserialize).collect(Collectors.toList());
+
+        if(recipe.is(CRUSHING))
+            serializeCrushingRecipe(inputs, outputs, recipeInfos, serializerType);
+    }
+
+    public RecipeEntry.MultiInput getValidInputs(List<RecipeEntryWidget.RecipeEntryEntry> inputs)
+    {
+        RecipeEntry.MultiInput multiInput = new RecipeEntry.MultiInput();
+
+        inputs.forEach(ree -> multiInput.add(new RecipeEntry.Input(ree.isTag(), ree.getRegistryName(), ree.getCount())));
+
+        return multiInput;
+    }
+
+    public RecipeEntry.MultiOutput getValidOutputs(List<RecipeEntryWidget.RecipeEntryEntry> outputs)
+    {
+        RecipeEntry.MultiOutput multiOutput = new RecipeEntry.MultiOutput();
+
+        outputs.forEach(ree -> multiOutput.add(new RecipeEntry.LuckedOutput(ree.getRegistryName(), ree.getCount(), ree.getChance())));
+
+        return multiOutput;
+    }
+
+    private void serializeCrushingRecipe(List<RecipeEntryWidget.RecipeEntryEntry> inputs, List<RecipeEntryWidget.RecipeEntryEntry> outputs, RecipeInfos recipeInfos, ModRecipeSerializer.SerializerType serializerType)
+    {
+        RecipeEntry.MultiInput input = getValidInputs(inputs);
+        RecipeEntry.MultiOutput output = getValidOutputs(outputs);
+        int processingTime = recipeInfos.getValue("processing_time").intValue();
+
+        CreateRecipeSerializer.get().serializeCrushingRecipe(input, output, processingTime, serializerType);
     }
 
     public static CreateRecipesManager get()

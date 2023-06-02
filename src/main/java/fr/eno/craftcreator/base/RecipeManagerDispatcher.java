@@ -7,19 +7,21 @@ import fr.eno.craftcreator.recipes.managers.MinecraftRecipeManager;
 import fr.eno.craftcreator.recipes.managers.ThermalRecipesManager;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.List;
 
 public class RecipeManagerDispatcher
 {
     /**
-     * @param mod               The mod to which the recipe belongs
-     * @param recipe            The type of recipe to create
-     * @param slots             The slots of the container
-     * @param recipeInfos       The infos of the recipe (energy, experience, chance, etc...)
-     * @param serializerType    The type of serializer (kubejs, etc)
+     * @param mod            The mod to which the recipe belongs
+     * @param recipe         The type of recipe to create
+     * @param tileEntity     The tile entity of the container
+     * @param slots          The slots of the container
+     * @param recipeInfos    The infos of the recipe (energy, experience, chance, etc...)
+     * @param serializerType The type of serializer (kubejs, etc)
      */
-    public static void createRecipe(SupportedMods mod, RecipeCreator recipe, List<Slot> slots, RecipeInfos recipeInfos, ModRecipeSerializer.SerializerType serializerType)
+    public static void createRecipe(SupportedMods mod, RecipeCreator recipe, BlockEntity tileEntity, List<Slot> slots, RecipeInfos recipeInfos, ModRecipeSerializer.SerializerType serializerType)
     {
         switch(mod)
         {
@@ -30,7 +32,7 @@ public class RecipeManagerDispatcher
                 ThermalRecipesManager.get().createRecipe(recipe, slots, recipeInfos, serializerType);
                 break;
             case CREATE:
-                CreateRecipesManager.get().createRecipe(recipe, slots, recipeInfos, serializerType);
+                CreateRecipesManager.get().createRecipe(recipe, tileEntity, recipeInfos, serializerType);
                 break;
             case MINECRAFT:
                 MinecraftRecipeManager.get().createRecipe(recipe, slots, recipeInfos, serializerType);

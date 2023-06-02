@@ -39,6 +39,12 @@ public class RecipeEntryWidget
     private final int width;
     private final int height;
 
+    private final boolean isOutput;
+    private int maxEntry;
+    private boolean hasCount;
+    private boolean hasTag;
+    private boolean hasChance;
+
     private RecipeCreator recipeCreator;
     private final BlockPos tilePos;
     private SlotItemHandler linkedSlot;
@@ -59,8 +65,9 @@ public class RecipeEntryWidget
 
     private MutableComponent message;
     private int messageCounter;
+    private boolean canUseWidget;
 
-    public RecipeEntryWidget(RecipeCreator recipeCreator, BlockPos pos, SlotItemHandler linkedSlot, int x, int y, int width, int height)
+    public RecipeEntryWidget(RecipeCreator recipeCreator, BlockPos pos, SlotItemHandler linkedSlot, int x, int y, int width, int height, boolean isOutput, int maxEntry)
     {
         this.recipeCreator = recipeCreator;
         this.tilePos = pos;
@@ -69,6 +76,11 @@ public class RecipeEntryWidget
         this.y = y;
         this.width = width;
         this.height = height;
+        this.isOutput = isOutput;
+        this.maxEntry = maxEntry;
+        this.hasCount = true;
+        this.hasTag = true;
+        this.hasChance = true;
         init();
     }
 
@@ -82,11 +94,10 @@ public class RecipeEntryWidget
 
         ArrayList<RecipeEntryEntry> entries = new ArrayList<>();
         entries.add(new RecipeEntryEntry(false));
-        entries.add(new RecipeEntryEntry(false));
         entries.add(new RecipeEntryEntry(true));
         this.entriesDropdown = new DropdownListWidget<>(startX, startY + y * i++, width - 6, 16, 16, entries, (entry) ->
         {
-            if(entriesDropdown.getIndex(entry) == entriesDropdown.getEntries().size() - 1)
+            if(entry.isLast())
             {
                 RecipeEntryEntry newEntry = new RecipeEntryEntry(false);
                 entriesDropdown.insertEntryBefore(newEntry, entry);
@@ -115,11 +126,17 @@ public class RecipeEntryWidget
         this.registryNameField.setBlitOffset(100);
 
         // Tag Checkbox
-        this.tagCheckBox = new SimpleCheckBox(startX, startY + y * i++, 10, 10, new TextComponent("is tag"), new TextComponent(""), false, true, checkbox ->
+        this.tagCheckBox = new SimpleCheckBox(startX, startY + y * i++, 10, 10, References.getTranslate("screen.widget.recipe_entry_widget.is_tag"), new TextComponent(""), false, true, checkbox ->
         {
             this.registryNameField.setEntries(EntryHelper.getStringEntryListWith(isTag() ? EntryHelper.getTags() : EntryHelper.getItems(), isTag() ? SimpleListWidget.ResourceLocationEntry.Type.TAG : SimpleListWidget.ResourceLocationEntry.Type.ITEM), true);
             this.registryNameField.setValue("");
         });
+
+        if(isOutput) // Hide tag checkbox for output and set it to false to ensure that the output is not a tag
+        {
+            this.tagCheckBox.visible = false;
+            this.tagCheckBox.setSelected(false);
+        }
 
         int fieldsWidth = 30;
 
@@ -149,37 +166,71 @@ public class RecipeEntryWidget
             showMessage(References.getTranslate("screen.widget.dropdown_list.entry.saved").withStyle(ChatFormatting.GREEN), 2);
             CraftCreator.LOGGER.debug("Save entry : Name=" + registryNameField.getValue() + " isTag=" + isTag() + " count=" + countField.getValue() + " chance=" + chanceField.getValue());
             InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket(
-                    "inputs",
+                    isOutput ? "outputs" : "inputs",
                     tilePos,
                     InitPackets.PacketDataType.PAIR_VALUE_STRING_JSON_OBJECT_LIST,
                     PairValues.create(
                             recipeCreator.getRecipeTypeLocation().getPath(),
                             this.entriesDropdown.getDropdownEntries()
                                     .stream()
+                                    .filter(ree -> !ree.isEmpty())
                                     .map(RecipeEntryEntry::serialize)
                                     .collect(Collectors.toList()))));
         });
+
+        this.saveEntryButton.active = false;
     }
 
     public void refresh(RecipeCreator recipeCreator)
     {
         this.recipeCreator = recipeCreator;
+        this.setHasChance(true);
+        this.setHasTag(true);
+        this.setHasCount(true);
         InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket(
-                "inputs-" + recipeCreator.getRecipeTypeLocation().getPath(),
+                (isOutput ? "outputs-" : "inputs-") + recipeCreator.getRecipeTypeLocation().getPath(),
                 tilePos,
                 InitPackets.PacketDataType.PAIR_VALUE_STRING_JSON_OBJECT_LIST));
     }
 
     public void setEntries(List<JsonObject> jsonList)
     {
-        if(jsonList.isEmpty()) return;
+        if(jsonList.isEmpty())
+        {
+            ArrayList<RecipeEntryEntry> entries = new ArrayList<>();
+            entries.add(new RecipeEntryEntry(false));
+            entries.add(new RecipeEntryEntry(true));
+            this.entriesDropdown.setEntries(entries);
+            displayStack = ItemStack.EMPTY;
+            registryNameField.setValue(Items.AIR.getRegistryName().toString());
+            this.entriesDropdown.trimWidthToEntries();
+            return;
+        }
 
         this.entriesDropdown.getDropdownEntries().clear();
-        this.entriesDropdown.setEntries(new ArrayList<>(jsonList.stream().map(RecipeEntryEntry::deserialize).collect(Collectors.toList())));
+        ArrayList<RecipeEntryEntry> list = jsonList.stream().map(RecipeEntryEntry::deserialize).collect(Collectors.toCollection(ArrayList::new));
+        list.add(new RecipeEntryEntry(true));
+        this.entriesDropdown.setEntries(list);
+        this.entriesDropdown.trimWidthToEntries();
+    }
+
+    public int getMaxEntry()
+    {
+        return maxEntry;
+    }
+
+    public void setMaxEntry(int maxEntry)
+    {
+        this.maxEntry = maxEntry;
     }
 
     public void tick()
     {
+        // Update widgets visibility
+        this.tagCheckBox.visible = hasTag();
+        this.countField.visible = hasCount();
+        this.chanceField.visible = hasChance();
+
         registryNameField.tick();
 
         // Update message
@@ -228,10 +279,6 @@ public class RecipeEntryWidget
         }
 
         displayStack.setCount(countField.getIntValue());
-    }
-
-    private static void loopItemEngine(ItemStack displayStack, String registryName, boolean isTag, int displayCounter)
-    {
     }
 
     /**
@@ -283,23 +330,34 @@ public class RecipeEntryWidget
         {
             ClientUtils.getFontRenderer().draw(matrixStack, message, x, y + height, 0xFFFFFFFF);
         }
+    }
 
+    public void renderDropdown(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    {
         entriesDropdown.render(matrixStack, mouseX, mouseY, partialTicks);
+    }
+
+    public void setCanUseWidget(boolean canUseWidget)
+    {
+        this.canUseWidget = canUseWidget;
     }
 
     public void mouseClicked(double mouseX, double mouseY, int button)
     {
-        if(!entriesDropdown.isFocused())
+        if(canUseWidget)
         {
-            registryNameField.mouseClicked(mouseX, mouseY, button);
-            countField.mouseClicked(mouseX, mouseY, button);
-            tagCheckBox.mouseClicked(mouseX, mouseY, button);
-            chanceField.mouseClicked(mouseX, mouseY, button);
-            removeEntryButton.mouseClicked(mouseX, mouseY, button);
-            saveEntryButton.mouseClicked(mouseX, mouseY, button);
-        }
+            if(!entriesDropdown.isFocused())
+            {
+                registryNameField.mouseClicked(mouseX, mouseY, button);
+                countField.mouseClicked(mouseX, mouseY, button);
+                tagCheckBox.mouseClicked(mouseX, mouseY, button);
+                chanceField.mouseClicked(mouseX, mouseY, button);
+                removeEntryButton.mouseClicked(mouseX, mouseY, button);
+                saveEntryButton.mouseClicked(mouseX, mouseY, button);
+            }
 
-        entriesDropdown.mouseClicked(mouseX, mouseY, button);
+            entriesDropdown.mouseClicked(mouseX, mouseY, button);
+        }
     }
 
     public void keyPressed(int keyCode, int scanCode, int modifiers)
@@ -343,6 +401,36 @@ public class RecipeEntryWidget
     public void setRecipeCreator(RecipeCreator recipeCreator)
     {
         this.recipeCreator = recipeCreator;
+    }
+
+    public boolean hasCount()
+    {
+        return hasCount;
+    }
+
+    public void setHasCount(boolean hasCount)
+    {
+        this.hasCount = hasCount;
+    }
+
+    public boolean hasTag()
+    {
+        return hasTag;
+    }
+
+    public void setHasTag(boolean hasTag)
+    {
+        this.hasTag = hasTag;
+    }
+
+    public boolean hasChance()
+    {
+        return hasChance;
+    }
+
+    public void setHasChance(boolean hasChance)
+    {
+        this.hasChance = hasChance;
     }
 
     public static class RecipeEntryEntry extends DropdownListWidget.Entry<ResourceLocation> implements JsonSerializable
@@ -479,6 +567,16 @@ public class RecipeEntryWidget
         public void renderTooltip(PoseStack matrixStack, int mouseX, int mouseY)
         {
 
+        }
+
+        public boolean isEmpty()
+        {
+            return this.registryName.equals(Items.AIR.getRegistryName());
+        }
+
+        public boolean isLast()
+        {
+            return isLast;
         }
     }
 }

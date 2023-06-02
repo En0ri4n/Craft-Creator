@@ -147,9 +147,9 @@ jar {
         attributes([
                 "Specification-Title"     : "${craftcreator_name}",
                 "Specification-Vendor"    : "En0ri4n",
-                "Specification-Version"   : "1", // We are version 1 of ourselves
+                "Specification-Version"   : project.version, // We are version 1 of ourselves
                 "Implementation-Title"    : "${craftcreator_name}",
-                "Implementation-Version"  : "${craftcreator_version}",
+                "Implementation-Version"  : project.version,
                 "Implementation-Vendor"   : "En0ri4n",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
