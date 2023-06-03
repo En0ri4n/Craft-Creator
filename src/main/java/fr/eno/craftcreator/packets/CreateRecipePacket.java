@@ -1,6 +1,5 @@
 package fr.eno.craftcreator.packets;
 
-import fr.eno.craftcreator.api.BlockUtils;
 import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.api.ServerUtils;
 import fr.eno.craftcreator.base.ModRecipeCreators;

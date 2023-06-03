@@ -54,7 +54,6 @@ public class RecipeManagerScreen extends ListScreen
             this.recipeTypeDropdown.setEntries(DropdownListWidget.Entries.getRecipeTypes(this.modId));
             this.recipeType = CommonUtils.parse(this.recipeTypeDropdown.getDropdownEntries().get(0).getValue());
             this.searchField.setValue("");
-            updateLists(true);
         }));
 
         addList(recipeTypeDropdown = new DropdownListWidget<>(width / 2, 0, 200, 20, 20, DropdownListWidget.Entries.getRecipeTypes(getCurrentMod().getModId()), (entry) ->
@@ -71,7 +70,7 @@ public class RecipeManagerScreen extends ListScreen
             updateLists(false);
         }, SupportedMods.isKubeJSLoaded()));
         
-        addWidget(searchField = new SimpleTextFieldWidget(10, height - 30, this.width / 3 - 35, 20, textField ->
+        addWidget(searchField = new SimpleTextFieldWidget(10, height - 27, this.width / 3 - 35, 20, textField ->
         {
             if(!textField.getValue().isEmpty())
             {
@@ -81,7 +80,7 @@ public class RecipeManagerScreen extends ListScreen
                 updateLists(false);
         }));
 
-        addButton(new SimpleButton(References.getTranslate("screen.recipe_manager.button.clear_search"), 10 + this.width / 3 - 35 + 2, height - 30, 20, 20, button ->
+        addButton(new SimpleButton(References.getTranslate("screen.recipe_manager.button.clear_search"), 10 + this.width / 3 - 35 + 2, height - 27, 20, 20, button ->
         {
             updateLists(true);
             this.searchField.setValue("");

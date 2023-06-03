@@ -657,7 +657,7 @@ public class SuggesterTextFieldWidget extends SimpleListWidget
             if(isFocused())
             {
                 pMatrixStack.pushPose();
-                pMatrixStack.translate(0, 0, 100); // Ensure that the list is rendered on top of all other elements
+                pMatrixStack.translate(0, 0, 300); // Ensure that the list is rendered on top of all other elements (items are like at z=~200)
                 RenderSystem.disableDepthTest();
                 RenderSystem.disableBlend();
                 RenderSystem.disableCull();

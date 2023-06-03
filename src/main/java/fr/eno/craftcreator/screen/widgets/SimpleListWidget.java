@@ -170,12 +170,20 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         RenderSystem.disableBlend();
     }
 
+    @Override
+    protected int getRowTop(int pIndex)
+    {
+        return super.getRowTop(pIndex);
+    }
+
     protected void trimWidthToEntries()
     {
         int maxWidth = ClientUtils.getCurrentScreen().width - x0;
         int maxEntryWidth = ClientUtils.getBiggestStringWidth(getEntries().stream().map(Entry::getEntryValue).collect(Collectors.toList()));
         this.width = Math.min(maxWidth, Math.max(width, maxEntryWidth));
         this.x1 = this.x0 + this.width;
+
+        this.y1 = y0 + Math.min(getEntries().size(), MAX_ITEMS_DISPLAYED) * itemHeight;
     }
 
     protected void renderList(@Nonnull MatrixStack matrixStack, int x, int y, int mouseX, int mouseY, float partialTicks)
@@ -464,7 +472,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
                 else if(craftIngredient instanceof CraftIngredients.DataIngredient)
                 {
                     CraftIngredients.DataIngredient dataIngredient = (CraftIngredients.DataIngredient) craftIngredient;
-                    ingredientValue.append(new StringTextComponent("" + (dataIngredient.isDouble() ? dataIngredient.getData().doubleValue() : dataIngredient.getData().intValue())).withStyle(TextFormatting.LIGHT_PURPLE));
+                    ingredientValue.append(new StringTextComponent(String.valueOf(dataIngredient.isDouble() ? dataIngredient.getData().doubleValue() : dataIngredient.getData().intValue())).withStyle(TextFormatting.LIGHT_PURPLE));
                     ingredientValue.append(new StringTextComponent(" ").append(dataIngredient.getUnit().getDisplayUnit()).withStyle(TextFormatting.DARK_GRAY));
                 }
                 else if(craftIngredient instanceof CraftIngredients.NBTIngredient)
@@ -572,7 +580,8 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
             CraftIngredients input = ModRecipeCreatorDispatcher.getInputs(recipe);
             CraftIngredients output = ModRecipeCreatorDispatcher.getOutput(recipe);
 
-            tooltips.add(new StringTextComponent(this.recipe.getId().toString()).withStyle(TextFormatting.GREEN, TextFormatting.UNDERLINE));
+            tooltips.add(new StringTextComponent(this.recipe.getId().toString()).withStyle(TextFormatting.GREEN, TextFormatting.UNDERLINE)
+                    .append(new StringTextComponent("§r§8§o (" + CommonUtils.getRecipeTypeName(recipe.getType()).getPath() + ")")));
             tooltips.add(new StringTextComponent(""));
             tooltips.add(References.getTranslate("screen.widget.simple_list.tooltip.input"));
             addToTooltip(tooltips, input);
@@ -711,7 +720,10 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         public void render(@Nonnull MatrixStack matrixStack, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean isMouseOver, float partialTicks)
         {
             int yPos = height / 2 - 16 / 2;
+            RenderSystem.pushMatrix(); // Need to use RenderSystem to get the actual matrixstack BECAUSE MINECRAFT CREATE A NEW MATRIXSTACK EVERY FRAME, WTF ?!?!?!
+            RenderSystem.translatef(0F, 0F, 200F); // Fixes z-fighting with inventory items
             ClientUtils.getItemRenderer().renderAndDecorateFakeItem(displayStack, left + yPos, top + yPos);
+            RenderSystem.popMatrix();
 
             String displayStr = ScreenUtils.truncateString(width, resourceLocation.toString());
             displayTruncatedString(matrixStack, displayStr, left, top, width, height, true, isMouseOver);

@@ -26,8 +26,14 @@
 	"craftcreator.screen.widget.dropdown_list.recipe_entry.entry.title": "Entry #%d",
 	"craftcreator.screen.widget.dropdown_list.recipe_entry.add": "Add Entry...",
 	"craftcreator.screen.widget.dropdown_list.entry.saved": "Saved!",
+	"craftcreator.screen.widget.dropdown_list.entry.reset": "Reset!",
+	"craftcreator.screen.widget.dropdown_list.entry.name": "%s ▼",
 
-	"craftcreator.screen.widget.recipe_entry_widget.is_tag": "Is Tag ?",
+	"craftcreator.screen.widget.recipe_entry_widget.tag": "Is Tag ?",
+	"craftcreator.screen.widget.recipe_entry_widget.tooltip.tag": "Check if you want a Tag instead of an Item",
+	"craftcreator.screen.widget.recipe_entry_widget.tooltip.reset": "Clear all entries",
+	"craftcreator.screen.widget.recipe_entry_widget.tooltip.save": "Save the current entry",
+	"craftcreator.screen.widget.recipe_entry_widget.tooltip.remove": "Remove the current entry",
 
 	"craftcreator.serializer.message.recipe.added": "§aRecipe %s §aby %s §asuccessfully generated",
 	"craftcreator.serializer.message.recipe.exists": "§cRecipe §4%s §cby §4%s §calready exists !",
@@ -80,6 +86,8 @@
 	"craftcreator.screen.remove_manager.button.has_id": "Id :",
 	"craftcreator.screen.remove_manager.button.remove": "Remove Recipe",
 
+	"craftcreator.screen.recipe_creator.label.input_counter": "§6Input §7(%s§7)",
+	"craftcreator.screen.recipe_creator.label.output_counter": "§2Output §7(%s§7)",
 
     "craftcreator.screen.recipe_creator.label.input": "§6Input",
     "craftcreator.screen.recipe_creator.label.output": "§2Output",
