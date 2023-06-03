@@ -40,7 +40,7 @@ public enum SupportedMods
      * Check if the mod is loaded
      *
      * @return True if the mod is loaded, false otherwise
-     * @see SupportedMods#isModLoaded(String)
+     * @see #isModLoaded(String)
      */
     public boolean isLoaded()
     {
@@ -62,7 +62,7 @@ public enum SupportedMods
      * Get the enum value from the mod id
      *
      * @param modId The mod id
-     * @return The enum value (MINECRAFT if the mod is not supported, avoiding null value)
+     * @return The enum value ({@link #MINECRAFT} if the mod is not supported, avoiding null value)
      */
     public static SupportedMods getMod(String modId)
     {

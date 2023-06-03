@@ -10,8 +10,7 @@ import java.util.List;
 
 public class MultiScreenModRecipeCreatorScreenGuiHandler<T extends MultiScreenModRecipeCreatorScreen<? extends CommonContainer>> implements IGuiContainerHandler<T>
 {
-    public MultiScreenModRecipeCreatorScreenGuiHandler() {
-    }
+    public MultiScreenModRecipeCreatorScreenGuiHandler() {}
 
     @Override
     public List<Rect2i> getGuiExtraAreas(T containerScreen)

@@ -1,10 +1,10 @@
 package fr.eno.craftcreator.item;
 
-
 import fr.eno.craftcreator.CraftCreator;
 import fr.eno.craftcreator.base.SupportedMods;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
 
 public class ItemBlockBasic extends BlockItem
@@ -18,6 +18,7 @@ public class ItemBlockBasic extends BlockItem
 	{
 		Item.Properties properties = new Item.Properties();
 		properties.stacksTo(64);
+		properties.rarity(Rarity.EPIC);
 		if(mod.isLoaded())
 			properties.tab(CraftCreator.CRAFT_CREATOR_TAB);
 
