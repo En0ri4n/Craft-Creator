@@ -2,6 +2,7 @@ package fr.eno.craftcreator.screen.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.ScreenUtils;
 import fr.eno.craftcreator.base.SupportedMods;
@@ -33,7 +34,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends S
 
     public DropdownListWidget(int x, int y, int width, int height, int itemHeight, ArrayList<T> entries, Consumer<T> onSelected)
     {
-        super(x, y + height, width, Math.min(entries.size(), MAX_ITEMS_DISPLAYED) * itemHeight, itemHeight, 0, 4, new TextComponent(""), null, false);
+        super(x, y + height, width, (Math.min(entries.size(), MAX_ITEMS_DISPLAYED)) * itemHeight, itemHeight, 0, 4, new TextComponent(""), null, false);
         this.setEntries(entries);
         this.dropdownSelected = entries.get(0);
         this.dropdownFieldX = x;
@@ -56,7 +57,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends S
         Screen.fill(matrixStack, this.dropdownFieldX, this.dropdownFieldY, this.dropdownFieldX + this.dropdownFieldWidth, this.dropdownFieldY + this.dropdownFieldHeight, 0xf2c3a942);
         Screen.fill(matrixStack, this.dropdownFieldX + 1, this.dropdownFieldY + 1, this.dropdownFieldX + this.dropdownFieldWidth - 1, this.dropdownFieldY + this.dropdownFieldHeight - 1, Color.DARK_GRAY.getRGB());
         int color = 0xFFFFFFFF;
-        MutableComponent title = new TextComponent(String.format("%s ▼", ScreenUtils.truncateString(dropdownFieldWidth - 10, getMessage().getString())));
+        MutableComponent title = References.getTranslate("screen.widget.dropdown_list.entry.name", ScreenUtils.truncateString(dropdownFieldWidth - 10, getMessage().getString()));
         drawCenteredString(matrixStack, ClientUtils.getFontRenderer(), title, this.dropdownFieldX + this.dropdownFieldWidth / 2, this.dropdownFieldY + dropdownFieldHeight / 2 - ClientUtils.getFontRenderer().lineHeight / 2, color);
 
         if(isFocused())
@@ -102,7 +103,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends S
         {
             super.mouseClicked(mouseX, mouseY, button);
 
-            if(!ScreenUtils.isMouseHover(dropdownFieldX, dropdownFieldY + dropdownFieldHeight, (int) mouseX, (int) mouseY, dropdownFieldWidth, height))
+            if(!ScreenUtils.isMouseHover(dropdownFieldX, dropdownFieldY + dropdownFieldHeight, (int) mouseX, (int) mouseY, dropdownFieldWidth, y1 - y0))
             {
                 this.setFocused(false);
                 return true;
@@ -151,6 +152,12 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends S
     public void insertEntryBefore(T entry, T before)
     {
         this.getEntries().add(this.getEntries().indexOf(before), entry);
+        trimWidthToEntries();
+    }
+
+    public void setEntry(T entry, T toReplace)
+    {
+        this.getEntries().set(this.getEntries().indexOf(toReplace), entry);
         trimWidthToEntries();
     }
 

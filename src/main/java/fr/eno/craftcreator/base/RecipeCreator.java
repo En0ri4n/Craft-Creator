@@ -18,14 +18,18 @@ public class RecipeCreator
 {
     private final SupportedMods mod;
     private final List<PositionnedSlot> slots;
+    private final int maxInputSize;
+    private final int maxOutputSize;
     private final ResourceLocation recipeTypeLocation;
     private final ResourceLocation itemIcon;
     private final ResourceLocation guiTexture;
 
-    private RecipeCreator(SupportedMods mod, List<PositionnedSlot> slots, ResourceLocation recipeTypeLocation, ResourceLocation itemIcon, ResourceLocation guiTexture)
+    private RecipeCreator(SupportedMods mod, List<PositionnedSlot> slots, int maxInputSize, int maxOutputSize, ResourceLocation recipeTypeLocation, ResourceLocation itemIcon, ResourceLocation guiTexture)
     {
         this.mod = mod;
         this.slots = slots;
+        this.maxInputSize = maxInputSize;
+        this.maxOutputSize = maxOutputSize;
         this.recipeTypeLocation = recipeTypeLocation;
         this.itemIcon = itemIcon;
         this.guiTexture = guiTexture;
@@ -62,6 +66,16 @@ public class RecipeCreator
         return slots;
     }
 
+    public int getMaxInputSize()
+    {
+        return maxInputSize;
+    }
+
+    public int getMaxOutputSize()
+    {
+        return maxOutputSize;
+    }
+
     public boolean is(RecipeCreator... recipeCreators)
     {
         for(RecipeCreator recipeCreator : recipeCreators)
@@ -77,6 +91,8 @@ public class RecipeCreator
 
         private final SupportedMods mod;
         private List<PositionnedSlot> slots;
+        private int maxInputSize = -1;
+        private int maxOutputSize = -1;
         private ResourceLocation recipeTypeLocation;
         private ResourceLocation itemIcon;
         private ResourceLocation guiTextureName;
@@ -95,6 +111,20 @@ public class RecipeCreator
         public Builder withSlots(List<PositionnedSlot> slots)
         {
             this.slots = slots;
+            return this;
+        }
+
+        /**
+         * Set the max input/output size of the recipe creator (default: -1)<br>
+         * Used for Create recipe creator to setup system of input/output
+         *
+         * @param maxInputSize the max input size of the recipe creator
+         * @return the current builder
+         */
+        public Builder setSize(int maxInputSize, int maxOutputSize)
+        {
+            this.maxInputSize = maxInputSize;
+            this.maxOutputSize = maxOutputSize;
             return this;
         }
 
@@ -145,7 +175,7 @@ public class RecipeCreator
          */
         public RecipeCreator build()
         {
-            return new RecipeCreator(mod, slots, recipeTypeLocation, itemIcon, guiTextureName);
+            return new RecipeCreator(mod, slots, maxInputSize, maxOutputSize, recipeTypeLocation, itemIcon, guiTextureName);
         }
 
         public static Builder of(SupportedMods mod)

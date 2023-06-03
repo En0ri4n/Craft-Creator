@@ -337,11 +337,11 @@ public class SlotHelper
         // Create
         int createSlots = 0;
         CRUSHING_SLOTS = list(
-                CRUSHING_SLOTS_INPUT = toList(new PositionnedSlot(createSlots++, 45, 121)),
-                CRUSHING_SLOTS_OUTPUT = toList(new PositionnedSlot(createSlots++, 189, 33), new PositionnedSlot(createSlots++, 189, 59), new PositionnedSlot(createSlots++, 189, 85), new PositionnedSlot(createSlots++, 189, 111)));
+                CRUSHING_SLOTS_INPUT = toList(),
+                CRUSHING_SLOTS_OUTPUT = toList());
         CUTTING_SLOTS = list(
-                CUTTING_SLOTS_INPUT = toList(new PositionnedSlot(createSlots++, 63, 98)),
-                CUTTING_SLOTS_OUTPUT = toList(new PositionnedSlot(createSlots++, 189, 33), new PositionnedSlot(createSlots++, 189, 59), new PositionnedSlot(createSlots++, 189, 85), new PositionnedSlot(createSlots++, 189, 111)));
+                CUTTING_SLOTS_INPUT = toList(),
+                CUTTING_SLOTS_OUTPUT = toList());
 
         CREATE_SLOTS_INPUT = list(
                 CRUSHING_SLOTS_INPUT,

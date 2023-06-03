@@ -100,8 +100,8 @@ public class ModRecipeCreators
         PYROLYZER = register(RecipeCreator.Builder.of(SupportedMods.THERMAL).withRecipeType("pyrolyzer").withIcon("machine_pyrolyzer").withSlots(SlotHelper.PYROLYZER_SLOTS));
 
         // Create
-        CRUSHING = register(RecipeCreator.Builder.of(SupportedMods.CREATE).withRecipeType("crushing").withIcon("crushing_wheel").withSlots(SlotHelper.CRUSHING_SLOTS));
-        CUTTING = register(RecipeCreator.Builder.of(SupportedMods.CREATE).withRecipeType("cutting").withIcon("mechanical_saw").withSlots(SlotHelper.CUTTING_SLOTS));
+        CRUSHING = register(RecipeCreator.Builder.of(SupportedMods.CREATE).withRecipeType("crushing").withIcon("crushing_wheel").withSlots(SlotHelper.CRUSHING_SLOTS).setSize(1, -1).withGuiTexture("create_recipe_creator.png"));
+        CUTTING = register(RecipeCreator.Builder.of(SupportedMods.CREATE).withRecipeType("cutting").withIcon("mechanical_saw").withSlots(SlotHelper.CUTTING_SLOTS).setSize(1, -1).withGuiTexture("create_recipe_creator.png"));
 
         RECIPE_CREATORS.trimToSize(); // Trim to size to save memory
     }

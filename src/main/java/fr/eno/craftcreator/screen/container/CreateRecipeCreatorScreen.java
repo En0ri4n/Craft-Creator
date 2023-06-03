@@ -2,6 +2,7 @@ package fr.eno.craftcreator.screen.container;
 
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
+import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.base.ModRecipeCreators;
 import fr.eno.craftcreator.container.CreateRecipeCreatorContainer;
 import fr.eno.craftcreator.container.slot.utils.PositionnedSlot;
@@ -10,8 +11,11 @@ import fr.eno.craftcreator.screen.container.base.MultiScreenModRecipeCreatorScre
 import fr.eno.craftcreator.screen.widgets.RecipeEntryWidget;
 import fr.eno.craftcreator.utils.PairValues;
 import fr.eno.craftcreator.utils.SlotHelper;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.player.Inventory;
 
@@ -47,8 +51,8 @@ public class CreateRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen
         int widgetHeight = 110;
         int widgetWidth = imageWidth / 2 - 2 * gapX;
 
-        inputWidget = new RecipeEntryWidget(getCurrentRecipe(), tilePos, PositionnedSlot.getSlotsFor(getCurrentRecipe().getSlots(), getMenu().getContainerSlots()).get(0), leftPos + gapX, topPos + gapY, widgetWidth, widgetHeight, false, 1);
-        outputWidget = new RecipeEntryWidget(getCurrentRecipe(), tilePos, PositionnedSlot.getSlotsFor(getCurrentRecipe().getSlots(), getMenu().getContainerSlots()).get(0), leftPos + guiTextureSize - gapX - widgetWidth, topPos + gapY, widgetWidth, widgetHeight, true, 100);
+        inputWidget = new RecipeEntryWidget(getCurrentRecipe(), tilePos,  leftPos + gapX, topPos + gapY, widgetWidth, widgetHeight, false, -1);
+        outputWidget = new RecipeEntryWidget(getCurrentRecipe(), tilePos, leftPos + guiTextureSize - gapX - widgetWidth, topPos + gapY, widgetWidth, widgetHeight, true, -1);
     }
 
     @Override
@@ -64,6 +68,7 @@ public class CreateRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen
         return recipeInfos;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void setData(String dataName, Object data)
     {
@@ -86,11 +91,13 @@ public class CreateRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen
     @Override
     protected void updateGui()
     {
-        this.inputWidget.refresh(getCurrentRecipe());
-        this.outputWidget.refresh(getCurrentRecipe());
+        inputWidget.refresh(getCurrentRecipe());
+        outputWidget.refresh(getCurrentRecipe());
+        inputWidget.setMaxSize(getCurrentRecipe().getMaxInputSize());
+        outputWidget.setMaxSize(getCurrentRecipe().getMaxOutputSize());
         setExecuteButtonPos(this.leftPos + this.imageWidth / 2 - 21, this.topPos + this.imageHeight / 2 + 8);
 
-        if(getCurrentRecipe().is(ModRecipeCreators.CRUSHING))
+        if(getCurrentRecipe().is(ModRecipeCreators.CRUSHING, ModRecipeCreators.CUTTING))
         {
             showDataField(0);
             setDataFieldValue(100, false, 0);
@@ -105,7 +112,7 @@ public class CreateRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen
     @Override
     protected void renderGui(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        if(getCurrentRecipe().is(ModRecipeCreators.CRUSHING))
+        if(getCurrentRecipe().is(ModRecipeCreators.CRUSHING, ModRecipeCreators.CUTTING))
         {
             renderDataFieldTitle(0, new TextComponent("Processing Time :"), matrixStack);
         }
@@ -114,10 +121,10 @@ public class CreateRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen
             inputWidget.render(matrixStack, mouseX, mouseY, partialTicks);
         if(outputWidget != null)
             outputWidget.render(matrixStack, mouseX, mouseY, partialTicks);
-        if(inputWidget != null)
-            inputWidget.renderDropdown(matrixStack, mouseX, mouseY, partialTicks);
         if(outputWidget != null)
             outputWidget.renderDropdown(matrixStack, mouseX, mouseY, partialTicks);
+        if(inputWidget != null)
+            inputWidget.renderDropdown(matrixStack, mouseX, mouseY, partialTicks);
     }
 
     @Override
@@ -125,6 +132,16 @@ public class CreateRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen
     {
         super.renderLabels(matrixStack, pMouseX, pMouseY);
         renderSideTitles(matrixStack);
+    }
+
+    @Override
+    protected void renderSideTitles(PoseStack matrixStack)
+    {
+        // Render Labels
+        MutableComponent inputLabel = References.getTranslate("screen.recipe_creator.label.input_counter", ChatFormatting.GRAY + String.valueOf(getCurrentRecipe().getMaxInputSize() == -1 ? "∞" : getCurrentRecipe().getMaxInputSize()));
+        MutableComponent ouputLabel = References.getTranslate("screen.recipe_creator.label.output_counter", ChatFormatting.GRAY + String.valueOf(getCurrentRecipe().getMaxOutputSize() == -1 ? "∞" : getCurrentRecipe().getMaxOutputSize()));
+        Screen.drawString(matrixStack, this.font, inputLabel, this.imageWidth / 4 - font.width(inputLabel.getString()) / 2, 8, 0xFFFFFFFF);
+        Screen.drawString(matrixStack, this.font, ouputLabel, this.imageWidth / 4 * 3 - font.width(ouputLabel.getString()) / 2, 8, 0xFFFFFFFF);
     }
 
     @Override
@@ -166,8 +183,14 @@ public class CreateRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen
     @Override
     protected void renderTooltip(PoseStack poseStack, int mouseX, int mouseY)
     {
-        if(!inputWidget.isFocused() && !outputWidget.isFocused())
-            super.renderTooltip(poseStack, mouseX, mouseY);
+        if(inputWidget != null)
+            inputWidget.renderTooltip(poseStack, mouseX, mouseY, width, height);
+        if(outputWidget != null)
+            outputWidget.renderTooltip(poseStack, mouseX, mouseY, width, height);
+
+        if(inputWidget != null && outputWidget != null)
+            if(!inputWidget.isFocused() && !outputWidget.isFocused())
+                super.renderTooltip(poseStack, mouseX, mouseY);
     }
 
     @Override

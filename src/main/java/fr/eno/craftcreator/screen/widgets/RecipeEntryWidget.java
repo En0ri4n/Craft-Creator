@@ -2,7 +2,6 @@ package fr.eno.craftcreator.screen.widgets;
 
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
-import fr.eno.craftcreator.CraftCreator;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
 import fr.eno.craftcreator.api.CommonUtils;
@@ -19,17 +18,21 @@ import fr.eno.craftcreator.utils.PairValues;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraftforge.client.gui.GuiUtils;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.registries.tags.ITag;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class RecipeEntryWidget
@@ -47,8 +50,6 @@ public class RecipeEntryWidget
 
     private RecipeCreator recipeCreator;
     private final BlockPos tilePos;
-    private SlotItemHandler linkedSlot;
-    private ItemStack lastStack = ItemStack.EMPTY;
 
     private DropdownListWidget<RecipeEntryEntry> entriesDropdown;
 
@@ -59,19 +60,24 @@ public class RecipeEntryWidget
 
     private IconButton removeEntryButton;
     private IconButton saveEntryButton;
+    private IconButton resetEntriesButton;
+
+    // Used to display the recipe summary in the tooltip
+    private final ItemStack recipeSummaryStack = new ItemStack(Items.KNOWLEDGE_BOOK);
 
     private ItemStack displayStack = ItemStack.EMPTY;
+    private int displayStackPosX;
+    private int displayStackPosY;
     private int displayCounter;
 
     private MutableComponent message;
     private int messageCounter;
     private boolean canUseWidget;
 
-    public RecipeEntryWidget(RecipeCreator recipeCreator, BlockPos pos, SlotItemHandler linkedSlot, int x, int y, int width, int height, boolean isOutput, int maxEntry)
+    public RecipeEntryWidget(RecipeCreator recipeCreator, BlockPos pos, int x, int y, int width, int height, boolean isOutput, int maxEntry)
     {
         this.recipeCreator = recipeCreator;
         this.tilePos = pos;
-        this.linkedSlot = linkedSlot;
         this.x = x;
         this.y = y;
         this.width = width;
@@ -92,15 +98,24 @@ public class RecipeEntryWidget
         int y = 16 + 3;
         int i = 0;
 
+        int itemSlotSize = 16;
+        this.displayStackPosX = x + 3;
+        this.displayStackPosY = this.y + height - 3 - itemSlotSize;
+
         ArrayList<RecipeEntryEntry> entries = new ArrayList<>();
         entries.add(new RecipeEntryEntry(false));
-        entries.add(new RecipeEntryEntry(true));
+        if(maxEntry > 1 || maxEntry == -1) // Add a second entry if the max entry is greater than 1 (because the last entry is always a "add new entry" entry)
+            entries.add(new RecipeEntryEntry(true));
+
         this.entriesDropdown = new DropdownListWidget<>(startX, startY + y * i++, width - 6, 16, 16, entries, (entry) ->
         {
-            if(entry.isLast())
+            if(entry.isLast() && (getMaxEntry() == -1 || entriesDropdown.getDropdownEntries().size() < getMaxEntry() + 1))
             {
                 RecipeEntryEntry newEntry = new RecipeEntryEntry(false);
-                entriesDropdown.insertEntryBefore(newEntry, entry);
+                if(maxEntry != -1 && entriesDropdown.getDropdownEntries().size() == maxEntry) // If the max entry is reached, the last entry is replaced by a simple entry
+                    entriesDropdown.setEntry(newEntry, entry);
+                else
+                    entriesDropdown.insertEntryBefore(newEntry, entry);
                 entriesDropdown.setDropdownSelected(newEntry);
 
                 this.registryNameField.setValue(newEntry.getRegistryName().toString());
@@ -108,6 +123,7 @@ public class RecipeEntryWidget
                 this.tagCheckBox.setSelected(newEntry.isTag());
                 this.chanceField.setNumberValue(newEntry.getChance(), true);
                 this.removeEntryButton.active = true;
+                entriesDropdown.trimWidthToEntries();
                 return;
             }
 
@@ -153,9 +169,10 @@ public class RecipeEntryWidget
             {
                 this.entriesDropdown.removeEntry(entriesDropdown.getDropdownSelected());
                 this.entriesDropdown.setScrollAmount(0D);
+                updateServerEntries();
             }
 
-            this.removeEntryButton.active = entriesDropdown.getEntries().size() > 2;
+            checkButtons();
         });
 
         // Save Button
@@ -164,54 +181,76 @@ public class RecipeEntryWidget
             this.entriesDropdown.getDropdownSelected().set(CommonUtils.parse(registryNameField.getValue()), countField.getIntValue(), isTag(), chanceField.getDoubleValue());
             this.entriesDropdown.trimWidthToEntries();
             showMessage(References.getTranslate("screen.widget.dropdown_list.entry.saved").withStyle(ChatFormatting.GREEN), 2);
-            CraftCreator.LOGGER.debug("Save entry : Name=" + registryNameField.getValue() + " isTag=" + isTag() + " count=" + countField.getValue() + " chance=" + chanceField.getValue());
-            InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket(
-                    isOutput ? "outputs" : "inputs",
-                    tilePos,
-                    InitPackets.PacketDataType.PAIR_VALUE_STRING_JSON_OBJECT_LIST,
-                    PairValues.create(
-                            recipeCreator.getRecipeTypeLocation().getPath(),
-                            this.entriesDropdown.getDropdownEntries()
-                                    .stream()
-                                    .filter(ree -> !ree.isEmpty())
-                                    .map(RecipeEntryEntry::serialize)
-                                    .collect(Collectors.toList()))));
+            updateServerEntries();
+            checkButtons();
+        });
+
+        this.resetEntriesButton = new IconButton(x + width - 21 - 21 - 21, startY + height - 24, References.getLoc("textures/gui/icons/cross.png"), 16, 16, 16, 48, b ->
+        {
+            reset();
+            showMessage(References.getTranslate("screen.widget.dropdown_list.entry.reset").withStyle(ChatFormatting.RED), 2);
+            updateServerEntries();
+            checkButtons();
         });
 
         this.saveEntryButton.active = false;
     }
 
+    private void updateServerEntries()
+    {
+        InitPackets.NetworkHelper.sendToServer(new UpdateRecipeCreatorTileDataServerPacket(isOutput ? "outputs" : "inputs", tilePos, InitPackets.PacketDataType.PAIR_VALUE_STRING_JSON_OBJECT_LIST, PairValues.create(recipeCreator.getRecipeTypeLocation().getPath(), this.entriesDropdown.getDropdownEntries().stream().filter(ree -> !ree.isEmpty()).map(RecipeEntryEntry::serialize).collect(Collectors.toList()))));
+    }
+
     public void refresh(RecipeCreator recipeCreator)
     {
+        this.setRecipeCreator(recipeCreator);
+
+        reset();
+
+        InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket((isOutput ? "outputs-" : "inputs-") + recipeCreator.getRecipeTypeLocation().getPath(), tilePos, InitPackets.PacketDataType.PAIR_VALUE_STRING_JSON_OBJECT_LIST));
+    }
+
+    private void setRecipeCreator(RecipeCreator recipeCreator)
+    {
         this.recipeCreator = recipeCreator;
-        this.setHasChance(true);
-        this.setHasTag(true);
-        this.setHasCount(true);
-        InitPackets.NetworkHelper.sendToServer(new RetrieveRecipeCreatorTileDataServerPacket(
-                (isOutput ? "outputs-" : "inputs-") + recipeCreator.getRecipeTypeLocation().getPath(),
-                tilePos,
-                InitPackets.PacketDataType.PAIR_VALUE_STRING_JSON_OBJECT_LIST));
     }
 
     public void setEntries(List<JsonObject> jsonList)
     {
         if(jsonList.isEmpty())
         {
-            ArrayList<RecipeEntryEntry> entries = new ArrayList<>();
-            entries.add(new RecipeEntryEntry(false));
-            entries.add(new RecipeEntryEntry(true));
-            this.entriesDropdown.setEntries(entries);
-            displayStack = ItemStack.EMPTY;
-            registryNameField.setValue(Items.AIR.getRegistryName().toString());
-            this.entriesDropdown.trimWidthToEntries();
+            reset();
             return;
         }
 
         this.entriesDropdown.getDropdownEntries().clear();
         ArrayList<RecipeEntryEntry> list = jsonList.stream().map(RecipeEntryEntry::deserialize).collect(Collectors.toCollection(ArrayList::new));
-        list.add(new RecipeEntryEntry(true));
+        if(maxEntry > 1 || maxEntry == -1)
+            list.add(new RecipeEntryEntry(true));
         this.entriesDropdown.setEntries(list);
         this.entriesDropdown.trimWidthToEntries();
+        checkButtons();
+    }
+
+    private void reset()
+    {
+        ArrayList<RecipeEntryEntry> entries = new ArrayList<>();
+        entries.add(new RecipeEntryEntry(false));
+        if(maxEntry > 1 || maxEntry == -1)
+            entries.add(new RecipeEntryEntry(true));
+        this.entriesDropdown.getDropdownEntries().clear();
+        this.entriesDropdown.setEntries(entries);
+        displayStack = ItemStack.EMPTY;
+        registryNameField.setValue(Items.AIR.getRegistryName().toString());
+        this.entriesDropdown.trimWidthToEntries();
+        checkButtons();
+    }
+
+    protected void checkButtons()
+    {
+        this.removeEntryButton.active = entriesDropdown.getEntries().size() > 2;
+        this.resetEntriesButton.active = entriesDropdown.getDropdownEntries().stream().anyMatch(ree -> !ree.isEmpty());
+        this.registryNameField.setEntries(EntryHelper.getStringEntryListWith(isTag() ? EntryHelper.getTags() : EntryHelper.getItems(), isTag() ? SimpleListWidget.ResourceLocationEntry.Type.TAG : SimpleListWidget.ResourceLocationEntry.Type.ITEM), true);
     }
 
     public int getMaxEntry()
@@ -219,7 +258,7 @@ public class RecipeEntryWidget
         return maxEntry;
     }
 
-    public void setMaxEntry(int maxEntry)
+    public void setMaxSize(int maxEntry)
     {
         this.maxEntry = maxEntry;
     }
@@ -233,22 +272,9 @@ public class RecipeEntryWidget
 
         registryNameField.tick();
 
-        // Update message
+        // Update message counter
         if(messageCounter > 0)
-        {
             messageCounter--;
-        }
-
-        // Update data if slot is not empty
-        if(linkedSlot.hasItem() && lastStack != linkedSlot.getItem())
-        {
-            this.registryNameField.setValue(linkedSlot.getItem().getItem().getRegistryName().toString());
-            this.countField.setNumberValue(linkedSlot.getItem().getCount(), false);
-            this.chanceField.setNumberValue(1D, true);
-            this.tagCheckBox.setSelected(false);
-
-            this.lastStack = linkedSlot.getItem();
-        }
 
         // Update display stack
         if(!isTag())
@@ -281,11 +307,42 @@ public class RecipeEntryWidget
         displayStack.setCount(countField.getIntValue());
     }
 
+    public void renderTooltip(PoseStack poseStack, int mouseX, int mouseY, int screenWidth, int screenHeight)
+    {
+        List<Component> tooltip = new ArrayList<>();
+
+        tooltip.add(References.getTranslate("screen.widget.simple_list.tooltip." + (isOutput ? "output" : "input")));
+        entriesDropdown.getDropdownEntries().forEach(ree ->
+        {
+            MutableComponent base = new TextComponent(ChatFormatting.BLUE + (ree.isTag() ? "Tag" : "Item"));
+            base.append(new TextComponent(ChatFormatting.WHITE + " : "));
+            base.append(new TextComponent(ChatFormatting.DARK_AQUA + ree.getRegistryName().toString()));
+            base.append(new TextComponent(ChatFormatting.GRAY + String.format(" (x%d) ", ree.getCount())));
+            if(ree.getChance() != 1D)
+                base.append(new TextComponent(ChatFormatting.DARK_GRAY + String.format("%.1f", 100 * ree.getChance()) + "%"));
+            if(!ree.isEmpty()) tooltip.add(base);
+        });
+
+        int itemSlotX = x + 3;
+        int itemSlotY = y + height - 3 - 16;
+        if(ScreenUtils.isMouseHover(itemSlotX + 16 + 6, itemSlotY, mouseX, mouseY, 16, 16))
+            ClientUtils.getCurrentScreen().renderTooltip(poseStack, tooltip, Optional.empty(), mouseX, mouseY);
+
+        if(resetEntriesButton.isMouseOver(mouseX, mouseY))
+            ClientUtils.getCurrentScreen().renderTooltip(poseStack, Collections.singletonList(References.getTranslate("screen.widget.recipe_entry_widget.tooltip.reset")), Optional.empty(), mouseX, mouseY);
+        if(removeEntryButton.isMouseOver(mouseX, mouseY))
+            ClientUtils.getCurrentScreen().renderTooltip(poseStack, Collections.singletonList(References.getTranslate("screen.widget.recipe_entry_widget.tooltip.remove")), Optional.empty(), mouseX, mouseY);
+        if(saveEntryButton.isMouseOver(mouseX, mouseY))
+            ClientUtils.getCurrentScreen().renderTooltip(poseStack, Collections.singletonList(References.getTranslate("screen.widget.recipe_entry_widget.tooltip.save")), Optional.empty(), mouseX, mouseY);
+        if(tagCheckBox.isMouseOver(mouseX, mouseY))
+            ClientUtils.getCurrentScreen().renderTooltip(poseStack, Collections.singletonList(References.getTranslate("screen.widget.recipe_entry_widget.tooltip.tag")), Optional.empty(), mouseX, mouseY);
+    }
+
     /**
      * Show a message for a given time
      *
      * @param message The message to show
-     * @param time The time in seconds
+     * @param time    The time in seconds
      */
     private void showMessage(MutableComponent message, int time)
     {
@@ -303,27 +360,25 @@ public class RecipeEntryWidget
         Screen.fill(matrixStack, x, y, x + width, y + height, 0x88000000);
 
         // Render the current entry item
-        int itemSlotSize = 16;
-        int itemSlotX = x + 3;
-        int itemSlotY = y + height - 3 - itemSlotSize;
-        Screen.fill(matrixStack, itemSlotX, itemSlotY, itemSlotX + itemSlotSize, itemSlotY + itemSlotSize, 0x68000000);
-        ClientUtils.getItemRenderer().renderGuiItem(displayStack, itemSlotX, itemSlotY);
+        Screen.fill(matrixStack, displayStackPosX, displayStackPosY, displayStackPosX + 16, displayStackPosY + 16, 0x68000000);
+
+        ClientUtils.getItemRenderer().renderGuiItem(displayStack, displayStackPosX, displayStackPosY);
+        ClientUtils.getItemRenderer().renderGuiItem(recipeSummaryStack, displayStackPosX + 16 + 6, displayStackPosY);
         matrixStack.pushPose();
-        if(registryNameField.isFocused()) matrixStack.translate(0, 0, -300); // Minecraft renders items decorations with a z level of ~200, so we need to decrease it
-        ClientUtils.getItemRenderer().renderGuiItemDecorations(ClientUtils.getFontRenderer(), displayStack, itemSlotX, itemSlotY, null);
+        if(registryNameField.isFocused())
+            matrixStack.translate(0, 0, -300); // Minecraft renders items decorations with a z level of ~200, so we need to decrease it
+        ClientUtils.getItemRenderer().renderGuiItemDecorations(ClientUtils.getFontRenderer(), displayStack, displayStackPosX, displayStackPosY, null);
         matrixStack.popPose();
+
 
         countField.render(matrixStack, mouseX, mouseY, partialTicks);
         tagCheckBox.render(matrixStack, mouseX, mouseY, partialTicks);
         chanceField.render(matrixStack, mouseX, mouseY, partialTicks);
         removeEntryButton.render(matrixStack, mouseX, mouseY, partialTicks);
         saveEntryButton.render(matrixStack, mouseX, mouseY, partialTicks);
-        matrixStack.pushPose();
-        if(registryNameField.isFocused()) matrixStack.translate(0, 0, 300); // Minecraft renders items with a z level of ~200, so we need to render the text field on top of it
-        registryNameField.render(matrixStack, mouseX, mouseY, partialTicks);
-        matrixStack.popPose();
+        resetEntriesButton.render(matrixStack, mouseX, mouseY, partialTicks);
 
-        if(!displayStack.isEmpty() && ScreenUtils.isMouseHover(itemSlotX, itemSlotY, mouseX, mouseY, itemSlotSize, itemSlotSize))
+        if(!displayStack.isEmpty() && ScreenUtils.isMouseHover(displayStackPosX, displayStackPosY, mouseX, mouseY, 16, 16))
             ClientUtils.getCurrentScreen().renderComponentTooltip(matrixStack, ClientUtils.getCurrentScreen().getTooltipFromItem(displayStack), mouseX, mouseY);
 
         if(messageCounter > 0 && message != null)
@@ -334,7 +389,22 @@ public class RecipeEntryWidget
 
     public void renderDropdown(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
+        registryNameField.render(matrixStack, mouseX, mouseY, partialTicks);
         entriesDropdown.render(matrixStack, mouseX, mouseY, partialTicks);
+
+        ItemStack stack = ClientUtils.getClientPlayer().inventoryMenu.getCarried();
+
+        if(!stack.isEmpty())
+        {
+            // Render the item being carried because it's not rendered on top of the widget
+            // Yes, we can call that hardcoding, but it's working and it's not that bad (I think)
+            // But if you have a better solution, please tell me
+            matrixStack.pushPose();
+            matrixStack.translate(0, 0, 300); // On top of everything
+            ClientUtils.getItemRenderer().renderGuiItem(stack, mouseX - 8, mouseY - 8);
+            ClientUtils.getItemRenderer().renderGuiItemDecorations(ClientUtils.getFontRenderer(), stack, mouseX - 8, mouseY - 8, null);
+            matrixStack.popPose();
+        }
     }
 
     public void setCanUseWidget(boolean canUseWidget)
@@ -348,12 +418,31 @@ public class RecipeEntryWidget
         {
             if(!entriesDropdown.isFocused())
             {
+                if(!registryNameField.isFocused())
+                {
+                    countField.mouseClicked(mouseX, mouseY, button);
+                    tagCheckBox.mouseClicked(mouseX, mouseY, button);
+                    chanceField.mouseClicked(mouseX, mouseY, button);
+                    removeEntryButton.mouseClicked(mouseX, mouseY, button);
+                    saveEntryButton.mouseClicked(mouseX, mouseY, button);
+                    resetEntriesButton.mouseClicked(mouseX, mouseY, button);
+
+                    if(ScreenUtils.isMouseHover(displayStackPosX, displayStackPosY, (int) mouseX, (int) mouseY, 16, 16))
+                    {
+                        ItemStack stack = ClientUtils.getClientPlayer().inventoryMenu.getCarried();
+
+                        if(!stack.isEmpty())
+                        {
+                            displayStack = new ItemStack(stack.getItem());
+                            registryNameField.setValue(stack.getItem().getRegistryName().toString());
+                            countField.setNumberValue(countField.visible ? stack.getCount() : 1, false);
+                            chanceField.setNumberValue(1D, true);
+                            tagCheckBox.setSelected(false);
+                        }
+                    }
+                }
+
                 registryNameField.mouseClicked(mouseX, mouseY, button);
-                countField.mouseClicked(mouseX, mouseY, button);
-                tagCheckBox.mouseClicked(mouseX, mouseY, button);
-                chanceField.mouseClicked(mouseX, mouseY, button);
-                removeEntryButton.mouseClicked(mouseX, mouseY, button);
-                saveEntryButton.mouseClicked(mouseX, mouseY, button);
             }
 
             entriesDropdown.mouseClicked(mouseX, mouseY, button);
@@ -391,16 +480,6 @@ public class RecipeEntryWidget
     public boolean isFocused()
     {
         return entriesDropdown.isFocused() || registryNameField.isFocused() || countField.isFocused() || chanceField.isFocused();
-    }
-
-    public void setLinkedSlot(SlotItemHandler linkedSlot)
-    {
-        this.linkedSlot = linkedSlot;
-    }
-
-    public void setRecipeCreator(RecipeCreator recipeCreator)
-    {
-        this.recipeCreator = recipeCreator;
     }
 
     public boolean hasCount()
@@ -476,7 +555,10 @@ public class RecipeEntryWidget
             int yPos = 10 / 2 - 16 / 2;
             ClientUtils.getItemRenderer().renderAndDecorateFakeItem(displayStack, yPos, yPos);
             Screen.fill(pMatrixStack, pLeft, pTop, pLeft + pWidth - 4, pTop + pHeight, 0x88FFFFFF);
+            pMatrixStack.pushPose();
+            pMatrixStack.translate(0, 0, 100); // Make sure text is rendered on top of the item
             Screen.drawCenteredString(pMatrixStack, ClientUtils.getFontRenderer(), getDisplayName(pIndex), pLeft + pWidth / 2, pTop + 3, 0x000000);
+            pMatrixStack.popPose();
         }
 
         @Override
@@ -493,8 +575,7 @@ public class RecipeEntryWidget
                 if(tag.size() > 0)
                 {
                     int displayTime = 40;
-                    if(displayCounter / displayTime >= tag.size())
-                        displayCounter = 0;
+                    if(displayCounter / displayTime >= tag.size()) displayCounter = 0;
 
                     Item item = tag.stream().toList().get(displayCounter / displayTime);
                     if(item != Items.AIR && item != null)
@@ -502,8 +583,7 @@ public class RecipeEntryWidget
                         displayStack = new ItemStack(item);
                     }
 
-                    if(!Screen.hasShiftDown())
-                        displayCounter++;
+                    if(!Screen.hasShiftDown()) displayCounter++;
                 }
             }
         }

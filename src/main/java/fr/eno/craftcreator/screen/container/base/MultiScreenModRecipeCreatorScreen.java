@@ -413,7 +413,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
     protected void renderSideTitles(PoseStack matrixStack)
     {
         // Render Labels
-        MutableComponent inputLabel = References.getTranslate("screen.recipe_creator.label.input").copy().withStyle(ChatFormatting.UNDERLINE);
+        MutableComponent inputLabel = References.getTranslate("screen.recipe_creator.label.input");
         Component ouputLabel = References.getTranslate("screen.recipe_creator.label.output");
         Screen.drawString(matrixStack, this.font, inputLabel, this.imageWidth / 4 - font.width(inputLabel.getString()) / 2, 8, 0xFFFFFFFF);
         Screen.drawString(matrixStack, this.font, ouputLabel, this.imageWidth / 4 * 3 - font.width(ouputLabel.getString()) / 2, 8, 0xFFFFFFFF);
