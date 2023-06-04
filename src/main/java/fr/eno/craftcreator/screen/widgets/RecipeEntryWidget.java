@@ -1,6 +1,7 @@
 package fr.eno.craftcreator.screen.widgets;
 
 import com.google.gson.JsonObject;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.api.ClientUtils;
@@ -21,7 +22,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -142,7 +145,7 @@ public class RecipeEntryWidget
         this.registryNameField.setBlitOffset(100);
 
         // Tag Checkbox
-        this.tagCheckBox = new SimpleCheckBox(startX, startY + y * i++, 10, 10, References.getTranslate("screen.widget.recipe_entry_widget.is_tag"), new TextComponent(""), false, true, checkbox ->
+        this.tagCheckBox = new SimpleCheckBox(startX, startY + y * i++, 10, 10, References.getTranslate("screen.widget.recipe_entry_widget.tag"), new TextComponent(""), false, true, checkbox ->
         {
             this.registryNameField.setEntries(EntryHelper.getStringEntryListWith(isTag() ? EntryHelper.getTags() : EntryHelper.getItems(), isTag() ? SimpleListWidget.ResourceLocationEntry.Type.TAG : SimpleListWidget.ResourceLocationEntry.Type.ITEM), true);
             this.registryNameField.setValue("");
@@ -392,18 +395,18 @@ public class RecipeEntryWidget
         registryNameField.render(matrixStack, mouseX, mouseY, partialTicks);
         entriesDropdown.render(matrixStack, mouseX, mouseY, partialTicks);
 
-        ItemStack stack = ClientUtils.getClientPlayer().inventoryMenu.getCarried();
+        ItemStack stack = ClientUtils.getClientPlayer().containerMenu.getCarried();
 
         if(!stack.isEmpty())
         {
             // Render the item being carried because it's not rendered on top of the widget
             // Yes, we can call that hardcoding, but it's working and it's not that bad (I think)
             // But if you have a better solution, please tell me
-            matrixStack.pushPose();
-            matrixStack.translate(0, 0, 300); // On top of everything
+            RenderSystem.getModelViewStack().pushPose(); // SO FUN TO USE ANOTHER MATRIX STACK FROM ANOTHER DIMENSION
+            RenderSystem.getModelViewStack().translate(0, 0, 300); // On top of everything
             ClientUtils.getItemRenderer().renderGuiItem(stack, mouseX - 8, mouseY - 8);
             ClientUtils.getItemRenderer().renderGuiItemDecorations(ClientUtils.getFontRenderer(), stack, mouseX - 8, mouseY - 8, null);
-            matrixStack.popPose();
+            RenderSystem.getModelViewStack().popPose();
         }
     }
 
@@ -429,7 +432,7 @@ public class RecipeEntryWidget
 
                     if(ScreenUtils.isMouseHover(displayStackPosX, displayStackPosY, (int) mouseX, (int) mouseY, 16, 16))
                     {
-                        ItemStack stack = ClientUtils.getClientPlayer().inventoryMenu.getCarried();
+                        ItemStack stack = ClientUtils.getClientPlayer().containerMenu.getCarried();
 
                         if(!stack.isEmpty())
                         {

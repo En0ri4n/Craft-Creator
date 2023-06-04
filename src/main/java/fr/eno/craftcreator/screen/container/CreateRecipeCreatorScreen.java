@@ -165,8 +165,6 @@ public class CreateRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen
     @Override
     public void containerTick()
     {
-        super.tick();
-
         if(inputWidget != null)
         {
             outputWidget.setCanUseWidget(!inputWidget.isFocused());
