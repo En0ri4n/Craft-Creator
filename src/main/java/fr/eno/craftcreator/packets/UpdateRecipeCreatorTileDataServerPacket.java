@@ -1,7 +1,7 @@
 package fr.eno.craftcreator.packets;
 
 import com.google.gson.JsonObject;
-import fr.eno.craftcreator.api.ServerUtils;
+import fr.eno.craftcreator.utils.ServerUtils;
 import fr.eno.craftcreator.init.InitPackets;
 import fr.eno.craftcreator.tileentity.base.InventoryDataContainerTileEntity;
 import fr.eno.craftcreator.utils.PairValues;

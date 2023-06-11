@@ -2,7 +2,7 @@ package fr.eno.craftcreator.recipes.kubejs;
 
 import com.google.gson.*;
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.api.CommonUtils;
+import fr.eno.craftcreator.utils.CommonUtils;
 import fr.eno.craftcreator.base.ModRecipeCreatorDispatcher;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;

@@ -3,7 +3,7 @@ package fr.eno.craftcreator.recipes.base;
 import com.google.gson.*;
 import fr.eno.craftcreator.CraftCreator;
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.api.CommonUtils;
+import fr.eno.craftcreator.utils.CommonUtils;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.recipes.kubejs.KubeJSHelper;
 import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;

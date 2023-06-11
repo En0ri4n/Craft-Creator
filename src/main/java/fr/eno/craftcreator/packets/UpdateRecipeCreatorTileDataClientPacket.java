@@ -1,10 +1,10 @@
 package fr.eno.craftcreator.packets;
 
 import com.google.gson.JsonObject;
-import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.api.CommonUtils;
+import fr.eno.craftcreator.client.utils.ClientUtils;
+import fr.eno.craftcreator.utils.CommonUtils;
 import fr.eno.craftcreator.init.InitPackets;
-import fr.eno.craftcreator.screen.container.base.ModRecipeCreatorDataScreen;
+import fr.eno.craftcreator.client.screen.container.base.ModRecipeCreatorDataScreen;
 import fr.eno.craftcreator.tileentity.base.MultiScreenRecipeCreatorTile;
 import fr.eno.craftcreator.utils.CustomRunnable;
 import fr.eno.craftcreator.utils.PairValues;

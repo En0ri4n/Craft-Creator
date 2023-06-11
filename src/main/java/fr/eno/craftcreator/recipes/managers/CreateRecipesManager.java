@@ -6,7 +6,7 @@ import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.serializers.CreateRecipeSerializer;
 import fr.eno.craftcreator.recipes.utils.RecipeEntry;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
-import fr.eno.craftcreator.screen.widgets.RecipeEntryWidget;
+import fr.eno.craftcreator.recipes.utils.SpecialRecipeEntry;
 import fr.eno.craftcreator.tileentity.CreateRecipeCreatorTile;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.tileentity.TileEntity;
@@ -32,42 +32,42 @@ public class CreateRecipesManager extends BaseRecipesManager
         if(!(tileEntity instanceof CreateRecipeCreatorTile)) return;
 
         CreateRecipeCreatorTile createRecipeCreatorTile = (CreateRecipeCreatorTile) tileEntity;
-        List<RecipeEntryWidget.RecipeEntryEntry> inputs = createRecipeCreatorTile.getInputs().get(recipe.getRecipeTypeLocation().getPath()).stream().map(RecipeEntryWidget.RecipeEntryEntry::deserialize).collect(Collectors.toList());
-        List<RecipeEntryWidget.RecipeEntryEntry> outputs = createRecipeCreatorTile.getOutputs().get(recipe.getRecipeTypeLocation().getPath()).stream().map(RecipeEntryWidget.RecipeEntryEntry::deserialize).collect(Collectors.toList());
+        List<SpecialRecipeEntry> inputs = createRecipeCreatorTile.getInputs().get(recipe.getRecipeTypeLocation().getPath()).stream().map(SpecialRecipeEntry::deserialize).collect(Collectors.toList());
+        List<SpecialRecipeEntry> outputs = createRecipeCreatorTile.getOutputs().get(recipe.getRecipeTypeLocation().getPath()).stream().map(SpecialRecipeEntry::deserialize).collect(Collectors.toList());
 
         if(recipe.is(CRUSHING))
-            serializeCrushingRecipe(inputs, outputs, recipeInfos, serializerType);
+            serializeCrushingRecipe(inputs, outputs, recipeInfos);
         else if(recipe.is(CUTTING))
-            serializeCuttingRecipe(inputs, outputs, recipeInfos, serializerType);
+            serializeCuttingRecipe(inputs, outputs, recipeInfos);
     }
 
-    public RecipeEntry.MultiInput getValidInputs(List<RecipeEntryWidget.RecipeEntryEntry> inputs)
+    public RecipeEntry.MultiInput getValidInputs(List<SpecialRecipeEntry> inputs)
     {
         RecipeEntry.MultiInput multiInput = new RecipeEntry.MultiInput();
-        inputs.forEach(ree -> multiInput.add(new RecipeEntry.Input(ree.isTag(), ree.getRegistryName(), ree.getCount())));
+        inputs.forEach(sre -> multiInput.add(new RecipeEntry.Input(sre.isTag(), sre.getRegistryName(), sre.getCount())));
         return multiInput;
     }
 
-    public RecipeEntry.MultiOutput getValidOutputs(List<RecipeEntryWidget.RecipeEntryEntry> outputs)
+    public RecipeEntry.MultiOutput getValidOutputs(List<SpecialRecipeEntry> outputs)
     {
         RecipeEntry.MultiOutput multiOutput = new RecipeEntry.MultiOutput();
-        outputs.forEach(ree -> multiOutput.add(new RecipeEntry.LuckedOutput(ree.getRegistryName(), ree.getCount(), ree.getChance())));
+        outputs.forEach(sre -> multiOutput.add(new RecipeEntry.LuckedOutput(sre.getRegistryName(), sre.getCount(), sre.getChance())));
         return multiOutput;
     }
 
-    protected boolean areEmpty(List<RecipeEntryWidget.RecipeEntryEntry> inputs, List<RecipeEntryWidget.RecipeEntryEntry> outputs)
+    protected boolean areEmpty(List<SpecialRecipeEntry> inputs, List<SpecialRecipeEntry> outputs)
     {
         boolean hasNoInput = true;
         boolean hasNoOutput = true;
 
-        for(RecipeEntryWidget.RecipeEntryEntry input : inputs)
+        for(SpecialRecipeEntry input : inputs)
             if(!input.isEmpty())
             {
                 hasNoInput = false;
                 break;
             }
 
-        for(RecipeEntryWidget.RecipeEntryEntry output : outputs)
+        for(SpecialRecipeEntry output : outputs)
             if(!output.isEmpty())
             {
                 hasNoOutput = false;
@@ -77,7 +77,7 @@ public class CreateRecipesManager extends BaseRecipesManager
         return hasNoInput || hasNoOutput;
     }
 
-    private void serializeCrushingRecipe(List<RecipeEntryWidget.RecipeEntryEntry> inputs, List<RecipeEntryWidget.RecipeEntryEntry> outputs, RecipeInfos recipeInfos, ModRecipeSerializer.SerializerType serializerType)
+    private void serializeCrushingRecipe(List<SpecialRecipeEntry> inputs, List<SpecialRecipeEntry> outputs, RecipeInfos recipeInfos)
     {
         if(areEmpty(inputs, outputs)) return;
 
@@ -85,10 +85,10 @@ public class CreateRecipesManager extends BaseRecipesManager
         RecipeEntry.MultiOutput output = getValidOutputs(outputs);
         int processingTime = recipeInfos.getValue("processing_time").intValue();
 
-        CreateRecipeSerializer.get().serializeCrushingRecipe(input, output, processingTime, serializerType);
+        CreateRecipeSerializer.get().serializeCrushingRecipe(input, output, processingTime);
     }
 
-    private void serializeCuttingRecipe(List<RecipeEntryWidget.RecipeEntryEntry> inputs, List<RecipeEntryWidget.RecipeEntryEntry> outputs, RecipeInfos recipeInfos, ModRecipeSerializer.SerializerType serializerType)
+    private void serializeCuttingRecipe(List<SpecialRecipeEntry> inputs, List<SpecialRecipeEntry> outputs, RecipeInfos recipeInfos)
     {
         if(areEmpty(inputs, outputs)) return;
 
@@ -96,7 +96,7 @@ public class CreateRecipesManager extends BaseRecipesManager
         RecipeEntry.MultiOutput output = getValidOutputs(outputs);
         int processingTime = recipeInfos.getValue("processing_time").intValue();
 
-        CreateRecipeSerializer.get().serializeCuttingRecipe(input, output, processingTime, serializerType);
+        CreateRecipeSerializer.get().serializeCuttingRecipe(input, output, processingTime);
     }
 
     public static CreateRecipesManager get()

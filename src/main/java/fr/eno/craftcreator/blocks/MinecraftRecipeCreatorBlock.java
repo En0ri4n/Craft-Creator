@@ -1,6 +1,5 @@
 package fr.eno.craftcreator.blocks;
 
-import fr.eno.craftcreator.api.BlockUtils;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.tileentity.MinecraftRecipeCreatorTile;
 import net.minecraft.block.BlockState;
@@ -47,7 +46,7 @@ public class MinecraftRecipeCreatorBlock extends RecipeCreatorBlock
     @Override
     public ActionResultType use(@Nonnull BlockState state, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull PlayerEntity playerIn, @Nonnull Hand handIn, @Nonnull BlockRayTraceResult hit)
     {
-        return BlockUtils.openMenu(SupportedMods.MINECRAFT, worldIn, pos, playerIn, MinecraftRecipeCreatorTile.class);
+        return openMenu(SupportedMods.MINECRAFT, worldIn, pos, playerIn, MinecraftRecipeCreatorTile.class);
     }
 
     @Override

@@ -21,7 +21,7 @@ public class CreateRecipeSerializer extends ModRecipeSerializer
         super(SupportedMods.CREATE);
     }
 
-    public void serializeCrushingRecipe(RecipeEntry.MultiInput input, RecipeEntry.MultiOutput output, int processingTime, SerializerType serializerType)
+    public void serializeCrushingRecipe(RecipeEntry.MultiInput input, RecipeEntry.MultiOutput output, int processingTime)
     {
         JsonObject obj = createBaseJson(AllRecipeTypes.CRUSHING.getType());
 
@@ -32,7 +32,7 @@ public class CreateRecipeSerializer extends ModRecipeSerializer
         addRecipeTo(obj, AllRecipeTypes.CRUSHING.getType(), output.getOneOutput().getRegistryName());
     }
 
-    public void serializeCuttingRecipe(RecipeEntry.MultiInput input, RecipeEntry.MultiOutput output, int processingTime, SerializerType serializerType)
+    public void serializeCuttingRecipe(RecipeEntry.MultiInput input, RecipeEntry.MultiOutput output, int processingTime)
     {
         JsonObject obj = createBaseJson(AllRecipeTypes.CUTTING.getType());
 
@@ -41,6 +41,17 @@ public class CreateRecipeSerializer extends ModRecipeSerializer
         obj.addProperty("processingTime", processingTime);
 
         addRecipeTo(obj, AllRecipeTypes.CUTTING.getType(), output.getOneOutput().getRegistryName());
+    }
+
+    public void serializeCompactingRecipe(RecipeEntry.MultiInput input, RecipeEntry.MultiOutput output, int processingTime)
+    {
+        JsonObject obj = createBaseJson(AllRecipeTypes.COMPACTING.getType());
+
+        obj.add("ingredients", getInputArray(input.get(0))); // Only one ingredient is allowed
+        obj.add("results", getResultArray(output));
+        obj.addProperty("processingTime", processingTime);
+
+        addRecipeTo(obj, AllRecipeTypes.COMPACTING.getType(), output.getOneOutput().getRegistryName());
     }
 
     @Override

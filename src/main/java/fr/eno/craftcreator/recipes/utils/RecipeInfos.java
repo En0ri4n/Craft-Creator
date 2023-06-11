@@ -1,7 +1,7 @@
 package fr.eno.craftcreator.recipes.utils;
 
 import com.google.gson.*;
-import fr.eno.craftcreator.api.CommonUtils;
+import fr.eno.craftcreator.utils.CommonUtils;
 import fr.eno.craftcreator.utils.JsonSerializable;
 import net.minecraft.util.ResourceLocation;
 

@@ -1,7 +1,8 @@
 package fr.eno.craftcreator.utils;
 
-import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.screen.widgets.SimpleListWidget;
+import fr.eno.craftcreator.client.utils.ClientUtils;
+import fr.eno.craftcreator.recipes.utils.EntryType;
+import fr.eno.craftcreator.client.screen.widgets.SimpleListWidget;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.tags.ItemTags;
@@ -32,7 +33,7 @@ public class EntryHelper
         return entries;
     }
 
-    public static <T extends SimpleListWidget.Entry> List<T> getStringEntryListWith(List<ResourceLocation> list, SimpleListWidget.ResourceLocationEntry.Type type)
+    public static <T extends SimpleListWidget.Entry> List<T> getStringEntryListWith(List<ResourceLocation> list, EntryType type)
     {
         List<T> entries = new ArrayList<>();
 
@@ -44,6 +45,11 @@ public class EntryHelper
     public static List<ResourceLocation> getItems()
     {
         return ForgeRegistries.ITEMS.getValues().stream().map(ForgeRegistryEntry::getRegistryName).collect(Collectors.toList());
+    }
+
+    public static List<ResourceLocation> getFluids()
+    {
+        return ForgeRegistries.FLUIDS.getValues().stream().map(ForgeRegistryEntry::getRegistryName).collect(Collectors.toList());
     }
 
     public static List<String> getMods()

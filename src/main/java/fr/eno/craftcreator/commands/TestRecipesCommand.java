@@ -4,7 +4,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
-import fr.eno.craftcreator.api.ServerUtils;
+import fr.eno.craftcreator.utils.ServerUtils;
 import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;

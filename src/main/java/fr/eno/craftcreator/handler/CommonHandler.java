@@ -1,8 +1,8 @@
 package fr.eno.craftcreator.handler;
 
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.api.CommonUtils;
+import fr.eno.craftcreator.client.utils.ClientUtils;
+import fr.eno.craftcreator.utils.CommonUtils;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.event.entity.player.PlayerEvent;

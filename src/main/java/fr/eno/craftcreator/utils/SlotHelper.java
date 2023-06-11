@@ -1,6 +1,5 @@
 package fr.eno.craftcreator.utils;
 
-import fr.eno.craftcreator.api.CommonUtils;
 import fr.eno.craftcreator.container.slot.utils.DefinedPositionnedSlot;
 import fr.eno.craftcreator.container.slot.utils.PositionnedSlot;
 import net.minecraft.block.Block;

@@ -1,7 +1,7 @@
 package fr.eno.craftcreator.base;
 
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.api.CommonUtils;
+import fr.eno.craftcreator.utils.CommonUtils;
 import fr.eno.craftcreator.container.slot.utils.PositionnedSlot;
 import fr.eno.craftcreator.utils.FormattableString;
 import net.minecraft.inventory.IInventory;

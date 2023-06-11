@@ -1,7 +1,7 @@
 package fr.eno.craftcreator.jei;
 
 import fr.eno.craftcreator.container.base.CommonContainer;
-import fr.eno.craftcreator.screen.container.base.MultiScreenModRecipeCreatorScreen;
+import fr.eno.craftcreator.client.screen.container.base.MultiScreenModRecipeCreatorScreen;
 import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import net.minecraft.client.renderer.Rectangle2d;
 

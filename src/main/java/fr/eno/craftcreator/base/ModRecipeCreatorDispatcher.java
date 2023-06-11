@@ -1,6 +1,6 @@
 package fr.eno.craftcreator.base;
 
-import fr.eno.craftcreator.api.CommonUtils;
+import fr.eno.craftcreator.utils.CommonUtils;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.serializers.BotaniaRecipeSerializer;
 import fr.eno.craftcreator.recipes.serializers.CreateRecipeSerializer;

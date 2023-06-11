@@ -1,14 +1,14 @@
 package fr.eno.craftcreator;
 
-import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.client.utils.ClientUtils;
 import fr.eno.craftcreator.commands.TestRecipesCommand;
 import fr.eno.craftcreator.init.*;
 import fr.eno.craftcreator.recipes.kubejs.KubeJSManager;
-import fr.eno.craftcreator.screen.container.BotaniaRecipeCreatorScreen;
-import fr.eno.craftcreator.screen.container.CreateRecipeCreatorScreen;
-import fr.eno.craftcreator.screen.container.MinecraftRecipeCreatorScreen;
-import fr.eno.craftcreator.screen.container.ThermalRecipeCreatorScreen;
-import fr.eno.craftcreator.utils.ClientDispatcher;
+import fr.eno.craftcreator.client.screen.container.BotaniaRecipeCreatorScreen;
+import fr.eno.craftcreator.client.screen.container.CreateRecipeCreatorScreen;
+import fr.eno.craftcreator.client.screen.container.MinecraftRecipeCreatorScreen;
+import fr.eno.craftcreator.client.screen.container.ThermalRecipeCreatorScreen;
+import fr.eno.craftcreator.client.ClientDispatcher;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;

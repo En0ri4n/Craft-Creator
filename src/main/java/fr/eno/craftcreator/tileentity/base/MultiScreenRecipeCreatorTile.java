@@ -1,6 +1,6 @@
 package fr.eno.craftcreator.tileentity.base;
 
-import fr.eno.craftcreator.api.CommonUtils;
+import fr.eno.craftcreator.utils.CommonUtils;
 import fr.eno.craftcreator.base.ModRecipeCreators;
 import fr.eno.craftcreator.base.SupportedMods;
 import net.minecraft.block.BlockState;

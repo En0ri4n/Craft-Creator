@@ -2,7 +2,7 @@ package fr.eno.craftcreator.recipes.utils;
 
 import com.google.gson.*;
 import fr.eno.craftcreator.CraftCreator;
-import fr.eno.craftcreator.api.CommonUtils;
+import fr.eno.craftcreator.utils.CommonUtils;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.utils.PairValues;
 import fr.eno.craftcreator.utils.Utils;

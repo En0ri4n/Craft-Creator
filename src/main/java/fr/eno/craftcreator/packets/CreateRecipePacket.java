@@ -1,7 +1,7 @@
 package fr.eno.craftcreator.packets;
 
-import fr.eno.craftcreator.api.CommonUtils;
-import fr.eno.craftcreator.api.ServerUtils;
+import fr.eno.craftcreator.utils.CommonUtils;
+import fr.eno.craftcreator.utils.ServerUtils;
 import fr.eno.craftcreator.base.ModRecipeCreators;
 import fr.eno.craftcreator.base.RecipeCreator;
 import fr.eno.craftcreator.base.RecipeManagerDispatcher;

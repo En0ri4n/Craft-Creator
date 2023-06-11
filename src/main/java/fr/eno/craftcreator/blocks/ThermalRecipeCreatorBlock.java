@@ -1,6 +1,5 @@
 package fr.eno.craftcreator.blocks;
 
-import fr.eno.craftcreator.api.BlockUtils;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.tileentity.ThermalRecipeCreatorTile;
 import net.minecraft.block.BlockState;
@@ -25,7 +24,7 @@ public class ThermalRecipeCreatorBlock extends RecipeCreatorBlock
     @Override
     public ActionResultType use(@Nonnull BlockState state, @Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull PlayerEntity playerIn, @Nonnull Hand handIn, @Nonnull BlockRayTraceResult hit)
     {
-        return BlockUtils.openMenu(SupportedMods.THERMAL, worldIn, pos, playerIn, ThermalRecipeCreatorTile.class);
+        return openMenu(SupportedMods.THERMAL, worldIn, pos, playerIn, ThermalRecipeCreatorTile.class);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package fr.eno.craftcreator.packets;
 
-import fr.eno.craftcreator.api.ClientUtils;
+import fr.eno.craftcreator.client.utils.ClientUtils;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.init.InitPackets;
 import net.minecraft.network.PacketBuffer;

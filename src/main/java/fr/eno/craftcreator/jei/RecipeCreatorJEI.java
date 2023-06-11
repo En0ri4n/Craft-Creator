@@ -1,11 +1,11 @@
 package fr.eno.craftcreator.jei;
 
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.screen.container.BotaniaRecipeCreatorScreen;
-import fr.eno.craftcreator.screen.container.CreateRecipeCreatorScreen;
-import fr.eno.craftcreator.screen.container.MinecraftRecipeCreatorScreen;
-import fr.eno.craftcreator.screen.container.ThermalRecipeCreatorScreen;
-import fr.eno.craftcreator.screen.container.base.MultiScreenModRecipeCreatorScreen;
+import fr.eno.craftcreator.client.screen.container.BotaniaRecipeCreatorScreen;
+import fr.eno.craftcreator.client.screen.container.CreateRecipeCreatorScreen;
+import fr.eno.craftcreator.client.screen.container.MinecraftRecipeCreatorScreen;
+import fr.eno.craftcreator.client.screen.container.ThermalRecipeCreatorScreen;
+import fr.eno.craftcreator.client.screen.container.base.MultiScreenModRecipeCreatorScreen;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.gui.handlers.IGuiContainerHandler;
