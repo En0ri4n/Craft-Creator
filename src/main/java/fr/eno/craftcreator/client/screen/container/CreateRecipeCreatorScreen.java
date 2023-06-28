@@ -48,7 +48,7 @@ public class CreateRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen
     {
         int gapX = 10;
         int gapY = 22;
-        int widgetHeight = 110;
+        int widgetHeight = 111;
         int widgetWidth = imageWidth / 2 - 2 * gapX;
 
         addWidget(inputWidget = new RecipeEntryWidget(getCurrentRecipe(), tilePos,  leftPos + gapX, topPos + gapY, widgetWidth, widgetHeight, false, -1));

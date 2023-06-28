@@ -33,8 +33,7 @@
 	"craftcreator.screen.widget.dropdown_list.entry.reset": "Reset!",
 	"craftcreator.screen.widget.dropdown_list.entry.name": "%s ▼",
 
-	"craftcreator.screen.widget.recipe_entry_widget.tag": "Is Tag ?",
-	"craftcreator.screen.widget.recipe_entry_widget.tooltip.tag": "Check if you want a Tag instead of an Item",
+	"craftcreator.screen.widget.recipe_entry_widget.tooltip.type": "Type of the entry",
 	"craftcreator.screen.widget.recipe_entry_widget.tooltip.reset": "Clear all entries",
 	"craftcreator.screen.widget.recipe_entry_widget.tooltip.save": "Save the current entry",
 	"craftcreator.screen.widget.recipe_entry_widget.tooltip.remove": "Remove the current entry",

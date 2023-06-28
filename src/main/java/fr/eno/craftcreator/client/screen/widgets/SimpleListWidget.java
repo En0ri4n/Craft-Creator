@@ -109,7 +109,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
     @Override
     protected int getScrollbarPosition()
     {
-        return this.x1;
+        return this.x1 - this.scrollBarWidth;
     }
 
     @Override
@@ -131,14 +131,9 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
 
         // Render background
         ClientUtils.bindTexture(getBackgroundTile());
-        ClientUtils.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        int alpha = 100;
-        bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-        bufferbuilder.vertex(this.x0, this.y1, 0.0D).uv((float) this.x0 / 32.0F, (float) (this.y1 + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, alpha).endVertex();
-        bufferbuilder.vertex(this.x1, this.y1, 0.0D).uv((float) this.x1 / 32.0F, (float) (this.y1 + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, alpha).endVertex();
-        bufferbuilder.vertex(this.x1, this.y0, 0.0D).uv((float) this.x1 / 32.0F, (float) (this.y0 + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, alpha).endVertex();
-        bufferbuilder.vertex(this.x0, this.y0, 0.0D).uv((float) this.x0 / 32.0F, (float) (this.y0 + (int) this.getScrollAmount()) / 32.0F).color(32, 32, 32, alpha).endVertex();
-        tesselator.end();
+        float dark = 0.2F;
+        ClientUtils.color4f(dark, dark, dark, 1.0F);
+        Screen.blit(pPoseStack, this.x0, this.y0, 0, 0, x1 - x0, y1 - y0, 16, 16);
 
         int rowLeft = this.getRowLeft();
         int k = this.y0 + 4 - (int) this.getScrollAmount();
@@ -182,9 +177,9 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         int maxWidth = ClientUtils.getCurrentScreen().width - x0;
         int maxEntryWidth = ClientUtils.getBiggestStringWidth(getEntries().stream().map(Entry::getEntryValue).collect(Collectors.toList()));
         this.width = Math.min(maxWidth, Math.max(width, maxEntryWidth));
-        this.x1 = this.x0 + this.width;
+        this.x1 = this.x0 + this.width + scrollBarWidth;
 
-        this.y1 = y0 + Math.min(getEntries().size(), MAX_ITEMS_DISPLAYED) * itemHeight;
+        this.y1 = y0 + Math.min(getEntries().size(), MAX_ITEMS_DISPLAYED) * itemHeight + 4;
     }
 
     protected void renderList(@Nonnull MatrixStack matrixStack, int x, int y, int mouseX, int mouseY, float partialTicks)
@@ -197,12 +192,13 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         {
             int rowTop = this.getRowTop(itemIndex);
             int rowBottom = this.getRowTop(itemIndex) + this.itemHeight;
-            if(rowBottom >= this.y0 + this.itemHeight && rowTop <= this.y1 - this.itemHeight)
+
+            if(rowTop >= this.y0 && rowBottom <= this.y1)
             {
-                int i1 = y + itemIndex * this.itemHeight + this.headerHeight;
-                int j1 = this.itemHeight - 4;
+                int innerHeight = this.itemHeight - 4;
                 Entry entry = this.getEntry(itemIndex);
                 int rowWidth = this.getRowWidth();
+
                 if(canHaveSelected && this.isSelectedItem(itemIndex))
                 {
                     int l1 = this.x0 + this.width / 2 - rowWidth / 2;
@@ -211,23 +207,23 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
                     float f = this.isFocused() ? 1.0F : 0.5F;
                     ClientUtils.color4f(f, f, f, 1.0F);
                     bufferbuilder.begin(7, DefaultVertexFormats.POSITION);
-                    bufferbuilder.vertex(l1, (i1 + j1 + 2), 0.0D).endVertex();
-                    bufferbuilder.vertex(i2, (i1 + j1 + 2), 0.0D).endVertex();
-                    bufferbuilder.vertex(i2, (i1 - 2), 0.0D).endVertex();
-                    bufferbuilder.vertex(l1, (i1 - 2), 0.0D).endVertex();
+                    bufferbuilder.vertex(l1, (rowTop + innerHeight + 2), 0.0D).endVertex();
+                    bufferbuilder.vertex(i2, (rowTop + innerHeight + 2), 0.0D).endVertex();
+                    bufferbuilder.vertex(i2, (rowTop - 2), 0.0D).endVertex();
+                    bufferbuilder.vertex(l1, (rowTop - 2), 0.0D).endVertex();
                     tesselator.end();
                     ClientUtils.color4f(0.0F, 0.0F, 0.0F, 1.0F);
                     bufferbuilder.begin(7, DefaultVertexFormats.POSITION);
-                    bufferbuilder.vertex((l1 + 1), (i1 + j1 + 1), 0.0D).endVertex();
-                    bufferbuilder.vertex((i2 - 1), (i1 + j1 + 1), 0.0D).endVertex();
-                    bufferbuilder.vertex((i2 - 1), (i1 - 1), 0.0D).endVertex();
-                    bufferbuilder.vertex((l1 + 1), (i1 - 1), 0.0D).endVertex();
+                    bufferbuilder.vertex((l1 + 1), (rowTop + innerHeight + 1), 0.0D).endVertex();
+                    bufferbuilder.vertex((i2 - 1), (rowTop + innerHeight + 1), 0.0D).endVertex();
+                    bufferbuilder.vertex((i2 - 1), (rowTop - 1), 0.0D).endVertex();
+                    bufferbuilder.vertex((l1 + 1), (rowTop - 1), 0.0D).endVertex();
                     tesselator.end();
                     RenderSystem.enableTexture();
                 }
 
                 int rowLeft = this.getRowLeft();
-                entry.render(matrixStack, itemIndex, rowTop, rowLeft, rowWidth, j1, mouseX, mouseY, Objects.equals(this.hoveredEntry, entry) && canDisplayTooltips, partialTicks);
+                entry.render(matrixStack, itemIndex, rowTop, rowLeft, rowWidth, innerHeight, mouseX, mouseY, Objects.equals(this.hoveredEntry, entry) && canDisplayTooltips, partialTicks);
             }
         }
     }

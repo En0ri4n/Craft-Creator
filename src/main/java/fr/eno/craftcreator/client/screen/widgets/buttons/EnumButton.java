@@ -33,10 +33,13 @@ public class EnumButton<T extends Translatable> extends Button
     @Override
     public boolean mouseClicked(double pMouseX, double pMouseY, int pButton)
     {
-        if(visible && active && isMouseOver(pMouseX, pMouseY) && pButton == 0)
+        if(clicked(pMouseX, pMouseY) && pButton == 0)
+        {
             increaseIndex();
+            return super.mouseClicked(pMouseX, pMouseY, pButton);
+        }
 
-        return super.mouseClicked(pMouseX, pMouseY, pButton);
+        return false;
     }
 
     public T getSelected()

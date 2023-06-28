@@ -34,7 +34,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends S
 
     public DropdownListWidget(int x, int y, int width, int height, int itemHeight, ArrayList<T> entries, Consumer<T> onSelected)
     {
-        super(x, y + height, width, (Math.min(entries.size(), MAX_ITEMS_DISPLAYED)) * itemHeight, itemHeight, 0, 4, new StringTextComponent(""), null, false);
+        super(x, y + height, width, (Math.min(entries.size(), MAX_ITEMS_DISPLAYED)) * (itemHeight) + 4, itemHeight, 0, 4, new StringTextComponent(""), null, false);
         this.setEntries(entries);
         this.dropdownSelected = entries.get(0);
         this.dropdownFieldX = x;
@@ -213,7 +213,7 @@ public class DropdownListWidget<T extends DropdownListWidget.Entry<?>> extends S
             int color = 0xFFFFFF;
             if(hovered)
             {
-                color = 0xf2c3a942;
+                color = 0xFFc3a942;
             }
 
             fill(matrixStack, left, top, left + width - 3, top + itemHeight, 0xFF000000);

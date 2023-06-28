@@ -48,7 +48,6 @@ public class RecipeEntryWidget extends Widget
     private final boolean isOutput;
     private int maxEntry;
     private boolean hasCount;
-    private boolean hasTag;
     private boolean hasChance;
 
     private RecipeCreator recipeCreator;
@@ -89,7 +88,6 @@ public class RecipeEntryWidget extends Widget
         this.isOutput = isOutput;
         this.maxEntry = maxEntry;
         this.hasCount = true;
-        this.hasTag = true;
         this.hasChance = true;
         init();
     }
@@ -134,13 +132,13 @@ public class RecipeEntryWidget extends Widget
         // Registry Name Text Field
         this.registryNameField = new SuggesterTextFieldWidget(startX, startY + y * i++, width - 2 * gapX, 16, EntryHelper.getStringEntryListWith(EntryHelper.getItems(), EntryType.ITEM), null, (newValue) ->
         {
-            this.saveEntryButton.active = CommonUtils.getItem(CommonUtils.parse(newValue)) != Items.AIR || !CommonUtils.getTag(CommonUtils.parse(newValue)).getValues().isEmpty();
+            this.saveEntryButton.active = CommonUtils.getItem(CommonUtils.parse(newValue)) != Items.AIR || CommonUtils.getFluid(CommonUtils.parse(newValue)) != null || !CommonUtils.getTag(CommonUtils.parse(newValue)).getValues().isEmpty();
         });
         this.registryNameField.setVisible(true);
         this.registryNameField.setBlitOffset(100);
 
         // Tag Checkbox
-        this.typeButton = new EnumButton<>(Arrays.asList(EntryType.ITEM, EntryType.TAG, EntryType.FLUID), startX, startY + y * i++, 50, 15, References.getTranslate("screen.widget.recipe_entry_widget.tag"), button ->
+        this.typeButton = new EnumButton<>(Arrays.asList(EntryType.ITEM, EntryType.TAG, EntryType.FLUID), startX, startY + y * i++, 50, 15, References.getTranslate("screen.widget.recipe_entry_widget.type"), button ->
         {
             this.registryNameField.setEntries(EntryHelper.getStringEntryListWith(getEntries(), getType()), true);
             this.countField.setMessage(new StringTextComponent(getType() == EntryType.FLUID ? "Amount :" : "Count :"));
@@ -153,13 +151,13 @@ public class RecipeEntryWidget extends Widget
         int fieldsWidth = 40;
 
         // Count Text Field
-        this.countField = new NumberDataFieldWidget(startX + width - fieldsWidth - gapX * 2, startY + (y = 14 + 3) * i++, fieldsWidth, 12, new StringTextComponent("Count :"), 1, false);
+        this.countField = new NumberDataFieldWidget(startX + width - fieldsWidth - gapX * 2, startY + (y = 14 + 4) * i++, fieldsWidth, 12, new StringTextComponent("Count :"), 1, false);
 
         // Chance Text Field
         this.chanceField = new NumberDataFieldWidget(startX + width - fieldsWidth - gapX * 2, startY + y * i++, fieldsWidth, 12, new StringTextComponent("Chance :"), 1D, true);
 
         // Remove button
-        this.removeEntryButton = new IconButton(x + width - 21, startY + height - 24, References.getLoc("textures/gui/icons/trash_can.png"), 16, 16, 16, 48, b ->
+        this.removeEntryButton = new IconButton(x + width - 21 - 21, startY + height - 24, References.getLoc("textures/gui/icons/trash_can.png"), 16, 16, 16, 48, b ->
         {
             if(entriesDropdown.getEntries().size() > 2)
             {
@@ -172,7 +170,7 @@ public class RecipeEntryWidget extends Widget
         });
 
         // Save Button
-        this.saveEntryButton = new IconButton(x + width - 21 - 21, startY + height - 24, References.getLoc("textures/gui/icons/save.png"), 16, 16, 16, 48, b ->
+        this.saveEntryButton = new IconButton(x + width - 21 - 21 - 21, startY + height - 24, References.getLoc("textures/gui/icons/save.png"), 16, 16, 16, 48, b ->
         {
             this.entriesDropdown.getDropdownSelected().set(CommonUtils.parse(registryNameField.getValue()), countField.getIntValue(), typeButton.getSelected(), chanceField.getDoubleValue());
             this.entriesDropdown.trimWidthToEntries();
@@ -181,7 +179,7 @@ public class RecipeEntryWidget extends Widget
             checkButtons();
         });
 
-        this.resetEntriesButton = new IconButton(x + width - 21 - 21 - 21, startY + height - 24, References.getLoc("textures/gui/icons/cross.png"), 16, 16, 16, 48, b ->
+        this.resetEntriesButton = new IconButton(x + width - 21, startY + height - 24, References.getLoc("textures/gui/icons/cross.png"), 16, 16, 16, 48, b ->
         {
             reset();
             showMessage(References.getTranslate("screen.widget.dropdown_list.entry.reset").withStyle(TextFormatting.RED), 2);
@@ -298,11 +296,15 @@ public class RecipeEntryWidget extends Widget
             messageCounter--;
 
         // Update display stack
-        if(!getType().equals(EntryType.TAG))
+        if(getType().isItem())
         {
             displayStack = new ItemStack(CommonUtils.getItem(CommonUtils.parse(registryNameField.getValue())));
         }
-        else
+        else if(getType().isFluid())
+        {
+            displayStack = new ItemStack(CommonUtils.getFluid(CommonUtils.parse(registryNameField.getValue())).getBucket());
+        }
+        else if(getType().isTag())
         {
             ITag<Item> tag = CommonUtils.getTag(CommonUtils.parse(registryNameField.getValue()));
 
@@ -338,11 +340,12 @@ public class RecipeEntryWidget extends Widget
             IFormattableTextComponent base = new StringTextComponent(TextFormatting.BLUE + (rse.getRecipeEntry().isTag() ? "Tag" : rse.getRecipeEntry().isItem() ? "Item": "Fluid"));
             base.append(new StringTextComponent(TextFormatting.WHITE + " : "));
             base.append(new StringTextComponent(TextFormatting.DARK_AQUA + rse.getRegistryName().toString()));
-            base.append(new StringTextComponent(TextFormatting.GRAY + String.format(" (x%d) ", rse.getCount())));
+            base.append(new StringTextComponent(TextFormatting.GRAY + String.format(getType().isFluid() ? " (%dmb) " : " (x%d) ", rse.getCount())));
             if(rse.getChance() != 1D)
                 base.append(new StringTextComponent(TextFormatting.DARK_GRAY + String.format("%.1f", 100 * rse.getChance()) + "%"));
             if(!rse.isEmpty()) tooltip.add(base);
         });
+
 
         int itemSlotX = x + 3;
         int itemSlotY = y + height - 3 - 16;
@@ -356,7 +359,7 @@ public class RecipeEntryWidget extends Widget
         if(saveEntryButton.isMouseOver(mouseX, mouseY))
             GuiUtils.drawHoveringText(poseStack, Collections.singletonList(References.getTranslate("screen.widget.recipe_entry_widget.tooltip.save")), mouseX, mouseY, screenWidth, screenHeight, -1, ClientUtils.getFontRenderer());
         if(typeButton.isMouseOver(mouseX, mouseY))
-            GuiUtils.drawHoveringText(poseStack, Collections.singletonList(References.getTranslate("screen.widget.recipe_entry_widget.tooltip.tag")), mouseX, mouseY, screenWidth, screenHeight, -1, ClientUtils.getFontRenderer());
+            GuiUtils.drawHoveringText(poseStack, Collections.singletonList(References.getTranslate("screen.widget.recipe_entry_widget.tooltip.type")), mouseX, mouseY, screenWidth, screenHeight, -1, ClientUtils.getFontRenderer());
     }
 
     /**
@@ -471,7 +474,7 @@ public class RecipeEntryWidget extends Widget
             entriesDropdown.mouseClicked(mouseX, mouseY, button);
         }
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        return true;
     }
 
     public boolean keyPressed(int keyCode, int scanCode, int modifiers)
@@ -579,7 +582,11 @@ public class RecipeEntryWidget extends Widget
             Screen.fill(pMatrixStack, pLeft, pTop, pLeft + pWidth - 4, pTop + pHeight, 0x88FFFFFF);
             pMatrixStack.pushPose();
             pMatrixStack.translate(0, 0, 100); // Make sure text is rendered on top of the item
-            Screen.drawCenteredString(pMatrixStack, ClientUtils.getFontRenderer(), getDisplayName(pIndex), pLeft + pWidth / 2, pTop + 3, 0x000000);
+            IFormattableTextComponent name = getDisplayName(pIndex);
+            if(!isLast())
+                name.append(TextFormatting.YELLOW + String.valueOf(TextFormatting.ITALIC) + " (" + (getType().isItem() || getType().isTag() ? "x" + recipeEntry.getCount() : recipeEntry.getCount() + "mb") + ")");
+
+            Screen.drawCenteredString(pMatrixStack, ClientUtils.getFontRenderer(), name, pLeft + pWidth / 2, pTop + 3, 0x000000);
             pMatrixStack.popPose();
         }
 
