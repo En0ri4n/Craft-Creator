@@ -27,15 +27,15 @@ public class MinecraftRecipeSerializer extends ModRecipeSerializer
         super(SupportedMods.MINECRAFT);
     }
 
-    public void serializeFurnaceRecipe(RecipeCreator smeltType, RecipeEntry.Input input, RecipeEntry.Output output, double experience, int cookTime)
+    public void serializeFurnaceRecipe(IRecipeType<?> smeltType, RecipeEntry.Input input, RecipeEntry.Output output, double experience, int cookTime)
     {
-        JsonObject obj = createBaseJson(smeltType.getRecipeType());
+        JsonObject obj = createBaseJson(smeltType);
         obj.add("ingredient", singletonItemJsonObject(input));
         obj.addProperty("experience", experience);
         obj.addProperty("cookingtime", cookTime);
         obj.addProperty("result", output.getRegistryName().toString());
 
-        addRecipeTo(obj, smeltType.getRecipeType(), output.getRegistryName());
+        addRecipeTo(obj, output.getRegistryName());
     }
 
     public void serializeStoneCutterRecipe(RecipeEntry.Input input, RecipeEntry.Output output)
@@ -45,7 +45,7 @@ public class MinecraftRecipeSerializer extends ModRecipeSerializer
         obj.addProperty("result", output.getRegistryName().toString());
         obj.addProperty("count", output.count());
 
-        addRecipeTo(obj, IRecipeType.STONECUTTING, output.getRegistryName());
+        addRecipeTo(obj, output.getRegistryName());
     }
 
     public void serializeSmithingRecipe(RecipeEntry.Input base, RecipeEntry.Input addition, RecipeEntry.Output output)
@@ -55,7 +55,7 @@ public class MinecraftRecipeSerializer extends ModRecipeSerializer
         obj.add("addition", singletonItemJsonObject(addition));
         obj.add("result", singletonItemJsonObject(output));
 
-        addRecipeTo(obj, IRecipeType.SMITHING, output.getRegistryName());
+        addRecipeTo(obj, output.getRegistryName());
     }
 
     public void serializeCraftingTableRecipe(ItemStack output, List<SlotItemHandler> slots, Map<Integer, ResourceLocation> taggedSlots, List<Integer> nbtSlots, boolean shaped)
@@ -86,7 +86,7 @@ public class MinecraftRecipeSerializer extends ModRecipeSerializer
         }
         obj.add("result", resultObj);
 
-        addRecipeTo(obj, IRecipeType.CRAFTING, output.getItem().getRegistryName());
+        addRecipeTo(obj, output.getItem().getRegistryName());
     }
 
     @Override

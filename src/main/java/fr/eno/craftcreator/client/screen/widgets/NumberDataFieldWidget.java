@@ -77,12 +77,26 @@ public class NumberDataFieldWidget extends TextFieldWidget
 
     public double getDoubleValue()
     {
-        return Double.parseDouble(this.getValue());
+        try
+        {
+            return Double.parseDouble(this.getValue());
+        }
+        catch(NumberFormatException e)
+        {
+            return 0D;
+        }
     }
 
     public int getIntValue()
     {
-        return Integer.parseInt(this.getValue());
+        try
+        {
+            return Integer.parseInt(this.getValue());
+        }
+        catch(NumberFormatException e)
+        {
+            return 0;
+        }
     }
 
     public void setTooltip(ITextComponent tooltip)

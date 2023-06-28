@@ -10,6 +10,7 @@ import fr.eno.craftcreator.recipes.kubejs.KubeJSModifiedRecipe;
 import fr.eno.craftcreator.recipes.utils.CraftIngredients;
 import fr.eno.craftcreator.recipes.utils.DatapackHelper;
 import fr.eno.craftcreator.recipes.utils.RecipeEntry;
+import fr.eno.craftcreator.utils.Utils;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
@@ -29,8 +30,6 @@ public abstract class ModRecipeSerializer
     private static final List<Character> TO_ESCAPE_PATTERN = Arrays.asList('$', '(', ')', '{', '}', '[', ']', '.');
     private static final List<Character> TO_ESCAPE = Collections.singletonList('"');
 
-    protected static final Gson GSON = new GsonBuilder().setLenient().create();
-
     protected final SupportedMods mod;
     protected SerializerType currentSerializeType;
 
@@ -49,13 +48,6 @@ public abstract class ModRecipeSerializer
         }
     }
 
-    public void addModifiedRecipe(KubeJSModifiedRecipe kubeJSModifiedRecipe)
-    {
-        String serializedRecipe = kubeJSModifiedRecipe.getBaseLine().format(kubeJSModifiedRecipe.getType().getDescriptor(), kubeJSModifiedRecipe.toJson());
-
-        if(!KubeJSHelper.isModifiedRecipePresent(mod, kubeJSModifiedRecipe)) KubeJSHelper.addModifiedRecipe(this.mod, serializedRecipe);
-    }
-
     public static void removeModifiedRecipe(SupportedMods mod, KubeJSModifiedRecipe recipe)
     {
         KubeJSHelper.removeModifiedRecipe(mod, recipe);
@@ -66,17 +58,18 @@ public abstract class ModRecipeSerializer
      * Send a feedback to the player with the result of the operation
      *
      * @param recipeJson the json of the recipe
-     * @param recipeType the type of the recipe
      * @param result     the result of the recipe (the id most of the time)
      */
-    protected void addRecipeTo(JsonObject recipeJson, IRecipeType<?> recipeType, ResourceLocation result)
+    protected void addRecipeTo(JsonObject recipeJson, ResourceLocation result)
     {
         Feedback feedback;
+
+        IRecipeType<?> recipeType = CommonUtils.getRecipeTypeByName(CommonUtils.parse(recipeJson.get("type").getAsString()));
 
         switch(currentSerializeType)
         {
             case KUBE_JS:
-                feedback = KubeJSHelper.addRecipeToFile(this.mod, recipeType, KubeJSModifiedRecipe.BASE_LINE.format(KubeJSModifiedRecipe.KubeJSModifiedRecipeType.CUSTOM, GSON.toJson(recipeJson)));
+                feedback = KubeJSHelper.addRecipeToFile(this.mod, recipeType, KubeJSModifiedRecipe.BASE_LINE.format(KubeJSModifiedRecipe.KubeJSModifiedRecipeType.CUSTOM, Utils.GSON.toJson(recipeJson)));
                 break;
             default:
             case MINECRAFT_DATAPACK:
@@ -248,7 +241,7 @@ public abstract class ModRecipeSerializer
      * @return the JsonArray of the given inputs or outputs
      * @see #singletonItemJsonObject(RecipeEntry)
      */
-    protected <T extends RecipeEntry> JsonArray listWithSingletonItems(RecipeEntry.MultiEntry<T> multiEntry)
+    protected <T extends RecipeEntry> JsonArray listWithSingletonEntries(RecipeEntry.MultiEntry<T> multiEntry)
     {
         JsonArray array = new JsonArray();
         multiEntry.getEntries().forEach(recipeEntry -> array.add(singletonItemJsonObject(recipeEntry)));

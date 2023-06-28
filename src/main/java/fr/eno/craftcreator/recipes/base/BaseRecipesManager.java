@@ -3,6 +3,8 @@ package fr.eno.craftcreator.recipes.base;
 import fr.eno.craftcreator.base.RecipeCreator;
 import fr.eno.craftcreator.recipes.utils.RecipeEntry;
 import fr.eno.craftcreator.recipes.utils.RecipeInfos;
+import fr.eno.craftcreator.recipes.utils.SpecialRecipeEntry;
+import fr.eno.craftcreator.utils.CommonUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.fluid.Fluid;
@@ -256,5 +258,78 @@ public abstract class BaseRecipesManager
     	}
 
     	return Fluids.EMPTY;
+    }
+
+    // FLAT RECIPE CREATORS //
+
+    public RecipeEntry.Input getInput(SpecialRecipeEntry input)
+    {
+        if(input.isFluid())
+            return new RecipeEntry.FluidInput(CommonUtils.getFluid(input.getRegistryName()), input.getCount());
+        else
+            return new RecipeEntry.Input(input.isTag(), input.getRegistryName(), input.getCount());
+    }
+
+    public RecipeEntry.Output getOutput(SpecialRecipeEntry output)
+    {
+        if(output.isFluid())
+            return new RecipeEntry.FluidOutput(CommonUtils.getFluid(output.getRegistryName()), output.getCount());
+
+        if(output.getChance() != 1D)
+            return new RecipeEntry.LuckedOutput(output.getRegistryName(), output.getCount(), output.getChance());
+
+        return new RecipeEntry.Output(output.getRegistryName(), output.getCount());
+    }
+
+    /**
+     * Get the content of all non-empty input entry as a {@link RecipeEntry.MultiInput}<br>
+     * @param inputs the inputs
+     * @return the multi input
+     */
+    public RecipeEntry.MultiInput getValidInputs(List<SpecialRecipeEntry> inputs)
+    {
+        RecipeEntry.MultiInput multiInput = new RecipeEntry.MultiInput();
+        inputs.forEach(sre -> multiInput.add(getInput(sre)));
+        return multiInput;
+    }
+
+    /**
+     * Get the content of all non-empty output entry as a {@link RecipeEntry.MultiOutput}<br>
+     * @param outputs the outputs
+     * @return the multi output
+     */
+    public RecipeEntry.MultiOutput getValidOutputs(List<SpecialRecipeEntry> outputs)
+    {
+        RecipeEntry.MultiOutput multiOutput = new RecipeEntry.MultiOutput();
+        outputs.forEach(sre -> multiOutput.add(getOutput(sre)));
+        return multiOutput;
+    }
+
+    /**
+     * Check if the specified list of inputs and outputs are empty<br>
+     * @param inputs the inputs
+     * @param outputs the outputs
+     * @return true if the inputs or the outputs are empty, false otherwise
+     */
+    protected boolean areEmpty(List<SpecialRecipeEntry> inputs, List<SpecialRecipeEntry> outputs)
+    {
+        boolean hasNoInput = true;
+        boolean hasNoOutput = true;
+
+        for(SpecialRecipeEntry input : inputs)
+            if(!input.isEmpty())
+            {
+                hasNoInput = false;
+                break;
+            }
+
+        for(SpecialRecipeEntry output : outputs)
+            if(!output.isEmpty())
+            {
+                hasNoOutput = false;
+                break;
+            }
+
+        return hasNoInput || hasNoOutput;
     }
 }

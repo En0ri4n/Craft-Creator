@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 // TODO: re arrange methods (in new classes) and sort them
 public class KubeJSHelper
 {
-    private static final Pattern RECIPE_PATTERN = Pattern.compile("\n.*event\\.custom\\(([^)]*)\\)");
+    private static final Pattern RECIPES_EVENT_PATTERN = Pattern.compile("\n.*event\\.custom\\(([^)]*)\\)");
     private static final Pattern MODIFIED_RECIPE_PATTERN = Pattern.compile("\n.*event\\.(.*)\\(([^)]*)\\)");
     
     public final static String ADDED_RECIPES_START = "ADDED-RECIPES-START";
@@ -77,7 +77,7 @@ public class KubeJSHelper
         
         String recipeFileContent = checkTypeGroup(readFile(getRecipeFile(mod)), recipeType);
         
-        Matcher customRecipeMatcher = RECIPE_PATTERN.matcher(recipeFileContent);
+        Matcher customRecipeMatcher = RECIPES_EVENT_PATTERN.matcher(recipeFileContent);
         
         while(customRecipeMatcher.find())
         {
@@ -102,7 +102,7 @@ public class KubeJSHelper
 
         String recipeFileContent = checkTypeGroup(readFile(getRecipeFile(mod)), recipeType);
 
-        Matcher customRecipeMatcher = RECIPE_PATTERN.matcher(recipeFileContent);
+        Matcher customRecipeMatcher = RECIPES_EVENT_PATTERN.matcher(recipeFileContent);
 
         while(customRecipeMatcher.find())
         {
@@ -175,7 +175,7 @@ public class KubeJSHelper
     {
         String recipeFileContent = checkTypeGroup(readFile(getRecipeFile(mod)), addedRecipe.getType());
         
-        Matcher recipeMatcher = RECIPE_PATTERN.matcher(recipeFileContent);
+        Matcher recipeMatcher = RECIPES_EVENT_PATTERN.matcher(recipeFileContent);
         
         while(recipeMatcher.find())
         {

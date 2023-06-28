@@ -47,6 +47,10 @@ public class ModRecipeCreators
     // Create
     public static final RecipeCreator CRUSHING;
     public static final RecipeCreator CUTTING;
+    public static final RecipeCreator MIXING;
+    public static final RecipeCreator MILLING;
+    public static final RecipeCreator COMPACTING;
+    public static final RecipeCreator PRESSING;
 
     public static List<RecipeCreator> getRecipeCreatorScreens(SupportedMods mod)
     {
@@ -100,8 +104,12 @@ public class ModRecipeCreators
         PYROLYZER = register(RecipeCreator.Builder.of(SupportedMods.THERMAL).withRecipeType("pyrolyzer").withIcon("machine_pyrolyzer").withSlots(SlotHelper.PYROLYZER_SLOTS));
 
         // Create
-        CRUSHING = register(RecipeCreator.Builder.of(SupportedMods.CREATE).withRecipeType("crushing").withIcon("crushing_wheel").withSlots(SlotHelper.CRUSHING_SLOTS).setSize(1, -1).withGuiTexture("create_recipe_creator.png"));
-        CUTTING = register(RecipeCreator.Builder.of(SupportedMods.CREATE).withRecipeType("cutting").withIcon("mechanical_saw").withSlots(SlotHelper.CUTTING_SLOTS).setSize(1, -1).withGuiTexture("create_recipe_creator.png"));
+        CRUSHING = register(RecipeCreator.Builder.of(SupportedMods.CREATE).withRecipeType("crushing").withIcon("crushing_wheel").withNoSlots().setSize(1, -1).withGuiTexture("create_recipe_creator.png"));
+        CUTTING = register(RecipeCreator.Builder.of(SupportedMods.CREATE).withRecipeType("cutting").withIcon("mechanical_saw").withNoSlots().setSize(1, -1).withGuiTexture("create_recipe_creator.png"));
+        MIXING = register(RecipeCreator.Builder.of(SupportedMods.CREATE).withRecipeType("mixing").withIcon("mechanical_mixer").withNoSlots().setSize(-1, 1).withGuiTexture("create_recipe_creator.png"));
+        MILLING = register(RecipeCreator.Builder.of(SupportedMods.CREATE).withRecipeType("milling").withIcon("millstone").withNoSlots().setSize(1, -1).withGuiTexture("create_recipe_creator.png"));
+        COMPACTING = register(RecipeCreator.Builder.of(SupportedMods.CREATE).withRecipeType("compacting").withIcon("mechanical_press").withNoSlots().setSize(1, -1).withGuiTexture("create_recipe_creator.png"));
+        PRESSING = register(RecipeCreator.Builder.of(SupportedMods.CREATE).withRecipeType("pressing").withIcon("mechanical_press").withNoSlots().setSize(1, -1).withGuiTexture("create_recipe_creator.png"));
 
         RECIPE_CREATORS.trimToSize(); // Trim to size to save memory
     }

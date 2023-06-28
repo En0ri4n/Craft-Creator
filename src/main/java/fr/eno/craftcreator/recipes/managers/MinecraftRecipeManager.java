@@ -49,7 +49,7 @@ public class MinecraftRecipeManager extends BaseRecipesManager
         RecipeEntry.Input input = getSingleInput(taggedSlots, slots.get(0));
         RecipeEntry.Output output = getSingleOutput(slots.get(1));
 
-        MinecraftRecipeSerializer.get().serializeFurnaceRecipe(recipe, input, output, experience, cookingTime);
+        MinecraftRecipeSerializer.get().serializeFurnaceRecipe(recipe.getRecipeType(), input, output, experience, cookingTime);
     }
 
     public void createSmithingTableRecipe(List<SlotItemHandler> slots)

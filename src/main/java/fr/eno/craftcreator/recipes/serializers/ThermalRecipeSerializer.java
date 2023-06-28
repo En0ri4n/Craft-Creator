@@ -38,7 +38,7 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
         recipeObj.addProperty("leaves", Utils.notNull(leaves.getRegistryName()).toString());
         recipeObj.add("result", getResult(fluidResult));
 
-        addRecipeTo(recipeObj, TCoreRecipeTypes.MAPPING_TREE_EXTRACTOR, fluidResult.getRegistryName());
+        addRecipeTo(recipeObj, fluidResult.getRegistryName());
     }
 
     public void serializePulverizerRecipe(RecipeEntry.Input input, RecipeEntry.MultiOutput outputs, double exp, Number energy, boolean isModEnergy)
@@ -48,7 +48,7 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
         recipeObj.addProperty("experience", exp);
         addIngredients(input, outputs, recipeObj);
 
-        addRecipeTo(recipeObj, TCoreRecipeTypes.RECIPE_PULVERIZER, outputs.getOneOutput().getRegistryName());
+        addRecipeTo(recipeObj, outputs.getOneOutput().getRegistryName());
     }
 
     public void serializeSawmillRecipe(RecipeEntry.Input input, RecipeEntry.MultiOutput outputs, Number energy, boolean isModEnergy)
@@ -57,7 +57,7 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
         addEnergy(recipeObj, energy, isModEnergy);
         addIngredients(input, outputs, recipeObj);
 
-        addRecipeTo(recipeObj, TCoreRecipeTypes.RECIPE_SAWMILL, outputs.getOneOutput().getRegistryName());
+        addRecipeTo(recipeObj, outputs.getOneOutput().getRegistryName());
     }
 
     public void serializeSmelterRecipe(List<RecipeEntry.MultiInput> input, RecipeEntry.MultiOutput output, double experience, Number energy, boolean isModEnergy)
@@ -114,7 +114,7 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
 
         recipeObj.add("result", getResultArray(output));
 
-        addRecipeTo(recipeObj, TCoreRecipeTypes.RECIPE_SMELTER, output.getOneOutput().getRegistryName());
+        addRecipeTo(recipeObj, output.getOneOutput().getRegistryName());
     }
 
     public void serializeInsolatorRecipe(RecipeEntry.Input input, RecipeEntry.MultiOutput outputs, double waterMod, Number energy, boolean isModEnergy)
@@ -125,7 +125,7 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
 
         addIngredients(input, outputs, recipeObj);
 
-        addRecipeTo(recipeObj, TCoreRecipeTypes.RECIPE_INSOLATOR, outputs.getOneOutput().getRegistryName());
+        addRecipeTo(recipeObj, outputs.getOneOutput().getRegistryName());
     }
 
     public void serializePressRecipe(RecipeEntry.Input input, RecipeEntry.Input inputDie, RecipeEntry.Output output, Number energy, boolean isModEnergy)
@@ -138,7 +138,7 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
         recipeObj.add("ingredients", ingredientsArray);
         recipeObj.add("result", getResult(output));
 
-        addRecipeTo(recipeObj, TCoreRecipeTypes.RECIPE_PRESS, output.getRegistryName());
+        addRecipeTo(recipeObj, output.getRegistryName());
     }
 
     public void serializeCentrifugeRecipe(RecipeEntry.Input input, RecipeEntry.MultiOutput outputs, RecipeEntry.FluidOutput fluidOutput, Number energy, boolean isModEnergy)
@@ -150,7 +150,7 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
         resultObj.add(getResult(fluidOutput));
         recipeObj.add("result", resultObj);
 
-        addRecipeTo(recipeObj, TCoreRecipeTypes.RECIPE_CENTRIFUGE, outputs.getOneOutput().getRegistryName());
+        addRecipeTo(recipeObj, outputs.getOneOutput().getRegistryName());
     }
 
     public void serializeChillerRecipe(RecipeEntry.FluidInput inputFluid, RecipeEntry.Input input, RecipeEntry.Output output, Number energy, boolean isModEnergy)
@@ -162,7 +162,7 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
         recipeObj.add("ingredients", inputArray);
         recipeObj.add("result", getResultArray(output));
 
-        addRecipeTo(recipeObj, TCoreRecipeTypes.RECIPE_CHILLER, output.getRegistryName());
+        addRecipeTo(recipeObj, output.getRegistryName());
     }
 
     public void serializeCrucibleRecipe(RecipeEntry.Input input, RecipeEntry.FluidOutput output, Number energy, boolean isModEnergy)
@@ -172,7 +172,7 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
         recipeObj.add("ingredient", getInput(input));
         recipeObj.add("result", getResult(output));
 
-        addRecipeTo(recipeObj, TCoreRecipeTypes.RECIPE_CRUCIBLE, output.getRegistryName());
+        addRecipeTo(recipeObj, output.getRegistryName());
     }
 
     public void serializeRefineryRecipe(RecipeEntry.FluidInput inputFluid, RecipeEntry.LuckedOutput outputItem, RecipeEntry.FluidOutput outputFluid, RecipeEntry.FluidOutput secondOutputFluid, Number energy, boolean isModEnergy)
@@ -189,7 +189,7 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
             resultObj.add(getResult(secondOutputFluid));
         recipeObj.add("result", resultObj);
 
-        addRecipeTo(recipeObj, TCoreRecipeTypes.RECIPE_REFINERY, outputItem.getRegistryName());
+        addRecipeTo(recipeObj, outputItem.getRegistryName());
     }
 
     public void serializeBottlerRecipe(RecipeEntry.Input input, RecipeEntry.FluidInput inputFluid, RecipeEntry.Output output, Number value, boolean isEnergyMod)
@@ -201,7 +201,7 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
         recipeObj.add("ingredients", inputArray);
         recipeObj.add("result", getResultArray(output));
 
-        addRecipeTo(recipeObj, TCoreRecipeTypes.RECIPE_BOTTLER, output.getRegistryName());
+        addRecipeTo(recipeObj, output.getRegistryName());
     }
 
     public void serializePyrolyzerRecipe(RecipeEntry.Input input, RecipeEntry.MultiOutput outputItems, RecipeEntry.FluidOutput outputFluid, double experience, Number energy, boolean isEnergyMod)
@@ -215,7 +215,7 @@ public class ThermalRecipeSerializer extends ModRecipeSerializer
             resultObj.add(getResult(outputFluid));
         recipeObj.add("result", resultObj);
 
-        addRecipeTo(recipeObj, TCoreRecipeTypes.RECIPE_PYROLYZER, outputItems.getOneOutput().getRegistryName());
+        addRecipeTo(recipeObj, outputItems.getOneOutput().getRegistryName());
     }
     
     private void addEnergy(JsonObject obj, Number energy, boolean isModEnergy)

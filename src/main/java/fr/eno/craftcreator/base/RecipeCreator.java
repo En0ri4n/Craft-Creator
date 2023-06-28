@@ -12,6 +12,7 @@ import net.minecraft.item.crafting.IRecipeType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RecipeCreator
@@ -111,6 +112,17 @@ public class RecipeCreator
         public Builder withSlots(List<PositionnedSlot> slots)
         {
             this.slots = slots;
+            return this;
+        }
+
+        /**
+         * Set an empty list of slots (Used for Flat recipe creators)
+         *
+         * @return the current builder
+         */
+        public Builder withNoSlots()
+        {
+            this.slots = new ArrayList<>();
             return this;
         }
 

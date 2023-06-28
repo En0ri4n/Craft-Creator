@@ -47,7 +47,8 @@ public class RecipeEntryWidget extends Widget
 
     private final boolean isOutput;
     private int maxEntry;
-    private boolean hasCount;
+    private boolean hasFluidAmount;
+    private boolean hasItemCount;
     private boolean hasChance;
 
     private RecipeCreator recipeCreator;
@@ -87,7 +88,8 @@ public class RecipeEntryWidget extends Widget
         this.height = height;
         this.isOutput = isOutput;
         this.maxEntry = maxEntry;
-        this.hasCount = true;
+        this.hasFluidAmount = true;
+        this.hasItemCount = true;
         this.hasChance = true;
         init();
     }
@@ -138,11 +140,11 @@ public class RecipeEntryWidget extends Widget
         this.registryNameField.setBlitOffset(100);
 
         // Tag Checkbox
-        this.typeButton = new EnumButton<>(Arrays.asList(EntryType.ITEM, EntryType.TAG, EntryType.FLUID), startX, startY + y * i++, 50, 15, References.getTranslate("screen.widget.recipe_entry_widget.type"), button ->
+        this.typeButton = new EnumButton<>(Arrays.asList(EntryType.ITEM, EntryType.TAG, EntryType.FLUID), startX, startY + y * i++, 50, 16, 0x80000000, button ->
         {
             this.registryNameField.setEntries(EntryHelper.getStringEntryListWith(getEntries(), getType()), true);
             this.countField.setMessage(new StringTextComponent(getType() == EntryType.FLUID ? "Amount :" : "Count :"));
-            this.registryNameField.setValue("");
+            // this.registryNameField.setValue(""); // Do we need to clear the text field ?
         });
 
         if(isOutput) // Set the available types for the output
@@ -260,6 +262,11 @@ public class RecipeEntryWidget extends Widget
         checkButtons();
     }
 
+    public void setAllowedTypes(EntryType... types)
+    {
+        this.typeButton.setItems(Arrays.asList(types));
+    }
+
     protected void checkButtons()
     {
         this.removeEntryButton.active = entriesDropdown.getEntries().size() > 2;
@@ -286,7 +293,7 @@ public class RecipeEntryWidget extends Widget
     public void tick()
     {
         // Update widgets visibility
-        this.countField.visible = hasCount();
+        this.countField.visible = getType().isFluid() ? hasFluidAmount() : hasItemCount();
         this.chanceField.visible = hasChance();
 
         registryNameField.tick();
@@ -436,6 +443,7 @@ public class RecipeEntryWidget extends Widget
         this.canUseWidget = canUseWidget;
     }
 
+    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button)
     {
         if(canUseWidget)
@@ -512,14 +520,30 @@ public class RecipeEntryWidget extends Widget
         return entriesDropdown.isFocused() || registryNameField.isFocused() || countField.isFocused() || chanceField.isFocused();
     }
 
-    public boolean hasCount()
+    public boolean hasItemCount()
     {
-        return hasCount;
+        return hasItemCount;
+    }
+
+    public void setHasItemCount(boolean hasItemCount)
+    {
+        this.hasItemCount = hasItemCount;
+    }
+
+    public void setHasFluidAmount(boolean hasFluidAmount)
+    {
+        this.hasFluidAmount = hasFluidAmount;
+    }
+
+    public boolean hasFluidAmount()
+    {
+        return hasFluidAmount;
     }
 
     public void setHasCount(boolean hasCount)
     {
-        this.hasCount = hasCount;
+        this.hasItemCount = hasCount;
+        this.hasFluidAmount = hasCount;
     }
 
     public boolean hasChance()
@@ -619,6 +643,7 @@ public class RecipeEntryWidget extends Widget
 
         public void set(ResourceLocation registryName, int count, EntryType type, double chance)
         {
+            if(registryName.getPath().isEmpty()) registryName = new ResourceLocation("minecraft", "air");
             recipeEntry.setRegistryName(registryName);
             recipeEntry.setCount(count);
             recipeEntry.setType(type);

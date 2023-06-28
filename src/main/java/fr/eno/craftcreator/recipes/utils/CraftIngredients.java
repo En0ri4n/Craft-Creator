@@ -1,7 +1,5 @@
 package fr.eno.craftcreator.recipes.utils;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import fr.eno.craftcreator.References;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -493,9 +491,42 @@ public class CraftIngredients
         }
     }
 
+    public static class StringDataIngredient extends CraftIngredient
+    {
+        private String data;
+
+        public StringDataIngredient(String description, String data)
+        {
+            super(CraftIngredientType.STRING_DATA, References.getLoc("string_data"), description);
+            this.data = data;
+        }
+
+        public StringDataIngredient setData(String data)
+        {
+            this.data = data;
+            return this;
+        }
+
+        public String getStringData()
+        {
+            return data;
+        }
+
+        @Override
+        public boolean equals(CraftIngredient ingredient)
+        {
+            if(ingredient instanceof StringDataIngredient)
+            {
+                StringDataIngredient stringDataIngredient = (StringDataIngredient) ingredient;
+                return this.getStringData().equals(stringDataIngredient.getStringData());
+            }
+
+            return false;
+        }
+    }
+
     public static class NBTIngredient extends CraftIngredient
     {
-        private final Gson gson = new GsonBuilder().setLenient().create();
         private CompoundNBT nbt;
 
         public NBTIngredient(CompoundNBT nbt)
@@ -539,6 +570,6 @@ public class CraftIngredients
 
     public enum CraftIngredientType
     {
-        ITEM, TAG, BLOCK, FLUID, MULTI_ITEM, DATA, NBT
+        ITEM, TAG, BLOCK, FLUID, MULTI_ITEM, DATA, STRING_DATA, NBT
     }
 }

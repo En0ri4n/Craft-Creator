@@ -106,17 +106,8 @@ public class SlotHelper
     public static final List<PositionnedSlot> PYROLYZER_SLOTS_INPUT;
     public static final List<PositionnedSlot> PYROLYZER_SLOTS_OUTPUT;
 
-    // Create
-    public static final int CREATE_SLOTS_SIZE;
-    public static final List<PositionnedSlot> CREATE_SLOTS;
-    public static final List<PositionnedSlot> CREATE_SLOTS_INPUT;
-    public static final List<PositionnedSlot> CREATE_SLOTS_OUTPUT;
-    public static final List<PositionnedSlot> CRUSHING_SLOTS;
-    public static final List<PositionnedSlot> CRUSHING_SLOTS_INPUT;
-    public static final List<PositionnedSlot> CRUSHING_SLOTS_OUTPUT;
-    public static final List<PositionnedSlot> CUTTING_SLOTS;
-    public static final List<PositionnedSlot> CUTTING_SLOTS_INPUT;
-    public static final List<PositionnedSlot> CUTTING_SLOTS_OUTPUT;
+    // Create (No slots, it's a flat recipe creator)
+    public static final int CREATE_SLOTS_SIZE = 0;
 
     /**
      * Transform an array of slots into a list
@@ -331,29 +322,5 @@ public class SlotHelper
                 PYROLYZER_SLOTS);
 
         THERMAL_SLOTS_SIZE = thermalSlots;
-
-
-        // Create
-        int createSlots = 0;
-        CRUSHING_SLOTS = list(
-                CRUSHING_SLOTS_INPUT = toList(),
-                CRUSHING_SLOTS_OUTPUT = toList());
-        CUTTING_SLOTS = list(
-                CUTTING_SLOTS_INPUT = toList(),
-                CUTTING_SLOTS_OUTPUT = toList());
-
-        CREATE_SLOTS_INPUT = list(
-                CRUSHING_SLOTS_INPUT,
-                CUTTING_SLOTS_INPUT);
-
-        CREATE_SLOTS_OUTPUT = list(
-                CRUSHING_SLOTS_OUTPUT,
-                CUTTING_SLOTS_OUTPUT);
-
-        CREATE_SLOTS = list(
-                CRUSHING_SLOTS,
-                CUTTING_SLOTS);
-
-        CREATE_SLOTS_SIZE = createSlots;
     }
 }

@@ -3,15 +3,19 @@ package fr.eno.craftcreator.recipes.serializers;
 import com.google.gson.JsonObject;
 import com.simibubi.create.AllRecipeTypes;
 import com.simibubi.create.content.contraptions.components.crusher.CrushingRecipe;
+import com.simibubi.create.content.contraptions.components.mixer.MixingRecipe;
 import com.simibubi.create.content.contraptions.components.saw.CuttingRecipe;
+import com.simibubi.create.content.contraptions.processing.HeatCondition;
 import com.simibubi.create.content.contraptions.processing.ProcessingOutput;
+import com.simibubi.create.content.contraptions.processing.ProcessingRecipe;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.utils.CraftIngredients;
 import fr.eno.craftcreator.recipes.utils.RecipeEntry;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.items.wrapper.RecipeWrapper;
 
-// TODO: add support for fixed size recipes in RecipeEntryWidget to prevent the user from adding more than one ingredient
 public class CreateRecipeSerializer extends ModRecipeSerializer
 {
     private static final CreateRecipeSerializer INSTANCE = new CreateRecipeSerializer();
@@ -21,26 +25,49 @@ public class CreateRecipeSerializer extends ModRecipeSerializer
         super(SupportedMods.CREATE);
     }
 
-    public void serializeCrushingRecipe(RecipeEntry.MultiInput input, RecipeEntry.MultiOutput output, int processingTime)
+    public void serializeCrushingRecipe(RecipeEntry.Input input, RecipeEntry.MultiOutput output, int processingTime)
     {
         JsonObject obj = createBaseJson(AllRecipeTypes.CRUSHING.getType());
 
-        obj.add("ingredients", getInputArray(input.get(0))); // Only one ingredient is allowed
+        obj.add("ingredients", getInputArray(input)); // Only one ingredient is allowed
         obj.add("results", getResultArray(output));
         obj.addProperty("processingTime", processingTime);
 
-        addRecipeTo(obj, AllRecipeTypes.CRUSHING.getType(), output.getOneOutput().getRegistryName());
+        addRecipeTo(obj, output.getOneOutput().getRegistryName());
     }
 
-    public void serializeCuttingRecipe(RecipeEntry.MultiInput input, RecipeEntry.MultiOutput output, int processingTime)
+    public void serializeCuttingRecipe(RecipeEntry.Input input, RecipeEntry.MultiOutput output, int processingTime)
     {
         JsonObject obj = createBaseJson(AllRecipeTypes.CUTTING.getType());
 
-        obj.add("ingredients", getInputArray(input.get(0))); // Only one ingredient is allowed
+        obj.add("ingredients", getInputArray(input)); // Only one ingredient is allowed
         obj.add("results", getResultArray(output));
         obj.addProperty("processingTime", processingTime);
 
-        addRecipeTo(obj, AllRecipeTypes.CUTTING.getType(), output.getOneOutput().getRegistryName());
+        addRecipeTo(obj, output.getOneOutput().getRegistryName());
+    }
+
+    public void serializeMixingRecipe(RecipeEntry.MultiInput input, RecipeEntry.Output output, HeatCondition heatRequirement)
+    {
+        JsonObject obj = createBaseJson(AllRecipeTypes.MIXING.getType());
+
+        obj.add("ingredients", getInputArray(input));
+        obj.add("results", getResultArray(output));
+        if(heatRequirement != HeatCondition.NONE)
+            obj.addProperty("heatRequirement", heatRequirement.serialize());
+
+        addRecipeTo(obj, output.getRegistryName());
+    }
+
+    public void serializeMillingRecipe(RecipeEntry.Input input, RecipeEntry.MultiOutput output, int processingTime)
+    {
+        JsonObject obj = createBaseJson(AllRecipeTypes.MILLING.getType());
+
+        obj.add("ingredients", getInputArray(input)); // Only one ingredient is allowed
+        obj.add("results", getResultArray(output));
+        obj.addProperty("processingTime", processingTime);
+
+        addRecipeTo(obj, output.getOneOutput().getRegistryName());
     }
 
     public void serializeCompactingRecipe(RecipeEntry.MultiInput input, RecipeEntry.MultiOutput output, int processingTime)
@@ -51,7 +78,7 @@ public class CreateRecipeSerializer extends ModRecipeSerializer
         obj.add("results", getResultArray(output));
         obj.addProperty("processingTime", processingTime);
 
-        addRecipeTo(obj, AllRecipeTypes.COMPACTING.getType(), output.getOneOutput().getRegistryName());
+        addRecipeTo(obj, output.getOneOutput().getRegistryName());
     }
 
     @Override
@@ -59,18 +86,14 @@ public class CreateRecipeSerializer extends ModRecipeSerializer
     {
         CraftIngredients inputIngredients = CraftIngredients.create();
 
-        if(recipe instanceof CrushingRecipe)
-        {
-            CrushingRecipe crushingRecipe = (CrushingRecipe) recipe;
-            putIfNotEmpty(inputIngredients, crushingRecipe.getIngredients());
-            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Processing Time", CraftIngredients.DataIngredient.DataUnit.TICK, crushingRecipe.getProcessingDuration(), false));
-        }
-        else if(recipe instanceof CuttingRecipe)
-        {
-            CuttingRecipe cuttingRecipe = (CuttingRecipe) recipe;
-            putIfNotEmpty(inputIngredients, cuttingRecipe.getIngredients());
-            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Processing Time", CraftIngredients.DataIngredient.DataUnit.TICK, cuttingRecipe.getProcessingDuration(), false));
-        }
+        ProcessingRecipe<RecipeWrapper> processRecipe = (ProcessingRecipe<RecipeWrapper>) recipe;
+        putIfNotEmpty(inputIngredients, processRecipe.getIngredients());
+
+        if(processRecipe.getProcessingDuration() != 0)
+            inputIngredients.addIngredient(new CraftIngredients.DataIngredient("Processing Time", CraftIngredients.DataIngredient.DataUnit.TICK, processRecipe.getProcessingDuration(), false));
+
+        if(processRecipe.getRequiredHeat() != HeatCondition.NONE)
+            inputIngredients.addIngredient(new CraftIngredients.StringDataIngredient("Heat", processRecipe.getRequiredHeat().serialize()));
 
         return inputIngredients;
     }
@@ -80,18 +103,13 @@ public class CreateRecipeSerializer extends ModRecipeSerializer
     {
         CraftIngredients outputIngredients = CraftIngredients.create();
 
-        if(recipe instanceof CrushingRecipe)
-        {
-            CrushingRecipe crushingRecipe = (CrushingRecipe) recipe;
-            for(ProcessingOutput output : crushingRecipe.getRollableResults())
-                outputIngredients.addIngredient(new CraftIngredients.ItemLuckIngredient(output.getStack().getItem().getRegistryName(), output.getStack().getCount(), output.getChance()));
-        }
-        else if(recipe instanceof CuttingRecipe)
-        {
-            CuttingRecipe cuttingRecipe = (CuttingRecipe) recipe;
-            for(ProcessingOutput output : cuttingRecipe.getRollableResults())
-                outputIngredients.addIngredient(new CraftIngredients.ItemLuckIngredient(output.getStack().getItem().getRegistryName(), output.getStack().getCount(), output.getChance()));
-        }
+        ProcessingRecipe<RecipeWrapper> processRecipe = (ProcessingRecipe<RecipeWrapper>) recipe;
+
+        for(ProcessingOutput output : processRecipe.getRollableResults())
+            outputIngredients.addIngredient(new CraftIngredients.ItemLuckIngredient(output.getStack().getItem().getRegistryName(), output.getStack().getCount(), output.getChance()));
+
+        for(FluidStack fluidOutput : processRecipe.getFluidResults())
+            outputIngredients.addIngredient(new CraftIngredients.FluidIngredient(fluidOutput.getFluid().getRegistryName(), fluidOutput.getAmount()));
 
         return outputIngredients;
     }

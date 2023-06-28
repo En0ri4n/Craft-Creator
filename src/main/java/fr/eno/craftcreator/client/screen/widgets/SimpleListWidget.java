@@ -472,6 +472,11 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
                     ingredientValue.append(new StringTextComponent(String.valueOf(dataIngredient.isDouble() ? dataIngredient.getData().doubleValue() : dataIngredient.getData().intValue())).withStyle(TextFormatting.LIGHT_PURPLE));
                     ingredientValue.append(new StringTextComponent(" ").append(dataIngredient.getUnit().getDisplayUnit()).withStyle(TextFormatting.DARK_GRAY));
                 }
+                else if(craftIngredient instanceof CraftIngredients.StringDataIngredient)
+                {
+                    CraftIngredients.StringDataIngredient stringDataIngredient = (CraftIngredients.StringDataIngredient) craftIngredient;
+                    ingredientValue.append(new StringTextComponent(String.valueOf(stringDataIngredient.getStringData())).withStyle(TextFormatting.YELLOW));
+                }
                 else if(craftIngredient instanceof CraftIngredients.NBTIngredient)
                 {
                     CraftIngredients.NBTIngredient nbtIngredient = (CraftIngredients.NBTIngredient) craftIngredient;

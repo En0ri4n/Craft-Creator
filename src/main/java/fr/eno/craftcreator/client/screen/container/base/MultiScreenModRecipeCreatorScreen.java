@@ -26,10 +26,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -73,7 +70,7 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
 
         initFields();
 
-        this.buttonGrid = new ButtonGrid<>(this.leftPos + this.imageWidth, this.topPos, 20, 2, 4, ItemIconButton.getButtons(getAvailableRecipesCreator().stream().map(RecipeCreator::getRecipeIcon).collect(Collectors.toList())), (button) ->
+        this.buttonGrid = new ButtonGrid<>(this.leftPos + this.imageWidth, this.topPos, 20, 2, 4, ItemIconButton.getButtons(getAvailableRecipesCreator()), (button) ->
         {
             this.currentScreenIndex = this.buttonGrid.getButtons().indexOf(button);
             updateData();
@@ -217,7 +214,8 @@ public abstract class MultiScreenModRecipeCreatorScreen<T extends CommonContaine
         nextButton.visible = hasNext();
         previousButton.visible = hasPrevious();
 
-        this.recipeTypeButton.setItem(getCurrentRecipe().getRecipeIcon());
+        recipeTypeButton.setItem(getCurrentRecipe().getRecipeIcon());
+        recipeTypeButton.setTooltip(getCurrentRecipe().getRecipeTypeLocation());
 
         updateGui();
     }

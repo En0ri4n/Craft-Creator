@@ -49,7 +49,7 @@ public class EntryHelper
 
     public static List<ResourceLocation> getFluids()
     {
-        return ForgeRegistries.FLUIDS.getValues().stream().map(ForgeRegistryEntry::getRegistryName).collect(Collectors.toList());
+        return ForgeRegistries.FLUIDS.getValues().stream().map(ForgeRegistryEntry::getRegistryName).filter(rl -> !rl.toString().contains("flowing")).collect(Collectors.toList());
     }
 
     public static List<String> getMods()

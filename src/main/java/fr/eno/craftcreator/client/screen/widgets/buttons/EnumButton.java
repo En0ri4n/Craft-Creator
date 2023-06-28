@@ -1,23 +1,30 @@
 package fr.eno.craftcreator.client.screen.widgets.buttons;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import fr.eno.craftcreator.References;
 import fr.eno.craftcreator.client.utils.ClientUtils;
-import fr.eno.craftcreator.utils.Translatable;
+import fr.eno.craftcreator.client.utils.ScreenUtils;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.StringTextComponent;
 
 import java.util.List;
+import java.util.Locale;
 
-public class EnumButton<T extends Translatable> extends Button
+public class EnumButton<T> extends Button
 {
+    private static final ResourceLocation TEXTURE = References.getLoc("textures/gui/buttons/gui_button.png");
+
     private List<T> values;
+    private int color;
     private int index;
 
-    public EnumButton(List<T> values, int pX, int pY, int pWidth, int pHeight, ITextComponent pMessage, IPressable pOnPress)
+    public EnumButton(List<T> values, int pX, int pY, int pWidth, int pHeight, int color, IPressable pOnPress)
     {
-        super(pX, pY, pWidth, pHeight, pMessage, pOnPress);
+        super(pX, pY, pWidth, pHeight, new StringTextComponent(""), pOnPress);
         this.values = values;
+        this.color = color;
     }
 
     @Override
@@ -25,9 +32,15 @@ public class EnumButton<T extends Translatable> extends Button
     {
         if(visible)
         {
-            Screen.fill(pMatrixStack, x, y, x + width, y + height, 0x88000000);
-            Screen.drawCenteredString(pMatrixStack, ClientUtils.getFontRenderer(), getSelected().getTranslationComponent().getString(), this.x + this.width / 2, this.y + (this.height - 8) / 2, 0xFFFFFFFF);
+            ClientUtils.bindTexture(TEXTURE);
+            ScreenUtils.renderSizedButton(pMatrixStack, x, y, width, height, active, isMouseOver(pMouseX, pMouseY));
+            Screen.drawCenteredString(pMatrixStack, ClientUtils.getFontRenderer(), getSelected().toString().toLowerCase(Locale.ROOT), this.x + this.width / 2, this.y + (this.height - 8) / 2, 0xFFFFFFFF);
         }
+    }
+
+    public void setColor(int color)
+    {
+        this.color = color;
     }
 
     @Override
@@ -36,7 +49,9 @@ public class EnumButton<T extends Translatable> extends Button
         if(clicked(pMouseX, pMouseY) && pButton == 0)
         {
             increaseIndex();
-            return super.mouseClicked(pMouseX, pMouseY, pButton);
+            onPress.onPress(this);
+            playDownSound(ClientUtils.getMinecraft().getSoundManager());
+            return true;
         }
 
         return false;

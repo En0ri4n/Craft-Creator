@@ -1,5 +1,6 @@
 package fr.eno.craftcreator.recipes.managers;
 
+import com.simibubi.create.content.contraptions.processing.HeatCondition;
 import fr.eno.craftcreator.base.RecipeCreator;
 import fr.eno.craftcreator.recipes.base.BaseRecipesManager;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
@@ -14,14 +15,13 @@ import net.minecraft.tileentity.TileEntity;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static fr.eno.craftcreator.base.ModRecipeCreators.CRUSHING;
-import static fr.eno.craftcreator.base.ModRecipeCreators.CUTTING;
+import static fr.eno.craftcreator.base.ModRecipeCreators.*;
 
 public class CreateRecipesManager extends BaseRecipesManager
 {
     private static final CreateRecipesManager INSTANCE = new CreateRecipesManager();
 
-     //We don't use this method because Create recipes are created not with slots but with another way
+     //We don't use this method because Create recipes are created not with slots
     @Override
     public void createRecipe(RecipeCreator recipe, List<Slot> slots, RecipeInfos recipeInfos, ModRecipeSerializer.SerializerType serializerType) {}
 
@@ -35,53 +35,21 @@ public class CreateRecipesManager extends BaseRecipesManager
         List<SpecialRecipeEntry> inputs = createRecipeCreatorTile.getInputs().get(recipe.getRecipeTypeLocation().getPath()).stream().map(SpecialRecipeEntry::deserialize).collect(Collectors.toList());
         List<SpecialRecipeEntry> outputs = createRecipeCreatorTile.getOutputs().get(recipe.getRecipeTypeLocation().getPath()).stream().map(SpecialRecipeEntry::deserialize).collect(Collectors.toList());
 
+        if(areEmpty(inputs, outputs)) return;
+
         if(recipe.is(CRUSHING))
             serializeCrushingRecipe(inputs, outputs, recipeInfos);
         else if(recipe.is(CUTTING))
             serializeCuttingRecipe(inputs, outputs, recipeInfos);
-    }
-
-    public RecipeEntry.MultiInput getValidInputs(List<SpecialRecipeEntry> inputs)
-    {
-        RecipeEntry.MultiInput multiInput = new RecipeEntry.MultiInput();
-        inputs.forEach(sre -> multiInput.add(new RecipeEntry.Input(sre.isTag(), sre.getRegistryName(), sre.getCount())));
-        return multiInput;
-    }
-
-    public RecipeEntry.MultiOutput getValidOutputs(List<SpecialRecipeEntry> outputs)
-    {
-        RecipeEntry.MultiOutput multiOutput = new RecipeEntry.MultiOutput();
-        outputs.forEach(sre -> multiOutput.add(new RecipeEntry.LuckedOutput(sre.getRegistryName(), sre.getCount(), sre.getChance())));
-        return multiOutput;
-    }
-
-    protected boolean areEmpty(List<SpecialRecipeEntry> inputs, List<SpecialRecipeEntry> outputs)
-    {
-        boolean hasNoInput = true;
-        boolean hasNoOutput = true;
-
-        for(SpecialRecipeEntry input : inputs)
-            if(!input.isEmpty())
-            {
-                hasNoInput = false;
-                break;
-            }
-
-        for(SpecialRecipeEntry output : outputs)
-            if(!output.isEmpty())
-            {
-                hasNoOutput = false;
-                break;
-            }
-
-        return hasNoInput || hasNoOutput;
+        else if(recipe.is(MIXING))
+            serializeMixingRecipe(inputs, outputs, recipeInfos);
+        else if(recipe.is(MILLING))
+            serializeMillingRecipe(inputs, outputs, recipeInfos);
     }
 
     private void serializeCrushingRecipe(List<SpecialRecipeEntry> inputs, List<SpecialRecipeEntry> outputs, RecipeInfos recipeInfos)
     {
-        if(areEmpty(inputs, outputs)) return;
-
-        RecipeEntry.MultiInput input = getValidInputs(inputs);
+        RecipeEntry.Input input = getInput(inputs.get(0));
         RecipeEntry.MultiOutput output = getValidOutputs(outputs);
         int processingTime = recipeInfos.getValue("processing_time").intValue();
 
@@ -90,13 +58,29 @@ public class CreateRecipesManager extends BaseRecipesManager
 
     private void serializeCuttingRecipe(List<SpecialRecipeEntry> inputs, List<SpecialRecipeEntry> outputs, RecipeInfos recipeInfos)
     {
-        if(areEmpty(inputs, outputs)) return;
-
-        RecipeEntry.MultiInput input = getValidInputs(inputs);
+        RecipeEntry.Input input = getInput(inputs.get(0));
         RecipeEntry.MultiOutput output = getValidOutputs(outputs);
         int processingTime = recipeInfos.getValue("processing_time").intValue();
 
         CreateRecipeSerializer.get().serializeCuttingRecipe(input, output, processingTime);
+    }
+
+    private void serializeMixingRecipe(List<SpecialRecipeEntry> inputs, List<SpecialRecipeEntry> outputs, RecipeInfos recipeInfos)
+    {
+        RecipeEntry.MultiInput input = getValidInputs(inputs);
+        RecipeEntry.Output output = getOutput(outputs.get(0));
+        HeatCondition heat = HeatCondition.values()[recipeInfos.getValue("heat_requirement").intValue()];
+
+        CreateRecipeSerializer.get().serializeMixingRecipe(input, output, heat);
+    }
+
+    private void serializeMillingRecipe(List<SpecialRecipeEntry> inputs, List<SpecialRecipeEntry> outputs, RecipeInfos recipeInfos)
+    {
+        RecipeEntry.Input input = getInput(inputs.get(0));
+        RecipeEntry.MultiOutput output = getValidOutputs(outputs);
+        int processingTime = recipeInfos.getValue("processing_time").intValue();
+
+        CreateRecipeSerializer.get().serializeMillingRecipe(input, output, processingTime);
     }
 
     public static CreateRecipesManager get()
