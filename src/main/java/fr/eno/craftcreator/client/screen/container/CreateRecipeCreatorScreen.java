@@ -51,8 +51,8 @@ public class CreateRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen
         int widgetHeight = 110;
         int widgetWidth = imageWidth / 2 - 2 * gapX;
 
-        inputWidget = new RecipeEntryWidget(getCurrentRecipe(), tilePos,  leftPos + gapX, topPos + gapY, widgetWidth, widgetHeight, false, -1);
-        outputWidget = new RecipeEntryWidget(getCurrentRecipe(), tilePos, leftPos + guiTextureSize - gapX - widgetWidth, topPos + gapY, widgetWidth, widgetHeight, true, -1);
+        addWidget(inputWidget = new RecipeEntryWidget(getCurrentRecipe(), tilePos,  leftPos + gapX, topPos + gapY, widgetWidth, widgetHeight, false, -1));
+        addWidget(outputWidget = new RecipeEntryWidget(getCurrentRecipe(), tilePos, leftPos + guiTextureSize - gapX - widgetWidth, topPos + gapY, widgetWidth, widgetHeight, true, -1));
     }
 
     @Override
@@ -105,7 +105,6 @@ public class CreateRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen
 
             inputWidget.setHasCount(false);
             inputWidget.setHasChance(false);
-            outputWidget.setHasTag(false);
         }
     }
 
@@ -167,15 +166,11 @@ public class CreateRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen
     {
         super.tick();
 
-        if(inputWidget != null)
+        if(outputWidget != null && inputWidget != null)
         {
             outputWidget.setCanUseWidget(!inputWidget.isFocused());
-            inputWidget.tick();
-        }
-
-        if(outputWidget != null)
-        {
             inputWidget.setCanUseWidget(!outputWidget.isFocused());
+            inputWidget.tick();
             outputWidget.tick();
         }
     }
@@ -196,7 +191,7 @@ public class CreateRecipeCreatorScreen extends MultiScreenModRecipeCreatorScreen
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button)
     {
-        if(!inputWidget.isFocused() && !outputWidget.isFocused()) super.mouseClicked(mouseX, mouseY, button);
+        if(!inputWidget.isFocused() && !outputWidget.isFocused()) return super.mouseClicked(mouseX, mouseY, button);
         inputWidget.mouseClicked(mouseX, mouseY, button);
         outputWidget.mouseClicked(mouseX, mouseY, button);
         return true;

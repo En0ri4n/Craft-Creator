@@ -1,22 +1,26 @@
-package fr.eno.craftcreator.screen.widgets;
+package fr.eno.craftcreator.client.screen.widgets;
 
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import fr.eno.craftcreator.References;
-import fr.eno.craftcreator.api.ClientUtils;
-import fr.eno.craftcreator.api.CommonUtils;
-import fr.eno.craftcreator.api.ScreenUtils;
 import fr.eno.craftcreator.base.RecipeCreator;
+import fr.eno.craftcreator.client.screen.widgets.buttons.EnumButton;
+import fr.eno.craftcreator.client.screen.widgets.buttons.IconButton;
+import fr.eno.craftcreator.client.utils.ClientUtils;
+import fr.eno.craftcreator.client.utils.ScreenUtils;
 import fr.eno.craftcreator.init.InitPackets;
 import fr.eno.craftcreator.packets.RetrieveRecipeCreatorTileDataServerPacket;
 import fr.eno.craftcreator.packets.UpdateRecipeCreatorTileDataServerPacket;
-import fr.eno.craftcreator.screen.widgets.buttons.IconButton;
-import fr.eno.craftcreator.screen.widgets.buttons.SimpleCheckBox;
+import fr.eno.craftcreator.recipes.utils.EntryType;
+import fr.eno.craftcreator.recipes.utils.SpecialRecipeEntry;
+import fr.eno.craftcreator.utils.CommonUtils;
 import fr.eno.craftcreator.utils.EntryHelper;
 import fr.eno.craftcreator.utils.JsonSerializable;
 import fr.eno.craftcreator.utils.PairValues;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.Widget;
+import net.minecraft.item.BucketItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -29,11 +33,12 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.client.gui.GuiUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class RecipeEntryWidget
+public class RecipeEntryWidget extends Widget
 {
     private final int x;
     private final int y;
@@ -53,7 +58,7 @@ public class RecipeEntryWidget
 
     private SuggesterTextFieldWidget registryNameField;
     private NumberDataFieldWidget countField;
-    private SimpleCheckBox tagCheckBox;
+    private EnumButton<EntryType> typeButton;
     private NumberDataFieldWidget chanceField;
 
     private IconButton removeEntryButton;
@@ -74,6 +79,7 @@ public class RecipeEntryWidget
 
     public RecipeEntryWidget(RecipeCreator recipeCreator, BlockPos pos, int x, int y, int width, int height, boolean isOutput, int maxEntry)
     {
+        super(x, y, width, height, new StringTextComponent(""));
         this.recipeCreator = recipeCreator;
         this.tilePos = pos;
         this.x = x;
@@ -116,43 +122,35 @@ public class RecipeEntryWidget
                     entriesDropdown.insertEntryBefore(newEntry, entry);
                 entriesDropdown.setDropdownSelected(newEntry);
 
-                this.registryNameField.setValue(newEntry.getRegistryName().toString());
-                this.countField.setNumberValue(newEntry.getCount(), false);
-                this.tagCheckBox.setSelected(newEntry.isTag());
-                this.chanceField.setNumberValue(newEntry.getChance(), true);
-                this.removeEntryButton.active = true;
+                loadEntry(newEntry);
+                removeEntryButton.active = true;
                 entriesDropdown.trimWidthToEntries();
                 return;
             }
 
-            this.tagCheckBox.setSelected(entry.isTag());
-            this.registryNameField.setValue(entry.getRegistryName().toString());
-            this.countField.setNumberValue(entry.getCount(), false);
-            this.chanceField.setNumberValue(entry.getChance(), true);
+            loadEntry(entry);
         });
 
         // Registry Name Text Field
-        this.registryNameField = new SuggesterTextFieldWidget(startX, startY + y * i++, width - 2 * gapX, 16, EntryHelper.getStringEntryListWith(EntryHelper.getItems(), SimpleListWidget.ResourceLocationEntry.Type.ITEM), null, (newValue) ->
+        this.registryNameField = new SuggesterTextFieldWidget(startX, startY + y * i++, width - 2 * gapX, 16, EntryHelper.getStringEntryListWith(EntryHelper.getItems(), EntryType.ITEM), null, (newValue) ->
         {
-            this.saveEntryButton.active = CommonUtils.getItem(CommonUtils.parse(newValue)) != Items.AIR || CommonUtils.getTag(CommonUtils.parse(newValue)) != null;
+            this.saveEntryButton.active = CommonUtils.getItem(CommonUtils.parse(newValue)) != Items.AIR || !CommonUtils.getTag(CommonUtils.parse(newValue)).getValues().isEmpty();
         });
         this.registryNameField.setVisible(true);
         this.registryNameField.setBlitOffset(100);
 
         // Tag Checkbox
-        this.tagCheckBox = new SimpleCheckBox(startX, startY + y * i++, 10, 10, References.getTranslate("screen.widget.recipe_entry_widget.tag"), new StringTextComponent(""), false, true, checkbox ->
+        this.typeButton = new EnumButton<>(Arrays.asList(EntryType.ITEM, EntryType.TAG, EntryType.FLUID), startX, startY + y * i++, 50, 15, References.getTranslate("screen.widget.recipe_entry_widget.tag"), button ->
         {
-            this.registryNameField.setEntries(EntryHelper.getStringEntryListWith(isTag() ? EntryHelper.getTags() : EntryHelper.getItems(), isTag() ? SimpleListWidget.ResourceLocationEntry.Type.TAG : SimpleListWidget.ResourceLocationEntry.Type.ITEM), true);
+            this.registryNameField.setEntries(EntryHelper.getStringEntryListWith(getEntries(), getType()), true);
+            this.countField.setMessage(new StringTextComponent(getType() == EntryType.FLUID ? "Amount :" : "Count :"));
             this.registryNameField.setValue("");
         });
 
-        if(isOutput) // Hide tag checkbox for output and set it to false to ensure that the output is not a tag
-        {
-            this.tagCheckBox.visible = false;
-            this.tagCheckBox.setSelected(false);
-        }
+        if(isOutput) // Set the available types for the output
+            this.typeButton.setItems(Arrays.asList(EntryType.ITEM, EntryType.FLUID));
 
-        int fieldsWidth = 30;
+        int fieldsWidth = 40;
 
         // Count Text Field
         this.countField = new NumberDataFieldWidget(startX + width - fieldsWidth - gapX * 2, startY + (y = 14 + 3) * i++, fieldsWidth, 12, new StringTextComponent("Count :"), 1, false);
@@ -176,7 +174,7 @@ public class RecipeEntryWidget
         // Save Button
         this.saveEntryButton = new IconButton(x + width - 21 - 21, startY + height - 24, References.getLoc("textures/gui/icons/save.png"), 16, 16, 16, 48, b ->
         {
-            this.entriesDropdown.getDropdownSelected().set(CommonUtils.parse(registryNameField.getValue()), countField.getIntValue(), isTag(), chanceField.getDoubleValue());
+            this.entriesDropdown.getDropdownSelected().set(CommonUtils.parse(registryNameField.getValue()), countField.getIntValue(), typeButton.getSelected(), chanceField.getDoubleValue());
             this.entriesDropdown.trimWidthToEntries();
             showMessage(References.getTranslate("screen.widget.dropdown_list.entry.saved").withStyle(TextFormatting.GREEN), 2);
             updateServerEntries();
@@ -192,6 +190,26 @@ public class RecipeEntryWidget
         });
 
         this.saveEntryButton.active = false;
+    }
+
+    private void loadEntry(RecipeEntryEntry entry)
+    {
+        this.registryNameField.setValue(entry.getRegistryName().toString());
+        this.countField.setNumberValue(entry.getCount(), false);
+        this.typeButton.setSelected(entry.getType());
+        this.chanceField.setNumberValue(entry.getChance(), true);
+    }
+
+    private List<ResourceLocation> getEntries()
+    {
+        if(getType().isTag())
+            return EntryHelper.getTags();
+        else if(getType().isItem())
+            return EntryHelper.getItems();
+        else if(getType().isFluid())
+            return EntryHelper.getFluids();
+
+        return new ArrayList<>();
     }
 
     private void updateServerEntries()
@@ -248,7 +266,13 @@ public class RecipeEntryWidget
     {
         this.removeEntryButton.active = entriesDropdown.getEntries().size() > 2;
         this.resetEntriesButton.active = entriesDropdown.getDropdownEntries().stream().anyMatch(ree -> !ree.isEmpty());
-        this.registryNameField.setEntries(EntryHelper.getStringEntryListWith(isTag() ? EntryHelper.getTags() : EntryHelper.getItems(), isTag() ? SimpleListWidget.ResourceLocationEntry.Type.TAG : SimpleListWidget.ResourceLocationEntry.Type.ITEM), true);
+        this.registryNameField.setEntries(EntryHelper.getStringEntryListWith(
+                getType().isTag() ?
+                        EntryHelper.getTags() :
+                        getType().isItem() ?
+                                EntryHelper.getItems() :
+                                EntryHelper.getFluids(),
+                getType()), true);
     }
 
     public int getMaxEntry()
@@ -264,7 +288,6 @@ public class RecipeEntryWidget
     public void tick()
     {
         // Update widgets visibility
-        this.tagCheckBox.visible = hasTag();
         this.countField.visible = hasCount();
         this.chanceField.visible = hasChance();
 
@@ -275,7 +298,7 @@ public class RecipeEntryWidget
             messageCounter--;
 
         // Update display stack
-        if(!isTag())
+        if(!getType().equals(EntryType.TAG))
         {
             displayStack = new ItemStack(CommonUtils.getItem(CommonUtils.parse(registryNameField.getValue())));
         }
@@ -283,7 +306,7 @@ public class RecipeEntryWidget
         {
             ITag<Item> tag = CommonUtils.getTag(CommonUtils.parse(registryNameField.getValue()));
 
-            if(tag != null)
+            if(!tag.getValues().isEmpty())
             {
                 int displayTime = 20;
                 List<Item> availableItems = tag.getValues();
@@ -310,15 +333,15 @@ public class RecipeEntryWidget
         List<IFormattableTextComponent> tooltip = new ArrayList<>();
 
         tooltip.add(References.getTranslate("screen.widget.simple_list.tooltip." + (isOutput ? "output" : "input")));
-        entriesDropdown.getDropdownEntries().forEach(ree ->
+        entriesDropdown.getDropdownEntries().forEach(rse ->
         {
-            IFormattableTextComponent base = new StringTextComponent(TextFormatting.BLUE + (ree.isTag() ? "Tag" : "Item"));
+            IFormattableTextComponent base = new StringTextComponent(TextFormatting.BLUE + (rse.getRecipeEntry().isTag() ? "Tag" : rse.getRecipeEntry().isItem() ? "Item": "Fluid"));
             base.append(new StringTextComponent(TextFormatting.WHITE + " : "));
-            base.append(new StringTextComponent(TextFormatting.DARK_AQUA + ree.getRegistryName().toString()));
-            base.append(new StringTextComponent(TextFormatting.GRAY + String.format(" (x%d) ", ree.getCount())));
-            if(ree.getChance() != 1D)
-                base.append(new StringTextComponent(TextFormatting.DARK_GRAY + String.format("%.1f", 100 * ree.getChance()) + "%"));
-            if(!ree.isEmpty()) tooltip.add(base);
+            base.append(new StringTextComponent(TextFormatting.DARK_AQUA + rse.getRegistryName().toString()));
+            base.append(new StringTextComponent(TextFormatting.GRAY + String.format(" (x%d) ", rse.getCount())));
+            if(rse.getChance() != 1D)
+                base.append(new StringTextComponent(TextFormatting.DARK_GRAY + String.format("%.1f", 100 * rse.getChance()) + "%"));
+            if(!rse.isEmpty()) tooltip.add(base);
         });
 
         int itemSlotX = x + 3;
@@ -332,7 +355,7 @@ public class RecipeEntryWidget
             GuiUtils.drawHoveringText(poseStack, Collections.singletonList(References.getTranslate("screen.widget.recipe_entry_widget.tooltip.remove")), mouseX, mouseY, screenWidth, screenHeight, -1, ClientUtils.getFontRenderer());
         if(saveEntryButton.isMouseOver(mouseX, mouseY))
             GuiUtils.drawHoveringText(poseStack, Collections.singletonList(References.getTranslate("screen.widget.recipe_entry_widget.tooltip.save")), mouseX, mouseY, screenWidth, screenHeight, -1, ClientUtils.getFontRenderer());
-        if(tagCheckBox.isMouseOver(mouseX, mouseY))
+        if(typeButton.isMouseOver(mouseX, mouseY))
             GuiUtils.drawHoveringText(poseStack, Collections.singletonList(References.getTranslate("screen.widget.recipe_entry_widget.tooltip.tag")), mouseX, mouseY, screenWidth, screenHeight, -1, ClientUtils.getFontRenderer());
     }
 
@@ -348,9 +371,9 @@ public class RecipeEntryWidget
         this.messageCounter = time * 20;
     }
 
-    private boolean isTag()
+    private EntryType getType()
     {
-        return this.tagCheckBox.selected();
+        return this.typeButton.getSelected();
     }
 
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
@@ -370,7 +393,7 @@ public class RecipeEntryWidget
 
 
         countField.render(matrixStack, mouseX, mouseY, partialTicks);
-        tagCheckBox.render(matrixStack, mouseX, mouseY, partialTicks);
+        typeButton.render(matrixStack, mouseX, mouseY, partialTicks);
         chanceField.render(matrixStack, mouseX, mouseY, partialTicks);
         removeEntryButton.render(matrixStack, mouseX, mouseY, partialTicks);
         saveEntryButton.render(matrixStack, mouseX, mouseY, partialTicks);
@@ -397,7 +420,7 @@ public class RecipeEntryWidget
             // Render the item being carried because it's not rendered on top of the widget
             // Yes, we can call that hardcoding, but it's working and it's not that bad (I think)
             // But if you have a better solution, please tell me
-            RenderSystem.pushMatrix(); // Fortunately, in next version of forge, a matrix stack will not be created for each frame by this method
+            RenderSystem.pushMatrix(); // Fortunately, in next version of forge (at least 1.18), a matrix stack will not be created for each frame by the item render method
             RenderSystem.translatef(0, 0, 300); // On top of everything
             ClientUtils.getItemRenderer().renderGuiItem(stack, mouseX - 8, mouseY - 8);
             ClientUtils.getItemRenderer().renderGuiItemDecorations(ClientUtils.getFontRenderer(), stack, mouseX - 8, mouseY - 8, null);
@@ -410,7 +433,7 @@ public class RecipeEntryWidget
         this.canUseWidget = canUseWidget;
     }
 
-    public void mouseClicked(double mouseX, double mouseY, int button)
+    public boolean mouseClicked(double mouseX, double mouseY, int button)
     {
         if(canUseWidget)
         {
@@ -419,12 +442,13 @@ public class RecipeEntryWidget
                 if(!registryNameField.isFocused())
                 {
                     countField.mouseClicked(mouseX, mouseY, button);
-                    tagCheckBox.mouseClicked(mouseX, mouseY, button);
+                    typeButton.mouseClicked(mouseX, mouseY, button);
                     chanceField.mouseClicked(mouseX, mouseY, button);
                     removeEntryButton.mouseClicked(mouseX, mouseY, button);
                     saveEntryButton.mouseClicked(mouseX, mouseY, button);
                     resetEntriesButton.mouseClicked(mouseX, mouseY, button);
 
+                    // Check if the player is hovering the display slot with a an item in hand and if so, copy it to the widget
                     if(ScreenUtils.isMouseHover(displayStackPosX, displayStackPosY, (int) mouseX, (int) mouseY, 16, 16))
                     {
                         ItemStack stack = ClientUtils.getClientPlayer().inventory.getCarried();
@@ -432,10 +456,11 @@ public class RecipeEntryWidget
                         if(!stack.isEmpty())
                         {
                             displayStack = new ItemStack(stack.getItem());
+                            typeButton.setSelected(stack.getItem() instanceof BucketItem ? EntryType.FLUID : EntryType.ITEM);
                             registryNameField.setValue(stack.getItem().getRegistryName().toString());
-                            countField.setNumberValue(countField.visible ? stack.getCount() : 1, false);
+                            if(countField.visible)
+                                countField.setNumberValue(typeButton.getSelected().isFluid() ? 1000 : stack.getCount(), false);
                             chanceField.setNumberValue(1D, true);
-                            tagCheckBox.setSelected(false);
                         }
                     }
                 }
@@ -445,34 +470,38 @@ public class RecipeEntryWidget
 
             entriesDropdown.mouseClicked(mouseX, mouseY, button);
         }
+
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
-    public void keyPressed(int keyCode, int scanCode, int modifiers)
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers)
     {
         registryNameField.keyPressed(keyCode, scanCode, modifiers);
         countField.keyPressed(keyCode, scanCode, modifiers);
-        tagCheckBox.keyPressed(keyCode, scanCode, modifiers);
         chanceField.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
-    public void charTyped(char codePoint, int modifiers)
+    public boolean charTyped(char codePoint, int modifiers)
     {
         registryNameField.charTyped(codePoint, modifiers);
         countField.charTyped(codePoint, modifiers);
-        tagCheckBox.charTyped(codePoint, modifiers);
         chanceField.charTyped(codePoint, modifiers);
+        return super.charTyped(codePoint, modifiers);
     }
 
-    public void mouseScrolled(double mouseX, double mouseY, double delta)
+    public boolean mouseScrolled(double mouseX, double mouseY, double delta)
     {
         entriesDropdown.mouseScrolled(mouseX, mouseY, delta);
         registryNameField.mouseScrolled(mouseX, mouseY, delta);
+        return super.mouseScrolled(mouseX, mouseY, delta);
     }
 
-    public void mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY)
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY)
     {
         entriesDropdown.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
         registryNameField.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
     public boolean isFocused()
@@ -490,16 +519,6 @@ public class RecipeEntryWidget
         this.hasCount = hasCount;
     }
 
-    public boolean hasTag()
-    {
-        return hasTag;
-    }
-
-    public void setHasTag(boolean hasTag)
-    {
-        this.hasTag = hasTag;
-    }
-
     public boolean hasChance()
     {
         return hasChance;
@@ -510,13 +529,10 @@ public class RecipeEntryWidget
         this.hasChance = hasChance;
     }
 
-    public static class RecipeEntryEntry extends DropdownListWidget.Entry<ResourceLocation> implements JsonSerializable
+    private static class RecipeEntryEntry extends DropdownListWidget.Entry<ResourceLocation> implements JsonSerializable
     {
         private final boolean isLast;
-        private ResourceLocation registryName;
-        private int count;
-        private boolean isTag;
-        private double chance;
+        private final SpecialRecipeEntry recipeEntry;
 
         private ItemStack displayStack = ItemStack.EMPTY;
         private int displayCounter;
@@ -524,22 +540,30 @@ public class RecipeEntryWidget
         public RecipeEntryEntry(boolean isLast)
         {
             this.isLast = isLast;
-            this.registryName = CommonUtils.parse("minecraft:air");
-            this.count = 1;
-            this.isTag = false;
-            this.chance = 1D;
+            this.recipeEntry = new SpecialRecipeEntry();
+        }
+
+        public RecipeEntryEntry(boolean isLast, SpecialRecipeEntry recipeEntry)
+        {
+            this.isLast = isLast;
+            this.recipeEntry = recipeEntry;
         }
 
         @Override
         public ResourceLocation getValue()
         {
-            return registryName;
+            return recipeEntry.getRegistryName();
+        }
+
+        public SpecialRecipeEntry getRecipeEntry()
+        {
+            return recipeEntry;
         }
 
         @Override
         public IFormattableTextComponent getDisplayName(int index)
         {
-            return (isLast ? References.getTranslate(getTranslationKey(), index + 1) : new StringTextComponent(this.registryName.getPath())).withStyle(TextFormatting.WHITE);
+            return (isLast ? References.getTranslate(getTranslationKey(), index + 1) : new StringTextComponent(recipeEntry.getRegistryName().getPath())).withStyle(TextFormatting.WHITE);
         }
 
         private String getTranslationKey()
@@ -562,13 +586,13 @@ public class RecipeEntryWidget
         @Override
         protected void tick()
         {
-            if(!isTag)
+            if(!recipeEntry.isTag())
             {
-                displayStack = new ItemStack(CommonUtils.getItem(registryName));
+                displayStack = new ItemStack(CommonUtils.getItem(recipeEntry.getRegistryName()));
             }
             else
             {
-                ITag<Item> tag = CommonUtils.getTag(registryName);
+                ITag<Item> tag = CommonUtils.getTag(recipeEntry.getRegistryName());
 
                 if(tag.getValues().size() > 0)
                 {
@@ -586,59 +610,49 @@ public class RecipeEntryWidget
             }
         }
 
-        public void set(ResourceLocation registryName, int count, boolean isTag, double chance)
+        public void set(ResourceLocation registryName, int count, EntryType type, double chance)
         {
-            this.registryName = registryName;
-            this.count = count;
-            this.isTag = isTag;
-            this.chance = chance;
+            recipeEntry.setRegistryName(registryName);
+            recipeEntry.setCount(count);
+            recipeEntry.setType(type);
+            recipeEntry.setChance(chance);
         }
 
         public ResourceLocation getRegistryName()
         {
-            return registryName;
+            return recipeEntry.getRegistryName();
         }
 
         public int getCount()
         {
-            return count;
+            return recipeEntry.getCount();
         }
 
-        public boolean isTag()
+        public EntryType getType()
         {
-            return isTag;
+            return recipeEntry.getType();
         }
 
         public double getChance()
         {
-            return chance;
+            return recipeEntry.getChance();
         }
 
         @Override
         public JsonObject serialize()
         {
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("RegistryName", registryName.toString());
-            jsonObject.addProperty("Count", count);
-            jsonObject.addProperty("IsTag", isTag);
-            jsonObject.addProperty("Chance", chance);
-            return jsonObject;
+            return recipeEntry.serialize();
         }
 
         public static RecipeEntryEntry deserialize(JsonObject jsonObject)
         {
-            RecipeEntryEntry recipeEntryEntry = new RecipeEntryEntry(false);
-            recipeEntryEntry.registryName = CommonUtils.parse(jsonObject.get("RegistryName").getAsString());
-            recipeEntryEntry.count = jsonObject.get("Count").getAsInt();
-            recipeEntryEntry.isTag = jsonObject.get("IsTag").getAsBoolean();
-            recipeEntryEntry.chance = jsonObject.get("Chance").getAsDouble();
-            return recipeEntryEntry;
+            return new RecipeEntryEntry(false, SpecialRecipeEntry.deserialize(jsonObject));
         }
 
         @Override
         public String getEntryValue()
         {
-            return this.registryName.toString();
+            return this.recipeEntry.getRegistryName().toString();
         }
 
         @Override
@@ -649,7 +663,7 @@ public class RecipeEntryWidget
 
         public boolean isEmpty()
         {
-            return this.registryName.equals(Items.AIR.getRegistryName());
+            return recipeEntry.isEmpty();
         }
 
         public boolean isLast()

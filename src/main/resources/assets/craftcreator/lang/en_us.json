@@ -6,6 +6,10 @@
 
 	"key.craftcreator.open_tutorial": "Open Tutorial",
 
+	"craftcreator.entry.type.item": "Item",
+	"craftcreator.entry.type.tag": "Tag",
+	"craftcreator.entry.type.fluid": "Fluid",
+	"craftcreator.entry.type.other": "Other",
 
 	"block.craftcreator.minecraft_recipe_creator": "§lMinecraft Table Recipe Creator",
 	"block.craftcreator.botania_recipe_creator": "§lBotania Recipe Creator",

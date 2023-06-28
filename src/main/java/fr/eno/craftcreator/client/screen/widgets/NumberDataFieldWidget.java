@@ -55,12 +55,18 @@ public class NumberDataFieldWidget extends TextFieldWidget
     }
 
     @Override
+    public boolean mouseClicked(double pMouseX, double pMouseY, int pButton)
+    {
+        if(!isMouseOver(pMouseX, pMouseY) && getValue().trim().isEmpty())
+            setValue("1");
+
+        return super.mouseClicked(pMouseX, pMouseY, pButton);
+    }
+
+    @Override
     public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers)
     {
-        boolean flag = super.keyPressed(pKeyCode, pScanCode, pModifiers);
-        if(getValue().trim().isEmpty())
-            setValue("0");
-        return flag;
+        return super.keyPressed(pKeyCode, pScanCode, pModifiers);
     }
 
     public void setNumberValue(Number number, boolean isDouble)
