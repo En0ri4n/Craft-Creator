@@ -539,12 +539,14 @@ public class SuggesterTextFieldWidget extends SimpleListWidget
                 return true;
             }
 
-            super.mouseClicked(pMouseX, pMouseY, pButton);
+            if(super.isMouseOver(pMouseX, pMouseY))
+                super.mouseClicked(pMouseX, pMouseY, pButton);
 
             if(super.isMouseOver(pMouseX, pMouseY))
             {
                 if(getSelected() != null)
                 {
+                    System.out.println(getSelected().getEntryValue());
                     setValue(getSelected().getEntryValue());
                     this.setFocus(false);
                     return true;

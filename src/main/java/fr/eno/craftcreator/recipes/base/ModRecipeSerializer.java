@@ -64,7 +64,12 @@ public abstract class ModRecipeSerializer
     {
         Feedback feedback;
 
-        IRecipeType<?> recipeType = CommonUtils.getRecipeTypeByName(CommonUtils.parse(recipeJson.get("type").getAsString()));
+        String recipeTypeLoc = recipeJson.get("type").getAsString();
+
+        if(recipeTypeLoc.contains("minecraft:crafting")) // Minecraft use "minecraft:crafting_shaped" or "minecraft:crafting_shapeless" for crafting recipes soooooo
+            recipeTypeLoc = "minecraft:crafting";
+
+        IRecipeType<?> recipeType = CommonUtils.getRecipeTypeByName(CommonUtils.parse(recipeTypeLoc));
 
         switch(currentSerializeType)
         {

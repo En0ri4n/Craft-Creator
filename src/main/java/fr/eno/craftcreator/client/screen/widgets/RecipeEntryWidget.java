@@ -55,7 +55,6 @@ public class RecipeEntryWidget extends Widget
     private final BlockPos tilePos;
 
     private DropdownListWidget<RecipeEntryEntry> entriesDropdown;
-
     private SuggesterTextFieldWidget registryNameField;
     private NumberDataFieldWidget countField;
     private EnumButton<EntryType> typeButton;
@@ -132,7 +131,7 @@ public class RecipeEntryWidget extends Widget
         });
 
         // Registry Name Text Field
-        this.registryNameField = new SuggesterTextFieldWidget(startX, startY + y * i++, width - 2 * gapX, 16, EntryHelper.getStringEntryListWith(EntryHelper.getItems(), EntryType.ITEM), null, (newValue) ->
+        this.registryNameField = new SuggesterTextFieldWidget(startX, startY + y * i++, width - 2 * gapX, 16, EntryHelper.getStringEntryListWith(EntryHelper.getItems(), EntryType.ITEM), (newEntry) -> registryNameField.setSelected(null), (newValue) ->
         {
             this.saveEntryButton.active = CommonUtils.getItem(CommonUtils.parse(newValue)) != Items.AIR || CommonUtils.getFluid(CommonUtils.parse(newValue)) != null || !CommonUtils.getTag(CommonUtils.parse(newValue)).getValues().isEmpty();
         });
@@ -241,7 +240,7 @@ public class RecipeEntryWidget extends Widget
 
         this.entriesDropdown.getDropdownEntries().clear();
         ArrayList<RecipeEntryEntry> list = jsonList.stream().map(RecipeEntryEntry::deserialize).collect(Collectors.toCollection(ArrayList::new));
-        if(maxEntry > 1 || maxEntry == -1)
+        if((maxEntry > 1 || maxEntry == -1) && list.size() < getMaxEntry())
             list.add(new RecipeEntryEntry(true));
         this.entriesDropdown.setEntries(list);
         this.entriesDropdown.trimWidthToEntries();
@@ -257,6 +256,7 @@ public class RecipeEntryWidget extends Widget
         this.entriesDropdown.getDropdownEntries().clear();
         this.entriesDropdown.setEntries(entries);
         displayStack = ItemStack.EMPTY;
+        registryNameField.setSelected(null);
         registryNameField.setValue(Items.AIR.getRegistryName().toString());
         this.entriesDropdown.trimWidthToEntries();
         checkButtons();
@@ -278,6 +278,8 @@ public class RecipeEntryWidget extends Widget
                                 EntryHelper.getItems() :
                                 EntryHelper.getFluids(),
                 getType()), true);
+        this.registryNameField.setSelected(null);
+        //this.registryNameField.setSelected(registryNameField.getEntries().stream().filter(e -> e.getEntryValue().equals(entriesDropdown.getDropdownSelected().getEntryValue())).findFirst().orElse(null));
     }
 
     public int getMaxEntry()
@@ -648,6 +650,11 @@ public class RecipeEntryWidget extends Widget
             recipeEntry.setCount(count);
             recipeEntry.setType(type);
             recipeEntry.setChance(chance);
+        }
+
+        public void setType(EntryType type)
+        {
+            recipeEntry.setType(type);
         }
 
         public ResourceLocation getRegistryName()

@@ -1,7 +1,6 @@
 package fr.eno.craftcreator.recipes.serializers;
 
 import com.google.gson.JsonObject;
-import fr.eno.craftcreator.base.RecipeCreator;
 import fr.eno.craftcreator.base.SupportedMods;
 import fr.eno.craftcreator.recipes.base.ModRecipeSerializer;
 import fr.eno.craftcreator.recipes.utils.CraftIngredients;

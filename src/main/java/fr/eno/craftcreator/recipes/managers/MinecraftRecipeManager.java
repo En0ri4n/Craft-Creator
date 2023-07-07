@@ -83,7 +83,7 @@ public class MinecraftRecipeManager extends BaseRecipesManager
 
         ItemStack output = slots.get(9).getItem();
 
-        MinecraftRecipeSerializer.get().serializeCraftingTableRecipe(output, slots, taggedSlots, nbtSlots, shaped);
+        MinecraftRecipeSerializer.get().serializeCraftingTableRecipe(output, slots.subList(0, slots.size() - 1), taggedSlots, nbtSlots, shaped); // Removing the result slot
     }
 
     public static MinecraftRecipeManager get()

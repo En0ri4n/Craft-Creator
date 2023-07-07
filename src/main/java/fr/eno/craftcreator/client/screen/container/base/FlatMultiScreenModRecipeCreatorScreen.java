@@ -153,8 +153,7 @@ public abstract class FlatMultiScreenModRecipeCreatorScreen<T extends CommonCont
     {
         inputWidget.mouseClicked(mouseX, mouseY, button);
         outputWidget.mouseClicked(mouseX, mouseY, button);
-        if(!inputWidget.isFocused() && !outputWidget.isFocused()) return super.mouseClicked(mouseX, mouseY, button);
-        return true;
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override

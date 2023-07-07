@@ -149,5 +149,8 @@
 	"craftcreator.screen.create_recipe_creator.mixing.title": "Mixing Recipe Creator",
 	"craftcreator.screen.create_recipe_creator.pressing.title": "Pressing Recipe Creator",
 	"craftcreator.screen.create_recipe_creator.compacting.title": "Compacting Recipe Creator",
-	"craftcreator.screen.create_recipe_creator.milling.title": "Milling Recipe Creator"
+	"craftcreator.screen.create_recipe_creator.milling.title": "Milling Recipe Creator",
+	"craftcreator.screen.create_recipe_creator.filling.title": "Filling Recipe Creator",
+	"craftcreator.screen.create_recipe_creator.splashing.title": "Splashing Recipe Creator",
+	"craftcreator.screen.create_recipe_creator.emptying.title": "Emptying Recipe Creator"
 }

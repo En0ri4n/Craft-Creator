@@ -284,6 +284,7 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
             if(hoveredEntry != null)
             {
                 this.setSelected(hoveredEntry);
+                this.hoveredEntry = null;
             }
         }
 
@@ -296,13 +297,14 @@ public class SimpleListWidget extends AbstractList<SimpleListWidget.Entry>
         entries.forEach(this::addEntry);
         if(resetScroll)
             this.setScrollAmount(0D);
+        setSelected(null);
         this.height = Math.min(entries.size(), MAX_ITEMS_DISPLAYED) * itemHeight;
     }
 
     @Override
     public void setSelected(@Nullable Entry entry)
     {
-        if(this.onSelected != null && entry != null)
+       if(this.onSelected != null && entry != null)
         {
             this.onSelected.accept(entry);
         }

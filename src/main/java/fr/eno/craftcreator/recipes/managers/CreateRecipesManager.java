@@ -21,9 +21,11 @@ public class CreateRecipesManager extends BaseRecipesManager
 {
     private static final CreateRecipesManager INSTANCE = new CreateRecipesManager();
 
-     //We don't use this method because Create recipes are created not with slots
+    //We don't use this method because Create recipes are created not with slots
     @Override
-    public void createRecipe(RecipeCreator recipe, List<Slot> slots, RecipeInfos recipeInfos, ModRecipeSerializer.SerializerType serializerType) {}
+    public void createRecipe(RecipeCreator recipe, List<Slot> slots, RecipeInfos recipeInfos, ModRecipeSerializer.SerializerType serializerType)
+    {
+    }
 
     public void createRecipe(RecipeCreator recipe, TileEntity tileEntity, RecipeInfos recipeInfos, ModRecipeSerializer.SerializerType serializerType)
     {
@@ -37,14 +39,15 @@ public class CreateRecipesManager extends BaseRecipesManager
 
         if(areEmpty(inputs, outputs)) return;
 
-        if(recipe.is(CRUSHING))
-            serializeCrushingRecipe(inputs, outputs, recipeInfos);
-        else if(recipe.is(CUTTING))
-            serializeCuttingRecipe(inputs, outputs, recipeInfos);
-        else if(recipe.is(MIXING))
-            serializeMixingRecipe(inputs, outputs, recipeInfos);
-        else if(recipe.is(MILLING))
-            serializeMillingRecipe(inputs, outputs, recipeInfos);
+        if(recipe.is(CRUSHING)) serializeCrushingRecipe(inputs, outputs, recipeInfos);
+        else if(recipe.is(CUTTING)) serializeCuttingRecipe(inputs, outputs, recipeInfos);
+        else if(recipe.is(MIXING)) serializeMixingRecipe(inputs, outputs, recipeInfos);
+        else if(recipe.is(MILLING)) serializeMillingRecipe(inputs, outputs, recipeInfos);
+        else if(recipe.is(COMPACTING)) serializeCompactingRecipe(inputs, outputs, recipeInfos);
+        else if(recipe.is(PRESSING)) serializePressingRecipe(inputs, outputs, recipeInfos);
+        else if(recipe.is(FILLING)) serializeFillingRecipe(inputs, outputs, recipeInfos);
+        else if(recipe.is(SPLASHING)) serializeSplashingRecipe(inputs, outputs, recipeInfos);
+        else if(recipe.is(EMPTYING)) serializeEmptyingRecipe(inputs, outputs, recipeInfos);
     }
 
     private void serializeCrushingRecipe(List<SpecialRecipeEntry> inputs, List<SpecialRecipeEntry> outputs, RecipeInfos recipeInfos)
@@ -81,6 +84,46 @@ public class CreateRecipesManager extends BaseRecipesManager
         int processingTime = recipeInfos.getValue("processing_time").intValue();
 
         CreateRecipeSerializer.get().serializeMillingRecipe(input, output, processingTime);
+    }
+
+    private void serializeCompactingRecipe(List<SpecialRecipeEntry> inputs, List<SpecialRecipeEntry> outputs, RecipeInfos recipeInfos)
+    {
+        RecipeEntry.MultiInput input = getValidInputs(inputs);
+        RecipeEntry.Output output = getOutput(outputs.get(0));
+
+        CreateRecipeSerializer.get().serializeCompactingRecipe(input, output);
+    }
+
+    private void serializePressingRecipe(List<SpecialRecipeEntry> inputs, List<SpecialRecipeEntry> outputs, RecipeInfos recipeInfos)
+    {
+        RecipeEntry.MultiInput input = getValidInputs(inputs);
+        RecipeEntry.Output output = getOutput(outputs.get(0));
+
+        CreateRecipeSerializer.get().serializePressingRecipe(input, output);
+    }
+
+    private void serializeFillingRecipe(List<SpecialRecipeEntry> inputs, List<SpecialRecipeEntry> outputs, RecipeInfos recipeInfos)
+    {
+        RecipeEntry.MultiInput input = getValidInputs(inputs);
+        RecipeEntry.Output output = getOutput(outputs.get(0));
+
+        CreateRecipeSerializer.get().serializeFillingRecipe(input, output);
+    }
+
+    private void serializeSplashingRecipe(List<SpecialRecipeEntry> inputs, List<SpecialRecipeEntry> outputs, RecipeInfos recipeInfos)
+    {
+        RecipeEntry.Input input = getInput(inputs.get(0));
+        RecipeEntry.MultiOutput output = getValidOutputs(outputs);
+
+        CreateRecipeSerializer.get().serializeSplashingRecipe(input, output);
+    }
+
+    private void serializeEmptyingRecipe(List<SpecialRecipeEntry> inputs, List<SpecialRecipeEntry> outputs, RecipeInfos recipeInfos)
+    {
+        RecipeEntry.Input input = getInput(inputs.get(0));
+        RecipeEntry.MultiOutput output = getValidOutputs(outputs);
+
+        CreateRecipeSerializer.get().serializeEmptyingRecipe(input, output);
     }
 
     public static CreateRecipesManager get()

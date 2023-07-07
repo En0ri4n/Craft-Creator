@@ -93,6 +93,48 @@ public class CreateRecipeCreatorScreen extends FlatMultiScreenModRecipeCreatorSc
             outputWidget.setHasChance(true);
             outputWidget.setAllowedTypes(EntryType.ITEM);
         }
+        else if(getCurrentRecipe().is(COMPACTING, FILLING))
+        {
+            inputWidget.setHasCount(false);
+            inputWidget.setHasFluidAmount(true);
+            inputWidget.setHasChance(false);
+            inputWidget.setAllowedTypes(EntryType.ITEM, EntryType.TAG, EntryType.FLUID);
+
+            outputWidget.setHasCount(false);
+            outputWidget.setHasChance(false);
+            outputWidget.setAllowedTypes(EntryType.ITEM);
+        }
+        else if(getCurrentRecipe().is(PRESSING))
+        {
+            inputWidget.setHasCount(false);
+            inputWidget.setHasChance(false);
+            inputWidget.setAllowedTypes(EntryType.ITEM, EntryType.TAG);
+
+            outputWidget.setHasCount(false);
+            outputWidget.setHasChance(false);
+            outputWidget.setAllowedTypes(EntryType.ITEM);
+        }
+        else if(getCurrentRecipe().is(SPLASHING))
+        {
+            inputWidget.setHasCount(false);
+            inputWidget.setHasChance(false);
+            inputWidget.setAllowedTypes(EntryType.ITEM, EntryType.TAG);
+
+            outputWidget.setHasCount(true);
+            outputWidget.setHasChance(true);
+            outputWidget.setAllowedTypes(EntryType.ITEM);
+        }
+        else if(getCurrentRecipe().is(EMPTYING))
+        {
+            inputWidget.setHasCount(false);
+            inputWidget.setHasChance(false);
+            inputWidget.setAllowedTypes(EntryType.ITEM, EntryType.TAG);
+
+            outputWidget.setHasCount(false);
+            outputWidget.setHasFluidAmount(true);
+            outputWidget.setHasChance(false);
+            outputWidget.setAllowedTypes(EntryType.ITEM, EntryType.FLUID);
+        }
     }
 
     @Override

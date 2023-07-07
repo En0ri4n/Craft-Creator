@@ -169,6 +169,18 @@ public class RecipeCreator
         }
 
         /**
+         * Set the icon of the recipe creator<br>
+         *
+         * @param item the item of the recipe creator
+         * @return the current builder
+         */
+        public Builder withIcon(Item item)
+        {
+            this.itemIcon = item.getRegistryName();
+            return this;
+        }
+
+        /**
          * The gui texture of the recipe creator
          *
          * @param guiTextureName the gui texture of the recipe creator

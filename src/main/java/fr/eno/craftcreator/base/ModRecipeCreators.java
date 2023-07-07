@@ -1,6 +1,7 @@
 package fr.eno.craftcreator.base;
 
 import fr.eno.craftcreator.utils.SlotHelper;
+import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.ArrayList;
@@ -51,6 +52,9 @@ public class ModRecipeCreators
     public static final RecipeCreator MILLING;
     public static final RecipeCreator COMPACTING;
     public static final RecipeCreator PRESSING;
+    public static final RecipeCreator FILLING;
+    public static final RecipeCreator SPLASHING;
+    public static final RecipeCreator EMPTYING;
 
     public static List<RecipeCreator> getRecipeCreatorScreens(SupportedMods mod)
     {
@@ -108,8 +112,11 @@ public class ModRecipeCreators
         CUTTING = register(RecipeCreator.Builder.of(SupportedMods.CREATE).withRecipeType("cutting").withIcon("mechanical_saw").withNoSlots().setSize(1, -1).withGuiTexture("create_recipe_creator.png"));
         MIXING = register(RecipeCreator.Builder.of(SupportedMods.CREATE).withRecipeType("mixing").withIcon("mechanical_mixer").withNoSlots().setSize(-1, 1).withGuiTexture("create_recipe_creator.png"));
         MILLING = register(RecipeCreator.Builder.of(SupportedMods.CREATE).withRecipeType("milling").withIcon("millstone").withNoSlots().setSize(1, -1).withGuiTexture("create_recipe_creator.png"));
-        COMPACTING = register(RecipeCreator.Builder.of(SupportedMods.CREATE).withRecipeType("compacting").withIcon("mechanical_press").withNoSlots().setSize(1, -1).withGuiTexture("create_recipe_creator.png"));
+        COMPACTING = register(RecipeCreator.Builder.of(SupportedMods.CREATE).withRecipeType("compacting").withIcon("mechanical_press").withNoSlots().setSize(-1, 1).withGuiTexture("create_recipe_creator.png"));
         PRESSING = register(RecipeCreator.Builder.of(SupportedMods.CREATE).withRecipeType("pressing").withIcon("mechanical_press").withNoSlots().setSize(1, -1).withGuiTexture("create_recipe_creator.png"));
+        FILLING = register(RecipeCreator.Builder.of(SupportedMods.CREATE).withRecipeType("filling").withIcon("spout").withNoSlots().setSize(2, 1).withGuiTexture("create_recipe_creator.png"));
+        SPLASHING = register(RecipeCreator.Builder.of(SupportedMods.CREATE).withRecipeType("splashing").withIcon(Items.SPLASH_POTION).withNoSlots().setSize(1, -1).withGuiTexture("create_recipe_creator.png"));
+        EMPTYING = register(RecipeCreator.Builder.of(SupportedMods.CREATE).withRecipeType("emptying").withIcon(Items.GLASS_BOTTLE).withNoSlots().setSize(1, -1).withGuiTexture("create_recipe_creator.png"));
 
         RECIPE_CREATORS.trimToSize(); // Trim to size to save memory
     }
