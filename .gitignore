@@ -1,3 +1,5 @@
 run
 .idea
 .gitignore
+.gradle
+build
