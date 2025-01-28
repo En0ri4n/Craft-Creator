@@ -1,5 +1,8 @@
 package fr.eno.craftcreatorapi;
 
+import fr.eno.craftcreatorapi.init.InitBlockBase;
+import fr.eno.craftcreatorapi.init.InitItemBase;
+import fr.eno.craftcreatorapi.utils.CraftCreatorException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +24,10 @@ public class CraftCreatorAPI
     @Getter
     private static final String kubeJsModId = "kubejs";
 
+    private ReferenceBase references;
     private SupportedModsBase supportedModsBase;
+    private InitBlockBase initBlockBase;
+    private InitItemBase initItemBase;
 
     private final List<Object> required = Arrays.asList(supportedModsBase);
 

@@ -2,21 +2,25 @@ package fr.eno.craftcreatorapi;
 
 
 import fr.eno.craftcreatorapi.container.slot.PositionnedSlot;
+import fr.eno.craftcreatorapi.utils.FormattableString;
+import fr.eno.craftcreatorapi.utils.Identifier;
+import lombok.Getter;
 
 import java.awt.*;
 import java.util.List;
 
-public class RecipeCreator
+@Getter
+public abstract class AbstractRecipeCreator
 {
     private final SupportedMods mod;
     private final List<PositionnedSlot> slots;
     private final int maxInputSize;
     private final int maxOutputSize;
-    private final ResourceLocation recipeTypeLocation;
-    private final ResourceLocation itemIcon;
-    private final ResourceLocation guiTexture;
+    private final Identifier recipeTypeLocation;
+    private final Identifier itemIcon;
+    private final Identifier guiTexture;
 
-    private RecipeCreator(SupportedMods mod, List<PositionnedSlot> slots, int maxInputSize, int maxOutputSize, ResourceLocation recipeTypeLocation, ResourceLocation itemIcon, ResourceLocation guiTexture)
+    private AbstractRecipeCreator(SupportedMods mod, List<PositionnedSlot> slots, int maxInputSize, int maxOutputSize, Identifier recipeTypeLocation, Identifier itemIcon, Identifier guiTexture)
     {
         this.mod = mod;
         this.slots = slots;
@@ -27,19 +31,9 @@ public class RecipeCreator
         this.guiTexture = guiTexture;
     }
 
-    public SupportedMods getMod()
-    {
-        return this.mod;
-    }
-
     public <C extends Container, T extends Recipe<C>> RecipeType<T> getRecipeType()
     {
         return CommonUtils.getRecipeTypeByName(this.recipeTypeLocation);
-    }
-
-    public ResourceLocation getRecipeTypeLocation()
-    {
-        return this.recipeTypeLocation;
     }
 
     public Item getRecipeIcon()
@@ -48,29 +42,9 @@ public class RecipeCreator
         return icon != null && icon != Items.AIR ? icon : Items.COMMAND_BLOCK;
     }
 
-    public ResourceLocation getGuiTexture()
+    public boolean is(AbstractRecipeCreator... recipeCreators)
     {
-        return guiTexture;
-    }
-
-    public List<PositionnedSlot> getSlots()
-    {
-        return slots;
-    }
-
-    public int getMaxInputSize()
-    {
-        return maxInputSize;
-    }
-
-    public int getMaxOutputSize()
-    {
-        return maxOutputSize;
-    }
-
-    public boolean is(RecipeCreator... recipeCreators)
-    {
-        for(RecipeCreator recipeCreator : recipeCreators)
+        for(AbstractRecipeCreator recipeCreator : recipeCreators)
             if(this.equals(recipeCreator))
                 return true;
 
@@ -85,9 +59,9 @@ public class RecipeCreator
         private List<PositionnedSlot> slots;
         private int maxInputSize = -1;
         private int maxOutputSize = -1;
-        private ResourceLocation recipeTypeLocation;
-        private ResourceLocation itemIcon;
-        private ResourceLocation guiTextureName;
+        private Identifier recipeTypeLocation;
+        private Identifier itemIcon;
+        private Identifier guiTextureName;
 
         private Builder(SupportedMods mod)
         {
@@ -128,10 +102,10 @@ public class RecipeCreator
          * @param recipeType the recipe type of the recipe creator
          * @return the current builder
          */
-        public Builder withRecipeType(String recipeType)
+        public Builder withRecipeType(Identifier recipeType)
         {
-            this.recipeTypeLocation = CommonUtils.parse(mod.getModId(), recipeType);
-            this.withGuiTexture(GUI_TEXTURE_NAME.format(recipeType));
+            this.recipeTypeLocation = recipeType;
+            this.withGuiTexture(GUI_TEXTURE_NAME.format(recipeType.getPath()));
             return this;
         }
 
@@ -139,12 +113,12 @@ public class RecipeCreator
          * Set the icon of the recipe creator (we assume that the item has the same mod id as the mod)<br>
          * e.g. if the mod id is "craftcreator" and the item is "crafting_table", the item will be "craftcreator:crafting_table"
          *
-         * @param item the item of the recipe creator
+         * @param icon the icon of the recipe creator
          * @return the current builder
          */
-        public Builder withIcon(String item)
+        public Builder withIcon(Identifier icon)
         {
-            this.itemIcon = CommonUtils.parse(mod.getModId() + ":" + item);
+            this.itemIcon = icon;
             return this;
         }
 
@@ -156,7 +130,7 @@ public class RecipeCreator
          */
         public Builder withGuiTexture(String guiTextureName)
         {
-            this.guiTextureName = References.getLoc("textures/gui/container/" + mod.getModId() + "/" + guiTextureName);
+            this.guiTextureName = CraftCreatorAPI.getInstance().getReferences().getTranslation("textures/gui/container/" + mod.getModId() + "/" + guiTextureName);
             return this;
         }
 

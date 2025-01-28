@@ -1,4 +1,4 @@
-package fr.eno.craftcreatorapi;
+package fr.eno.craftcreatorapi.utils;
 
 public class CraftCreatorException extends Exception
 {
