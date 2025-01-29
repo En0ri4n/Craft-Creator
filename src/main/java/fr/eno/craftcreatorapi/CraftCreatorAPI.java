@@ -2,6 +2,7 @@ package fr.eno.craftcreatorapi;
 
 import fr.eno.craftcreatorapi.init.InitBlockBase;
 import fr.eno.craftcreatorapi.init.InitItemBase;
+import fr.eno.craftcreatorapi.utils.ComponentHelperBase;
 import fr.eno.craftcreatorapi.utils.CraftCreatorException;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -28,8 +29,10 @@ public class CraftCreatorAPI
     private SupportedModsBase supportedModsBase;
     private InitBlockBase initBlockBase;
     private InitItemBase initItemBase;
+    private RecipeCreatorBase<?, ?> recipeCreatorBase;
+    private ComponentHelperBase<?> componentHelperBase;
 
-    private final List<Object> required = Arrays.asList(supportedModsBase);
+    private final List<Object> required = Arrays.asList(references, supportedModsBase, initBlockBase, initItemBase);
 
     public void initialize() throws CraftCreatorException
     {

@@ -1,9 +1,10 @@
 package fr.eno.craftcreatorapi.serializer.recipe;
 
 import com.google.gson.JsonObject;
+import fr.eno.craftcreatorapi.CraftCreatorAPI;
 import fr.eno.craftcreatorapi.serializer.recipe.utils.KubeJSRecipeAction;
 import fr.eno.craftcreatorapi.utils.FormattableString;
-import fr.eno.craftcreatorapi.utils.RecipeDescriptors;
+import fr.eno.craftcreatorapi.serializer.recipe.utils.RecipeDescriptors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

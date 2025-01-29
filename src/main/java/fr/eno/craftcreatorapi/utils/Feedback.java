@@ -7,11 +7,11 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum Feedback
 {
-    ADDED("serializer.message.recipe.added"),
-    REMOVED("serializer.message.recipe.removed"),
-    EXISTS("serializer.message.recipe.exists"),
-    DONT_EXISTS("serializer.message.recipe.dont_exists"),
-    FILE_ERROR("serializer.message.recipe.error");
+    ADDED("craftcreator.serializer.message.recipe.added"),
+    REMOVED("craftcreator.serializer.message.recipe.removed"),
+    EXISTS("craftcreator.serializer.message.recipe.exists"),
+    DONT_EXISTS("craftcreator.serializer.message.recipe.dont_exists"),
+    FILE_ERROR("craftcreator.serializer.message.recipe.error");
 
     private final String messageKey;
 }

@@ -1,7 +1,9 @@
 package fr.eno.craftcreatorapi.serializer.recipe.manager;
 
-import fr.eno.craftcreatorapi.AbstractRecipeCreator;
+import fr.eno.craftcreatorapi.RecipeCreatorBase;
 import fr.eno.craftcreatorapi.container.slot.CCSlot;
+import fr.eno.craftcreatorapi.serializer.recipe.utils.RecipeEntry;
+import fr.eno.craftcreatorapi.serializer.recipe.utils.RecipeParameters;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -19,7 +21,7 @@ public abstract class RecipeManagerBase
      * @param param the recipe infos
      * @param serializerType the serializer type
      */
-    public abstract void createRecipe(AbstractRecipeCreator recipe, List<CCSlot> slots, RecipeInfos param, ModRecipeSerializer.SerializerType serializerType);
+    public abstract void createRecipe(RecipeCreatorBase recipe, List<CCSlot> slots, RecipeParameters param, ModRecipeSerializer.SerializerType serializerType);
 
     /**
      * Get content of the first non-empty slot as a {@link RecipeEntry.Output}<br>
@@ -28,7 +30,7 @@ public abstract class RecipeManagerBase
      * @param outputCount the output slots count
      * @return the output or {@link RecipeEntry.Output#EMPTY} if no output found
      */
-    protected RecipeEntry.Output getValidOutput(List<SlotItemHandler> slots, int outputCount)
+    protected RecipeEntry.Output<?> getValidOutput(List<SlotItemHandler> slots, int outputCount)
     {
         for(int i = slots.size() - outputCount; i < slots.size(); i++)
         {

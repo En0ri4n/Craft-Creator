@@ -1,4 +1,4 @@
-package fr.eno.craftcreatorapi.utils;
+package fr.eno.craftcreatorapi.serializer.recipe.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -10,7 +10,7 @@ import java.awt.*;
 import java.util.List;
 
 @Getter
-public abstract class AbstractRecipeCreator
+public abstract class RecipeCreatorBase<ITEM, RECIPE_TYPE>
 {
     private final SupportedMods mod;
     private final List<PositionnedSlot> slots;
@@ -20,7 +20,7 @@ public abstract class AbstractRecipeCreator
     private final Identifier itemIcon;
     private final Identifier guiTexture;
 
-    private AbstractRecipeCreator(SupportedMods mod, List<PositionnedSlot> slots, int maxInputSize, int maxOutputSize, Identifier recipeTypeLocation, Identifier itemIcon, Identifier guiTexture)
+    private RecipeCreatorBase(SupportedMods mod, List<PositionnedSlot> slots, int maxInputSize, int maxOutputSize, Identifier recipeTypeLocation, Identifier itemIcon, Identifier guiTexture)
     {
         this.mod = mod;
         this.slots = slots;
@@ -31,20 +31,13 @@ public abstract class AbstractRecipeCreator
         this.guiTexture = guiTexture;
     }
 
-    public <C extends Container, T extends Recipe<C>> RecipeType<T> getRecipeType()
-    {
-        return CommonUtils.getRecipeTypeByName(this.recipeTypeLocation);
-    }
+    public abstract RECIPE_TYPE getRecipeType();
 
-    public Item getRecipeIcon()
-    {
-        Item icon = ForgeRegistries.ITEMS.getValue(this.itemIcon);
-        return icon != null && icon != Items.AIR ? icon : Items.COMMAND_BLOCK;
-    }
+    public abstract  ITEM getRecipeIcon();
 
-    public boolean is(AbstractRecipeCreator... recipeCreators)
+    public boolean is(RecipeCreatorBase... recipeCreators)
     {
-        for(AbstractRecipeCreator recipeCreator : recipeCreators)
+        for(RecipeCreatorBase recipeCreator : recipeCreators)
             if(this.equals(recipeCreator))
                 return true;
 
@@ -130,7 +123,7 @@ public abstract class AbstractRecipeCreator
          */
         public Builder withGuiTexture(String guiTextureName)
         {
-            this.guiTextureName = CraftCreatorAPI.getInstance().getReferences().getTranslation("textures/gui/container/" + mod.getModId() + "/" + guiTextureName);
+            this.guiTextureName = CraftCreatorAPI.getInstance().getReferences().getIdentifier("textures/gui/container/" + mod.getModId() + "/" + guiTextureName);
             return this;
         }
 
@@ -139,9 +132,9 @@ public abstract class AbstractRecipeCreator
          *
          * @return the built recipe creator
          */
-        public RecipeCreator build()
+        public RecipeCreatorBase build()
         {
-            return new RecipeCreator(mod, slots, maxInputSize, maxOutputSize, recipeTypeLocation, itemIcon, guiTextureName);
+            return CraftCreatorAPI.getInstance().new RecipeCreator(mod, slots, maxInputSize, maxOutputSize, recipeTypeLocation, itemIcon, guiTextureName);
         }
 
         public static Builder of(SupportedMods mod)

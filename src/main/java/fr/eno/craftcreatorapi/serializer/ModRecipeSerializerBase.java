@@ -5,7 +5,7 @@ import fr.eno.craftcreatorapi.SupportedMods;
 import fr.eno.craftcreatorapi.serializer.recipe.KubeJSRecipe;
 import fr.eno.craftcreatorapi.serializer.recipe.utils.KubeJSRecipeAction;
 import fr.eno.craftcreatorapi.utils.Feedback;
-import fr.eno.craftcreatorapi.utils.SerializerType;
+import fr.eno.craftcreatorapi.serializer.recipe.utils.SerializerType;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -13,17 +13,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public abstract class ModRecipeSerializer
+public abstract class ModRecipeSerializerBase
 {
     private static final List<Character> TO_ESCAPE_PATTERN = Arrays.asList('$', '(', ')', '{', '}', '[', ']', '.');
     private static final List<Character> TO_ESCAPE = Collections.singletonList('"');
 
-    protected static final Gson GSON = new GsonBuilder().setLenient().create();
+    protected static final Gson gson = new GsonBuilder().setStrictness(Strictness.LENIENT).create();
 
     protected final SupportedMods mod;
     protected SerializerType currentSerializeType;
 
-    protected ModRecipeSerializer(SupportedMods mod)
+    protected ModRecipeSerializerBase(SupportedMods mod)
     {
         this.mod = mod;
     }
@@ -65,7 +65,7 @@ public abstract class ModRecipeSerializer
         switch(currentSerializeType)
         {
             case KUBE_JS:
-                feedback = KubeJSHelper.addRecipeToFile(this.mod, recipeType, KubeJSModifiedRecipe.BASE_LINE.format(KubeJSModifiedRecipe.KubeJSModifiedRecipeType.CUSTOM, GSON.toJson(recipeJson)));
+                feedback = KubeJSHelper.addRecipeToFile(this.mod, recipeType, KubeJSModifiedRecipe.BASE_LINE.format(KubeJSModifiedRecipe.KubeJSModifiedRecipeType.CUSTOM, gson.toJson(recipeJson)));
                 break;
             default:
             case MINECRAFT_DATAPACK:

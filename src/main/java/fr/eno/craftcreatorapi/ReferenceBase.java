@@ -2,10 +2,16 @@ package fr.eno.craftcreatorapi;
 
 import fr.eno.craftcreatorapi.utils.Identifier;
 
-public interface ReferenceBase
+public abstract class ReferenceBase
 {
-    String getModId();
-    String getModName();
-    String getModVersion();
-    Identifier getTranslation(String key);
+    public static final String MOD_ID = "craftcreator";
+    abstract String getModName();
+    abstract String getModVersion();
+
+    public Identifier getIdentifier(String path)
+    {
+        return new Identifier(MOD_ID, path);
+    }
+
+    abstract String getTranslation(String key);
 }

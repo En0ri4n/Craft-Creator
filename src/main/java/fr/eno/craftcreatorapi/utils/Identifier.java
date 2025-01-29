@@ -14,4 +14,10 @@ public class Identifier
     {
         return new Identifier(namespace, path);
     }
+
+    public static Identifier parse(String id)
+    {
+        String[] split = id.split(":");
+        return new Identifier(split[0], split[1]);
+    }
 }
